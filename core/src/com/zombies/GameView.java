@@ -1,0 +1,371 @@
+package com.zombies;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.graphics.GL20;
+
+import java.util.LinkedList;
+import java.util.Random;
+
+public class GameView implements Screen {
+
+    //brought down a level
+    private PerspectiveCamera cam;
+    private SpriteBatch spriteBatch;
+
+    //regular variables
+    protected Player player;
+    protected World world;
+    protected Zombies main;
+    protected Box grid[][];
+    protected Random random = new Random();
+    protected CameraHandle camHandle;
+    protected Meshes meshes = new Meshes();
+    protected int lightingCount = 0;
+    protected Thumbpad thumbpad;
+    protected ShootButton shootButton;
+    public MessageHandler mh;
+    private HUD hud = new HUD(this);
+
+    //public objects
+    public C c = new C();
+    public Statistics s = new Statistics();
+
+    //lists
+    LinkedList<PostponedZombie> postZombie = new LinkedList<PostponedZombie>();
+    LinkedList<PostponedZombie> postZombieDump = new LinkedList<PostponedZombie>();
+    LinkedList<DyingZombie> dyingZombie = new LinkedList<DyingZombie>();
+    LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
+
+    public GameView(Zombies main) {
+        this.main = main;
+        grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
+        world = new World(new Vector2(), true);
+        setReferences();
+        generateLevel();
+        player = new Player(this, grid[1][1]);
+        addSurvivors();
+        populateLevel();
+        camHandle = new CameraHandle(this);
+        int radius = (int)(this.main.getWidth() * c.JOY_SIZE);
+        thumbpad = new Thumbpad(this);
+        shootButton = new ShootButton(this);
+        mh = new MessageHandler(this);
+        meshes.main.play();
+    }
+
+    private void addSurvivors() {
+        for (int i=1;i<=3;i++) {
+            Survivor s = player.getBox().addSurvivor();
+            s.wake();
+            player.addSurvivor(s);
+        }
+    }
+
+    public ShootButton getShootButton() {
+        return shootButton;
+    }
+
+    public HUD getHUD() {
+        return hud;
+    }
+
+    public void addMessage(Message m) {
+        mh.addMessage(m);
+    }
+
+    public Zombies getMain() {
+        return main;
+    }
+
+    public Thumbpad getThumbpad() {
+        return thumbpad;
+    }
+
+    public void populateLevel() {
+        for (int i=1;i<=c.GRID_WIDTH;i++){
+            for (int j=1;j<=c.GRID_HEIGHT;j++){
+                if (random.nextFloat() < 0.6f) {
+                    for (int k=0; k<= random.nextInt(c.BOX_MAX_ZOMBIES) + 2; k++) {
+                        grid[i][j].addZombie();
+                        s.numZombies ++;
+                    }
+                }
+            }
+        }
+    }
+
+    protected void generateLevel() {
+        for (int i=1;i<=c.GRID_HEIGHT;i++){
+            for (int j=1;j<=c.GRID_WIDTH;j++){
+                if (!grid[j][i].isTouched()){
+                    new Room(this, grid[j][i]);
+                }
+            }
+        }
+        for (int i=1;i<=c.GRID_HEIGHT;i++){
+            for (int j=1;j<=c.GRID_WIDTH;j++){
+                if (!grid[j][i].isPathed()) {
+                    grid[j][i].path(c.PATH_LENGTH);
+                }
+            }
+        }
+    }
+
+    public int getLightingCount() {
+        return lightingCount;
+    }
+
+    public Meshes getMeshes() {
+        return meshes;
+    }
+
+    public Box[][] getGrid() {
+        return grid;
+    }
+
+    protected void setReferences(){
+        for (int i=1;i<=c.GRID_WIDTH;i++){
+            for (int j=1;j<=c.GRID_HEIGHT;j++){
+                grid[i][j] = new Box(this, (i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT);
+            }
+        }
+        for (int i=1;i<=c.GRID_WIDTH;i++){
+            for (int j=1;j<=c.GRID_HEIGHT;j++){
+                if (j > 1){
+                    grid[i][j].addBorder(grid[i][j - 1]);
+                }
+                else {
+                    grid[i][j].addBorder(null);
+                }
+                if (i < c.GRID_WIDTH){
+                    grid[i][j].addBorder(grid[i + 1][j]);
+                }
+                else {
+                    grid[i][j].addBorder(null);
+                }
+                if (j < c.GRID_HEIGHT){
+                    grid[i][j].addBorder(grid[i][j + 1]);
+                }
+                else {
+                    grid[i][j].addBorder(null);
+                }
+                if (i > 1){
+                    grid[i][j].addBorder(grid[i - 1][j]);
+                }
+                else {
+                    grid[i][j].addBorder(null);
+                }
+            }
+        }
+    }
+
+    public int getWidth() {
+        return main.getWidth();
+    }
+
+    public int getHeight() {
+        return main.getHeight();
+    }
+
+    public void addPostZombie(PostponedZombie z) {
+        postZombie.add(z);
+    }
+
+    public void addDyingZombie(DyingZombie z) {
+        dyingZombie.add(z);
+    }
+
+    protected void clearDumps() {
+        for (PostponedZombie z: postZombieDump) {
+            postZombie.remove(z);
+        }
+        for (DyingZombie z: dyingZombieDump) {
+            dyingZombie.remove(z);
+        }
+        postZombieDump.clear();
+        dyingZombieDump.clear();
+    }
+
+    public void dumpPostZombie(PostponedZombie z) {
+        postZombieDump.add(z);
+    }
+
+    public void dumpDyingZombie(DyingZombie z) {
+        dyingZombieDump.add(z);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    @Override
+    public void render(float delta) {
+        player.render();
+        handleContacts();
+        camHandle.update();
+
+        lightingCount ++;
+        if (lightingCount == c.UPDATE_LIGHTING_INTERVAL) {
+            c.UPDATE_LIGHTING = true;
+            lightingCount = 0;
+        } else {
+            c.UPDATE_LIGHTING = false;
+        }
+
+        //lists
+        this.updateLists();
+        this.clearDumps();
+
+        mh.update();
+
+
+        world.step(Math.min(0.032f, Gdx.graphics.getDeltaTime()), 3, 4);
+        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        cam.update();
+//		renderer.render(view.getWorld());
+        spriteBatch.begin();
+        spriteBatch.enableBlending();
+        renderHud(spriteBatch);
+        spriteBatch.end();
+        Gdx.gl.glFlush();
+        handleKeys();
+    }
+
+    public void renderHud(SpriteBatch spriteBatch) {
+        hud.render(spriteBatch);
+    }
+
+    protected void updateLists() {
+        for (DyingZombie z: dyingZombie) {
+            z.update();
+            z.draw();
+        }
+    }
+
+    protected void handleKeys() {
+        if (c.DESKTOP_MODE) {
+            handleKeysDesktop();
+        } else {
+            handleKeysAndroid();
+        }
+
+    }
+
+    protected void handleContacts() {
+        for (Contact c: world.getContactList()) {
+            Fixture f1 = c.getFixtureA();
+            Fixture f2 = c.getFixtureB();
+            if (f1 == null || f2 == null)
+                return;
+            if (f1.getBody() == null || f2.getBody() == null)
+                return;
+            if ((BodData)f1.getBody().getUserData() == null || (BodData)f2.getBody().getUserData() == null)
+                return;
+            Collideable c1 = (Collideable)((BodData)f1.getBody().getUserData()).getObject();
+            Collideable c2 = (Collideable)((BodData)f2.getBody().getUserData()).getObject();
+            c1.handleCollision(f2);
+            c2.handleCollision(f1);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void hide() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void resize(int arg0, int arg1) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void resume() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void show() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void handleKeysDesktop() {
+        float strength = 10;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            player.getBody().applyForce(new Vector2(0, -strength), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            player.getBody().applyForce(new Vector2(-strength, 0), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+
+            player.getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
+        }
+
+        for (int i=0; i<3; i++) {
+            if (Gdx.input.isTouched(i)) {
+                int x = Gdx.input.getX(i);
+                int y = Gdx.input.getY(i);
+                int px = getWidth() / 2;
+                int py = getHeight() / 2;
+                Vector2 v = new Vector2(x - px, py - y);
+                player.shoot(v);
+                //view.getHUD().touch(Gdx.input.getX(i), Gdx.input.getY(i), i);
+            }
+        }
+
+    }
+
+    private void handleKeysAndroid() {
+        if (c.ENABLE_ACCEL) {
+            player.setMove(-Gdx.input.getPitch(), Gdx.input.getRoll());
+        }
+
+        for (int i=0; i<3; i++) {
+            if (Gdx.input.isTouched(i)) {
+                hud.touch(Gdx.input.getX(i), Gdx.input.getY(i), i);
+            }
+        }
+
+    }
+
+    public PerspectiveCamera getCamera() {
+        return cam;
+    }
+
+    public void setCamera(PerspectiveCamera cam){
+        this.cam = cam;
+    }
+
+}

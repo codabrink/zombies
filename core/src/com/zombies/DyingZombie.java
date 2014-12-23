@@ -1,0 +1,76 @@
+package com.zombies;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Vector2;
+
+public class DyingZombie {
+	
+	private C c;
+	private Vector2 position;
+	private float span = 0;
+	private long length = 500l;
+	private long createdAt = System.currentTimeMillis();
+	private float size;
+	private Mesh squareMesh;
+	private float[] verticies;
+	private GameView view;
+	
+	public DyingZombie(GameView view, Vector2 position) {
+		c = view.c;
+		
+		size = c.ZOMBIE_SIZE / 6f;
+		this.position = position;
+		this.view = view;
+		
+		squareMesh = new Mesh(true, 4, 4,
+				new VertexAttribute(Usage.Position, 3, "a_position"),
+				new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+		
+				verticies = new float[] {
+						-0.33f, -0.33f, 0, Color.toFloatBits(128, 0, 0, 255),
+						0.33f, -0.33f, 0, Color.toFloatBits(192, 0, 0, 255),
+						-0.33f, 0.33f, 0, Color.toFloatBits(192, 0, 0, 255),
+						0.33f, 0.33f, 0, Color.toFloatBits(255, 0, 0, 255) };
+				squareMesh.setVertices(verticies);
+				squareMesh.setIndices(new short[] { 0, 1, 2, 3});
+		
+	}
+	
+	public void draw() {
+		Gdx.gl10.glPushMatrix();
+		Gdx.gl10.glTranslatef(position.x, position.y, 0);
+		Gdx.gl10.glTranslatef(-(size * 2 + span), -(size * 2 + span), 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(2 * -(size * 2 + span), size * 2 + span, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(2 * -(size * 2 + span), size * 2 + span, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
+		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		Gdx.gl10.glPopMatrix();
+	}
+	
+	public void update() {
+		float percent = ((float)(System.currentTimeMillis() - createdAt)) / ((float)length);
+		span = 2 * percent;
+		if (System.currentTimeMillis() > createdAt + length) {
+			view.dumpDyingZombie(this);
+		}
+	}
+	
+}
