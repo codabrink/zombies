@@ -3,8 +3,8 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Random;
 
-import zombies.Guns.Pistol;
-import zombies.Guns.Shotgun;
+import com.guns.Pistol;
+import com.guns.Shotgun;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -139,6 +139,8 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw() {
+        drawSquare();
+
 		Gdx.gl10.glPushMatrix();
 		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
 

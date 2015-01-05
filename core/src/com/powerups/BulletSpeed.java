@@ -1,16 +1,15 @@
-package zombies.powerups;
+package com.powerups;
 
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import zombies.Collideable;
-import zombies.GameView;
-import zombies.Powerup;
+import com.zombies.Collideable;
+import com.zombies.GameView;
+import com.zombies.Powerup;
 
 public class BulletSpeed extends Powerup implements Collideable {
 
 	public BulletSpeed(GameView view) {
 		super(view);
-		
 	}
 
 	@Override

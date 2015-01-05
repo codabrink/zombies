@@ -1,19 +1,18 @@
-package zombies.powerups;
+package com.powerups;
 
 import java.util.Random;
 
-import zombies.BodData;
-import zombies.Box;
-import zombies.C;
-import zombies.Collideable;
-import zombies.GameView;
-import zombies.Powerup;
-import zombies.Unit;
-import zombies.Guns.Pistol;
+import com.zombies.BodData;
+import com.zombies.Box;
+import com.zombies.C;
+import com.zombies.Collideable;
+import com.zombies.GameView;
+import com.zombies.Powerup;
+import com.zombies.Unit;
+import com.guns.Pistol;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;

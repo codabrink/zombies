@@ -106,7 +106,7 @@ public class Unit {
 		
 	};
 
-	public Unit(GameView view, Model model) {
+	public Unit(GameView view) {
 		this.c = view.c;
 		shape = new CircleShape();
 		this.view = view;
@@ -173,59 +173,70 @@ public class Unit {
         idx = 0;
     }
 
-	public void draw(float x, float y, float width, float height, Color color) {
+    public Vector2 rotatePoint(float x, float y, float r) {
+        float nx = (float)(x * Math.cos(r) - y * Math.sin(r));
+        float ny = (float)(x * Math.sin(r) - y * Math.cos(r));
+        return new Vector2(nx, ny);
+    }
+
+	public void drawSquare(float x, float y, float width, float r, Color color) {
         //we don't want to hit any index out of bounds exception...
         //so we need to flush the batch if we can't store any more verts
         if (idx==verts.length)
             flush();
 
+        // rotation: http://math.stackexchange.com/questions/270194/how-to-find-the-vertices-angle-after-rotation
         //FIRST TRIANGLE
-
         //bottom left vertex
-        verts[idx++] = x; 			//Position(x, y)
-        verts[idx++] = y;
+        Vector2 point = rotatePoint(x - width / 2, y - width / 2, r);
+        verts[idx++] = point.x; 			//Position(x, y)
+        verts[idx++] = point.y;
         verts[idx++] = color.r; 	//Color(r, g, b, a)
         verts[idx++] = color.g;
         verts[idx++] = color.b;
         verts[idx++] = color.a;
 
         //top left vertex
-        verts[idx++] = x; 			//Position(x, y)
-        verts[idx++] = y + height;
+        point = rotatePoint(x - width / 2, y + width / 2, r);
+        verts[idx++] = point.x; 			//Position(x, y)
+        verts[idx++] = point.y;
         verts[idx++] = color.r; 	//Color(r, g, b, a)
         verts[idx++] = color.g;
         verts[idx++] = color.b;
         verts[idx++] = color.a;
 
         //bottom right vertex
-        verts[idx++] = x + width;	 //Position(x, y)
-        verts[idx++] = y;
+        point = rotatePoint(x + width / 2, y - width / 2, r);
+        verts[idx++] = point.x;	 //Position(x, y)
+        verts[idx++] = point.y;
         verts[idx++] = color.r;		 //Color(r, g, b, a)
         verts[idx++] = color.g;
         verts[idx++] = color.b;
         verts[idx++] = color.a;
 
         //SECOND TRIANGLE
-
         //top left vertex
-        verts[idx++] = x; 			//Position(x, y)
-        verts[idx++] = y + height;
+        point = rotatePoint(x - width / 2, y + width / 2, r);
+        verts[idx++] = point.x; 			//Position(x, y)
+        verts[idx++] = point.y;
         verts[idx++] = color.r; 	//Color(r, g, b, a)
         verts[idx++] = color.g;
         verts[idx++] = color.b;
         verts[idx++] = color.a;
 
         //top right vertex
-        verts[idx++] = x + width;
-        verts[idx++] = y + height;
+        point = rotatePoint(x + width / 2, y + width / 2, r);
+        verts[idx++] = point.x;
+        verts[idx++] = point.y;
         verts[idx++] = color.r;
         verts[idx++] = color.g;
         verts[idx++] = color.b;
         verts[idx++] = color.a;
 
         //bottom right vertex
-        verts[idx++] = x + width;	 //Position(x, y)
-        verts[idx++] = y;
+        point = rotatePoint(x + width / 2, y + width / 2, r);
+        verts[idx++] = point.x;	 //Position(x, y)
+        verts[idx++] = point.y;
         verts[idx++] = color.r;		 //Color(r, g, b, a)
         verts[idx++] = color.g;
         verts[idx++] = color.b;

@@ -1,10 +1,10 @@
-package zombies.Guns;
+package com.guns;
 
-import zombies.Bullet;
-import zombies.GameView;
-import zombies.Gun;
-import zombies.Message;
-import zombies.Unit;
+import com.zombies.Bullet;
+import com.zombies.GameView;
+import com.zombies.Gun;
+import com.zombies.Message;
+import com.zombies.Unit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
