@@ -9,10 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -21,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.math.Matrix4;
 
 public class Unit {
 
@@ -46,7 +44,9 @@ public class Unit {
 	protected float[] verticies;
 	protected GameView view;
 
-    // All the GLv2 crap
+    protected Matrix4[] corners;
+
+    // OpenGL 2.0 ES Shaders
     protected static final String VERT_SHADER =
             "attribute vec2 a_position;\n" +
                     "attribute vec4 a_color;\n" +
@@ -95,15 +95,12 @@ public class Unit {
     Mesh mesh;
     ShaderProgram shader;
 
-
 	private RayCastCallback vision = new RayCastCallback() {
-		
 		@Override
 		public float reportRayFixture(Fixture f, Vector2 point, Vector2 normal, float fraction) {
 			obstacles.add(f);
 			return 0;
 		}
-		
 	};
 
 	public Unit(GameView view) {
@@ -153,7 +150,7 @@ public class Unit {
         if (idx == 0)
             return;
 
-        //sends our vertext data to the mesh
+        //sends our vertex data to the mesh
         mesh.setVertices(verts);
         //no need for depth...
         Gdx.gl.glDepthMask(false);
@@ -179,69 +176,7 @@ public class Unit {
         return new Vector2(nx, ny);
     }
 
-	public void drawSquare(float x, float y, float width, float r, Color color) {
-        //we don't want to hit any index out of bounds exception...
-        //so we need to flush the batch if we can't store any more verts
-        if (idx==verts.length)
-            flush();
-
-        // rotation: http://math.stackexchange.com/questions/270194/how-to-find-the-vertices-angle-after-rotation
-        //FIRST TRIANGLE
-        //bottom left vertex
-        Vector2 point = rotatePoint(x - width / 2, y - width / 2, r);
-        verts[idx++] = point.x; 			//Position(x, y)
-        verts[idx++] = point.y;
-        verts[idx++] = color.r; 	//Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //top left vertex
-        point = rotatePoint(x - width / 2, y + width / 2, r);
-        verts[idx++] = point.x; 			//Position(x, y)
-        verts[idx++] = point.y;
-        verts[idx++] = color.r; 	//Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //bottom right vertex
-        point = rotatePoint(x + width / 2, y - width / 2, r);
-        verts[idx++] = point.x;	 //Position(x, y)
-        verts[idx++] = point.y;
-        verts[idx++] = color.r;		 //Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //SECOND TRIANGLE
-        //top left vertex
-        point = rotatePoint(x - width / 2, y + width / 2, r);
-        verts[idx++] = point.x; 			//Position(x, y)
-        verts[idx++] = point.y;
-        verts[idx++] = color.r; 	//Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //top right vertex
-        point = rotatePoint(x + width / 2, y + width / 2, r);
-        verts[idx++] = point.x;
-        verts[idx++] = point.y;
-        verts[idx++] = color.r;
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //bottom right vertex
-        point = rotatePoint(x + width / 2, y + width / 2, r);
-        verts[idx++] = point.x;	 //Position(x, y)
-        verts[idx++] = point.y;
-        verts[idx++] = color.r;		 //Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-    }
+    public void draw() {}
 
 	public Body getBody() {return body;}
 	public Box getBox() {
@@ -343,5 +278,4 @@ public class Unit {
 	public void update() {}
 	
 	public void victory() {}
-	
 }

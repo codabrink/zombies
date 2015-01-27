@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
-import zombies.powerups.HealthPickup;
-import zombies.powerups.PistolPickup;
-import zombies.powerups.ShotgunPickup;
+import com.powerups.HealthPickup;
+import com.powerups.PistolPickup;
+import com.powerups.ShotgunPickup;
 
 import com.badlogic.gdx.math.Vector2;
 

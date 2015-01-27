@@ -3,17 +3,16 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.guns.Pistol;
 import com.guns.Shotgun;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -35,10 +34,9 @@ public class Player extends Unit implements Collideable {
 	private float angle = 0;
 	private long lastAngleSet = System.currentTimeMillis();
 	private long angleLast = 1000l;
-	
-	private int zombieCount = 0;
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-
+	private int zombieKillCount = 0;
 
 	public Player(GameView view, Box box) {
 		super(view);
@@ -53,7 +51,13 @@ public class Player extends Unit implements Collideable {
 		health = c.PLAYER_HEALTH;
 		
 		guns.add(new Pistol(view, this, 50));
-		
+
+        // This is the base matrix
+        corners[0] = new Matrix4(new float[]{-0.5f, 0, 0, 0, -0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
+        corners[1] = new Matrix4(new float[]{ 0.5f, 0, 0, 0, -0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
+        corners[2] = new Matrix4(new float[]{ 0.5f, 0, 0, 0,  0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
+        corners[3] = new Matrix4(new float[]{-0.5f, 0, 0, 0,  0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
+
 		bDef.allowSleep = false;
 		bDef.fixedRotation = true;
 		bDef.linearDamping = c.LINEAR_DAMPING;
@@ -121,14 +125,14 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void addZombieKill() {
-		zombieCount++;
+		zombieKillCount++;
 	}
 	
 	public void applyMove() {
 //		body.applyForce(new Vector2(mX, mY), new Vector2());
 		Vector2 v = new Vector2(mX, mY);
 		if (v.len() > c.PLAYER_SPEED) {
-			body.setLinearVelocity(this.scale(v, c.PLAYER_SPEED));
+			body.setLinearVelocity(v.scl(c.PLAYER_SPEED));
 		} else {
 			body.setLinearVelocity(new Vector2(mX, mY));
 		}
@@ -139,24 +143,13 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw() {
-        drawSquare();
-
-		Gdx.gl10.glPushMatrix();
-		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
-
-		Gdx.gl10.glRotatef(angle, 0, 0, 1);
-		Gdx.gl10.glTranslatef(0, -0.5f, 0);
-		//render gun
-		view.getMeshes().gunMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		
-		Gdx.gl20.glTranslatef(0, 0.5f, 0);
-		
-		//render player
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl20.glPopMatrix();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 1, 0, 1);
+        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        shapeRenderer.end();
 		
 		if (!guns.isEmpty()) {
-			guns.get(gunIndex).draw();
+			//guns.get(gunIndex).draw();
 		}
 		for (Survivor s: survivors) {
 			s.draw();
@@ -194,7 +187,7 @@ public class Player extends Unit implements Collideable {
 	public float getY() {return body.getPosition().y;}
 	
 	public int getZombieCount() {
-		return zombieCount;
+		return zombieKillCount;
 	}
 	@Override
 	public void handleCollision(Fixture f) {
@@ -238,10 +231,8 @@ public class Player extends Unit implements Collideable {
 		return false;
 	}
 	
-	@Override
-	public void kill(Unit u) {
-		view.main.endGame();
-	}
+	//@Override
+	//public void kill(Unit u) {view.main.endGame();}
 	
 	public void setMove(float x, float y) {
 		if (Math.abs(x) < c.TILT_IGNORE) {

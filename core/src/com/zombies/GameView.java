@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -33,6 +34,7 @@ public class GameView implements Screen {
     protected ShootButton shootButton;
     public MessageHandler mh;
     private HUD hud = new HUD(this);
+    private ShapeRenderer shapeRenderer;
 
     //public objects
     public C c = new C();
@@ -46,6 +48,9 @@ public class GameView implements Screen {
 
     public GameView(Zombies main) {
         this.main = main;
+
+        shapeRenderer = new ShapeRenderer();
+
         grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
         setReferences();
@@ -68,6 +73,8 @@ public class GameView implements Screen {
             player.addSurvivor(s);
         }
     }
+
+    public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
 
     public ShootButton getShootButton() {
         return shootButton;

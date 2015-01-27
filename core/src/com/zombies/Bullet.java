@@ -2,10 +2,10 @@ package com.zombies;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -30,12 +30,15 @@ public class Bullet implements Collideable {
 	private Mesh squareMesh;
 	private float[] verticies;
 	private GameView view;
+    private ShapeRenderer shapeRenderer;
 	
 	public Bullet(GameView view, Unit unit, short group, Vector2 position, Vector2 direction) {
 		c = view.c;
 		this.direction = direction;
 		this.view = view;
-		
+
+        shapeRenderer = new ShapeRenderer();
+
 		bDef.allowSleep = false;
 		bDef.fixedRotation = true;
 		bDef.bullet = true;
@@ -74,10 +77,10 @@ public class Bullet implements Collideable {
 	
 	public void draw() {
 		if (lethal = true && System.currentTimeMillis() < createTime + c.BULLET_LIFE) {
-			Gdx.gl10.glPushMatrix();
-			Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
-			squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-			Gdx.gl10.glPopMatrix();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(1, 1, 1, 1);
+            shapeRenderer.rect(body.getPosition().x - c.BULLET_RADIUS, body.getPosition().y - c.BULLET_RADIUS, c.BULLET_RADIUS * 2, c.BULLET_RADIUS * 2);
+            shapeRenderer.end();
 		}
 	}
 	

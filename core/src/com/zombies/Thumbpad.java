@@ -41,7 +41,7 @@ public class Thumbpad {
 	   }
 	   view.player.setAngle((float)Math.toDegrees(Math.atan2(touch.y, touch.x)));
 	   if (!view.c.ENABLE_ACCEL) {
-		   view.player.getBody().applyForce(touch, new Vector2());
+           view.player.getBody().applyForce(touch, new Vector2(), true);
 	   }
 	   down = true;
 	   index = i;

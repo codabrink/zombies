@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class EndView implements Screen {
 
 	private SpriteBatch spriteBatch;
-	protected ZombiesGDX main;
+	protected Zombies main;
 	private long startTime = System.currentTimeMillis();
 	
-	public EndView(ZombiesGDX main) {
+	public EndView(Zombies main) {
 		this.main = main;
 		spriteBatch = new SpriteBatch();
 	}

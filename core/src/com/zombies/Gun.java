@@ -2,7 +2,6 @@ package com.zombies;
 
 import java.util.LinkedList;
 
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -32,7 +31,8 @@ public class Gun {
 	}
 	
 	public void draw() {
-		view.getMeshes().gunMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+        // TODO: Render gun
+        //view.getMeshes().gunMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 	
 	public Texture getTexture() {

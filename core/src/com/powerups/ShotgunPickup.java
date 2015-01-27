@@ -1,18 +1,17 @@
-package zombies.powerups;
+package com.powerups;
 
 import java.util.Random;
 
-import zombies.BodData;
-import zombies.Box;
-import zombies.C;
-import zombies.Collideable;
-import zombies.GameView;
-import zombies.Powerup;
-import zombies.Unit;
-import zombies.Guns.Shotgun;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.zombies.BodData;
+import com.zombies.Box;
+import com.zombies.C;
+import com.zombies.Collideable;
+import com.zombies.GameView;
+import com.zombies.Powerup;
+import com.zombies.Unit;
+import com.guns.Shotgun;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -37,6 +36,7 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	private GameView view;
 	private Box box;
 	private Random random = new Random();
+    private SpriteBatch batch;
 	
 	public ShotgunPickup(GameView view, Box box) {
 		super(view);
@@ -52,6 +52,8 @@ public class ShotgunPickup extends Powerup implements Collideable {
 		bDef.angle = random.nextFloat() * 360f;
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
+
+        batch = new SpriteBatch();
 		
 		body = view.getWorld().createBody(bDef);
 		shape.setRadius(c.PLAYER_SIZE * 0.75f);
@@ -80,16 +82,9 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	
 	@Override
 	public void draw() {
-		Gdx.gl10.glPushMatrix();
-		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
-		Gdx.gl10.glRotatef((float)Math.toDegrees(body.getAngle()), 0, 0, 1);
-		Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-		Gdx.gl10.glEnable(GL10.GL_BLEND);
-		Gdx.gl10.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		view.getMeshes().shotgunTexture.bind();
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.graphics.getGL10().glDisable(GL10.GL_TEXTURE_2D);
-		Gdx.gl10.glPopMatrix();
+        batch.begin();
+        batch.draw(view.getMeshes().shotgunTexture, body.getPosition().x, body.getPosition().y);
+        batch.end();
 	}
 	
 	private void destroy() {

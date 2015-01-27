@@ -29,7 +29,6 @@ public class Zombies extends Game {
         preView = new PreView(this);
         renderer = new Box2DDebugRenderer();
         setScreen(preView);
-        Gdx.gl10.glDisable(GL10.GL_LIGHTING);
     }
 
     public void reset() {

@@ -2,9 +2,7 @@ package com.zombies;
 
 import java.util.Random;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Zombie extends Unit implements Collideable{
 	
@@ -20,7 +19,8 @@ public class Zombie extends Unit implements Collideable{
 	private Player player;
 	private Random random = new Random();
 	private int updateInt;
-	
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super(view);
 		c = view.c;
@@ -80,13 +80,13 @@ public class Zombie extends Unit implements Collideable{
 	public void attack(Unit u) {
 		attack = u;
 	}
-	
-	@Override
+
+    @Override
 	public void draw() {
-		Gdx.gl10.glPushMatrix();
-		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glPopMatrix();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 1, 0, 1);
+        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        shapeRenderer.end();
 	}
 	
 	@Override
@@ -146,9 +146,9 @@ public class Zombie extends Unit implements Collideable{
 	
 	@Override
 	public void move() {
-		body.applyForce(scale(mPos.sub(body.getPosition()), c.ZOMBIE_AGILITY), new Vector2());
+        body.applyForce(mPos.sub(body.getPosition()).scl(c.ZOMBIE_AGILITY), new Vector2(), true);
 		if (body.getLinearVelocity().len() > c.ZOMBIE_SPEED) { //Zombie is going too fast
-			body.setLinearVelocity(this.scale(body.getLinearVelocity(), c.ZOMBIE_SPEED));
+            body.setLinearVelocity(body.getLinearVelocity().scl(c.ZOMBIE_SPEED));
 		}
 	}
 	

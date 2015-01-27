@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 public class Wall implements Collideable {
 	private float x1, y1, x2, y2;
 	private Box box;
 	private Body body;
-	private ArrayList<PolygonShape> shapes;
+	private ArrayList<EdgeShape> shapes;
 	private ArrayList<DrawLine> lines;
 	private GameView view;
 	public boolean door = false;
@@ -30,15 +30,15 @@ public class Wall implements Collideable {
 		this.index = index;
 		
 		//set up arraylists
-		shapes = new ArrayList<PolygonShape>();
+		shapes = new ArrayList<EdgeShape>();
 		lines = new ArrayList<DrawLine>();
 		
 		lines.add(new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x2 + box.getX(), y2 + box.getY()));
 		
 		//set up physics
 		body = view.getWorld().createBody(new BodyDef());
-		PolygonShape shape = new PolygonShape();
-		shape.setAsEdge(new Vector2(x1, y1), new Vector2(x2, y2));
+        EdgeShape shape = new EdgeShape();
+		shape.set(new Vector2(x1, y1), new Vector2(x2, y2));
 		shapes.add(shape);
 		body.createFixture(shape, 0);
 		body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
@@ -89,8 +89,8 @@ public class Wall implements Collideable {
 	
 	public void makeDoor() {
 		removeWall();
-		PolygonShape s1 = new PolygonShape();
-		PolygonShape s2 = new PolygonShape();
+		EdgeShape s1 = new EdgeShape();
+		EdgeShape s2 = new EdgeShape();
 		DrawLine d1 = null, d2 = null;
 		if (x1 == x2) {
 			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + box.getX(), y1 + c.BOX_HEIGHT / 2f - c.PLAYER_SIZE * c.DOOR_SIZE + box.getY());
@@ -102,8 +102,8 @@ public class Wall implements Collideable {
 		}
 		lines.add(d1);
 		lines.add(d2);
-		s1.setAsEdge(d1.getV1(box), d1.getV2(box));
-		s2.setAsEdge(d2.getV1(box), d2.getV2(box));
+		s1.set(d1.getV1(box), d1.getV2(box));
+		s2.set(d2.getV1(box), d2.getV2(box));
 		body.createFixture(s1, 0);
 		body.createFixture(s2, 0);
 		

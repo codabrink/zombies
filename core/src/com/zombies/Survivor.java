@@ -2,14 +2,8 @@ package com.zombies;
 
 import java.util.LinkedList;
 import java.util.Random;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -32,10 +26,11 @@ public class Survivor extends Unit implements Collideable {
 	private long lastAttack = System.currentTimeMillis();
 	private int updateInt;
 	private long fireRate;
+    private ShapeRenderer shapeRenderer;
 	
 	public Survivor(GameView view, Box box, Vector2 position) {
 		super(view);
-		
+		shapeRenderer = view.getShapeRenderer();
 		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
 		
 		lastShot = System.currentTimeMillis();
@@ -66,19 +61,6 @@ public class Survivor extends Unit implements Collideable {
 		health = c.SURVIVOR_HEALTH;
 		
 		this.view = view;
-		
-		squareMesh = new Mesh(true, 4, 4,
-				new VertexAttribute(Usage.Position, 3, "a_position"),
-				new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-		
-				verticies = new float[] {
-						-0.5f, -0.5f, 0, Color.toFloatBits(0, 0, 128, 255),
-						0.5f, -0.5f, 0, Color.toFloatBits(0, 0, 192, 255),
-						-0.5f, 0.5f, 0, Color.toFloatBits(0, 0, 192, 255),
-						0.5f, 0.5f, 0, Color.toFloatBits(0, 0, 255, 255) };
-				squareMesh.setVertices(verticies);   
-				squareMesh.setIndices(new short[] { 0, 1, 2, 3});
-		
 	}
 	
 	private void AI() {
@@ -172,10 +154,11 @@ public class Survivor extends Unit implements Collideable {
 		for (Bullet b: bullets) {
 			b.draw();
 		}
-		Gdx.gl10.glPushMatrix();
-		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glPopMatrix();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 1, 0, 1);
+        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        shapeRenderer.end();
 	}
 	
 	public Box getBox() {
@@ -214,7 +197,7 @@ public class Survivor extends Unit implements Collideable {
 					return;
 				}
 				if (System.currentTimeMillis() > lastShot + fireRate) {
-					Vector2 shot = scale(target.getBody().getPosition().sub(body.getPosition()), 100);
+                    Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).scl(100);
 					if (bullets.size() > c.MAX_BULLETS) {
 						bullets.getFirst().setPosition(new Vector2(body.getPosition().x, body.getPosition().y));
 						bullets.getFirst().setVelocity(shot);

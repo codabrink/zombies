@@ -1,8 +1,6 @@
 package com.zombies;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -42,27 +40,7 @@ public class DyingZombie {
 	}
 	
 	public void draw() {
-		Gdx.gl10.glPushMatrix();
-		Gdx.gl10.glTranslatef(position.x, position.y, 0);
-		Gdx.gl10.glTranslatef(-(size * 2 + span), -(size * 2 + span), 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(2 * -(size * 2 + span), size * 2 + span, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(2 * -(size * 2 + span), size * 2 + span, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glTranslatef(size * 2 + span, 0, 0);
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
-		Gdx.gl10.glPopMatrix();
+
 	}
 	
 	public void update() {

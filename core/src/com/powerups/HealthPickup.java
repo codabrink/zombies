@@ -81,6 +81,9 @@ public class HealthPickup extends Powerup implements Collideable {
 
 	@Override
 	public void draw() {
+        //TODO: Draw health pickups.
+
+        /*
 		Gdx.gl10.glPushMatrix();
 		Gdx.gl10.glTranslatef(body.getPosition().x, body.getPosition().y, 0);
 		Gdx.gl10.glRotatef((float)Math.toDegrees(body.getAngle()), 0, 0, 1);
@@ -91,6 +94,7 @@ public class HealthPickup extends Powerup implements Collideable {
 		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
 		Gdx.graphics.getGL10().glDisable(GL10.GL_TEXTURE_2D);
 		Gdx.gl10.glPopMatrix();
+		*/
 	}
 	
 	private void destroy() {
