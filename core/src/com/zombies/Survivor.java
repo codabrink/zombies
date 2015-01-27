@@ -156,7 +156,7 @@ public class Survivor extends Unit implements Collideable {
 		}
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 1, 0, 1);
+        shapeRenderer.setColor(0, 0, 1, 1);
         shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
         shapeRenderer.end();
 	}
@@ -259,16 +259,7 @@ public class Survivor extends Unit implements Collideable {
 	}
 	
 	private void updateVerticies() {
-		float percent = health / c.SURVIVOR_HEALTH;
-		if (percent < 0f) {
-			percent = 0f;
-		}
-		float invPercent = 1.0f - percent;
-		verticies[3] = Color.toFloatBits((int)(128f * invPercent), 0, (int)(128f * percent), 255);
-		verticies[7] = Color.toFloatBits((int)(192f * invPercent), 0, (int)(192f * percent), 255);
-		verticies[11] = Color.toFloatBits((int)(192f * invPercent), 0, (int)(192f * percent), 255);
-		verticies[15] = Color.toFloatBits((int)(255f * invPercent), 0, (int)(255f * percent), 255);
-		squareMesh.setVertices(verticies);
+
 	}
 	
 }

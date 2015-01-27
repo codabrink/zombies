@@ -41,6 +41,15 @@ public class Zombies extends Game {
         System.gc();
     }
 
+    @Override
+    public void resize(int width, int height) {
+        float aspectRatio = (float) width / (float) height;
+        if (view != null) view.setCamera(new PerspectiveCamera(67, 2f * aspectRatio, 2f));
+        this.width = width;
+        this.height = height;
+        if (view != null) view.getThumbpad().updateResize();
+    }
+
     public int getHeight() {
         return height;
     }

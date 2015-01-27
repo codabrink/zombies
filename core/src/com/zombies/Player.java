@@ -52,12 +52,6 @@ public class Player extends Unit implements Collideable {
 		
 		guns.add(new Pistol(view, this, 50));
 
-        // This is the base matrix
-        corners[0] = new Matrix4(new float[]{-0.5f, 0, 0, 0, -0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
-        corners[1] = new Matrix4(new float[]{ 0.5f, 0, 0, 0, -0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
-        corners[2] = new Matrix4(new float[]{ 0.5f, 0, 0, 0,  0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
-        corners[3] = new Matrix4(new float[]{-0.5f, 0, 0, 0,  0.5f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f});
-
 		bDef.allowSleep = false;
 		bDef.fixedRotation = true;
 		bDef.linearDamping = c.LINEAR_DAMPING;

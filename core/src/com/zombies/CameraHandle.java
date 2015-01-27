@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 
 public class CameraHandle {
-
 	private GameView view;
 	private Player player;
 	private Zombies main;
@@ -20,8 +19,7 @@ public class CameraHandle {
 	
 	public void update() {
 		cam = view.getCamera();
-		cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 20);
+		cam.position.set(20, 20, 20);
 		movement.mul(new Matrix3());
 	}
-	
 }
