@@ -34,7 +34,6 @@ public class Player extends Unit implements Collideable {
 	private float angle = 0;
 	private long lastAngleSet = System.currentTimeMillis();
 	private long angleLast = 1000l;
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
 	private int zombieKillCount = 0;
 
@@ -137,10 +136,10 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 1, 0, 1);
-        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
-        shapeRenderer.end();
+        view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+        view.getShapeRenderer().setColor(0, 1, 0, 1);
+        view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        view.getShapeRenderer().end();
 		
 		if (!guns.isEmpty()) {
 			//guns.get(gunIndex).draw();
@@ -269,7 +268,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void render() {
-		box.getRoom().drawFloors();
+		//box.getRoom().drawFloors();
 		
 		this.draw();
 		

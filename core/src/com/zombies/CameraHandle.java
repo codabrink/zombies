@@ -19,7 +19,8 @@ public class CameraHandle {
 	
 	public void update() {
 		cam = view.getCamera();
-		cam.position.set(20, 20, 20);
+		cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 50);
+        cam.update();
 		movement.mul(new Matrix3());
 	}
 }

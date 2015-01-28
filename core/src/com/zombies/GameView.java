@@ -6,7 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
@@ -36,6 +38,11 @@ public class GameView implements Screen {
     private HUD hud = new HUD(this);
     private ShapeRenderer shapeRenderer;
 
+    public float scale = 1;
+
+    private Box2DDebugRenderer debugRenderer;
+    private Matrix4 debugMatrix;
+
     //public objects
     public C c = new C();
     public Statistics s = new Statistics();
@@ -49,7 +56,10 @@ public class GameView implements Screen {
     public GameView(Zombies main) {
         this.main = main;
 
+        cam = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
+        spriteBatch = new SpriteBatch();
+        debugRenderer = new Box2DDebugRenderer();
 
         grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
@@ -75,6 +85,7 @@ public class GameView implements Screen {
     }
 
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
+    public SpriteBatch   getSpriteBatch() {return spriteBatch;}
 
     public ShootButton getShootButton() {
         return shootButton;
@@ -219,7 +230,6 @@ public class GameView implements Screen {
 
     @Override
     public void render(float delta) {
-        player.render();
         handleContacts();
         camHandle.update();
 
@@ -237,17 +247,21 @@ public class GameView implements Screen {
 
         mh.update();
 
+        shapeRenderer.setProjectionMatrix(cam.combined);
 
         world.step(Math.min(0.032f, Gdx.graphics.getDeltaTime()), 3, 4);
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
 //		renderer.render(view.getWorld());
         spriteBatch.begin();
+
         spriteBatch.enableBlending();
         renderHud(spriteBatch);
         spriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
+        player.render();
     }
 
     public void renderHud(SpriteBatch spriteBatch) {

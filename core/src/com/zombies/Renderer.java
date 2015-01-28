@@ -5,6 +5,17 @@ package com.zombies;
  */
 public class Renderer {
 
+    public void renderRoom() {
 
 
+    }
+
+    public void renderBox() {
+
+    }
+
+    public void renderWall() {
+
+
+    }
 }

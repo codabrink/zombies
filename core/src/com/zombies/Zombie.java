@@ -19,7 +19,6 @@ public class Zombie extends Unit implements Collideable{
 	private Player player;
 	private Random random = new Random();
 	private int updateInt;
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super(view);
@@ -83,10 +82,10 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 1, 0, 1);
-        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
-        shapeRenderer.end();
+        view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+        view.getShapeRenderer().setColor(0, 1, 0, 1);
+        view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        view.getShapeRenderer().end();
 	}
 	
 	@Override

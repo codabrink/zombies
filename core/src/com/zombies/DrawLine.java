@@ -35,7 +35,7 @@ public class DrawLine {
 	public void draw() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 1, 1, 1);
-        shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
+        shapeRenderer.line(v1.x * view.scale, v1.y * view.scale, v2.x * view.scale, v2.y * view.scale);
         shapeRenderer.end();
 	}
 	
