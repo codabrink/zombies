@@ -83,7 +83,7 @@ public class Zombie extends Unit implements Collideable{
     @Override
 	public void draw() {
         view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        view.getShapeRenderer().setColor(0, 1, 0, 1);
+        view.getShapeRenderer().setColor(1, 0, 0, 1);
         view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
         view.getShapeRenderer().end();
 	}
@@ -145,9 +145,9 @@ public class Zombie extends Unit implements Collideable{
 	
 	@Override
 	public void move() {
-        body.applyForce(mPos.sub(body.getPosition()).scl(c.ZOMBIE_AGILITY), new Vector2(), true);
+        body.applyForce(mPos.sub(body.getPosition()).setLength(c.ZOMBIE_AGILITY), new Vector2(), true);
 		if (body.getLinearVelocity().len() > c.ZOMBIE_SPEED) { //Zombie is going too fast
-            body.setLinearVelocity(body.getLinearVelocity().scl(c.ZOMBIE_SPEED));
+            body.setLinearVelocity(body.getLinearVelocity().setLength(c.ZOMBIE_SPEED));
 		}
 	}
 	

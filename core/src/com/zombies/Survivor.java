@@ -197,7 +197,7 @@ public class Survivor extends Unit implements Collideable {
 					return;
 				}
 				if (System.currentTimeMillis() > lastShot + fireRate) {
-                    Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).scl(100);
+                    Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).setLength(100);
 					if (bullets.size() > c.MAX_BULLETS) {
 						bullets.getFirst().setPosition(new Vector2(body.getPosition().x, body.getPosition().y));
 						bullets.getFirst().setVelocity(shot);
@@ -259,7 +259,6 @@ public class Survivor extends Unit implements Collideable {
 	}
 	
 	private void updateVerticies() {
-
 	}
 	
 }

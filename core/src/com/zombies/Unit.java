@@ -131,7 +131,7 @@ public class Unit {
 	
 	protected void capSpeed() {
 		if (body.getLinearVelocity().len() > speed) {
-            body.setLinearVelocity(body.getLinearVelocity().scl(c.PLAYER_SPEED));
+            body.setLinearVelocity(body.getLinearVelocity().setLength(c.PLAYER_SPEED));
 		}
 	}
 	
@@ -253,7 +253,7 @@ public class Unit {
 	}
 	
 	protected void move() {
-		body.applyForce(mPos.sub(body.getPosition().scl(c.ZOMBIE_AGILITY)), new Vector2(), true);
+		body.applyForce(mPos.sub(body.getPosition().setLength(c.ZOMBIE_AGILITY)), new Vector2(), true);
 	}
 	
 	public Vector2 randomDirection() {

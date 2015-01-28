@@ -35,7 +35,7 @@ public class Crate implements Collideable  {
 		height = 2f;
 		width = 2f;
 
-        batch = new SpriteBatch();
+        batch = view.getWorldSpriteBatch();
 
 		bDef.allowSleep = true;
 		bDef.fixedRotation = false;

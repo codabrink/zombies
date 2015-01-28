@@ -47,7 +47,9 @@ public class Zombies extends Game {
         if (view != null) view.setCamera(new PerspectiveCamera(67, 2f * aspectRatio, 2f));
         this.width = width;
         this.height = height;
-        if (view != null) view.getThumbpad().updateResize();
+        if (view != null) {
+            view.getThumbpad().updateResize();
+        }
     }
 
     public int getHeight() {

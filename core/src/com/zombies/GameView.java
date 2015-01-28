@@ -22,6 +22,8 @@ public class GameView implements Screen {
     //brought down a level
     private PerspectiveCamera cam;
     private SpriteBatch spriteBatch;
+    private SpriteBatch worldSpriteBatch;
+    private ShapeRenderer shapeRenderer;
 
     //regular variables
     protected Player player;
@@ -36,7 +38,7 @@ public class GameView implements Screen {
     protected ShootButton shootButton;
     public MessageHandler mh;
     private HUD hud = new HUD(this);
-    private ShapeRenderer shapeRenderer;
+
 
     public float scale = 1;
 
@@ -59,6 +61,7 @@ public class GameView implements Screen {
         cam = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
+        worldSpriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
 
         grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
@@ -83,9 +86,6 @@ public class GameView implements Screen {
             player.addSurvivor(s);
         }
     }
-
-    public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
-    public SpriteBatch   getSpriteBatch() {return spriteBatch;}
 
     public ShootButton getShootButton() {
         return shootButton;
@@ -241,15 +241,16 @@ public class GameView implements Screen {
             c.UPDATE_LIGHTING = false;
         }
 
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        worldSpriteBatch.setProjectionMatrix(cam.combined);
+
         //lists
         this.updateLists();
         this.clearDumps();
 
         mh.update();
 
-        shapeRenderer.setProjectionMatrix(cam.combined);
-
-        world.step(Math.min(0.032f, Gdx.graphics.getDeltaTime()), 3, 4);
+        world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
@@ -384,9 +385,10 @@ public class GameView implements Screen {
     public PerspectiveCamera getCamera() {
         return cam;
     }
-
     public void setCamera(PerspectiveCamera cam){
         this.cam = cam;
     }
-
+    public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
+    public SpriteBatch   getSpriteBatch() {return spriteBatch;}
+    public SpriteBatch   getWorldSpriteBatch() {return worldSpriteBatch;}
 }
