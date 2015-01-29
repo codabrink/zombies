@@ -36,7 +36,6 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	private GameView view;
 	private Box box;
 	private Random random = new Random();
-    private SpriteBatch batch;
 	
 	public ShotgunPickup(GameView view, Box box) {
 		super(view);
@@ -52,8 +51,6 @@ public class ShotgunPickup extends Powerup implements Collideable {
 		bDef.angle = random.nextFloat() * 360f;
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
-
-        batch = new SpriteBatch();
 		
 		body = view.getWorld().createBody(bDef);
 		shape.setRadius(c.PLAYER_SIZE * 0.75f);
@@ -82,9 +79,10 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	
 	@Override
 	public void draw() {
-        batch.begin();
-        batch.draw(view.getMeshes().shotgunTexture, body.getPosition().x, body.getPosition().y);
-        batch.end();
+        float radius = c.PLAYER_SIZE * 0.75f;
+        view.getWorldSpriteBatch().begin();
+        view.getWorldSpriteBatch().draw(view.getMeshes().shotgunTexture, body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, radius * 2, radius * 2, 1, 1, body.getAngle(), 0, 0, 256, 64, false, false);
+        view.getWorldSpriteBatch().end();
 	}
 	
 	private void destroy() {
