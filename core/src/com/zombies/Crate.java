@@ -28,7 +28,6 @@ public class Crate implements Collideable  {
     private SpriteBatch batch;
 
 	public Crate(GameView view, Vector2 position) {
-		
 		this.view = view;
 		this.c = view.c;
 		
@@ -60,12 +59,11 @@ public class Crate implements Collideable  {
 		body.createFixture(fDef);
 		
 		float boxHeight = 2f;
-		
 	}
 	
 	public void draw() {
         batch.begin();
-        batch.draw(view.getMeshes().crateTexture, body.getPosition().x, body.getPosition().y);
+        batch.draw(view.getMeshes().crateTexture, body.getPosition().x - width, body.getPosition().y - height, width, height, width * 2, height * 2, 1, 1, body.getAngle(), 0, 0, 32, 32, false, false);
         batch.end();
 	}
 
