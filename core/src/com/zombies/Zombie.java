@@ -19,6 +19,7 @@ public class Zombie extends Unit implements Collideable{
 	private Player player;
 	private Random random = new Random();
 	private int updateInt;
+    private Vector2 carcass;
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super(view);
@@ -42,7 +43,9 @@ public class Zombie extends Unit implements Collideable{
 		mass.mass = .1f;
 		body.setMassData(mass);
 		body.setUserData(new BodData("zombie", this));
-		
+
+        color = new Color(1, 0, 0, 1);
+
 		fDef.shape = shape;
 		fDef.density = 0.1f;
 		
@@ -83,8 +86,13 @@ public class Zombie extends Unit implements Collideable{
     @Override
 	public void draw() {
         view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        view.getShapeRenderer().setColor(1, 0, 0, 1);
-        view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        view.getShapeRenderer().setColor(color);
+        if (dead) {
+            view.getShapeRenderer().rect(carcass.x - 0.5f, carcass.y - 0.5f, 1, 1);
+        } else {
+            view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        }
+
         view.getShapeRenderer().end();
 	}
 	
@@ -100,10 +108,10 @@ public class Zombie extends Unit implements Collideable{
 	}
 	
 	@Override
-	public void kill(Unit u) {
-		view.addDyingZombie(new DyingZombie(view, body.getPosition()));
+	public void die(Unit u) {
+        carcass = body.getPosition();
 		destroy();
-		box.getUnits().remove(this);
+        color = new Color(1, 0, 0, 0.3f);
 		if (u == view.getPlayer()) {
 			view.getPlayer().addZombieKill();
 		}

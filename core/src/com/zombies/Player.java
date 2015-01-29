@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.guns.Pistol;
-import com.guns.Shotgun;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Mesh;
@@ -145,7 +142,7 @@ public class Player extends Unit implements Collideable {
 	public void draw() {
         view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         view.getShapeRenderer().setColor(0, 1, 0, 1);
-        view.getShapeRenderer().rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float)Math.toDegrees(body.getAngle()));
+        view.getShapeRenderer().rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float) Math.toDegrees(body.getAngle()));
         view.getShapeRenderer().end();
 		
 		if (!guns.isEmpty()) {
@@ -223,7 +220,7 @@ public class Player extends Unit implements Collideable {
 		health -= zombieStrength;
 		view.s.damageTaken += zombieStrength;
 		if (health < 0) {
-			kill(u);
+			die(u);
 		}
 		lastAttack = System.currentTimeMillis();
 	}
@@ -235,7 +232,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	//@Override
-	//public void kill(Unit u) {view.main.endGame();}
+	//public void die(Unit u) {view.main.endGame();}
 	
 	public void setMove(float x, float y) {
 		if (Math.abs(x) < c.TILT_IGNORE) {

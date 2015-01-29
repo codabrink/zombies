@@ -2,7 +2,7 @@ package com.zombies;
 
 import java.util.LinkedList;
 import java.util.Random;
-import com.badlogic.gdx.graphics.Color;
+
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -122,7 +122,7 @@ public class Survivor extends Unit implements Collideable {
 	}
 	
 	@Override
-	public void kill(Unit u) {
+	public void die(Unit u) {
 		if (dead) return;
 		view.addDyingZombie(new DyingZombie(view, body.getPosition()));
 		view.getPlayer().killSurvivor(this);
@@ -142,7 +142,7 @@ public class Survivor extends Unit implements Collideable {
 		health -= zombieStrength;
 		view.s.damageTaken += zombieStrength;
 		if (health < 0) {
-			kill(u);
+			die(u);
 		}
 		lastAttack = System.currentTimeMillis();
 	}

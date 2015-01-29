@@ -43,6 +43,7 @@ public class Unit {
 	protected Mesh squareMesh;
 	protected float[] verticies;
 	protected GameView view;
+    protected Color color;
 
     protected Matrix4[] corners;
 
@@ -211,7 +212,7 @@ public class Unit {
 		health -= zombieStrength;
 		if (health < 0) {
 			u.victory();
-			kill(u);
+			die(u);
 		}
 		sick(u);
 	}
@@ -245,7 +246,7 @@ public class Unit {
 		return true;
 	}
 	
-	public void kill(Unit u) {
+	public void die(Unit u) {
 		destroy();
 		box.getUnits().remove(this);
 		view.getPlayer().addZombieKill();
