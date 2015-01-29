@@ -37,7 +37,7 @@ public class Bullet implements Collideable {
 		this.direction = direction;
 		this.view = view;
 
-        shapeRenderer = new ShapeRenderer();
+        shapeRenderer = view.getShapeRenderer();
 
 		bDef.allowSleep = false;
 		bDef.fixedRotation = true;

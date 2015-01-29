@@ -34,7 +34,8 @@ public class GameView implements Screen {
     protected CameraHandle camHandle;
     protected Meshes meshes = new Meshes();
     protected int lightingCount = 0;
-    protected Thumbpad thumbpad;
+    protected ThumbpadLeft thumbpadLeft;
+    protected ThumbpadRight thumbpadRight;
     protected ShootButton shootButton;
     public MessageHandler mh;
     private HUD hud = new HUD(this);
@@ -73,10 +74,13 @@ public class GameView implements Screen {
         populateLevel();
         camHandle = new CameraHandle(this);
         int radius = (int)(this.main.getWidth() * c.JOY_SIZE);
-        thumbpad = new Thumbpad(this);
+        thumbpadLeft = new ThumbpadLeft(this);
+        thumbpadRight = new ThumbpadRight(this);
         shootButton = new ShootButton(this);
         mh = new MessageHandler(this);
         meshes.main.play();
+
+        Gdx.input.setInputProcessor(hud);
     }
 
     private void addSurvivors() {
@@ -103,9 +107,10 @@ public class GameView implements Screen {
         return main;
     }
 
-    public Thumbpad getThumbpad() {
-        return thumbpad;
+    public ThumbpadLeft getThumbpadLeft() {
+        return thumbpadLeft;
     }
+    public ThumbpadRight getThumbpadRight() { return thumbpadRight;}
 
     public void populateLevel() {
         for (int i=1;i<=c.GRID_WIDTH;i++){
@@ -258,15 +263,14 @@ public class GameView implements Screen {
         spriteBatch.begin();
 
         spriteBatch.enableBlending();
-        renderHud(spriteBatch);
+
+        hud.update();
+        hud.render(spriteBatch);
+
         spriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
         player.render();
-    }
-
-    public void renderHud(SpriteBatch spriteBatch) {
-        hud.render(spriteBatch);
     }
 
     protected void updateLists() {
@@ -373,13 +377,6 @@ public class GameView implements Screen {
         if (c.ENABLE_ACCEL) {
             player.setMove(-Gdx.input.getPitch(), Gdx.input.getRoll());
         }
-
-        for (int i=0; i<3; i++) {
-            if (Gdx.input.isTouched(i)) {
-                hud.touch(Gdx.input.getX(i), Gdx.input.getY(i), i);
-            }
-        }
-
     }
 
     public PerspectiveCamera getCamera() {

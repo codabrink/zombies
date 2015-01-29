@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.guns.Pistol;
 import com.guns.Shotgun;
@@ -35,6 +36,8 @@ public class Player extends Unit implements Collideable {
 	private long lastAngleSet = System.currentTimeMillis();
 	private long angleLast = 1000l;
 
+    private float radius, diameter;
+
 	private int zombieKillCount = 0;
 
 	public Player(GameView view, Box box) {
@@ -42,7 +45,10 @@ public class Player extends Unit implements Collideable {
 		this.view = view;
 		this.box = box;
 		this.c = view.c;
-		
+
+        radius = c.PLAYER_SIZE * 0.5f;
+        diameter = c.PLAYER_SIZE;
+
 		GROUP = -1;
 		
 		speed = c.PLAYER_SPEED;
@@ -52,7 +58,7 @@ public class Player extends Unit implements Collideable {
 		guns.add(new Pistol(view, this, 50));
 
 		bDef.allowSleep = false;
-		bDef.fixedRotation = true;
+		bDef.fixedRotation = false;
 		bDef.linearDamping = c.LINEAR_DAMPING;
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
@@ -104,6 +110,7 @@ public class Player extends Unit implements Collideable {
 	
 	public void setAngle(float angle) {
 		this.angle = angle;
+        body.setTransform(body.getPosition().x, body.getPosition().y, (float)Math.toRadians(angle));
 		lastAngleSet = System.currentTimeMillis();
 	}
 	
@@ -138,12 +145,15 @@ public class Player extends Unit implements Collideable {
 	public void draw() {
         view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         view.getShapeRenderer().setColor(0, 1, 0, 1);
-        view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+        view.getShapeRenderer().rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float)Math.toDegrees(body.getAngle()));
         view.getShapeRenderer().end();
 		
 		if (!guns.isEmpty()) {
 			//guns.get(gunIndex).draw();
 		}
+        for (Gun g: guns) {
+            g.draw();
+        }
 		for (Survivor s: survivors) {
 			s.draw();
 		}
@@ -328,7 +338,10 @@ public class Player extends Unit implements Collideable {
 	@Override
 	public void update() {
 		box.updateZombieRecords(this);
-		
+
+        //TODO this is temporary
+        health = c.PLAYER_HEALTH;
+
 //		applyMove();
 		updateVerticies();
 		box.updatePlayerRecords();

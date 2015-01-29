@@ -81,7 +81,7 @@ public class PistolPickup extends Powerup implements Collideable {
 	@Override
 	public void draw() {
         view.getWorldSpriteBatch().begin();
-        view.getWorldSpriteBatch().draw(view.getMeshes().pistolTexture, body.getPosition().x, body.getPosition().y);
+        view.getWorldSpriteBatch().draw(view.getMeshes().pistolTexture, body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, radius * 2, radius * 2, 1, 1, body.getAngle(), 0, 0, 256, 256, false, false);
         view.getWorldSpriteBatch().end();
 	}
 	

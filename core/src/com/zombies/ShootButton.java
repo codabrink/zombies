@@ -23,7 +23,7 @@ public class ShootButton {
 		diameter = view.getWidth() * 0.2f;
 		if (x > view.getWidth() - diameter) {
 			if (y > view.getHeight() - diameter) {
-				view.getPlayer().shoot(view.getPlayer().getDirection());
+                view.getPlayer().shoot(view.getPlayer().getDirection());
 				down = true;
 			}
 		}
