@@ -12,7 +12,7 @@
         jar="/Users/Coda/working/zombies/core/build/libs/core-1.0.jar"
         jumboMode="false"
         revision="20.0.0"
-        sha1="7706777b2e8393c786beca70fe06cce3b57b587e">
+        sha1="5810b03afaa4f49f98ecc13e2f13d2ce131afd83">
         <dex dex="/Users/Coda/working/zombies/android/build/intermediates/pre-dexed/debug/core-1.0-259a93ad3336789ea082418bed398fdcb8cba48b.jar" />
     </item>
     <item

@@ -92,7 +92,6 @@ public class Zombie extends Unit implements Collideable{
         } else {
             view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
         }
-
         view.getShapeRenderer().end();
 	}
 	
@@ -109,13 +108,14 @@ public class Zombie extends Unit implements Collideable{
 	
 	@Override
 	public void die(Unit u) {
+        if (dead) return;
+
         carcass = body.getPosition();
+        color = new Color(0.3f, 0, 0, 0.3f);
 		destroy();
-        color = new Color(1, 0, 0, 0.3f);
 		if (u == view.getPlayer()) {
 			view.getPlayer().addZombieKill();
 		}
-		dead = true;
 		view.s.zombieKills ++;
 		view.s.score += c.SCORE_ZOMBIE_KILL;
 	}
@@ -128,6 +128,8 @@ public class Zombie extends Unit implements Collideable{
 
 	@Override
 	public void update() {
+        if (dead) return;
+
 		//handle sleeping
 		if (attack == null) {
 			if (random.nextFloat() <= c.ZOMBIE_AWARENESS && this.isVisionClear()) {
@@ -158,7 +160,9 @@ public class Zombie extends Unit implements Collideable{
             body.setLinearVelocity(body.getLinearVelocity().setLength(c.ZOMBIE_SPEED));
 		}
 	}
-	
+
+    // OpenGL Stuff.. Keep for later
+
 	private void updateVerticies() {
 		if (updateInt != view.getLightingCount() || c.DISABLE_LIGHTING) { return; }
 		//calculate color

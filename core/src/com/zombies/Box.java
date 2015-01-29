@@ -349,6 +349,8 @@ public class Box {
 	}
 	
 	public void updateZombieRecords(Unit p) {
+        if (p.dead) return;
+
 		//too far right
 		if (p.getX() > x + c.BOX_WIDTH) {
 			if (borders.get(1) != null) {

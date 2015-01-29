@@ -137,8 +137,11 @@ public class Unit {
 	}
 	
 	public void destroy() {
+        dead = true;
 		shape.dispose();
-		body.getWorld().destroyBody(body);
+        body.setUserData(null);
+		view.getWorld().destroyBody(body);
+        body = null;
 	}
 	
 	public float distance(Unit z) {
@@ -201,7 +204,7 @@ public class Unit {
 	}
 	
 	public float getY() {
-		return body.getPosition().y;
+        return body.getPosition().y;
 	}
 	
 	public void hurt(float zombieStrength, Unit u) {
@@ -210,7 +213,7 @@ public class Unit {
 			return;
 		}
 		health -= zombieStrength;
-		if (health < 0) {
+		if (health < 0 && !dead) {
 			u.victory();
 			die(u);
 		}
@@ -246,12 +249,7 @@ public class Unit {
 		return true;
 	}
 	
-	public void die(Unit u) {
-		destroy();
-		box.getUnits().remove(this);
-		view.getPlayer().addZombieKill();
-		dead = true;
-	}
+	public void die(Unit u) {}
 	
 	protected void move() {
 		body.applyForce(mPos.sub(body.getPosition().setLength(c.ZOMBIE_AGILITY)), new Vector2(), true);
