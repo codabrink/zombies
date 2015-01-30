@@ -58,7 +58,7 @@ public class ThumbpadLeft extends Thumbpad {
 
     public void touchUp(float x, float y, int i) {
         if (i == index) {
-            touch = new Vector2(1, 1);
+            touch = new Vector2(0, 0);
             down = false;
         }
     }

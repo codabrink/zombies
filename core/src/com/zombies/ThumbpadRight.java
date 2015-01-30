@@ -33,6 +33,7 @@ public class ThumbpadRight extends Thumbpad {
     }
 
     public void updateFromTouch(float x, float y, int i) {
+        down = true;
         touchDown = System.currentTimeMillis();
     }
 
@@ -51,6 +52,7 @@ public class ThumbpadRight extends Thumbpad {
                 view.getPlayer().shoot(view.getPlayer().getDirection());
             }
             touch = new Vector2(1, 0);
+            down = false;
         }
     }
 

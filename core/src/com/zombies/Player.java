@@ -107,6 +107,7 @@ public class Player extends Unit implements Collideable {
 	
 	public void setAngle(float angle) {
 		this.angle = angle;
+        System.out.println("Angle: "+ Math.toRadians(angle));
         body.setTransform(body.getPosition().x, body.getPosition().y, (float)Math.toRadians(angle));
 		lastAngleSet = System.currentTimeMillis();
 	}
