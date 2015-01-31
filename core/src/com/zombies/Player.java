@@ -325,7 +325,11 @@ public class Player extends Unit implements Collideable {
 		}
 		
 		this.handleHealth();
-		
+
+        for (Gun g: guns) {
+            g.update();
+        }
+
 		for (Survivor s: survivors) {
 			s.update();
 			s.getBox().updateSurvivorRecords(s);

@@ -43,22 +43,22 @@ public class Pistol extends Gun {
 	@Override
 	public void shoot(Vector2 direction) {
 		if (System.currentTimeMillis() < lastShot + speed) { return; }
-		if (ammo <= 0) {
+		if (ammo == 0) {
 			view.mh.addMessage(new Message(view, "You're out of ammo! Find another gun!"));
 			lastShot = System.currentTimeMillis();
 			return;
 		}
 		lastShot = System.currentTimeMillis();
-        bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), direction));
+        bullets.add(new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), direction));
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;
-		ammo--;
+		if (ammo > 0) ammo--;
 		shoot.play(0.2f);
 	}
 	
 	@Override
 	public void update() {
-		
+		super.update();
 	}
 	
 }

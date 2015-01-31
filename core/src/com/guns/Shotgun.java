@@ -47,7 +47,7 @@ public class Shotgun extends Gun {
 		lastShot = System.currentTimeMillis();
 		for (int i=1; i <= shotSize; i++) {
 			Vector2 tempDirection = direction.rotate(random.nextFloat() * shotSpread * 2 - shotSpread);
-			bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), tempDirection));
+			bullets.add(new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), tempDirection));
 		}
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;
@@ -57,7 +57,7 @@ public class Shotgun extends Gun {
 	
 	@Override
 	public void update() {
-		
+		super.update();
 	}
 	
 }

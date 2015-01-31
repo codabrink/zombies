@@ -16,6 +16,7 @@ public class Gun {
 	protected long speed;
 	protected int ammo;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
+    protected LinkedList<Bullet> killBullets = new LinkedList<Bullet>();
 	protected String type;
 	protected GunBox gb;
 	protected Texture texture;
@@ -29,7 +30,9 @@ public class Gun {
 	}
 	
 	public void update() {
-		
+		for (Bullet b: killBullets) {
+            bullets.remove(b);
+        }
 	}
 	
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
@@ -67,9 +70,9 @@ public class Gun {
 	public void shoot(Vector2 direction) {
 		
 	}
-	
 	public void addAmmo(int add) {
 		ammo += add;
 	}
+    public void appendKillBullets(Bullet b) {killBullets.add(b);}
 	
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.guns.Pistol;
 
 public class Survivor extends Unit implements Collideable {
 
@@ -27,11 +28,13 @@ public class Survivor extends Unit implements Collideable {
 	private long lastAttack = System.currentTimeMillis();
 	private int updateInt;
 	private long fireRate;
+    private Pistol gun;
 
 	public Survivor(GameView view, Box box, Vector2 position) {
 		super(view);
 		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
-		
+
+        gun = new Pistol(view, this, -1);
 		lastShot = System.currentTimeMillis();
 		speed = c.PLAYER_SPEED;
 		
@@ -197,7 +200,10 @@ public class Survivor extends Unit implements Collideable {
 				}
 				if (System.currentTimeMillis() > lastShot + fireRate) {
                     Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).setLength(100);
-					bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
+                    gun.shoot(shot);
+
+                    //Switched over to a gun system
+                    //bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
 					
 					lastShot = System.currentTimeMillis();
 					view.s.survivorShots ++;

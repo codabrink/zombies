@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import java.util.Arrays;
+import java.util.Vector;
 
 public class Bullet {
 	private Unit unit;
@@ -13,17 +14,22 @@ public class Bullet {
 	private C c;
     private Vector2 position;
     private Vector2 direction;
-    private String[] stoppingObjects = {"crate", "wall"};
+    private String[] stoppingObjects = {"zombie", "crate", "wall"};
 	private GameView view;
 	private float speed = 3f;
     private RayCastCallback callback;
+    private Gun gun;
 
-	public Bullet(final GameView view, Unit unit, short group, Vector2 position, Vector2 direction) {
+    private Vector2 stopPoint;
+    private Fixture stopFixture;
+
+	public Bullet(final GameView view, Unit unit, short group, Gun gun, Vector2 position, Vector2 direction) {
 		c = view.c;
 		this.view = view;
         this.position = position.cpy();
         this.direction = direction.cpy().setLength(speed);
 		this.unit = unit;
+        this.gun = gun;
 
         callback = new RayCastCallback() {
             @Override
@@ -31,18 +37,29 @@ public class Bullet {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData)fixture.getBody().getUserData());
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
-                    view.getHUD().setDebugMessage(normal.toString());
+                    stopPoint = point.cpy();
+                    stopFixture = fixture;
+                    return 0;
                 }
-                return 1;
+                return 0;
             }
         };
-
         view.getWorld().rayCast(callback, position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE)), position.cpy().add(direction.cpy().setLength(100)));
 	}
 
     public void update() {
-        view.getHUD().setDebugMessage(direction.toString());
+        Vector2 oldPosition = position.cpy();
         position.add(direction);
+
+        if (stopPoint == null) return;
+        //Is stopPoint in the middle of our movement delta?
+        if (oldPosition.x < stopPoint.x && position.x > stopPoint.x ||
+                oldPosition.x > stopPoint.x && position.x < stopPoint.x) {
+            if (oldPosition.y < stopPoint.y && position.y > stopPoint.y ||
+                    oldPosition.y > stopPoint.y && position.y < stopPoint.y) {
+                gun.appendKillBullets(this);
+            }
+        }
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
