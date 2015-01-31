@@ -13,6 +13,7 @@ public class Bullet {
 	private long createTime = System.currentTimeMillis();
 	private C c;
     private Vector2 position;
+    private Vector2 originalPosition;
     private Vector2 direction;
     private String[] stoppingObjects = {"zombie", "crate", "wall"};
 	private GameView view;
@@ -20,12 +21,14 @@ public class Bullet {
     private RayCastCallback callback;
     private Gun gun;
 
-    private Vector2 stopPoint;
+    private float destinedTrajectoryLength;
+
     private Fixture stopFixture;
 
-	public Bullet(final GameView view, Unit unit, short group, Gun gun, Vector2 position, Vector2 direction) {
+	public Bullet(final GameView view, Unit unit, short group, Gun gun, final Vector2 position, Vector2 direction) {
 		c = view.c;
 		this.view = view;
+        this.originalPosition = position.cpy();
         this.position = position.cpy();
         this.direction = direction.cpy().setLength(speed);
 		this.unit = unit;
@@ -37,7 +40,7 @@ public class Bullet {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData)fixture.getBody().getUserData());
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
-                    stopPoint = point.cpy();
+                    destinedTrajectoryLength = position.dst(point);
                     stopFixture = fixture;
                     return 0;
                 }
@@ -48,18 +51,12 @@ public class Bullet {
 	}
 
     public void update() {
-        Vector2 oldPosition = position.cpy();
+        //move the bullet
         position.add(direction);
 
-        if (stopPoint == null) return;
-        //Is stopPoint in the middle of our movement delta?
-        if (oldPosition.x < stopPoint.x && position.x > stopPoint.x ||
-                oldPosition.x > stopPoint.x && position.x < stopPoint.x) {
-            if (oldPosition.y < stopPoint.y && position.y > stopPoint.y ||
-                    oldPosition.y > stopPoint.y && position.y < stopPoint.y) {
-                gun.appendKillBullets(this);
-            }
-        }
+        if (stopFixture == null) return;
+        if (originalPosition.dst(position) > destinedTrajectoryLength)
+            gun.appendKillBullets(this);
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
