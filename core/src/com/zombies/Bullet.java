@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import java.util.Arrays;
 
 public class Bullet {
 	private Unit unit;
@@ -14,26 +15,29 @@ public class Bullet {
     private Vector2 direction;
     private String[] stoppingObjects = {"crate", "wall"};
 	private GameView view;
-	private float speed = 1f;
+	private float speed = 3f;
     private RayCastCallback callback;
 
-	public Bullet(GameView view, Unit unit, short group, Vector2 position, Vector2 direction) {
+	public Bullet(final GameView view, Unit unit, short group, Vector2 position, Vector2 direction) {
 		c = view.c;
 		this.view = view;
-        this.position = position;
-        this.direction = direction.setLength(speed);
+        this.position = position.cpy();
+        this.direction = direction.cpy().setLength(speed);
 		this.unit = unit;
 
         callback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                return 0;
+                // If the fixture is in the stoppingObjects list
+                BodData bodData = ((BodData)fixture.getBody().getUserData());
+                if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
+                    view.getHUD().setDebugMessage(normal.toString());
+                }
+                return 1;
             }
         };
 
-        view.getWorld().rayCast(callback, position, position.add(new Vector2(direction).setLength(100)));
-        if (unit == view.getPlayer())
-            System.out.println(position.toString());
+        view.getWorld().rayCast(callback, position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE)), position.cpy().add(direction.cpy().setLength(100)));
 	}
 
     public void update() {

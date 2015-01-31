@@ -185,7 +185,7 @@ public class Player extends Unit implements Collideable {
 		view.s.damageTaken += zombieStrength;
 		if (health < 0) {
 			die(u);
-		}
+    }
 		lastAttack = System.currentTimeMillis();
 	}
 	

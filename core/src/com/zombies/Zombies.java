@@ -22,7 +22,6 @@ public class Zombies extends Game {
     public void create() {
         view = new GameView(this);
         preView = new PreView(this);
-        renderer = new Box2DDebugRenderer();
         setScreen(preView);
     }
 

@@ -3,6 +3,7 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -65,7 +66,7 @@ public class Box {
 			powerups.add(new HealthPickup(view, this));
 		}
 	}
-	
+
 	public void addBorder(Box box) {
 		borders.add(box);
 	}
@@ -89,7 +90,9 @@ public class Box {
 	}
 	
 	public void addZombie() {
-		zombies.add(new Zombie(view, this, this.randomPoint()));
+        if (c.POPULATE_ZOMBIES) {
+            zombies.add(new Zombie(view, this, this.randomPoint()));
+        }
 	}
 	
 	public void addZombie(Unit u) {
@@ -110,8 +113,7 @@ public class Box {
 	public Vector2 getPosition() {
 		return new Vector2(x, y);
 	}
-	
-	
+
 	public Vector2 getPosition(int i) {
 		switch (i) {
 		case 1:
@@ -386,5 +388,4 @@ public class Box {
 			}
 		}
 	}
-	
 }

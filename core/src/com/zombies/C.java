@@ -74,4 +74,6 @@ public class C {
 	public float ZOMBIE_SPEED = 15f;
 	public float ZOMBIE_STRENGTH = 7f;
 	public float ZOOM_LEVEL = 0f;
+
+    public boolean POPULATE_ZOMBIES = false;
 }

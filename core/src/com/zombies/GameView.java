@@ -84,6 +84,8 @@ public class GameView implements Screen {
     }
 
     private void addSurvivors() {
+        //TODO remove
+        if (true) return;
         for (int i=1;i<=3;i++) {
             Survivor s = player.getBox().addSurvivor();
             s.wake();

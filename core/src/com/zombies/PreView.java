@@ -40,7 +40,7 @@ public class PreView implements Screen {
 	private void handleKeys() {
 		for (int i=0; i<3; i++) {
 			if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
-				main.setScreen(new GameView(main));
+				main.setScreen(main.view);
 			}
 		}
 	}
