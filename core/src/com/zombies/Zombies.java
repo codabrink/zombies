@@ -27,7 +27,7 @@ public class Zombies extends Game {
     }
 
     public void reset() {
-        view.meshes.main.stop();
+        //view.meshes.main.stop();
         view.world.dispose();
         view = null;
         System.gc();

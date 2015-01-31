@@ -13,32 +13,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22550496-e46a-422a-b706-e1578395e5af" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/android/android-release.apk" afterPath="$PROJECT_DIR$/android/android-release.apk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/intermediates/model_data.bin" afterPath="$PROJECT_DIR$/build/intermediates/model_data.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Box.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Box.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/android/build/generated/source/buildConfig/release/com/zombies/android/BuildConfig.java" afterPath="$PROJECT_DIR$/android/build/generated/source/buildConfig/release/com/zombies/android/BuildConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Bullet.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Bullet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/powerups/BulletSpeed.java" afterPath="$PROJECT_DIR$/core/src/com/powerups/BulletSpeed.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Crate.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Crate.java" />
+      <change type="DELETED" beforePath="C:\Users\Coda\Documents\GitHub\zombies\android\assets\data\sound\cock.mp3" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/GameView.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/GameView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Gun.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Gun.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/powerups/HealthPickup.java" afterPath="$PROJECT_DIR$/core/src/com/powerups/HealthPickup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/guns/Pistol.java" afterPath="$PROJECT_DIR$/core/src/com/guns/Pistol.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/powerups/PistolPickup.java" afterPath="$PROJECT_DIR$/core/src/com/powerups/PistolPickup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Player.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Player.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/PlayerPulse.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/PlayerPulse.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Powerup.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Powerup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Room.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Room.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/guns/Shotgun.java" afterPath="$PROJECT_DIR$/core/src/com/guns/Shotgun.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/powerups/ShotgunPickup.java" afterPath="$PROJECT_DIR$/core/src/com/powerups/ShotgunPickup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Survivor.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Survivor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Unit.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Unit.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Zombie.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Zombie.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Meshes.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Meshes.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/com/zombies/Zombies.java" afterPath="$PROJECT_DIR$/core/src/com/zombies/Zombies.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" afterPath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/android/manifest-merger-release-report.txt" afterPath="$PROJECT_DIR$/android/manifest-merger-release-report.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="gradle.iws" />
@@ -65,90 +44,11 @@
       <file leaf-file-name="Player.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2914" max-vertical-offset="5593">
-              <caret line="215" column="19" selection-start-line="215" selection-start-column="19" selection-end-line="215" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2710" max-vertical-offset="5593">
+              <caret line="244" column="27" selection-start-line="244" selection-start-column="27" selection-end-line="244" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ThumbpadRight.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/ThumbpadRight.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="1190">
-              <caret line="51" column="33" selection-start-line="51" selection-start-column="33" selection-end-line="51" selection-end-column="33" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Unit.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Unit.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="160" max-vertical-offset="2924">
-              <caret line="30" column="30" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Pistol.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/guns/Pistol.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="986">
-              <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-              <folding>
-                <element signature="e#822#1025#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Bullet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Bullet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="918">
-              <caret line="35" column="50" selection-start-line="35" selection-start-column="50" selection-end-line="35" selection-end-column="50" />
-              <folding>
-                <element signature="e#843#1046#0" expanded="true" />
-                <element signature="e#1035#1036#0" expanded="true" />
-                <element signature="e#1262#1263#0" expanded="true" />
-                <element signature="e#1312#1313#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PreView.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/PreView.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3688442" vertical-offset="313" max-vertical-offset="1564">
-              <caret line="43" column="13" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ZombieAI.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/ZombieAI.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Zombies.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Zombies.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="918">
-              <caret line="32" column="20" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -156,19 +56,23 @@
       <file leaf-file-name="Survivor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Survivor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2700" max-vertical-offset="4097">
-              <caret line="199" column="20" selection-start-line="199" selection-start-column="20" selection-end-line="199" selection-end-column="20" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4097">
+              <caret line="210" column="5" selection-start-line="210" selection-start-column="5" selection-end-line="210" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Shotgun.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/com/guns/Shotgun.java">
+      <file leaf-file-name="Bullet.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Bullet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="952">
-              <caret line="49" column="12" selection-start-line="49" selection-start-column="12" selection-end-line="49" selection-end-column="12" />
-              <folding />
+            <state vertical-scroll-proportion="0.58090454" vertical-offset="0" max-vertical-offset="995">
+              <caret line="38" column="26" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
+              <folding>
+                <element signature="e#843#1046#0" expanded="true" />
+                <element signature="e#1035#1036#0" expanded="true" />
+                <element signature="e#1312#1313#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1490,7 +1394,6 @@
         <option value="$PROJECT_DIR$/core/src/com/zombies/ThumbpadRight.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/ThumbpadLeft.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Unit.java" />
-        <option value="$PROJECT_DIR$/core/src/com/zombies/GameView.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Box.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Crate.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Powerup.java" />
@@ -1505,8 +1408,10 @@
         <option value="$PROJECT_DIR$/core/src/com/zombies/Survivor.java" />
         <option value="$PROJECT_DIR$/core/src/com/guns/Shotgun.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Player.java" />
-        <option value="$PROJECT_DIR$/core/src/com/zombies/Bullet.java" />
+        <option value="$PROJECT_DIR$/core/src/com/zombies/Meshes.java" />
+        <option value="$PROJECT_DIR$/core/src/com/zombies/GameView.java" />
         <option value="$PROJECT_DIR$/core/src/com/zombies/Zombies.java" />
+        <option value="$PROJECT_DIR$/core/src/com/zombies/Bullet.java" />
       </list>
     </option>
   </component>
@@ -1923,16 +1828,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Unit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3120" max-vertical-offset="5130">
-          <caret line="208" column="0" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Floor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1755">
@@ -2150,16 +2045,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/GameView.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="6120">
-          <caret line="35" column="36" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Box.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1510" max-vertical-offset="5814">
@@ -2206,24 +2091,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/powerups/ShotgunPickup.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="119" max-vertical-offset="1360">
-          <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Zombie.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1013" max-vertical-offset="2482">
-          <caret line="87" column="21" selection-start-line="87" selection-start-column="21" selection-end-line="87" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Collideable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.05479452" vertical-offset="0" max-vertical-offset="1241">
@@ -2261,7 +2128,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="160" max-vertical-offset="2924">
           <caret line="30" column="30" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -2284,16 +2151,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2914" max-vertical-offset="5593">
-          <caret line="215" column="19" selection-start-line="215" selection-start-column="19" selection-end-line="215" selection-end-column="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/zombies/ZombieAI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
@@ -2302,48 +2159,89 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/guns/Shotgun.java">
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Zombie.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="952">
-          <caret line="49" column="12" selection-start-line="49" selection-start-column="12" selection-end-line="49" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Survivor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2700" max-vertical-offset="4097">
-          <caret line="199" column="20" selection-start-line="199" selection-start-column="20" selection-end-line="199" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Bullet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="918">
-          <caret line="35" column="50" selection-start-line="35" selection-start-column="50" selection-end-line="35" selection-end-column="50" />
-          <folding>
-            <element signature="e#843#1046#0" expanded="true" />
-            <element signature="e#1035#1036#0" expanded="true" />
-            <element signature="e#1262#1263#0" expanded="true" />
-            <element signature="e#1312#1313#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Zombies.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="918">
-          <caret line="32" column="20" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2346">
+          <caret line="87" column="21" selection-start-line="87" selection-start-column="21" selection-end-line="87" selection-end-column="21" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/zombies/PreView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3688442" vertical-offset="313" max-vertical-offset="1564">
-          <caret line="43" column="13" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1564">
+          <caret line="57" column="16" selection-start-line="57" selection-start-column="16" selection-end-line="57" selection-end-column="16" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/guns/Shotgun.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="952">
+          <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/powerups/ShotgunPickup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="119" max-vertical-offset="1360">
+          <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Meshes.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="969">
+          <caret line="28" column="6" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/GameView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="432" max-vertical-offset="5865">
+          <caret line="80" column="10" selection-start-line="80" selection-start-column="10" selection-end-line="80" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Zombies.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42713568" vertical-offset="0" max-vertical-offset="995">
+          <caret line="29" column="10" selection-start-line="29" selection-start-column="10" selection-end-line="29" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2710" max-vertical-offset="5593">
+          <caret line="244" column="27" selection-start-line="244" selection-start-column="27" selection-end-line="244" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Survivor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4097">
+          <caret line="210" column="5" selection-start-line="210" selection-start-column="5" selection-end-line="210" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/zombies/Bullet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.58090454" vertical-offset="0" max-vertical-offset="995">
+          <caret line="38" column="26" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
+          <folding>
+            <element signature="e#843#1046#0" expanded="true" />
+            <element signature="e#1035#1036#0" expanded="true" />
+            <element signature="e#1312#1313#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

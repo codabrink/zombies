@@ -78,7 +78,7 @@ public class GameView implements Screen {
         thumbpadRight = new ThumbpadRight(this);
         shootButton = new ShootButton(this);
         mh = new MessageHandler(this);
-        meshes.main.play();
+        //meshes.main.play();
 
         Gdx.input.setInputProcessor(hud);
     }

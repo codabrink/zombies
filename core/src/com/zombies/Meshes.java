@@ -26,7 +26,7 @@ public class Meshes {
 	
 	public Sound shotgunPickup = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun-pickup.mp3"));
 	
-	public Music main = Gdx.audio.newMusic(Gdx.files.internal("data/sound/music/main.mp3"));
+	//public Music main = Gdx.audio.newMusic(Gdx.files.internal("data/sound/music/main.mp3"));
 	
 	public Meshes() {
 				FileHandle imageFileHandle = Gdx.files.internal("data/wall1.png");
