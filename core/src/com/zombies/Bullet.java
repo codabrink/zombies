@@ -31,13 +31,14 @@ public class Bullet {
             }
         };
 
-        view.getWorld().rayCast(callback, position, position.add(direction.setLength(100)));
+        view.getWorld().rayCast(callback, position, position.add(new Vector2(direction).setLength(100)));
         if (unit == view.getPlayer())
             System.out.println(position.toString());
 	}
 
     public void update() {
-        position = position.add(direction);
+        view.getHUD().setDebugMessage(direction.toString());
+        position.add(direction);
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
