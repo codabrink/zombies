@@ -3,6 +3,7 @@ package com.powerups;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
 import com.zombies.Box;
 import com.zombies.C;
@@ -31,8 +32,6 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	private FixtureDef fDef = new FixtureDef();
 	private float radius = 0.8f;
 	private CircleShape shape;
-	private Mesh squareMesh;
-	private float[] verticies;
 	private GameView view;
 	private Box box;
 	private Random random = new Random();
@@ -63,26 +62,14 @@ public class ShotgunPickup extends Powerup implements Collideable {
 		fDef.density = 0.1f;
 		
 		body.createFixture(fDef);
-		
-		squareMesh = new Mesh(true, 4, 4,
-				new VertexAttribute(Usage.Position, 3, "a_position"),
-				new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords"));
-		
-				verticies = new float[] {
-		                -radius * 2, -radius, 0, 0, 0,
-		                radius * 2, -radius, 0, 1, 0,
-		                -radius * 2, radius, 0, 0, 1,
-		                radius * 2, radius, 0, 1, 1};
-				squareMesh.setVertices(verticies);
-		        squareMesh.setIndices(new short[] { 0, 1, 2, 3 });
 	}
 	
 	@Override
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         float radius = c.PLAYER_SIZE * 0.75f;
-        view.getWorldSpriteBatch().begin();
-        view.getWorldSpriteBatch().draw(view.getMeshes().shotgunTexture, body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, radius * 4, radius * 2, 1, 1, body.getAngle(), 0, 0, 256, 64, false, false);
-        view.getWorldSpriteBatch().end();
+        spriteBatch.begin();
+        spriteBatch.draw(view.getMeshes().shotgunTexture, body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, radius * 4, radius * 2, 1, 1, body.getAngle(), 0, 0, 256, 64, false, false);
+        spriteBatch.end();
 	}
 	
 	private void destroy() {

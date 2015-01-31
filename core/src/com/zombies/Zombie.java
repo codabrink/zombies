@@ -3,9 +3,7 @@ package com.zombies;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -54,19 +52,6 @@ public class Zombie extends Unit implements Collideable{
 		health = c.ZOMBIE_HEALTH;
 
 		mPos = this.randomClosePoint();
-		
-		squareMesh = new Mesh(true, 4, 4,
-				new VertexAttribute(Usage.Position, 3, "a_position"),
-				new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-		
-				verticies = new float[] {
-						-0.5f, -0.5f, 0, Color.toFloatBits(128, 0, 0, 255),
-						0.5f, -0.5f, 0, Color.toFloatBits(192, 0, 0, 255),
-						-0.5f, 0.5f, 0, Color.toFloatBits(192, 0, 0, 255),
-						0.5f, 0.5f, 0, Color.toFloatBits(255, 0, 0, 255) };
-				squareMesh.setVertices(verticies);   
-				squareMesh.setIndices(new short[] { 0, 1, 2, 3});
-		
 	}
 	
 	private void attack() {
@@ -74,7 +59,6 @@ public class Zombie extends Unit implements Collideable{
 		if (System.currentTimeMillis() < lastAttack + c.ZOMBIE_ATTACK_RATE) { return; }
 		if (body.getPosition().dst(attack.getBody().getPosition()) < c.ZOMBIE_SIZE * 2) {
 			attack.hurt(c.ZOMBIE_STRENGTH, this);
-//			attack.getBody().applyForce(scale(attack.getBody().getPosition().sub(body.getPosition()), 100f), new Vector2());
 			lastAttack = System.currentTimeMillis();
 		}
 	}
@@ -84,15 +68,15 @@ public class Zombie extends Unit implements Collideable{
 	}
 
     @Override
-	public void draw() {
-        view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        view.getShapeRenderer().setColor(color);
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(color);
         if (dead) {
-            view.getShapeRenderer().rect(carcass.x - 0.5f, carcass.y - 0.5f, 1, 1);
+            shapeRenderer.rect(carcass.x - 0.5f, carcass.y - 0.5f, 1, 1);
         } else {
-            view.getShapeRenderer().rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
+            shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
         }
-        view.getShapeRenderer().end();
+        shapeRenderer.end();
 	}
 	
 	@Override
@@ -103,7 +87,6 @@ public class Zombie extends Unit implements Collideable{
 	
 	public void hitByBullet(Unit u) {
 		this.hurt(c.BULLET_DAMAGE_FACTOR, u);
-		this.updateColor();
 	}
 	
 	@Override
@@ -150,7 +133,6 @@ public class Zombie extends Unit implements Collideable{
 			}
 		}
 		this.move();
-		updateVerticies();
 	}
 	
 	@Override
@@ -160,42 +142,4 @@ public class Zombie extends Unit implements Collideable{
             body.setLinearVelocity(body.getLinearVelocity().setLength(c.ZOMBIE_SPEED));
 		}
 	}
-
-    // OpenGL Stuff.. Keep for later
-
-	private void updateVerticies() {
-		if (updateInt != view.getLightingCount() || c.DISABLE_LIGHTING) { return; }
-		//calculate color
-		float percent = health / c.ZOMBIE_HEALTH;
-		if (percent < 0f) {
-			percent = 0f;
-		}
-		float invPercent = 1.0f - percent;
-		//calculate light
-		float d = body.getPosition().dst(view.getPlayer().getBody().getPosition());
-		float lp = (c.LIGHT_DIST - d) / c.LIGHT_DIST;
-		if (lp < 0f) {
-			lp = 0f;
-		}
-		verticies[3] = Color.toFloatBits((int)(128f * percent * lp), 0, (int)(128f * invPercent * lp), 255);
-		verticies[7] = Color.toFloatBits((int)(192f * percent * lp), 0, (int)(192f * invPercent * lp), 255);
-		verticies[11] = Color.toFloatBits((int)(192f * percent * lp), 0, (int)(192f * invPercent * lp), 255);
-		verticies[15] = Color.toFloatBits((int)(255f * percent * lp), 0, (int)(255f * invPercent * lp), 255);
-		squareMesh.setVertices(verticies);
-	}
-	
-	public void updateColor() {
-		//calculate color
-		float percent = health / c.ZOMBIE_HEALTH;
-		if (percent < 0f) {
-			percent = 0f;
-		}
-		float invPercent = 1.0f - percent;
-		verticies[3] = Color.toFloatBits((int)(128f * percent), 0, (int)(128f * invPercent), 255);
-		verticies[7] = Color.toFloatBits((int)(192f * percent), 0, (int)(192f * invPercent), 255);
-		verticies[11] = Color.toFloatBits((int)(192f * percent), 0, (int)(192f * invPercent), 255);
-		verticies[15] = Color.toFloatBits((int)(255f * percent), 0, (int)(255f * invPercent), 255);
-		squareMesh.setVertices(verticies);
-	}
-	
 }

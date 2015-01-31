@@ -2,6 +2,8 @@ package com.powerups;
 
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
 import com.zombies.Box;
 import com.zombies.C;
@@ -80,7 +82,7 @@ public class HealthPickup extends Powerup implements Collideable {
 	}
 
 	@Override
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         //TODO: Draw health pickups.
 
         /*
@@ -91,7 +93,7 @@ public class HealthPickup extends Powerup implements Collideable {
 		Gdx.gl10.glEnable(GL10.GL_BLEND);
 		Gdx.gl10.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		view.getMeshes().healthTexture.bind();
-		squareMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		squareMesh.draw(GL10.GL_TRIANGLE_STRIP, 0, 4);
 		Gdx.graphics.getGL10().glDisable(GL10.GL_TEXTURE_2D);
 		Gdx.gl10.glPopMatrix();
 		*/

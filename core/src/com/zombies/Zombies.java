@@ -31,7 +31,6 @@ public class Zombies extends Game {
         view.world.dispose();
         view = null;
         System.gc();
-        view = new GameView(this);
         setScreen(preView);
         System.gc();
     }

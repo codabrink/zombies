@@ -2,9 +2,8 @@ package com.zombies;
 
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -25,16 +24,12 @@ public class Crate implements Collideable  {
 	private GameView view;
 	private C c;
 
-    private SpriteBatch batch;
-
 	public Crate(GameView view, Vector2 position) {
 		this.view = view;
 		this.c = view.c;
 		
 		height = 2f;
 		width = 2f;
-
-        batch = view.getWorldSpriteBatch();
 
 		bDef.allowSleep = true;
 		bDef.fixedRotation = false;
@@ -61,10 +56,10 @@ public class Crate implements Collideable  {
 		float boxHeight = 2f;
 	}
 	
-	public void draw() {
-        batch.begin();
-        batch.draw(view.getMeshes().crateTexture, body.getPosition().x - width, body.getPosition().y - height, width, height, width * 2, height * 2, 1, 1, body.getAngle(), 0, 0, 32, 32, false, false);
-        batch.end();
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        spriteBatch.begin();
+        spriteBatch.draw(view.getMeshes().crateTexture, body.getPosition().x - width, body.getPosition().y - height, width, height, width * 2, height * 2, 1, 1, body.getAngle(), 0, 0, 32, 32, false, false);
+        spriteBatch.end();
 	}
 
 	public Vector2 getPoint(int i) {

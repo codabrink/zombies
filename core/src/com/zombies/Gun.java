@@ -4,7 +4,9 @@ import java.util.LinkedList;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 
 public class Gun {
 
@@ -18,7 +20,7 @@ public class Gun {
 	protected GunBox gb;
 	protected Texture texture;
 	protected C c;
-	
+
 	public Gun(GameView view, Unit unit) {
 		this.view = view;
 		this.unit = unit;
@@ -30,9 +32,8 @@ public class Gun {
 		
 	}
 	
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         // TODO: Render gun
-        //view.getMeshes().gunMesh.render(GL10.GL_TRIANGLE_STRIP, 0, 4);
 	}
 	
 	public Texture getTexture() {

@@ -2,14 +2,8 @@ package com.zombies;
 
 import java.util.ArrayList;
 import java.util.Random;
-
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.guns.Pistol;
-
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -55,7 +49,7 @@ public class Player extends Unit implements Collideable {
 		guns.add(new Pistol(view, this, 50));
 
 		bDef.allowSleep = false;
-		bDef.fixedRotation = false;
+		bDef.fixedRotation = true;
 		bDef.linearDamping = c.LINEAR_DAMPING;
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
@@ -72,19 +66,6 @@ public class Player extends Unit implements Collideable {
 		fDef.filter.groupIndex = GROUP;
 		
 		body.createFixture(fDef);
-		
-		verticies = new float[] {
-                -0.5f, -0.5f, 0, Color.toFloatBits(0, 128, 0, 255),
-                0.5f, -0.5f, 0, Color.toFloatBits(0, 192, 0, 255),
-                -0.5f, 0.5f, 0, Color.toFloatBits(0, 192, 0, 255),
-                0.5f, 0.5f, 0, Color.toFloatBits(0, 255, 0, 255) };
-		
-		squareMesh = new Mesh(true, 4, 4,
-				new VertexAttribute(Usage.Position, 3, "a_position"),
-				new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
-		
-				squareMesh.setVertices(verticies);   
-		        squareMesh.setIndices(new short[] { 0, 1, 2, 3});
 	}
 	
 	public float getHealth() {
@@ -107,7 +88,6 @@ public class Player extends Unit implements Collideable {
 	
 	public void setAngle(float angle) {
 		this.angle = angle;
-        System.out.println("Angle: "+ Math.toRadians(angle));
         body.setTransform(body.getPosition().x, body.getPosition().y, (float)Math.toRadians(angle));
 		lastAngleSet = System.currentTimeMillis();
 	}
@@ -138,23 +118,6 @@ public class Player extends Unit implements Collideable {
 	
 	public void clearOldRoom() {
 		oldRoom = null;
-	}
-	
-	public void draw() {
-        view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        view.getShapeRenderer().setColor(0, 1, 0, 1);
-        view.getShapeRenderer().rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float) Math.toDegrees(body.getAngle()));
-        view.getShapeRenderer().end();
-		
-		if (!guns.isEmpty()) {
-			//guns.get(gunIndex).draw();
-		}
-        for (Gun g: guns) {
-            g.draw();
-        }
-		for (Survivor s: survivors) {
-			s.draw();
-		}
 	}
 	
 	public Body getBody() {return body;}
@@ -249,7 +212,6 @@ public class Player extends Unit implements Collideable {
 		this.suggestAngle((float)Math.toDegrees(Math.atan2(y, x)));
 	}
 	
-	
 	public Vector2 getDirection() {
 		float ax = (float)Math.cos(Math.toRadians(this.angle));
 		float ay = (float)Math.sin(Math.toRadians(this.angle));
@@ -275,12 +237,27 @@ public class Player extends Unit implements Collideable {
 		survivorKill.add(s);
 	}
 	
-	public void render() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		//box.getRoom().drawFloors();
-		
-		this.draw();
-		
-		box.getRoom().drawRoom();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 1, 0, 1);
+        shapeRenderer.rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float)Math.toDegrees(body.getAngle()));
+
+        float gunOffsetX = radius * 0.5f;
+        float gunOffsetY = 0;
+        shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
+        shapeRenderer.rect(body.getPosition().x + gunOffsetX, body.getPosition().y + gunOffsetY, -gunOffsetX, -gunOffsetY, radius,   diameter, 1, 1, (float)Math.toDegrees(body.getAngle()) - 90);
+        shapeRenderer.end();
+
+        for (Gun g: guns) {
+            g.draw(spriteBatch, shapeRenderer);
+        }
+        for (Survivor s: survivors) {
+            s.draw(spriteBatch, shapeRenderer);
+        }
+
+        box.getRoom().drawRoom(spriteBatch, shapeRenderer);
 		
 		if (oldRoom != null) {
 			oldRoom.drawWalls();
@@ -341,7 +318,6 @@ public class Player extends Unit implements Collideable {
         health = c.PLAYER_HEALTH;
 
 //		applyMove();
-		updateVerticies();
 		box.updatePlayerRecords();
 		
 		if (oldRoom != null) {
@@ -370,20 +346,5 @@ public class Player extends Unit implements Collideable {
 		if (!c.DESKTOP_MODE) {
 			this.applyMove();
 		}
-		
 	}
-	
-	private void updateVerticies() {
-		float percent = health / c.PLAYER_HEALTH;
-		if (percent < 0f) {
-			percent = 0f;
-		}
-		float invPercent = 1.0f - percent;
-		verticies[3] = Color.toFloatBits((int)(128f * invPercent), (int)(128f * percent), 0, 255);
-		verticies[7] = Color.toFloatBits((int)(192f * invPercent), (int)(192f * percent), 0, 255);
-		verticies[11] = Color.toFloatBits((int)(192f * invPercent), (int)(192f * percent), 0, 255);
-		verticies[15] = Color.toFloatBits((int)(255f * invPercent), (int)(255f * percent), 0, 255);
-		squareMesh.setVertices(verticies);
-	}
-	
 }

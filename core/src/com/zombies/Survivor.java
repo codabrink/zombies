@@ -3,6 +3,7 @@ package com.zombies;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -26,11 +27,9 @@ public class Survivor extends Unit implements Collideable {
 	private long lastAttack = System.currentTimeMillis();
 	private int updateInt;
 	private long fireRate;
-    private ShapeRenderer shapeRenderer;
-	
+
 	public Survivor(GameView view, Box box, Vector2 position) {
 		super(view);
-		shapeRenderer = view.getShapeRenderer();
 		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
 		
 		lastShot = System.currentTimeMillis();
@@ -147,12 +146,12 @@ public class Survivor extends Unit implements Collideable {
 		lastAttack = System.currentTimeMillis();
 	}
 	
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		if (dead) {
 			return;
 		}
 		for (Bullet b: bullets) {
-			b.draw();
+			b.draw(spriteBatch, shapeRenderer);
 		}
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -198,14 +197,7 @@ public class Survivor extends Unit implements Collideable {
 				}
 				if (System.currentTimeMillis() > lastShot + fireRate) {
                     Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).setLength(100);
-					if (bullets.size() > c.MAX_BULLETS) {
-						bullets.getFirst().setPosition(new Vector2(body.getPosition().x, body.getPosition().y));
-						bullets.getFirst().setVelocity(shot);
-						// throw bullet to back of list
-						bullets.add(bullets.removeFirst().refresh());
-					} else {
-						bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
-					}
+					bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
 					
 					lastShot = System.currentTimeMillis();
 					view.s.survivorShots ++;

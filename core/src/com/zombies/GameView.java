@@ -21,8 +21,8 @@ public class GameView implements Screen {
 
     //brought down a level
     private PerspectiveCamera cam;
+    private SpriteBatch HUDSpriteBatch;
     private SpriteBatch spriteBatch;
-    private SpriteBatch worldSpriteBatch;
     private ShapeRenderer shapeRenderer;
 
     //regular variables
@@ -61,8 +61,8 @@ public class GameView implements Screen {
 
         cam = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
+        HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
-        worldSpriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
 
         grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
@@ -247,7 +247,7 @@ public class GameView implements Screen {
         }
 
         shapeRenderer.setProjectionMatrix(cam.combined);
-        worldSpriteBatch.setProjectionMatrix(cam.combined);
+        spriteBatch.setProjectionMatrix(cam.combined);
 
         //lists
         this.updateLists();
@@ -259,18 +259,18 @@ public class GameView implements Screen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
-//		renderer.render(view.getWorld());
-        spriteBatch.begin();
+//		renderer.draw(view.getWorld());
+        HUDSpriteBatch.begin();
 
-        spriteBatch.enableBlending();
+        HUDSpriteBatch.enableBlending();
 
         hud.update();
-        hud.render(spriteBatch);
+        hud.render(HUDSpriteBatch);
 
-        spriteBatch.end();
+        HUDSpriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
-        player.render();
+        player.draw(spriteBatch, shapeRenderer);
     }
 
     protected void updateLists() {
@@ -386,6 +386,6 @@ public class GameView implements Screen {
         this.cam = cam;
     }
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
-    public SpriteBatch   getSpriteBatch() {return spriteBatch;}
-    public SpriteBatch   getWorldSpriteBatch() {return worldSpriteBatch;}
+    public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}
+    public SpriteBatch getSpriteBatch() {return spriteBatch;}
 }

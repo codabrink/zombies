@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.ShotgunPickup;
@@ -124,20 +126,20 @@ public class Box {
 		return new Vector2();
 	}
 	
-	public void drawBox() {
+	public void drawBox(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		for (Unit u: zombies) {
 			if (u != view.getPlayer()) {
-				u.draw();
+				u.draw(spriteBatch, shapeRenderer);
 			}
 		}
 		for (Unit u: survivors) {
-			u.draw();
+			u.draw(spriteBatch, shapeRenderer);
 		}
 		for (Crate c: crates) {
-			c.draw();
+			c.draw(spriteBatch, shapeRenderer);
 		}
 		for (Powerup p: powerups) {
-			p.draw();
+			p.draw(spriteBatch, shapeRenderer);
 		}
 		drawWalls();
 	}

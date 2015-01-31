@@ -1,5 +1,7 @@
 package com.powerups;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import com.zombies.Collideable;
@@ -18,7 +20,7 @@ public class BulletSpeed extends Powerup implements Collideable {
 	}
 	
 	@Override
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		
 	}
 	

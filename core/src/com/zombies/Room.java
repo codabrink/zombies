@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Room {
@@ -73,9 +75,9 @@ public class Room {
 		}
 	}
 	
-	public void drawRoom() {
+	public void drawRoom(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		for (Box b: boxes) {
-			b.drawBox();
+			b.drawBox(spriteBatch, shapeRenderer);
 		}
 	}
 	

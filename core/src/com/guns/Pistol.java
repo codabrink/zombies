@@ -1,5 +1,9 @@
 package com.guns;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.zombies.Bullet;
 import com.zombies.GameView;
 import com.zombies.Gun;
@@ -11,21 +15,28 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
 public class Pistol extends Gun {
-	
 	private Sound shoot = Gdx.audio.newSound(Gdx.files.internal("data/sound/pistol.mp3"));
-	
+	private RayCastCallback callback;
+
 	public Pistol(GameView view, Unit unit, int ammo) {
 		super(view, unit);
 		speed = 200l;
 		type = "pistol";
 		this.ammo = ammo;
 		this.texture = view.getMeshes().pistolTexture;
+
+        callback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                return 1;
+            }
+        };
 	}
 
 	@Override
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		for (Bullet b: bullets) {
-			b.draw();
+			b.draw(spriteBatch, shapeRenderer);
 		}
 	}
 	
@@ -38,13 +49,7 @@ public class Pistol extends Gun {
 			return;
 		}
 		lastShot = System.currentTimeMillis();
-		if (bullets.size() > view.c.MAX_BULLETS) {
-			bullets.getFirst().reShoot(unit.getBody().getPosition(), direction);
-			// throw bullet to back of list
-			bullets.add(bullets.removeFirst().refresh());
-		} else {
-			bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), direction));
-		}
+        bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), direction));
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;
 		ammo--;

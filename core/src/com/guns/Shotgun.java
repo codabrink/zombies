@@ -2,6 +2,8 @@ package com.guns;
 
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.Bullet;
 import com.zombies.GameView;
 import com.zombies.Gun;
@@ -28,9 +30,9 @@ public class Shotgun extends Gun {
 	}
 
 	@Override
-	public void draw() {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		for (Bullet b: bullets) {
-			b.draw();
+			b.draw(spriteBatch, shapeRenderer);
 		}
 	}
 	
@@ -45,13 +47,7 @@ public class Shotgun extends Gun {
 		lastShot = System.currentTimeMillis();
 		for (int i=1; i <= shotSize; i++) {
 			Vector2 tempDirection = direction.rotate(random.nextFloat() * shotSpread * 2 - shotSpread);
-			if (bullets.size() > c.MAX_BULLETS) {
-				bullets.getFirst().reShoot(unit.getBody().getPosition(), tempDirection);
-				// throw bullet to back of list
-				bullets.add(bullets.removeFirst().refresh());
-			} else {
-				bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), tempDirection));
-			}
+			bullets.add(new Bullet(view, unit, unit.getGroup(), unit.getBody().getPosition(), tempDirection));
 		}
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;

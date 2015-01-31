@@ -37,7 +37,7 @@ public class PlayerPulse {
 		if (!setUp) {this.updateVerticies(); setUp=true;}
 		for (Mesh m: meshes) {
             //TODO temporarily disabling this
-			//m.render(GL20.GL_TRIANGLE_STRIP, 0, 4);
+			//m.draw(GL20.GL_TRIANGLE_STRIP, 0, 4);
 		}
 	}
 	
