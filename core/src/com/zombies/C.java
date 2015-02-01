@@ -2,7 +2,6 @@ package com.zombies;
 
 public class C {
 
-	public boolean DESKTOP_MODE = false;
 	public boolean ENABLE_ACCEL = false;
 	public int BOX_HEIGHT = 15;
 	public int BOX_MAX_ZOMBIES = 8;

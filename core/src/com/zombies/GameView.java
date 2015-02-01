@@ -1,5 +1,6 @@
 package com.zombies;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -286,8 +287,11 @@ public class GameView implements Screen {
     }
 
     protected void handleKeys() {
-        handleKeysDesktop();
-        handleKeysAndroid();
+        if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+            handleKeysDesktop();
+        } else {
+            handleKeysAndroid();
+        }
     }
 
     protected void handleContacts() {

@@ -2,6 +2,9 @@ package com.zombies;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -347,7 +350,7 @@ public class Player extends Unit implements Collideable {
 
 		capSpeed();
 		
-		if (!c.DESKTOP_MODE) {
+		if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
 			this.applyMove();
 		}
 	}
