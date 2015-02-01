@@ -11,6 +11,7 @@ import java.util.Vector;
 public class Bullet {
 	private Unit unit;
 	private long createTime = System.currentTimeMillis();
+    private long lifeTime = 1000l;
 	private C c;
     private Vector2 position;
     private Vector2 originalPosition;
@@ -55,8 +56,14 @@ public class Bullet {
         position.add(direction);
 
         if (stopFixture == null) return;
-        if (originalPosition.dst(position) > destinedTrajectoryLength)
+        BodData bodData = ((BodData)stopFixture.getBody().getUserData());
+        if (bodData != null && bodData.getType() == "zombie") {
+            ((Zombie) bodData.getObject()).die(unit);
+        }
+
+        if (originalPosition.dst(position) > destinedTrajectoryLength || System.currentTimeMillis() > createTime + lifeTime) {
             gun.appendKillBullets(this);
+        }
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {

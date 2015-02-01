@@ -39,7 +39,7 @@ public class GameView implements Screen {
     protected ShootButton shootButton;
     public MessageHandler mh;
     private HUD hud = new HUD(this);
-
+    private LinkedList<DebugDots> 
 
     public float scale = 1;
 
@@ -340,6 +340,10 @@ public class GameView implements Screen {
     @Override
     public void show() {
         // TODO Auto-generated method stub
+
+    }
+
+    public void addDebugDots(Vector2 p1, Vector2 p2) {
 
     }
 

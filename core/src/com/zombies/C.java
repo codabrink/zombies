@@ -69,12 +69,12 @@ public class C {
 	public float ZOMBIE_CHANGE_CHANCE = 0.03f;
 	public float ZOMBIE_GUT_SPREAD = 20f;
 	public int   ZOMBIE_HEALTH = 6;
-	public float ZOMBIE_SIZE = 1f; //zombie size
+	public float ZOMBIE_SIZE = 1f;
 	public float ZOMBIE_SLEEP_SPEED = 3f;
 	public float ZOMBIE_SPEED = 15f;
 	public float ZOMBIE_STRENGTH = 7f;
 	public float ZOOM_LEVEL = 0f;
 
-    public boolean POPULATE_ZOMBIES = false;
+    public boolean POPULATE_ZOMBIES = true;
     public boolean POPULATE_SURVIVORS = false;
 }
