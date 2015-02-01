@@ -241,7 +241,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-		//box.getRoom().drawFloors();
+		box.getRoom().drawFloors(spriteBatch, shapeRenderer);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);

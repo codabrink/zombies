@@ -106,8 +106,8 @@ public class Box {
 			walls.get(i).makeDoor();
 	}
 	
-	public void drawFloor() {
-		floor.draw();
+	public void drawFloor(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+		floor.draw(spriteBatch, shapeRenderer);
 	}
 	
 	public Vector2 getPosition() {

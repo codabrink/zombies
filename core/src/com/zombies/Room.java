@@ -81,9 +81,9 @@ public class Room {
 		}
 	}
 	
-	public void drawFloors() {
+	public void drawFloors(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
 		for (Box b: boxes) {
-			b.drawFloor();
+			b.drawFloor(spriteBatch, shapeRenderer);
 		}
 	}
 	
