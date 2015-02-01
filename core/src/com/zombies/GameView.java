@@ -39,7 +39,7 @@ public class GameView implements Screen {
     protected ShootButton shootButton;
     public MessageHandler mh;
     private HUD hud = new HUD(this);
-    private LinkedList<DebugDots> 
+    private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
 
     public float scale = 1;
 
@@ -272,6 +272,10 @@ public class GameView implements Screen {
         Gdx.gl.glFlush();
         handleKeys();
         player.draw(spriteBatch, shapeRenderer);
+
+        for (DebugDots dd: debugDots) {
+            dd.draw(spriteBatch, shapeRenderer);
+        }
     }
 
     protected void updateLists() {
@@ -343,10 +347,6 @@ public class GameView implements Screen {
 
     }
 
-    public void addDebugDots(Vector2 p1, Vector2 p2) {
-
-    }
-
     private void handleKeysDesktop() {
         float strength = 10;
 
@@ -393,4 +393,11 @@ public class GameView implements Screen {
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
     public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}
     public SpriteBatch getSpriteBatch() {return spriteBatch;}
+
+    public void addDebugDots(Vector2 p1, Vector2 p2) {
+        debugDots.add(new DebugDots(this, p1, p2));
+    }
+    public void clearDebugDots() {
+        debugDots = new LinkedList<DebugDots>();
+    }
 }

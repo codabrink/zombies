@@ -48,7 +48,12 @@ public class Bullet {
                 return 0;
             }
         };
-        view.getWorld().rayCast(callback, position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE)), position.cpy().add(direction.cpy().setLength(100)));
+        Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
+        Vector2 p2 = position.cpy().add(direction.cpy().setLength(10));
+
+        view.getWorld().rayCast(callback, p1, p2);
+        view.clearDebugDots();
+        view.addDebugDots(p1, p2);
 	}
 
     public void update() {

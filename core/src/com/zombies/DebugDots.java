@@ -17,7 +17,7 @@ public class DebugDots {
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        shapeRenderer.begin();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1, 0, 1, 1);
         shapeRenderer.rect(p1.x - radius, p1.y - radius, radius * 2, radius * 2);
         shapeRenderer.rect(p2.x - radius, p2.y - radius, radius * 2, radius * 2);

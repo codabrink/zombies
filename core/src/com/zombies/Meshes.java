@@ -1,9 +1,6 @@
 package com.zombies;
 
-import java.util.LinkedList;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -24,7 +21,7 @@ public class Meshes {
 	public Texture floor2Texture;
 	public Mesh gunMesh;
 	
-	public Sound shotgunPickup = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun-pickup.mp3"));
+	public Sound shotgunPickup = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun-pickup.ogg"));
 	
 	//public Music main = Gdx.audio.newMusic(Gdx.files.internal("data/sound/music/main.mp3"));
 	
