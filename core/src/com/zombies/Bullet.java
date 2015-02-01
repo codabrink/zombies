@@ -21,26 +21,26 @@ public class Bullet {
 	private float speed = 3f;
     private RayCastCallback callback;
     private Gun gun;
-    private float castSpread = 2.5f;
+    private float castSpread = 2f;
 
     private float destinedTrajectoryLength;
 
     private Fixture stopFixture;
 
 	public Bullet(final GameView view, Unit unit, short group, Gun gun, final Vector2 position, Vector2 direction) {
-		c = view.c;
-		this.view = view;
+        c = view.c;
+        this.view = view;
         this.originalPosition = position.cpy();
         this.position = position.cpy();
         this.direction = direction.cpy().setLength(speed);
-		this.unit = unit;
+        this.unit = unit;
         this.gun = gun;
 
         callback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
                 // If the fixture is in the stoppingObjects list
-                BodData bodData = ((BodData)fixture.getBody().getUserData());
+                BodData bodData = ((BodData) fixture.getBody().getUserData());
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
                     destinedTrajectoryLength = position.dst(point);
                     stopFixture = fixture;
@@ -53,25 +53,25 @@ public class Bullet {
         Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
         Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
         view.getWorld().rayCast(callback, p1, p2);
-        view.addDebugDots(p1, p2);
+        if (c.DEBUG_BULLETS) view.addDebugDots(p1, p2);
 
         Vector2 relativePoint = p2.cpy().sub(p1);
         relativePoint.rotate(castSpread * -2);
         view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
 
         relativePoint.rotate(castSpread);
         view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
 
         relativePoint.rotate(castSpread * 2);
         view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
 
         relativePoint.rotate(castSpread);
         view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        view.addDebugDots(p1, relativePoint.cpy().add(p1));
-	}
+        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
+    }
 
     public void update() {
         //move the bullet
