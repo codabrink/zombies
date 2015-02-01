@@ -21,6 +21,7 @@ public class Bullet {
 	private float speed = 3f;
     private RayCastCallback callback;
     private Gun gun;
+    private float castSpread = 2.5f;
 
     private float destinedTrajectoryLength;
 
@@ -48,12 +49,28 @@ public class Bullet {
                 return 0;
             }
         };
-        Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
-        Vector2 p2 = position.cpy().add(direction.cpy().setLength(10));
-
-        view.getWorld().rayCast(callback, p1, p2);
         view.clearDebugDots();
+        Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
+        Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
+        view.getWorld().rayCast(callback, p1, p2);
         view.addDebugDots(p1, p2);
+
+        Vector2 relativePoint = p2.cpy().sub(p1);
+        relativePoint.rotate(castSpread * -2);
+        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
+        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+
+        relativePoint.rotate(castSpread);
+        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
+        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+
+        relativePoint.rotate(castSpread * 2);
+        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
+        view.addDebugDots(p1, relativePoint.cpy().add(p1));
+
+        relativePoint.rotate(castSpread);
+        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
+        view.addDebugDots(p1, relativePoint.cpy().add(p1));
 	}
 
     public void update() {

@@ -286,12 +286,8 @@ public class GameView implements Screen {
     }
 
     protected void handleKeys() {
-        if (c.DESKTOP_MODE) {
-            handleKeysDesktop();
-        } else {
-            handleKeysAndroid();
-        }
-
+        handleKeysDesktop();
+        handleKeysAndroid();
     }
 
     protected void handleContacts() {
@@ -348,7 +344,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 10;
+        float strength = 150;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
