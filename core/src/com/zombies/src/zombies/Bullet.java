@@ -1,4 +1,4 @@
-package com.zombies;
+package com.zombies.src.zombies;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.RayCastCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class Bullet {
 	private Unit unit;

@@ -1,19 +1,18 @@
-package com.guns;
-
-import java.util.ArrayList;
-import java.util.Random;
-
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zombies.Bullet;
-import com.zombies.GameView;
-import com.zombies.Gun;
-import com.zombies.Message;
-import com.zombies.Unit;
+package com.zombies.src.guns;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.src.zombies.Bullet;
+import com.zombies.src.zombies.GameView;
+import com.zombies.src.zombies.Gun;
+import com.zombies.src.zombies.Message;
+import com.zombies.src.zombies.Unit;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Shotgun extends Gun {
 

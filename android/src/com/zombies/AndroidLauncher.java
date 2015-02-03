@@ -1,4 +1,4 @@
-package com.zombies.android;
+package com.zombies;
 
 import android.os.Bundle;
 

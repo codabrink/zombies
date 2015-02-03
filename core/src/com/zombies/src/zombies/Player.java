@@ -1,18 +1,18 @@
-package com.zombies;
-
-import java.util.ArrayList;
-import java.util.Random;
+package com.zombies.src.zombies;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.zombies.src.guns.Pistol;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Player extends Unit implements Collideable {
 
