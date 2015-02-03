@@ -1,5 +1,6 @@
 package com.zombies;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -20,8 +21,10 @@ public class HUD implements InputProcessor{
 
 	public void render(SpriteBatch spriteBatch) {
 		view.getPlayer().renderGunInfo(spriteBatch);
-		view.getThumbpadLeft().render(spriteBatch);
-        view.getThumbpadRight().render(spriteBatch);
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
+            view.getThumbpadLeft().render(spriteBatch);
+            view.getThumbpadRight().render(spriteBatch);
+        }
 		this.drawHealth(spriteBatch);
 		this.drawZombiesKilled(spriteBatch);
         this.drawDebug();
@@ -72,21 +75,25 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        //Left thumbpad
-        if (screenX < Gdx.graphics.getWidth() * 0.5f) {
-            view.getThumbpadLeft().updateFromTouch(screenX, screenY, pointer);
-        }
-        //Right thumbpad
-        if (screenX > Gdx.graphics.getWidth() * 0.5f) {
-            view.getThumbpadRight().updateFromTouch(screenX, screenY, pointer);
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
+            //Left thumbpad
+            if (screenX < Gdx.graphics.getWidth() * 0.5f) {
+                view.getThumbpadLeft().updateFromTouch(screenX, screenY, pointer);
+            }
+            //Right thumbpad
+            if (screenX > Gdx.graphics.getWidth() * 0.5f) {
+                view.getThumbpadRight().updateFromTouch(screenX, screenY, pointer);
+            }
         }
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        view.getThumbpadLeft().touchUp(screenX, screenY, pointer);
-        view.getThumbpadRight().touchUp(screenX, screenY, pointer);
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
+            view.getThumbpadLeft().touchUp(screenX, screenY, pointer);
+            view.getThumbpadRight().touchUp(screenX, screenY, pointer);
+        }
         return false;
     }
 
