@@ -1,5 +1,6 @@
 package com.guns;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,6 +21,7 @@ public class Shotgun extends Gun {
 	private Random random = new Random();
 	private float shotSpread = 10;
 	private Sound shoot = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun.mp3"));
+    private Random r = new Random();
 	
 	public Shotgun(GameView view, Unit unit, int ammo) {
 		super(view, unit);
@@ -47,7 +49,12 @@ public class Shotgun extends Gun {
 		lastShot = System.currentTimeMillis();
 		for (int i=1; i <= shotSize; i++) {
 			Vector2 tempDirection = direction.rotate(random.nextFloat() * shotSpread * 2 - shotSpread);
-			bullets.add(new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), tempDirection));
+            Bullet bullet = new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), tempDirection);
+			bullets.add(bullet);
+
+            ArrayList<Unit> killRoster = bullet.unitsInBulletRange();
+            if (killRoster.size() > 0)
+                killRoster.get(r.nextInt(killRoster.size())).die(unit);
 		}
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;

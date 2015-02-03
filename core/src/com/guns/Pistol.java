@@ -14,9 +14,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Pistol extends Gun {
 	private Sound shoot = Gdx.audio.newSound(Gdx.files.internal("data/sound/pistol.mp3"));
 	private RayCastCallback callback;
+    private Random r = new Random();
 
 	public Pistol(GameView view, Unit unit, int ammo) {
 		super(view, unit);
@@ -49,7 +53,13 @@ public class Pistol extends Gun {
 			return;
 		}
 		lastShot = System.currentTimeMillis();
-        bullets.add(new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), direction));
+        Bullet bullet = new Bullet(view, unit, unit.getGroup(), this, unit.getBody().getPosition(), direction);
+        bullets.add(bullet);
+
+        ArrayList<Unit> killRoster = bullet.unitsInBulletRange();
+        if (killRoster.size() > 0)
+            killRoster.get(r.nextInt(killRoster.size())).die(unit);
+
 		unit.getBox().getRoom().alarm(unit);
 		view.s.shots ++;
 		if (ammo > 0) ammo--;

@@ -172,6 +172,15 @@ public class Box {
 	public ArrayList<Unit> getUnits() {
 		return zombies;
 	}
+    public ArrayList<Unit> getAliveUnits() {
+        ArrayList<Unit> units = new ArrayList<Unit>();
+        for (Unit u: zombies) {
+            if (!u.dead) {
+                units.add(u);
+            }
+        }
+        return units;
+    }
 	
 	public Wall getWall(int i) {
 		return walls.get(i);

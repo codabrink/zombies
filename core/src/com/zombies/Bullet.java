@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
+import java.util.LinkedList;
 
 public class Bullet {
 	private Unit unit;
@@ -21,7 +23,7 @@ public class Bullet {
 	private float speed = 3f;
     private RayCastCallback callback;
     private Gun gun;
-    private float castSpread = 2f;
+    private float shotSpread = 5f;
 
     private float destinedTrajectoryLength;
 
@@ -50,27 +52,29 @@ public class Bullet {
             }
         };
         view.clearDebugDots();
+    }
+
+    public ArrayList<Unit> unitsInBulletRange() {
+        ArrayList<Unit> units = new ArrayList<Unit>();
         Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
         Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
         view.getWorld().rayCast(callback, p1, p2);
-        if (c.DEBUG_BULLETS) view.addDebugDots(p1, p2);
 
-        Vector2 relativePoint = p2.cpy().sub(p1);
-        relativePoint.rotate(castSpread * -2);
-        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        Vector2 shotPointLeft = p2.cpy().sub(p1).rotate(-shotSpread).add(p1);
+        view.getWorld().rayCast(callback, p1, shotPointLeft);
+        Vector2 shotPointRight = p2.cpy().sub(p1).rotate(shotSpread).add(p1);
+        view.getWorld().rayCast(callback, p1, shotPointRight.cpy().add(p1));
+        if (c.DEBUG_BULLETS) view.addDebugDots(shotPointLeft, shotPointRight);
 
-        relativePoint.rotate(castSpread);
-        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        for (Unit u: unit.getBox().getRoom().getAliveUnits()) {
+            if (pointInTriangle(u.getBody().getPosition(), p1, shotPointLeft, shotPointRight)) {
+                units.add(u);
+            }
+        }
 
-        relativePoint.rotate(castSpread * 2);
-        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        view.getHUD().setDebugMessage(""+units.size());
 
-        relativePoint.rotate(castSpread);
-        view.getWorld().rayCast(callback, p1, relativePoint.cpy().add(p1));
-        if (c.DEBUG_BULLETS) view.addDebugDots(p1, relativePoint.cpy().add(p1));
+        return units;
     }
 
     public void update() {
@@ -78,10 +82,6 @@ public class Bullet {
         position.add(direction);
 
         if (stopFixture == null) return;
-        BodData bodData = ((BodData)stopFixture.getBody().getUserData());
-        if (bodData != null && bodData.getType() == "zombie") {
-            ((Zombie) bodData.getObject()).die(unit);
-        }
 
         if (originalPosition.dst(position) > destinedTrajectoryLength || System.currentTimeMillis() > createTime + lifeTime) {
             gun.appendKillBullets(this);
@@ -95,7 +95,21 @@ public class Bullet {
         shapeRenderer.end();
         update();
 	}
-	
+
+    private float sign (Vector2 p1, Vector2 p2, Vector2 p3) {
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    }
+
+    private boolean pointInTriangle (Vector2 pt, Vector2 v1, Vector2 v2, Vector2 v3) {
+        boolean b1, b2, b3;
+
+        b1 = sign(pt, v1, v2) < 0.0f;
+        b2 = sign(pt, v2, v3) < 0.0f;
+        b3 = sign(pt, v3, v1) < 0.0f;
+
+        return ((b1 == b2) && (b2 == b3));
+    }
+
 	public Unit getUnit() {
 		return unit;
 	}

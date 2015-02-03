@@ -21,7 +21,7 @@ public class Meshes {
 	public Texture floor2Texture;
 	public Mesh gunMesh;
 	
-	public Sound shotgunPickup = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun-pickup.ogg"));
+	public Sound shotgunPickup = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun-pickup.mp3"));
 	
 	//public Music main = Gdx.audio.newMusic(Gdx.files.internal("data/sound/music/main.mp3"));
 	
