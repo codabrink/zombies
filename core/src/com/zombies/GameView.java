@@ -164,34 +164,34 @@ public class GameView implements Screen {
     protected void setReferences(){
         for (int i=1;i<=c.GRID_WIDTH;i++){
             for (int j=1;j<=c.GRID_HEIGHT;j++){
-                grid[i][j] = new Box(this, (i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT);
+                grid[i][j] = new Box(this, (i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT, i, j);
             }
         }
         for (int i=1;i<=c.GRID_WIDTH;i++){
             for (int j=1;j<=c.GRID_HEIGHT;j++){
                 if (j > 1){
-                    grid[i][j].addBorder(grid[i][j - 1]);
+                    grid[i][j].addAdjBox(grid[i][j - 1]);
                 }
                 else {
-                    grid[i][j].addBorder(null);
+                    grid[i][j].addAdjBox(null);
                 }
                 if (i < c.GRID_WIDTH){
-                    grid[i][j].addBorder(grid[i + 1][j]);
+                    grid[i][j].addAdjBox(grid[i + 1][j]);
                 }
                 else {
-                    grid[i][j].addBorder(null);
+                    grid[i][j].addAdjBox(null);
                 }
                 if (j < c.GRID_HEIGHT){
-                    grid[i][j].addBorder(grid[i][j + 1]);
+                    grid[i][j].addAdjBox(grid[i][j + 1]);
                 }
                 else {
-                    grid[i][j].addBorder(null);
+                    grid[i][j].addAdjBox(null);
                 }
                 if (i > 1){
-                    grid[i][j].addBorder(grid[i - 1][j]);
+                    grid[i][j].addAdjBox(grid[i - 1][j]);
                 }
                 else {
-                    grid[i][j].addBorder(null);
+                    grid[i][j].addAdjBox(null);
                 }
             }
         }

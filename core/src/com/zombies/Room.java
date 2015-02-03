@@ -31,7 +31,15 @@ public class Room {
 		c = view.c;
 		this.view = view;
 	}
-	
+
+    public void doorsTo(Room room) {
+        if (!adjRooms.contains(room)) {
+            //TODO further path finding to that room
+            return;
+        }
+
+    }
+
 	public Room(GameView view, Box box) {
 		c = view.c;
 		size = random.nextInt(c.MAX_ROOM_SIZE - c.MIN_ROOM_SIZE) + c.MIN_ROOM_SIZE;

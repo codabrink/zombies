@@ -71,7 +71,7 @@ public class Survivor extends Unit implements Collideable {
 			return;
         //when in different room then player try and get to same room as player
 		if (box.getRoom() != view.getPlayer().getBox().getRoom()) {
-            mPos = findDoorToEnterRoom(getRoom());
+            //mPos = findDoorToEnterRoom(getRoom());
 		}
         //when in same room as player
 		else {
@@ -143,9 +143,7 @@ public class Survivor extends Unit implements Collideable {
 		if (dead) {
 			return;
 		}
-		for (Bullet b: bullets) {
-			b.draw(spriteBatch, shapeRenderer);
-		}
+        gun.draw(spriteBatch, shapeRenderer);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 1, 1);

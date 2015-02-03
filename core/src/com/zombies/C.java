@@ -75,9 +75,9 @@ public class C {
 	public float ZOOM_LEVEL = 0f;
 
     //DEBUG
-    public boolean DEBUG_BULLETS = true;
+    public boolean DEBUG_BULLETS = false;
 
 
     public boolean POPULATE_ZOMBIES = true;
-    public boolean POPULATE_SURVIVORS = false;
+    public boolean POPULATE_SURVIVORS = true;
 }

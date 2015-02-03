@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class DebugDots {
 
+    //TODO Old class, currently unused
+
     private GameView view;
     Vector2 p1;
     Vector2 p2;

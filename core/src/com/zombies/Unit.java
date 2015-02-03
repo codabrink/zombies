@@ -179,7 +179,12 @@ public class Unit {
 		float ny = body.getPosition().y + y;
 		mPos = new Vector2(nx, ny);
 	}
-	
+
+    public ArrayList<Vector2> pathFind(Vector2 point) {
+
+        return new ArrayList<Vector2>();
+    }
+
 	public void sick(Unit a) {
 		if (attack == null)
 			attack = a;

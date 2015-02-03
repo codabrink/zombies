@@ -3,7 +3,6 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,7 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Box {
 
-	private ArrayList<Box> borders = new ArrayList<Box>();
+	private ArrayList<Box> adjBoxes = new ArrayList<Box>();
 	private ArrayList<Wall> walls = new ArrayList<Wall>();
 	private ArrayList<Unit> zombies = new ArrayList<Unit>();
 	private ArrayList<Unit> survivors = new ArrayList<Unit>();
@@ -25,20 +24,22 @@ public class Box {
 	private LinkedList<Powerup> powerups = new LinkedList<Powerup>();
 	private boolean touched = false;
 	private boolean pathed = false;
-	private int x=0, y=0;
+    private Vector2 position;
+    private int indexX, indexY;
 	private Room room;
 	private GameView view;
 	private Random random = new Random();
 	private C c;
 	private Floor floor;
 	
-	public Box(GameView view, int x, int y) {
+	public Box(GameView view, float x, float y, int indexX, int indexY) {
 		this.c = view.c;
-		this.x = x;
-		this.y = y;
+        position = new Vector2(x, y);
 		this.view = view;
 		this.floor = new Floor(view, this);
-		
+        this.indexX = indexX;
+        this.indexY = indexY;
+
 		//create walls
 		walls.add(new Wall(this.view, this, 0, 0, c.BOX_WIDTH, 0, 0)); //top wall
 		walls.add(new Wall(this.view, this, c.BOX_WIDTH, 0, c.BOX_WIDTH, c.BOX_HEIGHT, 1)); //right wall
@@ -46,7 +47,6 @@ public class Box {
 		walls.add(new Wall(this.view, this, 0, 0, 0, c.BOX_HEIGHT, 3)); //left wall
 		
 		this.populateBox();
-		
 	}
 	
 	private void populateBox() {
@@ -67,9 +67,30 @@ public class Box {
 		}
 	}
 
-	public void addBorder(Box box) {
-		borders.add(box);
+	public void addAdjBox(Box box) {
+		adjBoxes.add(box);
 	}
+    public boolean isAdjacent(Box box) { return adjBoxes.contains(box); }
+    public int adjDirection(Box box) {
+        int dX = box.getIndexX() - this.indexX;
+        int dY = box.getIndexY() - this.indexY;
+        if (dX != 0 && dY != 0 || box == this) { return -1; }
+        if (dX == -1)
+            return 4;
+        if (dX == 1)
+            return 2;
+        if (dY == -1)
+            return 1;
+        if (dY == 1)
+            return 3;
+        return -1;
+    }
+
+    public int getIndexX() {return indexX;}
+    public int getIndexY() {return indexY;}
+    public float getX() {return position.x;}
+    public float getY() {return position.y;}
+
 
 	public LinkedList<Powerup> getPowerups() {
 		return powerups;
@@ -100,8 +121,8 @@ public class Box {
 	}
 	
 	public void createDoor(Box box) {
-		if (!borders.contains(box)) return;
-		int i = borders.indexOf(box);
+		if (!adjBoxes.contains(box)) return;
+		int i = adjBoxes.indexOf(box);
 		if (walls.get(i) != null)
 			walls.get(i).makeDoor();
 	}
@@ -111,19 +132,19 @@ public class Box {
 	}
 	
 	public Vector2 getPosition() {
-		return new Vector2(x, y);
+		return position;
 	}
 
 	public Vector2 getPosition(int i) {
 		switch (i) {
 		case 1:
-			return new Vector2(x, y);
+			return position;
 		case 2:
-			return new Vector2(x + c.BOX_WIDTH, y);
+			return position.cpy().add(c.BOX_WIDTH, 0);
 		case 3:
-			return new Vector2(x, y + c.BOX_HEIGHT);
+			return position.cpy().add(0, c.BOX_HEIGHT);
 		case 4:
-			return new Vector2(x + c.BOX_WIDTH, y + c.BOX_HEIGHT);
+			return position.cpy().add(c.BOX_WIDTH, c.BOX_HEIGHT);
 		}
 		return new Vector2();
 	}
@@ -154,11 +175,11 @@ public class Box {
 	}
 	
 	public Box getBox(int i) {
-		return borders.get(i);
+		return adjBoxes.get(i);
 	}
 	
 	public ArrayList<Box> getBoxes() {
-		return borders;
+		return adjBoxes;
 	}
 	
 	public Room getRoom() {
@@ -187,15 +208,7 @@ public class Box {
 	}
 	
 	public ArrayList<Wall> getWalls() { return walls; }
-	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
+
 	public boolean isPathed() {
 		return pathed;
 	}
@@ -211,7 +224,7 @@ public class Box {
 			int i = 0;
 			while (box == null) {
 				i = random.nextInt(3);
-				box = borders.get(i);
+				box = adjBoxes.get(i);
 			}
 			createDoor(box);
 			box.createDoor(this);
@@ -220,7 +233,7 @@ public class Box {
 	}
 	
 	public Vector2 randomPoint() {
-		return new Vector2(x + random.nextFloat() * c.BOX_WIDTH, y + random.nextFloat() * c.BOX_HEIGHT);
+		return position.cpy().add(random.nextFloat() * c.BOX_WIDTH, random.nextFloat() * c.BOX_HEIGHT);
 	}
 	
 	public Unit randomZombie() {
@@ -235,28 +248,20 @@ public class Box {
 	}
 	
 	public void removeWall(Box box){
-		if (!borders.contains(box)) return;
-		int i = borders.indexOf(box);
+		if (!adjBoxes.contains(box)) return;
+		int i = adjBoxes.indexOf(box);
 		walls.get(i).removeWall();
 		walls.set(i, null);
 	}
 	
 	public void setBorder(Box box, int i) {
-		borders.add(i, box);
+		adjBoxes.add(i, box);
 	}
 
 	public Box setRoom(Room room) {
 		this.room = room;
 		touched = true;
 		return this;
-	}
-	
-	public void setX(int x) {
-		this.x = x;
-	}
-	
-	public void setY(int y) {
-		this.y = y;
 	}
 	
 	public void touch(){
@@ -301,62 +306,62 @@ public class Box {
 	public void updatePlayerRecords() {
 		Player player = view.getPlayer();
 		//too far right
-		if (player.getX() > x + c.BOX_WIDTH) {
-			if (borders.get(1) != null) {
-				player.setBox(borders.get(1));
+		if (player.getX() > position.x + c.BOX_WIDTH) {
+			if (adjBoxes.get(1) != null) {
+				player.setBox(adjBoxes.get(1));
 			}
 		}
 		//too far left
-		if (player.getX() < x) {
-			if (borders.get(3) != null) {
-				player.setBox(borders.get(3));
+		if (player.getX() < position.x) {
+			if (adjBoxes.get(3) != null) {
+				player.setBox(adjBoxes.get(3));
 			}
 		}
 		//too far below
-		if (player.getY() > y + c.BOX_HEIGHT) {
-			if (borders.get(2) != null) {
-				player.setBox(borders.get(2));
+		if (player.getY() > position.y + c.BOX_HEIGHT) {
+			if (adjBoxes.get(2) != null) {
+				player.setBox(adjBoxes.get(2));
 			}
 		}
 		//too far above
-		if (player.getY() < y) {
-			if (borders.get(0) != null) {
-				player.setBox(borders.get(0));
+		if (player.getY() < position.y) {
+			if (adjBoxes.get(0) != null) {
+				player.setBox(adjBoxes.get(0));
 			}
 		}
 	}
 	
 	public void updateSurvivorRecords(Unit p) {
 		//too far right
-		if (p.getX() > x + c.BOX_WIDTH) {
-			if (borders.get(1) != null) {
-				p.setBox(borders.get(1));
+		if (p.getX() > position.x + c.BOX_WIDTH) {
+			if (adjBoxes.get(1) != null) {
+				p.setBox(adjBoxes.get(1));
 				dumpList.add(p);
-				borders.get(1).addSurvivor(p);
+				adjBoxes.get(1).addSurvivor(p);
 			}
 		}
 		//too far left
-		if (p.getX() < x) {
-			if (borders.get(3) != null) {
-				p.setBox(borders.get(3));
+		if (p.getX() < position.x) {
+			if (adjBoxes.get(3) != null) {
+				p.setBox(adjBoxes.get(3));
 				dumpList.add(p);
-				borders.get(3).addSurvivor(p);
+				adjBoxes.get(3).addSurvivor(p);
 			}
 		}
 		//too far below
-		if (p.getY() > y + c.BOX_HEIGHT) {
-			if (borders.get(2) != null) {
-				p.setBox(borders.get(2));
+		if (p.getY() > position.y + c.BOX_HEIGHT) {
+			if (adjBoxes.get(2) != null) {
+				p.setBox(adjBoxes.get(2));
 				dumpList.add(p);
-				borders.get(2).addSurvivor(p);
+				adjBoxes.get(2).addSurvivor(p);
 			}
 		}
 		//too far above
-		if (p.getY() < y) {
-			if (borders.get(0) != null) {
-				p.setBox(borders.get(0));
+		if (p.getY() < position.y) {
+			if (adjBoxes.get(0) != null) {
+				p.setBox(adjBoxes.get(0));
 				dumpList.add(p);
-				borders.get(0).addSurvivor(p);
+				adjBoxes.get(0).addSurvivor(p);
 			}
 		}
 	}
@@ -365,35 +370,35 @@ public class Box {
         if (p.dead) return;
 
 		//too far right
-		if (p.getX() > x + c.BOX_WIDTH) {
-			if (borders.get(1) != null) {
-				p.setBox(borders.get(1));
+		if (p.getX() > position.x + c.BOX_WIDTH) {
+			if (adjBoxes.get(1) != null) {
+				p.setBox(adjBoxes.get(1));
 				dumpList.add(p);
-				borders.get(1).addZombie(p);
+				adjBoxes.get(1).addZombie(p);
 			}
 		}
 		//too far left
-		if (p.getX() < x) {
-			if (borders.get(3) != null) {
-				p.setBox(borders.get(3));
+		if (p.getX() < position.x) {
+			if (adjBoxes.get(3) != null) {
+				p.setBox(adjBoxes.get(3));
 				dumpList.add(p);
-				borders.get(3).addZombie(p);
+				adjBoxes.get(3).addZombie(p);
 			}
 		}
 		//too far below
-		if (p.getY() > y + c.BOX_HEIGHT) {
-			if (borders.get(2) != null) {
-				p.setBox(borders.get(2));
+		if (p.getY() > position.y + c.BOX_HEIGHT) {
+			if (adjBoxes.get(2) != null) {
+				p.setBox(adjBoxes.get(2));
 				dumpList.add(p);
-				borders.get(2).addZombie(p);
+				adjBoxes.get(2).addZombie(p);
 			}
 		}
 		//too far above
-		if (p.getY() < y) {
-			if (borders.get(0) != null) {
-				p.setBox(borders.get(0));
+		if (p.getY() < position.y) {
+			if (adjBoxes.get(0) != null) {
+				p.setBox(adjBoxes.get(0));
 				dumpList.add(p);
-				borders.get(0).addZombie(p);
+				adjBoxes.get(0).addZombie(p);
 			}
 		}
 	}
