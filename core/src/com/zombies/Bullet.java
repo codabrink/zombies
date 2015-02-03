@@ -56,7 +56,7 @@ public class Bullet {
 
     public ArrayList<Unit> unitsInBulletRange() {
         ArrayList<Unit> units = new ArrayList<Unit>();
-        Vector2 p1 = position.cpy().add(direction.cpy().setLength(c.PLAYER_SIZE));
+        Vector2 p1 = position.cpy().add(direction);
         Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
         view.getWorld().rayCast(callback, p1, p2);
 
