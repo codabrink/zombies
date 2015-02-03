@@ -67,61 +67,51 @@ public class Survivor extends Unit implements Collideable {
 	
 	private void AI() {
 		handleShots();
-		if (mPos == null) {
-			mPos = randomDirection();
-		}
-		this.move();
 		if (!this.canChangeMPos())
 			return;
-		if (box != view.getPlayer().getBox()) {
-			//move left
-			float dx = view.getPlayer().getBody().getPosition().x - body.getPosition().x;
-			float dy = view.getPlayer().getBody().getPosition().y - body.getPosition().y;
-			if (Math.abs(dx) > Math.abs(dy)) {
-				if (dx < 0) {
-					if (box.getWall(3) == null) {
-						mPos = box.getBox(3).randomPoint();
-					}
-					else {
-						mPos = new Vector2(box.getX(), box.getY() + c.BOX_HEIGHT / 2f);
-					}
-				}
-				//move right
-				else {
-					if (box.getWall(1) == null) {
-						mPos = box.getBox(1).randomPoint();
-					}
-					else {
-						mPos = new Vector2(box.getX() + c.BOX_WIDTH, box.getY() + c.BOX_HEIGHT / 2f);
-					}
-				}
-			}
-			else {
-				//move up
-				if (dy < 0) {
-					if (box.getWall(0) == null) {
-						mPos = box.getBox(0).randomPoint();
-					}
-					else {
-						mPos = new Vector2(box.getX() + c.BOX_WIDTH / 2f, box.getY());
-					}
-				}
-				//move down
-				else {
-					if (box.getWall(2) == null) {
-						mPos = box.getBox(2).randomPoint();
-					}
-					else {
-						mPos = new Vector2(box.getX() + c.BOX_WIDTH / 2f, box.getY() + c.BOX_HEIGHT);
-					}
-				}
-			}
+        //when in different room then player try and get to same room as player
+		if (box.getRoom() != view.getPlayer().getBox().getRoom()) {
+            mPos = findDoorToEnterRoom(getRoom());
 		}
+        //when in same room as player
 		else {
-			mPos = randomDirection();
+            if (isFurtherThanFromPlayer(20f)) {
+                //defend
+            } else if (zombiesBetweenSelfAndPlayer()) {
+                //move to zombie
+            } else if (isFurtherThanFromPlayer(10f) || isCloserThanFromPlayer(6f)) {
+                //move closer to player
+                Vector2 dP = new Vector2(
+                        body.getPosition().x - view.getPlayer().getX() + (random.nextFloat() * 2 - 1f),
+                        body.getPosition().y - view.getPlayer().getY() + (random.nextFloat() * 2 - 1f)
+                );
+                dP.setLength(8 + (random.nextFloat() * 4 - 2f));
+                mPos = view.getPlayer().getBody().getPosition().cpy().add(dP);
+            }
 		}
-		
+        if (mPos != null) {
+            this.move();
+            mPos = null;
+        }
 	}
+
+    @Override
+    public void move() {
+        body.applyForce(mPos.sub(body.getPosition()).setLength(8f), new Vector2(), true);
+    }
+
+    public boolean isFurtherThanFromPlayer(float distance) {
+        return view.getPlayer().getBody().getPosition().dst(body.getPosition()) >= distance;
+    }
+
+    public boolean isCloserThanFromPlayer(float distance) {
+        return view.getPlayer().getBody().getPosition().dst(body.getPosition()) < distance;
+    }
+
+    public boolean zombiesBetweenSelfAndPlayer() {
+        return false;
+    }
+
 	
 	@Override
 	public void die(Unit u) {
