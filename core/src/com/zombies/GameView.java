@@ -142,6 +142,11 @@ public class GameView implements Screen {
                 }
             }
         }
+        for (int i=1;i<=c.GRID_HEIGHT;i++) {
+            for (int j = 1; j <= c.GRID_WIDTH; j++) {
+                grid[j][i].getRoom().findAdjacentRooms();
+            }
+        }
     }
 
     public int getLightingCount() {

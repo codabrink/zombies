@@ -17,9 +17,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Shotgun extends Gun {
 
-	private int shotSize = 4;
+	private int shotSize = 6;
 	private Random random = new Random();
-	private float shotSpread = 10;
+	private float shotSpread = 5;
 	private Sound shoot = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun.mp3"));
     private Random r = new Random();
 	

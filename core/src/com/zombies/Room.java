@@ -13,13 +13,13 @@ public class Room {
 
 	private int size;
 	private ArrayList<Box> boxes = new ArrayList<Box>();
-	private LinkedList<Room> rooms = new LinkedList<Room>();
+	private ArrayList<Room> adjRooms = new ArrayList<Room>();
 	private Random random = new Random();
 	private boolean alarmed = false;
 	private float alpha = 0;
 	private GameView view;
 	private C c;
-	
+
 	public Room(GameView view, ArrayList<Box> boxes) {
 		this.boxes = boxes;
 		for (Box b: boxes) {
@@ -30,7 +30,6 @@ public class Room {
 		//set references
 		c = view.c;
 		this.view = view;
-		this.setAdjacent();
 	}
 	
 	public Room(GameView view, Box box) {
@@ -54,12 +53,11 @@ public class Room {
 		this.removeWalls();
 		
 		this.view = view;
-		this.setAdjacent();
 	}
 	
-	public void addRoom(Room r) {
-		if (!rooms.contains(r)) {
-			rooms.add(r);
+	public void addAdjRoom(Room r) {
+		if (!adjRooms.contains(r)) {
+			adjRooms.add(r);
 		}
 	}
 	
@@ -176,16 +174,23 @@ public class Room {
 		}
 	}
 	
-	public void setAdjacent() {
+	public void findAdjacentRooms() {
 		for (Box b: boxes) {
 			for (Box bb: b.getBoxes()) {
 				if (bb != null && bb.getRoom() != null)
-					bb.getRoom().addRoom(this);
+					bb.getRoom().addAdjRoom(this);
 			}
 		}
 	}
-	
-	public void update() {
+
+    public void primaryUpdate() {
+        view.getHUD().setDebugMessage(adjRooms.size()+"");
+        for (Room r: adjRooms) {
+            r.secondaryUpdate();
+        }
+    }
+
+	public void secondaryUpdate() {
 		for (Box b: boxes) {
 			b.update();
 		}

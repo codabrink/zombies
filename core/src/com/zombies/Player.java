@@ -267,7 +267,7 @@ public class Player extends Unit implements Collideable {
 		}
 		
 		//update things
-		box.getRoom().update();
+		box.getRoom().primaryUpdate();
 		update();
 	}
 	

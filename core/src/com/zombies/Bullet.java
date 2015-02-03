@@ -71,9 +71,6 @@ public class Bullet {
                 units.add(u);
             }
         }
-
-        view.getHUD().setDebugMessage(""+units.size());
-
         return units;
     }
 
