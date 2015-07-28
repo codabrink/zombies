@@ -22,6 +22,7 @@ public class Survivor extends Unit implements Collideable {
 	private boolean found = false;
 	private long lastShot;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
+    protected LinkedList<Vector2> pointsOfInterest = new LinkedList<Vector2>(); // Points of interest
 	private Unit target = null;
 	private Random random = new Random();
 	private short GROUP = -4;
@@ -69,35 +70,42 @@ public class Survivor extends Unit implements Collideable {
 		handleShots();
 		if (!this.canChangeMPos())
 			return;
-        //when in different room then player try and get to same room as player
-		if (box.getRoom() != view.getPlayer().getBox().getRoom()) {
-            //mPos = findDoorToEnterRoom(getRoom());
-		}
-        //when in same room as player
-		else {
-            if (isFurtherThanFromPlayer(20f)) {
-                //defend
-            } else if (zombiesBetweenSelfAndPlayer()) {
-                //move to zombie
-            } else if (isFurtherThanFromPlayer(10f) || isCloserThanFromPlayer(6f)) {
-                //move closer to player
-                Vector2 dP = new Vector2(
-                        body.getPosition().x - view.getPlayer().getX() + (random.nextFloat() * 2 - 1f),
-                        body.getPosition().y - view.getPlayer().getY() + (random.nextFloat() * 2 - 1f)
-                );
-                dP.setLength(8 + (random.nextFloat() * 4 - 2f));
-                mPos = view.getPlayer().getBody().getPosition().cpy().add(dP);
-            }
-		}
-        if (mPos != null) {
+
+        if (isFurtherThanFromPlayer(40f)) {
+            body.setTransform(pointNearPlayer(), 0);
+            pointsOfInterest.clear();
+        } else if (zombiesBetweenSelfAndPlayer()) {
+            //move to zombie
+        } else if (isFurtherThanFromPlayer(10f) || isCloserThanFromPlayer(6f)) {
+            mPos = pointNearPlayer();
+        }
+        if (pointsOfInterest.size() > 0 || mPos != null) {
             this.move();
             mPos = null;
         }
 	}
 
+    private Vector2 pointNearPlayer() {
+        //move closer to player
+        Vector2 dP = new Vector2(
+                body.getPosition().x - view.getPlayer().getX() + (random.nextFloat() * 2 - 1f),
+                body.getPosition().y - view.getPlayer().getY() + (random.nextFloat() * 2 - 1f)
+        );
+        dP.setLength(8 + (random.nextFloat() * 4 - 2f));
+        return view.getPlayer().getBody().getPosition().cpy().add(dP);
+    }
+
     @Override
     public void move() {
-        body.applyForce(mPos.sub(body.getPosition()).setLength(8f), new Vector2(), true);
+        if (pointsOfInterest.size() > 0) {
+            // NOTE: With this if here, there is one frame where the survivor doesn't move.
+            body.applyForce(pointsOfInterest.peek().cpy().sub(body.getPosition()).setLength(8f), new Vector2(), true);
+            if (pointsOfInterest.peek().dst(body.getPosition()) < 1) {
+                pointsOfInterest.remove();
+            }
+        } else {
+            body.applyForce(mPos.sub(body.getPosition()).setLength(8f), new Vector2(), true);
+        }
     }
 
     public boolean isFurtherThanFromPlayer(float distance) {
@@ -112,6 +120,9 @@ public class Survivor extends Unit implements Collideable {
         return false;
     }
 
+    public void pushPointOfInterest(Vector2 point) {
+        pointsOfInterest.push(point);
+    }
 	
 	@Override
 	public void die(Unit u) {
@@ -225,7 +236,7 @@ public class Survivor extends Unit implements Collideable {
 		}
 		else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < c.SURVIVOR_WAKE_DIST) {
 			found = true;
-			box.addDumpList(this);
+			box.removeSurvivor(this);
 			view.getPlayer().addSurvivor(this);
 			view.s.survivorsFound ++;
 			view.s.score += c.SCORE_FIND_SURVIVOR;

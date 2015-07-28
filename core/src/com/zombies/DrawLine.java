@@ -38,7 +38,7 @@ public class DrawLine {
         shapeRenderer.line(v1.x * view.scale, v1.y * view.scale, v2.x * view.scale, v2.y * view.scale);
         shapeRenderer.end();
 	}
-	
+
 	public Vector2 getV1(Box box) {
 		return new Vector2(v1.x - box.getX(), v1.y - box.getY());
 	}

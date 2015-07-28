@@ -42,6 +42,8 @@ public class GameView implements Screen {
     private HUD hud = new HUD(this);
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
 
+    public LinkedList<Room> loadedRooms = new LinkedList<Room>();
+
     public float scale = 1;
 
     private Box2DDebugRenderer debugRenderer;
@@ -70,9 +72,9 @@ public class GameView implements Screen {
         world = new World(new Vector2(), true);
         setReferences();
         generateLevel();
-        player = new Player(this, grid[1][1]);
         addSurvivors();
         populateLevel();
+        player = new Player(this, grid[1][1]);
         camHandle = new CameraHandle(this);
         int radius = (int)(this.main.getWidth() * c.JOY_SIZE);
         thumbpadLeft = new ThumbpadLeft(this);
@@ -86,10 +88,8 @@ public class GameView implements Screen {
 
     private void addSurvivors() {
         if (!c.POPULATE_SURVIVORS) return;
-        for (int i=1;i<=3;i++) {
-            Survivor s = player.getBox().addSurvivor();
-            s.wake();
-            player.addSurvivor(s);
+        for (int i=1;i<=10;i++) {
+            randomBox().addSurvivor();
         }
     }
 
@@ -125,6 +125,10 @@ public class GameView implements Screen {
                 }
             }
         }
+    }
+
+    public Box randomBox(){
+        return grid[random.nextInt(c.GRID_WIDTH)+1][random.nextInt(c.GRID_HEIGHT)+1];
     }
 
     protected void generateLevel() {
@@ -242,6 +246,8 @@ public class GameView implements Screen {
 
     @Override
     public void render(float delta) {
+        updateLoop();
+
         handleContacts();
         camHandle.update();
 
@@ -260,8 +266,6 @@ public class GameView implements Screen {
         this.updateLists();
         this.clearDumps();
 
-        mh.update();
-
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -270,8 +274,6 @@ public class GameView implements Screen {
         HUDSpriteBatch.begin();
 
         HUDSpriteBatch.enableBlending();
-
-        hud.update();
         hud.render(HUDSpriteBatch);
 
         HUDSpriteBatch.end();
@@ -282,6 +284,16 @@ public class GameView implements Screen {
         for (DebugDots dd: debugDots) {
             dd.draw(spriteBatch, shapeRenderer);
         }
+    }
+
+    protected void updateLoop() {
+        for (Room r : (LinkedList<Room>)loadedRooms.clone()) {
+            r.update();
+        }
+        mh.update();
+        hud.update();
+
+        player.update();
     }
 
     protected void updateLists() {

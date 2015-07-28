@@ -40,6 +40,8 @@ public class Player extends Unit implements Collideable {
 		this.box = box;
 		this.c = view.c;
 
+		box.getRoom().currentRoom();
+
         radius = c.PLAYER_SIZE * 0.5f;
         diameter = c.PLAYER_SIZE;
 
@@ -193,10 +195,8 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public boolean isBody(Body b) {
-		if (b == body)
-			return true;
-		return false;
-	}
+        return b == body;
+    }
 	
 	//@Override
 	//public void die(Unit u) {view.main.endGame();}
@@ -241,7 +241,8 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-		box.getRoom().drawFloors(spriteBatch, shapeRenderer);
+        box.getRoom().draw(spriteBatch, shapeRenderer);
+        box.getRoom().drawAdjacentRooms(spriteBatch, shapeRenderer);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
@@ -259,16 +260,6 @@ public class Player extends Unit implements Collideable {
         for (Survivor s: survivors) {
             s.draw(spriteBatch, shapeRenderer);
         }
-
-        box.getRoom().drawRoom(spriteBatch, shapeRenderer);
-		
-		if (oldRoom != null) {
-			oldRoom.drawWalls();
-		}
-		
-		//update things
-		box.getRoom().primaryUpdate();
-		update();
 	}
 	
 	public void renderGunInfo(SpriteBatch spriteBatch) {
@@ -289,10 +280,15 @@ public class Player extends Unit implements Collideable {
 	public void setBox(Box b) {
 		if (b.getRoom() != box.getRoom()) {
 			oldRoom = box.getRoom();
+			for(Survivor s : survivors) {
+                // TODO: update to exact point
+				s.pushPointOfInterest(new Vector2(body.getPosition()));
+			}
+			b.getRoom().currentRoom();
 		}
 		box = b;
 	}
-	
+
 	public void setGun(Gun g) {
 		gunIndex = guns.indexOf(g);
 	}
@@ -323,10 +319,6 @@ public class Player extends Unit implements Collideable {
 //		applyMove();
 		box.updatePlayerRecords();
 		
-		if (oldRoom != null) {
-			oldRoom.updateAlpha();
-		}
-		
 		this.handleHealth();
 
         for (Gun g: guns) {
@@ -339,7 +331,6 @@ public class Player extends Unit implements Collideable {
 		}
 		
 		for(Survivor s: survivorKill) {
-			
 			survivors.remove(s);
 		}
 		survivorKill.clear();

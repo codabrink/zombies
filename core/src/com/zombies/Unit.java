@@ -35,6 +35,10 @@ public class Unit {
 	protected float speed;
 	protected GameView view;
     protected Color color;
+    protected boolean loaded = false;
+
+    protected Vector2 storedPosition;
+    protected BodData storedBodData;
 
 	private RayCastCallback vision = new RayCastCallback() {
 		@Override
@@ -181,7 +185,6 @@ public class Unit {
 	}
 
     public ArrayList<Vector2> pathFind(Vector2 point) {
-
         return new ArrayList<Vector2>();
     }
 
@@ -189,7 +192,27 @@ public class Unit {
 		if (attack == null)
 			attack = a;
 	}
-	
+
+    public void load() {
+
+    }
+
+	public void unload() {
+        if (body == null)
+            return;
+
+        storedPosition = body.getPosition();
+        storedBodData = ((BodData)body.getUserData());
+
+        shape.dispose();
+        body.setUserData(null);
+        view.getWorld().destroyBody(body);
+        shape = null;
+        body = null;
+
+        loaded = false;
+	}
+
 	public void update() {}
 	
 	public void victory() {}

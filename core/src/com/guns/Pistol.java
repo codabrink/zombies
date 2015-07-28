@@ -32,7 +32,7 @@ public class Pistol extends Gun {
         callback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                return 1;
+				return 1;
             }
         };
 	}
@@ -68,7 +68,6 @@ public class Pistol extends Gun {
 	
 	@Override
 	public void update() {
-		super.update();
-	}
-	
+        super.update();
+    }
 }

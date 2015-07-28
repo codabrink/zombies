@@ -54,7 +54,7 @@ public class C {
 	public float SHOOT_BUTTON_SIZE = 0.07f;
 	public float SURVIVOR_CHANCE = 0.07f;
 	public long SURVIVOR_FIRE_RATE = 250;
-	public float SURVIVOR_HEALTH = 20;
+	public float SURVIVOR_HEALTH = 60;
 	public float SURVIVOR_WAKE_DIST = 10f;
 	public long TIME_LIMIT = 120000;
 	public float TILT_IGNORE = 5f;

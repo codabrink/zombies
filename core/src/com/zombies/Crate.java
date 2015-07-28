@@ -76,6 +76,13 @@ public class Crate implements Collideable  {
 		return null;
 	}
 
+	public void unload() {
+		shape.dispose();
+		body.setUserData(null);
+		view.getWorld().destroyBody(body);
+		body = null;
+	}
+
     public void update() {}
 
 	@Override

@@ -18,8 +18,6 @@ public class Box {
 	private ArrayList<Wall> walls = new ArrayList<Wall>();
 	private ArrayList<Unit> zombies = new ArrayList<Unit>();
 	private ArrayList<Unit> survivors = new ArrayList<Unit>();
-	private ArrayList<Unit> dumpList = new ArrayList<Unit>();
-	private ArrayList<Unit> addList = new ArrayList<Unit>();
 	private ArrayList<Crate> crates = new ArrayList<Crate>();
 	private LinkedList<Powerup> powerups = new LinkedList<Powerup>();
 	private boolean touched = false;
@@ -48,7 +46,19 @@ public class Box {
 		
 		this.populateBox();
 	}
-	
+
+	public void load() {
+		for (Unit z : zombies ) {
+			z.load();
+		}
+	}
+
+	public void unload() {
+		for (Unit z : zombies) {
+			z.unload();
+		}
+	}
+
 	private void populateBox() {
 		if (c.ENABLE_CRATES && random.nextFloat() < c.CRATE_CHANCE) {
 			crates.add(new Crate(view, this.randomPoint()));
@@ -96,10 +106,6 @@ public class Box {
 		return powerups;
 	}
 	
-	public void addDumpList(Unit u) {
-		dumpList.add(u);
-	}
-
 	public Survivor addSurvivor() {
 		Survivor s = new Survivor(view, this, this.randomPoint());
 		survivors.add(s);
@@ -109,6 +115,7 @@ public class Box {
 	public void addSurvivor(Unit u) {
 		survivors.add(u);
 	}
+    public void removeSurvivor(Unit u) {survivors.remove(u);}
 	
 	public void addZombie() {
         if (c.POPULATE_ZOMBIES) {
@@ -117,7 +124,7 @@ public class Box {
 	}
 	
 	public void addZombie(Unit u) {
-		addList.add(u);
+		zombies.add(u);
 	}
 	
 	public void createDoor(Box box) {
@@ -196,7 +203,7 @@ public class Box {
     public ArrayList<Unit> getAliveUnits() {
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (Unit u: zombies) {
-            if (!u.dead) {
+            if (!u.dead && u.getBody() != null) {
                 units.add(u);
             }
         }
@@ -241,9 +248,6 @@ public class Box {
 			return null;
 		}
 		Unit u = zombies.get(random.nextInt(zombies.size()));
-		if (u == view.getPlayer()) {
-			return randomZombie();
-		}
 		return u;
 	}
 	
@@ -269,13 +273,11 @@ public class Box {
 	}
 	
 	public void update() {
-		for (Unit u: zombies) {
-			if (u != view.getPlayer()) {
-				u.update();
-				updateZombieRecords(u);
-			}
+		for (Unit u: (ArrayList<Unit>)zombies.clone()) {
+            u.update();
+            updateZombieRecords(u);
 		}
-		for (Unit u: survivors) {
+		for (Unit u: (ArrayList<Survivor>)survivors.clone()) {
 			u.update();
 			updateSurvivorRecords(u);
 		}
@@ -283,16 +285,6 @@ public class Box {
 		for (Crate c: crates) {
 			c.update();
 		}
-		
-		for (Unit u: dumpList) {
-			zombies.remove(u);
-			survivors.remove(u);
-		}
-		dumpList.clear();
-		for (Unit u: addList) {
-			zombies.add(u);
-		}
-		addList.clear();
 		updateWalls();
 	}
 	
@@ -336,7 +328,7 @@ public class Box {
 		if (p.getX() > position.x + c.BOX_WIDTH) {
 			if (adjBoxes.get(1) != null) {
 				p.setBox(adjBoxes.get(1));
-				dumpList.add(p);
+                survivors.remove(p);
 				adjBoxes.get(1).addSurvivor(p);
 			}
 		}
@@ -344,7 +336,7 @@ public class Box {
 		if (p.getX() < position.x) {
 			if (adjBoxes.get(3) != null) {
 				p.setBox(adjBoxes.get(3));
-				dumpList.add(p);
+				survivors.remove(p);
 				adjBoxes.get(3).addSurvivor(p);
 			}
 		}
@@ -352,7 +344,7 @@ public class Box {
 		if (p.getY() > position.y + c.BOX_HEIGHT) {
 			if (adjBoxes.get(2) != null) {
 				p.setBox(adjBoxes.get(2));
-				dumpList.add(p);
+                survivors.remove(p);
 				adjBoxes.get(2).addSurvivor(p);
 			}
 		}
@@ -360,7 +352,7 @@ public class Box {
 		if (p.getY() < position.y) {
 			if (adjBoxes.get(0) != null) {
 				p.setBox(adjBoxes.get(0));
-				dumpList.add(p);
+				survivors.remove(p);
 				adjBoxes.get(0).addSurvivor(p);
 			}
 		}
@@ -373,7 +365,7 @@ public class Box {
 		if (p.getX() > position.x + c.BOX_WIDTH) {
 			if (adjBoxes.get(1) != null) {
 				p.setBox(adjBoxes.get(1));
-				dumpList.add(p);
+				zombies.remove(p);
 				adjBoxes.get(1).addZombie(p);
 			}
 		}
@@ -381,15 +373,15 @@ public class Box {
 		if (p.getX() < position.x) {
 			if (adjBoxes.get(3) != null) {
 				p.setBox(adjBoxes.get(3));
-				dumpList.add(p);
-				adjBoxes.get(3).addZombie(p);
+                zombies.remove(p);
+                adjBoxes.get(3).addZombie(p);
 			}
 		}
 		//too far below
 		if (p.getY() > position.y + c.BOX_HEIGHT) {
 			if (adjBoxes.get(2) != null) {
 				p.setBox(adjBoxes.get(2));
-				dumpList.add(p);
+				zombies.remove(p);
 				adjBoxes.get(2).addZombie(p);
 			}
 		}
@@ -397,7 +389,7 @@ public class Box {
 		if (p.getY() < position.y) {
 			if (adjBoxes.get(0) != null) {
 				p.setBox(adjBoxes.get(0));
-				dumpList.add(p);
+				zombies.remove(p);
 				adjBoxes.get(0).addZombie(p);
 			}
 		}

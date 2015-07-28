@@ -124,7 +124,11 @@ public class Wall implements Collideable {
 		body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
 		lines = new ArrayList<DrawLine>();
 	}
-	
+
+	public void unload() {
+		// unload the wall
+	}
+
 	public void update() {
 		for (DrawLine d: lines) {
 			d.update();

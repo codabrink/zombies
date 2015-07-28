@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -19,6 +20,7 @@ public class Room {
 	private float alpha = 0;
 	private GameView view;
 	private C c;
+    private boolean loaded = false;
 
 	public Room(GameView view, ArrayList<Box> boxes) {
 		this.boxes = boxes;
@@ -39,6 +41,36 @@ public class Room {
         }
 
     }
+
+	public void currentRoom() {
+		load(); // load self
+		for (Room r : (LinkedList<Room>)view.loadedRooms.clone()) {
+			if (!adjRooms.contains(r)) {
+				r.unload();
+			}
+		}
+		for (Room r : adjRooms) {
+			r.load();
+		}
+	}
+
+	public void load() {
+		if (view.loadedRooms.contains(this))
+			return;
+		for (Box b : boxes) {
+			b.load();
+		}
+		view.loadedRooms.push(this);
+        loaded = true;
+	}
+
+	public void unload() {
+		for (Box b: boxes) {
+			b.unload();
+		}
+		view.loadedRooms.remove(this);
+        loaded = false;
+	}
 
 	public Room(GameView view, Box box) {
 		c = view.c;
@@ -81,19 +113,22 @@ public class Room {
 			alarmed = true;
 		}
 	}
-	
-	public void drawRoom(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-		for (Box b: boxes) {
-			b.drawBox(spriteBatch, shapeRenderer);
-		}
-	}
-	
-	public void drawFloors(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-		for (Box b: boxes) {
-			b.drawFloor(spriteBatch, shapeRenderer);
-		}
-	}
-	
+
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        for (Box b : boxes) {
+            b.drawFloor(spriteBatch, shapeRenderer);
+        }
+        for (Box b: boxes) {
+            b.drawBox(spriteBatch, shapeRenderer);
+        }
+    }
+
+    public void drawAdjacentRooms(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        for (Room r : adjRooms){
+            r.draw(spriteBatch, shapeRenderer);
+        }
+    }
+
 	public void drawWalls() {
 		for (Box b: boxes) {
 			b.drawWalls();
@@ -191,19 +226,12 @@ public class Room {
 		}
 	}
 
-    public void primaryUpdate() {
-        for (Room r: adjRooms) {
-            r.secondaryUpdate();
-        }
+    public void update() {
+        if (!loaded)
+            return;
+        for (Box b: boxes) b.update();
     }
 
-	public void secondaryUpdate() {
-		for (Box b: boxes) {
-			b.update();
-		}
-		updateAlpha();
-	}
-	
 	public void updateAlpha() {
 		if (view.getPlayer().getRoom() == this) {
 			if (alpha < 255) {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,36 +25,43 @@ public class Zombie extends Unit implements Collideable{
 		c = view.c;
 		this.box = box;
 		player = view.getPlayer();
-		
+
+        // I kinda hate you, Java...
+        storedPosition = position;
+        storedBodData = new BodData("zombie", this);
+
 		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
-		
 		speed = c.ZOMBIE_SPEED;
-		
+        color = new Color(1, 0, 0, 1);
+		health = c.ZOMBIE_HEALTH;
+	}
+
+    @Override
+	public void load() {
+        if (body != null)
+            return;
+
+        shape = new CircleShape();
 		bDef.allowSleep = true;
 		bDef.fixedRotation = true;
 		bDef.linearDamping = c.LINEAR_DAMPING;
-		bDef.position.set(position);
+		bDef.position.set(storedPosition);
 		bDef.type = BodyType.DynamicBody;
-		
+
 		body = view.getWorld().createBody(bDef);
 		shape.setRadius(c.ZOMBIE_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;
 		body.setMassData(mass);
-		body.setUserData(new BodData("zombie", this));
-
-        color = new Color(1, 0, 0, 1);
+		body.setUserData(storedBodData);
 
 		fDef.shape = shape;
 		fDef.density = 0.1f;
-		
-		body.createFixture(fDef);
-		
-		health = c.ZOMBIE_HEALTH;
 
-		mPos = this.randomClosePoint();
+		body.createFixture(fDef);
+        loaded = true;
 	}
-	
+
 	private void attack() {
 		mPos = attack.getBody().getPosition();
 		if (System.currentTimeMillis() < lastAttack + c.ZOMBIE_ATTACK_RATE) { return; }
@@ -117,9 +125,9 @@ public class Zombie extends Unit implements Collideable{
 		if (attack == null) {
 			if (random.nextFloat() <= c.ZOMBIE_AWARENESS && this.isVisionClear()) {
 				if (random.nextBoolean() == true) {
-					attack = player;
+					attack = view.getPlayer();
 				} else {
-					attack = player.randomSurvivor();
+					attack = view.getPlayer().randomSurvivor();
 				}
 			}
 		}
