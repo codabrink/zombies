@@ -21,7 +21,6 @@ public class Player extends Unit implements Collideable {
 	private long lastAttack = System.currentTimeMillis();
 	private long lastShot = System.currentTimeMillis();
 	private float mX=0, mY=0;
-	private Room oldRoom = null;
 	private Random random = new Random();
 	private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
 	private ArrayList<Survivor> survivorKill = new ArrayList<Survivor>();
@@ -120,11 +119,7 @@ public class Player extends Unit implements Collideable {
 			body.setLinearVelocity(new Vector2(mX, mY));
 		}
 	}
-	
-	public void clearOldRoom() {
-		oldRoom = null;
-	}
-	
+
 	public Body getBody() {return body;}
 	
 	public Box getBox() {
@@ -241,8 +236,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        box.getRoom().draw(spriteBatch, shapeRenderer);
-        box.getRoom().drawAdjacentRooms(spriteBatch, shapeRenderer);
+        box.getRoom().draw(spriteBatch, shapeRenderer, frame, 7);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
@@ -279,7 +273,6 @@ public class Player extends Unit implements Collideable {
 	@Override
 	public void setBox(Box b) {
 		if (b.getRoom() != box.getRoom()) {
-			oldRoom = box.getRoom();
 			for(Survivor s : survivors) {
                 // TODO: update to exact point
 				s.pushPointOfInterest(new Vector2(body.getPosition()));
@@ -311,6 +304,7 @@ public class Player extends Unit implements Collideable {
 	
 	@Override
 	public void update(int frame) {
+		box.getRoom().update(frame, 6);
 		box.updateZombieRecords(this);
 
         //TODO this is temporary

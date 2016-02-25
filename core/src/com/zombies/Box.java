@@ -276,21 +276,18 @@ public class Box {
 	}
 	
 	public void update(int frame) {
-		Iterator<Unit> i = zombies.iterator();
-		while(i.hasNext()) {
-			Zombie z = (Zombie)i.next();
-			z.update(frame);
-			updateZombieRecords(z);
+        for (Unit u: (ArrayList<Unit>)zombies.clone()) {
+            u.update(frame);
+            updateZombieRecords(u);
 
-			if (z.dead) {
-				z.destroy();
-				i.remove();
-			}
-		}
+            if (u.dead) {
+                zombies.remove(u);
+            }
+        }
 
-		while (i.hasNext()) {
-			Survivor s = (Survivor)i.next();
-			updateSurvivorRecords(s);
+        for (Unit u: (ArrayList<Unit>)survivors.clone()) {
+            u.update(frame);
+			updateSurvivorRecords(u);
 		}
 
 		for (Crate c: crates) {

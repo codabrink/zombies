@@ -37,7 +37,7 @@ public class Unit {
     protected Color color;
     protected boolean loaded = false;
 
-    private int frame = 0;
+    protected int frame = 0;
 
     protected Vector2 storedPosition;
     protected BodData storedBodData;

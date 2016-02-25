@@ -21,6 +21,7 @@ public class Room {
 	private GameView view;
 	private C c;
     private boolean loaded = false;
+    private int frame;
 
 	public Room(GameView view, ArrayList<Box> boxes) {
 		this.boxes = boxes;
@@ -44,23 +45,12 @@ public class Room {
 
 	public void currentRoom() {
 		load(); // load self
-		for (Room r : (LinkedList<Room>)view.loadedRooms.clone()) {
-			if (!adjRooms.contains(r)) {
-				r.unload();
-			}
-		}
-		for (Room r : adjRooms) {
-			r.load();
-		}
 	}
 
 	public void load() {
-		if (view.loadedRooms.contains(this))
-			return;
 		for (Box b : boxes) {
 			b.load();
 		}
-		view.loadedRooms.push(this);
         loaded = true;
 	}
 
@@ -68,7 +58,6 @@ public class Room {
 		for (Box b: boxes) {
 			b.unload();
 		}
-		view.loadedRooms.remove(this);
         loaded = false;
 	}
 
@@ -114,18 +103,20 @@ public class Room {
 		}
 	}
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, int frame, int distance) {
+        if (this.frame == frame)
+            return;
         for (Box b : boxes) {
             b.drawFloor(spriteBatch, shapeRenderer);
         }
         for (Box b: boxes) {
             b.drawBox(spriteBatch, shapeRenderer);
         }
-    }
 
-    public void drawAdjacentRooms(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        for (Room r : adjRooms){
-            r.draw(spriteBatch, shapeRenderer);
+        if (distance > 0) {
+            for (Room r : adjRooms) {
+                r.draw(spriteBatch, shapeRenderer, frame, distance - 1);
+            }
         }
     }
 
@@ -226,37 +217,19 @@ public class Room {
 		}
 	}
 
-    public void update(int frame) {
-        if (!loaded)
+    public void update(int frame, int distance) {
+        if (!loaded || this.frame == frame)
             return;
+        this.frame = frame;
+
+        if (distance > 0) {
+            for (Room r : adjRooms) {
+                r.update(frame, distance - 1);
+            }
+        }
+
         for (Box b: boxes) b.update(frame);
     }
-
-	public void updateAlpha() {
-		if (view.getPlayer().getRoom() == this) {
-			if (alpha < 255) {
-				alpha += c.ROOM_ALPHA_RATE;
-			}
-			if (alpha > 255) {
-				alpha = 255;
-			}
-		}
-		else {
-			if (alpha > 0) {
-				alpha -= c.ROOM_ALPHA_RATE;
-			}
-			if (alpha <= 0) {
-				view.getPlayer().clearOldRoom();
-			}
-		}
-		for (Box b: boxes) {
-			for (Wall w: b.getWalls()) {
-				if (w != null) {
-					//TODO: udpate alpha
-				}
-			}
-		}
-	}
 
     public LinkedList<Unit> getAliveUnits() {
         LinkedList<Unit> units = new LinkedList<Unit>();

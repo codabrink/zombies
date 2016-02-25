@@ -43,8 +43,6 @@ public class GameView implements Screen {
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private int frame = 0;
 
-    public LinkedList<Room> loadedRooms = new LinkedList<Room>();
-
     public float scale = 1;
 
     private Box2DDebugRenderer debugRenderer;
@@ -288,9 +286,6 @@ public class GameView implements Screen {
     }
 
     protected void updateLoop() {
-        for (Room r : (LinkedList<Room>)loadedRooms.clone()) {
-            r.update(frame);
-        }
         mh.update();
         hud.update();
 
