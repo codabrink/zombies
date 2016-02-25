@@ -52,7 +52,7 @@ public class HUD implements InputProcessor{
         if (true) return;
 		spriteBatch.end();
 		view.mh.sBatch.begin();
-        view.mh.font.setScale(2);
+        //view.mh.font.setScale(2);
 		view.mh.font.draw(view.mh.sBatch, "Zombies Killed: " + String.valueOf((int)view.s.zombieKills), view.getWidth() - view.getWidth() / 2 - 40, 20);
 		view.mh.sBatch.end();
 		spriteBatch.begin();
