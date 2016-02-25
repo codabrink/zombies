@@ -18,7 +18,6 @@ public class Zombie extends Unit implements Collideable{
 	private Player player;
 	private Random random = new Random();
 	private int updateInt;
-    private Vector2 carcass;
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super(view);
@@ -77,13 +76,11 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        if (dead) return;
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
-        if (dead) {
-            shapeRenderer.rect(carcass.x - 0.5f, carcass.y - 0.5f, 1, 1);
-        } else {
-            shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
-        }
+        shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
         shapeRenderer.end();
 	}
 	
@@ -101,14 +98,12 @@ public class Zombie extends Unit implements Collideable{
 	public void die(Unit u) {
         if (dead) return;
 
-        carcass = body.getPosition();
-        color = new Color(0.3f, 0, 0, 0.3f);
-		destroy();
 		if (u == view.getPlayer()) {
 			view.getPlayer().addZombieKill();
 		}
 		view.s.zombieKills ++;
 		view.s.score += c.SCORE_ZOMBIE_KILL;
+        dead = true;
 	}
 	
 	private Vector2 randomClosePoint() {
@@ -118,8 +113,9 @@ public class Zombie extends Unit implements Collideable{
 	}
 
 	@Override
-	public void update() {
-        if (dead) return;
+	public void update(int frame) {
+		super.update(frame);
+		if (dead) return;
 
 		//handle sleeping
 		if (attack == null) {

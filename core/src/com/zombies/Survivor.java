@@ -227,13 +227,12 @@ public class Survivor extends Unit implements Collideable {
 	}
 	
 	@Override
-	public void update() {
-		if (dead) {
+	public void update(int frame) {
+		super.update(frame);
+		if (dead)
 			return;
-		}
-		if (found) {
+		if (found)
 			AI();
-		}
 		else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < c.SURVIVOR_WAKE_DIST) {
 			found = true;
 			box.removeSurvivor(this);

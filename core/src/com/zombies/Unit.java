@@ -37,6 +37,8 @@ public class Unit {
     protected Color color;
     protected boolean loaded = false;
 
+    private int frame = 0;
+
     protected Vector2 storedPosition;
     protected BodData storedBodData;
 
@@ -77,9 +79,9 @@ public class Unit {
 	
 	public void destroy() {
         dead = true;
+		view.getWorld().destroyBody(body);
 		shape.dispose();
         body.setUserData(null);
-		view.getWorld().destroyBody(body);
         body = null;
 	}
 	
@@ -213,7 +215,11 @@ public class Unit {
         loaded = false;
 	}
 
-	public void update() {}
+	public void update(int frame) {
+        if (this.frame == frame)
+            return;
+        this.frame = frame;
+    }
 	
 	public void victory() {}
 }

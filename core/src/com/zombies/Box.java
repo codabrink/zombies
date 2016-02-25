@@ -11,12 +11,14 @@ import com.powerups.PistolPickup;
 import com.powerups.ShotgunPickup;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.zombie.Carcass;
 
 public class Box {
 
 	private ArrayList<Box> adjBoxes = new ArrayList<Box>();
 	private ArrayList<Wall> walls = new ArrayList<Wall>();
 	private ArrayList<Unit> zombies = new ArrayList<Unit>();
+	private ArrayList<Carcass> carcasses = new ArrayList<Carcass>();
 	private ArrayList<Unit> survivors = new ArrayList<Unit>();
 	private ArrayList<Crate> crates = new ArrayList<Crate>();
 	private LinkedList<Powerup> powerups = new LinkedList<Powerup>();
@@ -272,13 +274,13 @@ public class Box {
 		touched = true;
 	}
 	
-	public void update() {
+	public void update(int frame) {
 		for (Unit u: (ArrayList<Unit>)zombies.clone()) {
-            u.update();
+            u.update(frame);
             updateZombieRecords(u);
 		}
 		for (Unit u: (ArrayList<Survivor>)survivors.clone()) {
-			u.update();
+			u.update(frame);
 			updateSurvivorRecords(u);
 		}
 		
@@ -359,7 +361,11 @@ public class Box {
 	}
 	
 	public void updateZombieRecords(Unit p) {
-        if (p.dead) return;
+        if (p.dead) {
+			zombies.remove(p);
+			p.destroy();
+			return;
+		}
 
 		//too far right
 		if (p.getX() > position.x + c.BOX_WIDTH) {

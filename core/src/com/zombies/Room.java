@@ -129,11 +129,11 @@ public class Room {
         }
     }
 
-	public void drawWalls() {
+	public void drawWalls(int frame) {
 		for (Box b: boxes) {
 			b.drawWalls();
 			for (Unit z: b.getUnits()) {
-				z.update();
+				z.update(frame);
 			}
 		}
 	}
@@ -226,10 +226,10 @@ public class Room {
 		}
 	}
 
-    public void update() {
+    public void update(int frame) {
         if (!loaded)
             return;
-        for (Box b: boxes) b.update();
+        for (Box b: boxes) b.update(frame);
     }
 
 	public void updateAlpha() {

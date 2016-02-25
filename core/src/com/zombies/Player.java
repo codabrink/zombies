@@ -310,7 +310,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	@Override
-	public void update() {
+	public void update(int frame) {
 		box.updateZombieRecords(this);
 
         //TODO this is temporary
@@ -326,7 +326,7 @@ public class Player extends Unit implements Collideable {
         }
 
 		for (Survivor s: survivors) {
-			s.update();
+			s.update(frame);
 			s.getBox().updateSurvivorRecords(s);
 		}
 		

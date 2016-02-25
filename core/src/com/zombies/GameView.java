@@ -41,6 +41,7 @@ public class GameView implements Screen {
     public MessageHandler mh;
     private HUD hud = new HUD(this);
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
+    private int frame = 0;
 
     public LinkedList<Room> loadedRooms = new LinkedList<Room>();
 
@@ -288,12 +289,17 @@ public class GameView implements Screen {
 
     protected void updateLoop() {
         for (Room r : (LinkedList<Room>)loadedRooms.clone()) {
-            r.update();
+            r.update(frame);
         }
         mh.update();
         hud.update();
 
-        player.update();
+        frame++;
+
+        if (frame > 2000)
+            frame = 0;
+
+        player.update(frame);
     }
 
     protected void updateLists() {
