@@ -1,6 +1,7 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -275,21 +276,29 @@ public class Box {
 	}
 	
 	public void update(int frame) {
-		for (Unit u: (ArrayList<Unit>)zombies.clone()) {
-            u.update(frame);
-            updateZombieRecords(u);
+		Iterator<Unit> i = zombies.iterator();
+		while(i.hasNext()) {
+			Zombie z = (Zombie)i.next();
+			z.update(frame);
+			updateZombieRecords(z);
+
+			if (z.dead) {
+				z.destroy();
+				i.remove();
+			}
 		}
-		for (Unit u: (ArrayList<Survivor>)survivors.clone()) {
-			u.update(frame);
-			updateSurvivorRecords(u);
+
+		while (i.hasNext()) {
+			Survivor s = (Survivor)i.next();
+			updateSurvivorRecords(s);
 		}
-		
+
 		for (Crate c: crates) {
 			c.update();
 		}
 		updateWalls();
 	}
-	
+
 	private void updateWalls() {
 		for (Wall w: walls) {
 			if (w != null)
@@ -361,12 +370,6 @@ public class Box {
 	}
 	
 	public void updateZombieRecords(Unit p) {
-        if (p.dead) {
-			zombies.remove(p);
-			p.destroy();
-			return;
-		}
-
 		//too far right
 		if (p.getX() > position.x + c.BOX_WIDTH) {
 			if (adjBoxes.get(1) != null) {
