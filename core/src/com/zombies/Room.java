@@ -106,6 +106,7 @@ public class Room {
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, int frame, int distance) {
         if (this.frame == frame)
             return;
+        this.frame = frame;
         for (Box b : boxes) {
             b.drawFloor(spriteBatch, shapeRenderer);
         }
