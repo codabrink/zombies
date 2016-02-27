@@ -32,13 +32,6 @@ public class Zone {
                 checkNearbyZones();
         }
 
-        for (Zombie z: (ArrayList<Zombie>)zombies.clone()) {
-            z.update(frame);
-
-            if (z.isDead())
-                zombies.remove(z);
-        }
-
         if (limit > 0)
             for (Zone z: adjZones) {
                 z.update(frame, limit - 1);
@@ -55,6 +48,12 @@ public class Zone {
             }
         }
         fsAdjCheck = 0;
+    }
+
+    public void load() {
+        for (Zombie z: (ArrayList<Zombie>)zombies.clone()) {
+            z.load();
+        }
     }
 
     public void addBox(Box b) {

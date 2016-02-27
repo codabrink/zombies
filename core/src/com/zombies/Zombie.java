@@ -59,8 +59,7 @@ public class Zombie extends Unit implements Collideable{
 
 		body.createFixture(fDef);
 
-        if (GameView.activeZombies.indexOf(this) == -1)
-            GameView.activeZombies.add(this);
+        view.addActiveZombie(this);
 	}
 
 	private void attack() {
@@ -98,13 +97,11 @@ public class Zombie extends Unit implements Collideable{
 	
 	@Override
 	public void die(Unit u) {
-        if (dead) return;
-
-		if (u == view.getPlayer()) {
-			view.getPlayer().addZombieKill();
-		}
 		view.s.zombieKills ++;
 		view.s.score += C.SCORE_ZOMBIE_KILL;
+
+        view.removeActiveZombie(this);
+        zone.zombies.remove(this);
         dead = true;
 	}
 	
@@ -117,7 +114,15 @@ public class Zombie extends Unit implements Collideable{
 	@Override
 	public void update(int frame) {
 		super.update(frame);
-		if (dead || !loaded) return;
+        if (!loaded) {
+            if (storedPosition.dst(GameView.m.getPlayer().getBody().getPosition()) < 50)
+                load();
+            else
+                return;
+        }
+
+        if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > C.ZONE_SIZE * 2)
+            this.unload();
 
 		//handle sleeping
 		if (attack == null) {

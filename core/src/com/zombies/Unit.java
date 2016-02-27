@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.zombies.zombie.Zone;
 
 public class Unit {
 	protected Unit attack = null;
@@ -35,6 +36,7 @@ public class Unit {
 	protected GameView view;
     protected Color color;
     protected boolean loaded = false;
+    protected Zone zone;
 
     protected int frame = 0;
 
@@ -222,4 +224,11 @@ public class Unit {
     }
 	
 	public void victory() {}
+    public void updateZone() {
+        Zone z;
+        if (body != null)
+            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
+        else
+            z = Zone.getZone(storedPosition.x, storedPosition.y);
+    }
 }

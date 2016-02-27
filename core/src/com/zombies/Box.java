@@ -54,15 +54,9 @@ public class Box {
     }
 
 	public void load() {
-		for (Unit z : zombies ) {
-			z.load();
-		}
 	}
 
 	public void unload() {
-		for (Unit z : zombies) {
-			z.unload();
-		}
 	}
 
 	private void populateBox() {
@@ -279,8 +273,6 @@ public class Box {
 	}
 	
 	public void update(int frame) {
-        System.out.println(zombies.size());
-
         for (Unit u: (ArrayList<Unit>)survivors.clone()) {
             u.update(frame);
 			updateSurvivorRecords(u);

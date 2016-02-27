@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
+import com.sun.org.apache.xalan.internal.xsltc.dom.ArrayNodeListIterator;
 import com.zombies.zombie.Zone;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class GameView implements Screen {
 
     public static GameView m;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
-    public static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
+    private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
 
     //brought down a level
     private PerspectiveCamera cam;
@@ -304,6 +305,10 @@ public class GameView implements Screen {
             frame = 0;
 
         player.update(frame);
+        for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
+            z.update(frame);
+            z.draw(spriteBatch, shapeRenderer);
+        }
     }
 
     protected void updateLists() {
@@ -420,6 +425,13 @@ public class GameView implements Screen {
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
     public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}
     public SpriteBatch getSpriteBatch() {return spriteBatch;}
+    public void addActiveZombie(Zombie z) {
+        if (activeZombies.indexOf(z) == -1)
+            activeZombies.add(z);
+    }
+    public boolean removeActiveZombie(Zombie z) {
+        return activeZombies.remove(z);
+    }
 
     public void addDebugDots(Vector2 p1, Vector2 p2) {
         debugDots.add(new DebugDots(this, p1, p2));

@@ -67,6 +67,7 @@ public class Player extends Unit implements Collideable {
 		fDef.filter.groupIndex = GROUP;
 		
 		body.createFixture(fDef);
+        updateZone();
 	}
 	
 	public float getHealth() {
@@ -337,4 +338,15 @@ public class Player extends Unit implements Collideable {
 			this.applyMove();
 		}
 	}
+
+    @Override
+    public void updateZone() {
+        Zone z;
+        if (body != null)
+            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
+        else
+            z = Zone.getZone(storedPosition.x, storedPosition.y);
+        if (zone != z)
+            z.load();
+    }
 }
