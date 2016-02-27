@@ -6,6 +6,7 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.Bullet;
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Gun;
 import com.zombies.Message;
@@ -23,9 +24,9 @@ public class Shotgun extends Gun {
 	private Sound shoot = Gdx.audio.newSound(Gdx.files.internal("data/sound/shotgun.mp3"));
     private Random r = new Random();
 	
-	public Shotgun(GameView view, Unit unit, int ammo) {
-		super(view, unit);
-		speed = c.SHOTGUN_SPEED;
+	public Shotgun(Unit unit, int ammo) {
+		super(unit);
+		speed = C.SHOTGUN_SPEED;
 		type = "shotgun";
 		this.ammo = ammo;
 		this.texture = view.getMeshes().shotgunTexture;

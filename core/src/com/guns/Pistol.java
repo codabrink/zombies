@@ -22,8 +22,8 @@ public class Pistol extends Gun {
 	private RayCastCallback callback;
     private Random r = new Random();
 
-	public Pistol(GameView view, Unit unit, int ammo) {
-		super(view, unit);
+	public Pistol(Unit unit, int ammo) {
+		super(unit);
 		speed = 200l;
 		type = "pistol";
 		this.ammo = ammo;

@@ -1,6 +1,7 @@
 package com.zombies;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -14,11 +15,15 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
+import com.zombies.zombie.Zone;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class GameView implements Screen {
+
+    public static GameView m;
 
     //brought down a level
     private PerspectiveCamera cam;
@@ -31,6 +36,9 @@ public class GameView implements Screen {
     protected World world;
     protected Zombies main;
     protected Box grid[][];
+
+    public ArrayList<ArrayList<Zone>> zones;
+
     protected Random random = new Random();
     protected CameraHandle camHandle;
     protected Meshes meshes = new Meshes();
@@ -59,6 +67,7 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView(Zombies main) {
+        this.m = this;
         this.main = main;
 
         cam = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -73,7 +82,7 @@ public class GameView implements Screen {
         generateLevel();
         addSurvivors();
         populateLevel();
-        player = new Player(this, grid[1][1]);
+        player = new Player(grid[1][1]);
         camHandle = new CameraHandle(this);
         int radius = (int)(this.main.getWidth() * c.JOY_SIZE);
         thumbpadLeft = new ThumbpadLeft(this);
@@ -167,7 +176,7 @@ public class GameView implements Screen {
     protected void setReferences(){
         for (int i=1;i<=c.GRID_WIDTH;i++){
             for (int j=1;j<=c.GRID_HEIGHT;j++){
-                grid[i][j] = new Box(this, (i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT, i, j);
+                grid[i][j] = new Box((i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT, i, j);
             }
         }
         for (int i=1;i<=c.GRID_WIDTH;i++){

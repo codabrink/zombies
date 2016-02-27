@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.zombie.Zone;
 
 public class Zombie extends Unit implements Collideable{
 	
@@ -17,10 +18,10 @@ public class Zombie extends Unit implements Collideable{
 	private long lastAttack = System.currentTimeMillis();
 	private Player player;
 	private Random random = new Random();
-	private int updateInt;
+	private Zone zone;
 
 	public Zombie(GameView view, Box box, Vector2 position) {
-		super(view);
+		super();
 		c = view.c;
 		this.box = box;
 		player = view.getPlayer();
@@ -29,7 +30,6 @@ public class Zombie extends Unit implements Collideable{
         storedPosition = position;
         storedBodData = new BodData("zombie", this);
 
-		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
 		speed = c.ZOMBIE_SPEED;
         color = new Color(1, 0, 0, 1);
 		health = c.ZOMBIE_HEALTH;

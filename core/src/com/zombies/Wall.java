@@ -16,17 +16,15 @@ public class Wall implements Collideable {
 	private ArrayList<DrawLine> lines;
 	private GameView view;
 	public boolean door = false;
-	private C c;
 	int index;
 	
-	public Wall(GameView view, Box box, float x1, float y1, float x2, float y2, int index) {
-		c = view.c;
+	public Wall(Box box, float x1, float y1, float x2, float y2, int index) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
 		this.y2 = y2;
 		this.box = box;
-		this.view = view;
+		this.view = GameView.m;
 		this.index = index;
 		
 		//set up arraylists
@@ -93,12 +91,12 @@ public class Wall implements Collideable {
 		EdgeShape s2 = new EdgeShape();
 		DrawLine d1 = null, d2 = null;
 		if (x1 == x2) {
-			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + box.getX(), y1 + c.BOX_HEIGHT / 2f - c.PLAYER_SIZE * c.DOOR_SIZE + box.getY());
-			d2 = new DrawLine(view, x1 + box.getX(), y1 + c.BOX_HEIGHT / 2f + c.PLAYER_SIZE * c.DOOR_SIZE + box.getY(), x1 + box.getX(), y2 + box.getY());
+			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + box.getX(), y1 + C.BOX_HEIGHT / 2f - C.PLAYER_SIZE * C.DOOR_SIZE + box.getY());
+			d2 = new DrawLine(view, x1 + box.getX(), y1 + C.BOX_HEIGHT / 2f + C.PLAYER_SIZE * C.DOOR_SIZE + box.getY(), x1 + box.getX(), y2 + box.getY());
 		}
 		else if (y1 == y2) {
-			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + c.BOX_WIDTH / 2f - c.PLAYER_SIZE * c.DOOR_SIZE + box.getX(), y1 + box.getY());
-			d2 = new DrawLine(view, x1 + box.getX() + c.BOX_WIDTH / 2f + c.PLAYER_SIZE * c.DOOR_SIZE, y1 + box.getY(), x2 + box.getX(), y1 + box.getY());
+			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + C.BOX_WIDTH / 2f - C.PLAYER_SIZE * C.DOOR_SIZE + box.getX(), y1 + box.getY());
+			d2 = new DrawLine(view, x1 + box.getX() + C.BOX_WIDTH / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, y1 + box.getY(), x2 + box.getX(), y1 + box.getY());
 		}
 		lines.add(d1);
 		lines.add(d2);

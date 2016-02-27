@@ -20,7 +20,6 @@ public class Unit {
 	protected Body body;
 	protected Box box;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
-	protected C c;
 	protected boolean dead = false;
 	protected float diffX, diffY;
 	protected FixtureDef fDef = new FixtureDef();
@@ -50,10 +49,9 @@ public class Unit {
 		}
 	};
 
-	public Unit(GameView view) {
-		this.c = view.c;
+	public Unit() {
 		shape = new CircleShape();
-		this.view = view;
+		this.view = GameView.m;
 	}
 	
 	public void addGun(Gun g) {
@@ -73,7 +71,7 @@ public class Unit {
 	
 	protected void capSpeed() {
 		if (body.getLinearVelocity().len() > speed) {
-            body.setLinearVelocity(body.getLinearVelocity().setLength(c.PLAYER_SPEED));
+            body.setLinearVelocity(body.getLinearVelocity().setLength(C.PLAYER_SPEED));
 		}
 	}
 	
@@ -143,8 +141,8 @@ public class Unit {
 	
 	public void heal(float h) {
 		health += h;
-		if (health > c.PLAYER_HEALTH) {
-			health = c.PLAYER_HEALTH;
+		if (health > C.PLAYER_HEALTH) {
+			health = C.PLAYER_HEALTH;
 		}
 	}
 	
@@ -169,7 +167,7 @@ public class Unit {
 	public void die(Unit u) {}
 	
 	protected void move() {
-		body.applyForce(mPos.sub(body.getPosition().setLength(c.ZOMBIE_AGILITY)), new Vector2(), true);
+		body.applyForce(mPos.sub(body.getPosition().setLength(C.ZOMBIE_AGILITY)), new Vector2(), true);
 	}
 	
 	public Vector2 randomDirection() {
@@ -216,8 +214,10 @@ public class Unit {
 	}
 
 	public void update(int frame) {
-        if (this.frame == frame)
-            return;
+        if (this.frame == frame) {
+			if (C.DEBUG) System.out.println("ERROR: something is checking this unit twice.");
+			return;
+		}
         this.frame = frame;
     }
 	

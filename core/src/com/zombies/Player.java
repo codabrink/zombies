@@ -17,14 +17,12 @@ import com.badlogic.gdx.physics.box2d.MassData;
 public class Player extends Unit implements Collideable {
 
 	private long beginAttacks = System.currentTimeMillis();
-	private C c;
 	private long lastAttack = System.currentTimeMillis();
 	private long lastShot = System.currentTimeMillis();
 	private float mX=0, mY=0;
 	private Random random = new Random();
 	private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
 	private ArrayList<Survivor> survivorKill = new ArrayList<Survivor>();
-	private GameView view;
 	private float angle = 0;
 	private long lastAngleSet = System.currentTimeMillis();
 	private long angleLast = 1000l;
@@ -33,33 +31,31 @@ public class Player extends Unit implements Collideable {
 
 	private int zombieKillCount = 0;
 
-	public Player(GameView view, Box box) {
-		super(view);
-		this.view = view;
+	public Player(Box box) {
+		super();
 		this.box = box;
-		this.c = view.c;
 
 		box.getRoom().currentRoom();
 
-        radius = c.PLAYER_SIZE * 0.5f;
-        diameter = c.PLAYER_SIZE;
+        radius = C.PLAYER_SIZE * 0.5f;
+        diameter = C.PLAYER_SIZE;
 
 		GROUP = -1;
 		
-		speed = c.PLAYER_SPEED;
+		speed = C.PLAYER_SPEED;
 		
-		health = c.PLAYER_HEALTH;
+		health = C.PLAYER_HEALTH;
 		
-		guns.add(new Pistol(view, this, 50));
+		guns.add(new Pistol(this, 50));
 
 		bDef.allowSleep = false;
 		bDef.fixedRotation = true;
-		bDef.linearDamping = c.LINEAR_DAMPING;
+		bDef.linearDamping = C.LINEAR_DAMPING;
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
 		
 		body = view.getWorld().createBody(bDef);
-		shape.setRadius(c.PLAYER_SIZE * 0.75f);
+		shape.setRadius(C.PLAYER_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;
 		body.setMassData(mass);
@@ -113,8 +109,8 @@ public class Player extends Unit implements Collideable {
 	public void applyMove() {
 //		body.applyForce(new Vector2(mX, mY), new Vector2());
 		Vector2 v = new Vector2(mX, mY);
-		if (v.len() > c.PLAYER_SPEED) {
-			body.setLinearVelocity(v.scl(c.PLAYER_SPEED));
+		if (v.len() > C.PLAYER_SPEED) {
+			body.setLinearVelocity(v.scl(C.PLAYER_SPEED));
 		} else {
 			body.setLinearVelocity(new Vector2(mX, mY));
 		}
@@ -131,7 +127,7 @@ public class Player extends Unit implements Collideable {
 	}
 	
 	public float getHealthPercent() {
-		return health / c.PLAYER_HEALTH;
+		return health / C.PLAYER_HEALTH;
 	}
 	
 	public Room getRoom() {
@@ -161,12 +157,12 @@ public class Player extends Unit implements Collideable {
 	}
 	private void handleHealth() {
 //		restore health
-//		if (health < c.PLAYER_HEALTH && System.currentTimeMillis() - lastAttack > c.RESTORE_HEALTH_TIME) {
-//			health += c.HEALTH_RESTORE_RATE;
+//		if (health < C.PLAYER_HEALTH && System.currentTimeMillis() - lastAttack > C.RESTORE_HEALTH_TIME) {
+//			health += C.HEALTH_RESTORE_RATE;
 //		}
 //		cap health
-		if (health > c.PLAYER_HEALTH) {
-			health = c.PLAYER_HEALTH;
+		if (health > C.PLAYER_HEALTH) {
+			health = C.PLAYER_HEALTH;
 		} else if (health < 0) {
 			health = 0;
 		}
@@ -174,7 +170,7 @@ public class Player extends Unit implements Collideable {
 	
 	@Override
 	public void hurt(float zombieStrength, Unit u) {
-		if (health >= c.PLAYER_HEALTH) {
+		if (health >= C.PLAYER_HEALTH) {
 			beginAttacks = System.currentTimeMillis();
 		}
 		if (view.getPlayer().getRoom() != box.getRoom()) {
@@ -197,15 +193,15 @@ public class Player extends Unit implements Collideable {
 	//public void die(Unit u) {view.main.endGame();}
 	
 	public void setMove(float x, float y) {
-		if (Math.abs(x) < c.TILT_IGNORE) {
+		if (Math.abs(x) < C.TILT_IGNORE) {
 			mX = 0;
 		} else {
-			mX = (x - c.TILT_IGNORE) * c.TILT_SENSITIVITY;
+			mX = (x - C.TILT_IGNORE) * C.TILT_SENSITIVITY;
 		}
-		if (Math.abs(y) < c.TILT_IGNORE) {
+		if (Math.abs(y) < C.TILT_IGNORE) {
 			mY = 0;
 		} else {
-			mY = (y - c.TILT_IGNORE) * c.TILT_SENSITIVITY;
+			mY = (y - C.TILT_IGNORE) * C.TILT_SENSITIVITY;
 		}
 		this.suggestAngle((float)Math.toDegrees(Math.atan2(y, x)));
 	}
@@ -305,10 +301,9 @@ public class Player extends Unit implements Collideable {
 	@Override
 	public void update(int frame) {
 		box.getRoom().update(frame, 6);
-		box.updateZombieRecords(this);
 
         //TODO this is temporary
-        health = c.PLAYER_HEALTH;
+        health = C.PLAYER_HEALTH;
 
 //		applyMove();
 		box.updatePlayerRecords();

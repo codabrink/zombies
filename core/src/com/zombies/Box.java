@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.zombie.Carcass;
 
 public class Box {
-
 	private ArrayList<Box> adjBoxes = new ArrayList<Box>();
 	private ArrayList<Wall> walls = new ArrayList<Wall>();
 	private ArrayList<Unit> zombies = new ArrayList<Unit>();
@@ -33,19 +32,18 @@ public class Box {
 	private C c;
 	private Floor floor;
 	
-	public Box(GameView view, float x, float y, int indexX, int indexY) {
-		this.c = view.c;
+	public Box(float x, float y, int indexX, int indexY) {
         position = new Vector2(x, y);
-		this.view = view;
+		this.view = GameView.m;
 		this.floor = new Floor(view, this);
         this.indexX = indexX;
         this.indexY = indexY;
 
 		//create walls
-		walls.add(new Wall(this.view, this, 0, 0, c.BOX_WIDTH, 0, 0)); //top wall
-		walls.add(new Wall(this.view, this, c.BOX_WIDTH, 0, c.BOX_WIDTH, c.BOX_HEIGHT, 1)); //right wall
-		walls.add(new Wall(this.view, this, 0, c.BOX_HEIGHT, c.BOX_WIDTH, c.BOX_HEIGHT, 2)); //bottom wall
-		walls.add(new Wall(this.view, this, 0, 0, 0, c.BOX_HEIGHT, 3)); //left wall
+		walls.add(new Wall(this, 0, 0, c.BOX_WIDTH, 0, 0)); //top wall
+		walls.add(new Wall(this, c.BOX_WIDTH, 0, c.BOX_WIDTH, c.BOX_HEIGHT, 1)); //right wall
+		walls.add(new Wall(this, 0, c.BOX_HEIGHT, c.BOX_WIDTH, c.BOX_HEIGHT, 2)); //bottom wall
+		walls.add(new Wall(this, 0, 0, 0, c.BOX_HEIGHT, 3)); //left wall
 		
 		this.populateBox();
 	}
@@ -67,7 +65,7 @@ public class Box {
 			crates.add(new Crate(view, this.randomPoint()));
 		}
 		if (c.ENABLE_SURVIVORS && random.nextFloat() < c.SURVIVOR_CHANCE) {
-			survivors.add(new Survivor(view, this, this.randomPoint()));
+			survivors.add(new Survivor(this, this.randomPoint()));
 		}
 		if (c.ENABLE_SHOTGUN && random.nextFloat() < c.SHOTGUN_CHANCE) {
 			powerups.add(new ShotgunPickup(view, this));
@@ -110,7 +108,7 @@ public class Box {
 	}
 	
 	public Survivor addSurvivor() {
-		Survivor s = new Survivor(view, this, this.randomPoint());
+		Survivor s = new Survivor(this, this.randomPoint());
 		survivors.add(s);
 		return s;
 	}
@@ -278,12 +276,10 @@ public class Box {
 	public void update(int frame) {
         for (Unit u: (ArrayList<Unit>)zombies.clone()) {
             u.update(frame);
-            updateZombieRecords(u);
 
-            if (u.dead) {
-                zombies.remove(u);
-            }
         }
+
+        System.out.println(zombies.size());
 
         for (Unit u: (ArrayList<Unit>)survivors.clone()) {
             u.update(frame);
@@ -362,41 +358,6 @@ public class Box {
 				p.setBox(adjBoxes.get(0));
 				survivors.remove(p);
 				adjBoxes.get(0).addSurvivor(p);
-			}
-		}
-	}
-	
-	public void updateZombieRecords(Unit p) {
-		//too far right
-		if (p.getX() > position.x + c.BOX_WIDTH) {
-			if (adjBoxes.get(1) != null) {
-				p.setBox(adjBoxes.get(1));
-				zombies.remove(p);
-				adjBoxes.get(1).addZombie(p);
-			}
-		}
-		//too far left
-		if (p.getX() < position.x) {
-			if (adjBoxes.get(3) != null) {
-				p.setBox(adjBoxes.get(3));
-                zombies.remove(p);
-                adjBoxes.get(3).addZombie(p);
-			}
-		}
-		//too far below
-		if (p.getY() > position.y + c.BOX_HEIGHT) {
-			if (adjBoxes.get(2) != null) {
-				p.setBox(adjBoxes.get(2));
-				zombies.remove(p);
-				adjBoxes.get(2).addZombie(p);
-			}
-		}
-		//too far above
-		if (p.getY() < position.y) {
-			if (adjBoxes.get(0) != null) {
-				p.setBox(adjBoxes.get(0));
-				zombies.remove(p);
-				adjBoxes.get(0).addZombie(p);
 			}
 		}
 	}

@@ -5,16 +5,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Vector;
 
 public class Bullet {
 	private Unit unit;
 	private long createTime = System.currentTimeMillis();
     private long lifeTime = 1000l;
-	private C c;
     private Vector2 position;
     private Vector2 originalPosition;
     private Vector2 direction;
@@ -23,14 +24,13 @@ public class Bullet {
 	private float speed = 3f;
     private RayCastCallback callback;
     private Gun gun;
-    private float shotSpread = 5f;
+    private float shotSpread = 10f;
 
     private float destinedTrajectoryLength;
 
     private Fixture stopFixture;
 
 	public Bullet(final GameView view, Unit unit, short group, Gun gun, final Vector2 position, Vector2 direction) {
-        c = view.c;
         this.view = view;
         this.originalPosition = position.cpy();
         this.position = position.cpy();
@@ -60,14 +60,18 @@ public class Bullet {
         Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
         view.getWorld().rayCast(callback, p1, p2);
 
-        Vector2 shotPointLeft = p2.cpy().sub(p1).rotate(-shotSpread).add(p1);
-        view.getWorld().rayCast(callback, p1, shotPointLeft);
-        Vector2 shotPointRight = p2.cpy().sub(p1).rotate(shotSpread).add(p1);
-        view.getWorld().rayCast(callback, p1, shotPointRight.cpy().add(p1));
-        if (c.DEBUG_BULLETS) view.addDebugDots(shotPointLeft, shotPointRight);
+        ArrayList<Vector2> hitBoxCorners = new ArrayList<Vector2>();
+        Vector2 behindPlayer = position.cpy().sub(direction.cpy().setLength(-C.PLAYER_SIZE * 6));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(C.PLAYER_SIZE * 6)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(30 + C.PLAYER_SIZE * 2)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(30 + C.PLAYER_SIZE * 2)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(C.PLAYER_SIZE * 6)));
+
+        if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(0), hitBoxCorners.get(1));
+        if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(2), hitBoxCorners.get(3));
 
         for (Unit u: unit.getBox().getRoom().getAliveUnits()) {
-            if (pointInTriangle(u.getBody().getPosition(), p1, shotPointLeft, shotPointRight)) {
+            if (pointInTrapezoid(u.getBody().getPosition(), hitBoxCorners)) {
                 units.add(u);
             }
         }
@@ -88,13 +92,13 @@ public class Bullet {
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1, 1, 1, 1);
-        shapeRenderer.rect(position.x - c.BULLET_RADIUS, position.y - c.BULLET_RADIUS, c.BULLET_RADIUS * 2, c.BULLET_RADIUS * 2);
+        shapeRenderer.rect(position.x - C.BULLET_RADIUS, position.y - C.BULLET_RADIUS, C.BULLET_RADIUS * 2, C.BULLET_RADIUS * 2);
         shapeRenderer.end();
         update();
 	}
 
-    private float sign (Vector2 p1, Vector2 p2, Vector2 p3) {
-        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    private boolean pointInTrapezoid (Vector2 pt, ArrayList<Vector2> list) {
+        return pointInTriangle(pt, list.get(0), list.get(1), list.get(3)) || pointInTriangle(pt, list.get(1), list.get(2), list.get(3));
     }
 
     private boolean pointInTriangle (Vector2 pt, Vector2 v1, Vector2 v2, Vector2 v3) {
@@ -105,6 +109,10 @@ public class Bullet {
         b3 = sign(pt, v3, v1) < 0.0f;
 
         return ((b1 == b2) && (b2 == b3));
+    }
+
+    private float sign (Vector2 p1, Vector2 p2, Vector2 p3) {
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
     }
 
 	public Unit getUnit() {

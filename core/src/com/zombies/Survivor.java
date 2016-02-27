@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -16,10 +17,9 @@ import com.guns.Pistol;
 public class Survivor extends Unit implements Collideable {
 
 	private long beginAttacks = System.currentTimeMillis();
-	private GameView view;
 	private BodyDef bDef = new BodyDef();
 	private FixtureDef fDef = new FixtureDef();
-	private boolean found = false;
+	private boolean found = true;
 	private long lastShot;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
     protected LinkedList<Vector2> pointsOfInterest = new LinkedList<Vector2>(); // Points of interest
@@ -31,24 +31,24 @@ public class Survivor extends Unit implements Collideable {
 	private long fireRate;
     private Pistol gun;
 
-	public Survivor(GameView view, Box box, Vector2 position) {
-		super(view);
-		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
+	public Survivor(Box box, Vector2 position) {
+		super();
+		updateInt = random.nextInt(C.UPDATE_LIGHTING_INTERVAL);
 
-        gun = new Pistol(view, this, -1);
+        gun = new Pistol(this, -1);
 		lastShot = System.currentTimeMillis();
-		speed = c.PLAYER_SPEED;
+		speed = C.PLAYER_SPEED;
 		
-		fireRate = c.SURVIVOR_FIRE_RATE + ((long)random.nextFloat() * 1000l);
+		fireRate = C.SURVIVOR_FIRE_RATE + ((long)random.nextFloat() * 1000l);
 		
 		bDef.allowSleep = true;
 		bDef.fixedRotation = true;
-		bDef.linearDamping = c.LINEAR_DAMPING;
+		bDef.linearDamping = C.LINEAR_DAMPING;
 		bDef.position.set(position);
 		bDef.type = BodyType.DynamicBody;
 		
 		body = view.getWorld().createBody(bDef);
-		shape.setRadius(c.PLAYER_SIZE * 0.75f);
+		shape.setRadius(C.PLAYER_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;
 		body.setMassData(mass);
@@ -61,7 +61,7 @@ public class Survivor extends Unit implements Collideable {
 		body.createFixture(fDef);
 		this.box = box;
 		
-		health = c.SURVIVOR_HEALTH;
+		health = C.SURVIVOR_HEALTH;
 		
 		this.view = view;
 	}
@@ -74,8 +74,6 @@ public class Survivor extends Unit implements Collideable {
         if (isFurtherThanFromPlayer(40f)) {
             body.setTransform(pointNearPlayer(), 0);
             pointsOfInterest.clear();
-        } else if (zombiesBetweenSelfAndPlayer()) {
-            //move to zombie
         } else if (isFurtherThanFromPlayer(10f) || isCloserThanFromPlayer(6f)) {
             mPos = pointNearPlayer();
         }
@@ -135,7 +133,7 @@ public class Survivor extends Unit implements Collideable {
 	
 	@Override
 	public void hurt(float zombieStrength, Unit u) {
-		if (health >= c.PLAYER_HEALTH) {
+		if (health >= C.PLAYER_HEALTH) {
 			beginAttacks = System.currentTimeMillis();
 		}
 		if (view.getPlayer().getRoom() != box.getRoom()) {
@@ -145,7 +143,8 @@ public class Survivor extends Unit implements Collideable {
 		health -= zombieStrength;
 		view.s.damageTaken += zombieStrength;
 		if (health < 0) {
-			die(u);
+			//TODO let survivors die
+			//die(u);
 		}
 		lastAttack = System.currentTimeMillis();
 	}
@@ -233,12 +232,12 @@ public class Survivor extends Unit implements Collideable {
 			return;
 		if (found)
 			AI();
-		else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < c.SURVIVOR_WAKE_DIST) {
+		else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < C.SURVIVOR_WAKE_DIST) {
 			found = true;
 			box.removeSurvivor(this);
 			view.getPlayer().addSurvivor(this);
 			view.s.survivorsFound ++;
-			view.s.score += c.SCORE_FIND_SURVIVOR;
+			view.s.score += C.SCORE_FIND_SURVIVOR;
 		}
 		
 		for (Bullet b: bullets) {

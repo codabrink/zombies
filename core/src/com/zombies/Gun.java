@@ -20,12 +20,10 @@ public class Gun {
 	protected String type;
 	protected GunBox gb;
 	protected Texture texture;
-	protected C c;
 
-	public Gun(GameView view, Unit unit) {
-		this.view = view;
+	public Gun(Unit unit) {
+		this.view = GameView.m;
 		this.unit = unit;
-		this.c = view.c;
 		gb = new GunBox(view, this);
 	}
 	

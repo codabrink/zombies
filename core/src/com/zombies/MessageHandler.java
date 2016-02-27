@@ -16,7 +16,7 @@ public class MessageHandler {
 	
 	public MessageHandler(GameView view) {
 		this.view = view;
-		font = new BitmapFont(Gdx.files.internal("data/main.fnt"), Gdx.files.internal("data/main.png"), false);
+		font = new BitmapFont(Gdx.files.internal("data/main.fnt"), false);
 	}
 	
 	public void addMessage (Message m) {

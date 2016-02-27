@@ -102,7 +102,7 @@ public class PistolPickup extends Powerup implements Collideable {
 		Object o = ((BodData)f.getBody().getUserData()).getObject();
 		if (type == "player") {
 			Unit u = (Unit)o;
-			u.addGun(new Pistol(view, u, 70));
+			u.addGun(new Pistol(u, 70));
 			this.destroy();
 		}
 	}

@@ -89,7 +89,7 @@ public class ShotgunPickup extends Powerup implements Collideable {
 		Object o = ((BodData)f.getBody().getUserData()).getObject();
 		if (type == "player") {
 			Unit u = (Unit)o;
-			u.addGun(new Shotgun(view, u, c.SHOTGUN_AMMO));
+			u.addGun(new Shotgun(u, c.SHOTGUN_AMMO));
 			view.getMeshes().shotgunPickup.play();
 			this.destroy();
 		}

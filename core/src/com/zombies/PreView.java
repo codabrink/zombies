@@ -24,6 +24,7 @@ public class PreView implements Screen {
 		spriteBatch.begin();
 		spriteBatch.enableBlending();
 		spriteBatch.end();
+		main.view.mh.font.getData().setScale(.5f);
 		main.view.mh.sBatch.begin();
 		main.view.mh.font.draw(main.view.mh.sBatch, "ZOMBIE SURGE", 10, getHeight() / 2 + 50);
 		main.view.mh.font.draw(main.view.mh.sBatch, "Kill as many zombies as you can before dying.", 10, getHeight() / 2 + 30);
