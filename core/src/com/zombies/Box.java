@@ -274,11 +274,6 @@ public class Box {
 	}
 	
 	public void update(int frame) {
-        for (Unit u: (ArrayList<Unit>)zombies.clone()) {
-            u.update(frame);
-
-        }
-
         System.out.println(zombies.size());
 
         for (Unit u: (ArrayList<Unit>)survivors.clone()) {

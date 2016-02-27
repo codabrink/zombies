@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.zombies.zombie.Zone;
 
 public class Player extends Unit implements Collideable {
 
@@ -301,6 +302,8 @@ public class Player extends Unit implements Collideable {
 	@Override
 	public void update(int frame) {
 		box.getRoom().update(frame, 6);
+
+		Zone.getZone(body.getPosition().x, body.getPosition().y).update(frame, 1);
 
         //TODO this is temporary
         health = C.PLAYER_HEALTH;

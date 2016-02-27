@@ -33,6 +33,9 @@ public class Zombie extends Unit implements Collideable{
 		speed = c.ZOMBIE_SPEED;
         color = new Color(1, 0, 0, 1);
 		health = c.ZOMBIE_HEALTH;
+
+        zone = Zone.getZone(position.x, position.y);
+        zone.zombies.add(this);
 	}
 
     @Override
@@ -115,7 +118,7 @@ public class Zombie extends Unit implements Collideable{
 	@Override
 	public void update(int frame) {
 		super.update(frame);
-		if (dead) return;
+		if (dead || !loaded) return;
 
 		//handle sleeping
 		if (attack == null) {

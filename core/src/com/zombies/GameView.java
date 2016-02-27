@@ -24,6 +24,7 @@ import java.util.Random;
 public class GameView implements Screen {
 
     public static GameView m;
+    public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
 
     //brought down a level
     private PerspectiveCamera cam;
@@ -36,8 +37,6 @@ public class GameView implements Screen {
     protected World world;
     protected Zombies main;
     protected Box grid[][];
-
-    public ArrayList<ArrayList<Zone>> zones;
 
     protected Random random = new Random();
     protected CameraHandle camHandle;
