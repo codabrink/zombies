@@ -25,6 +25,7 @@ public class GameView implements Screen {
 
     public static GameView m;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
+    public static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
 
     //brought down a level
     private PerspectiveCamera cam;

@@ -1,5 +1,6 @@
 package com.zombies.zombie;
 
+import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombie;
@@ -14,6 +15,7 @@ public class Zone {
     private int x, y, frame, fsAdjCheck=0;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
+    public ArrayList<Box> boxes = new ArrayList<Box>();
 
     public Zone(int x, int y) {
         this.x = x;this.y = y;
@@ -30,8 +32,11 @@ public class Zone {
                 checkNearbyZones();
         }
 
-        for (Zombie z: zombies) {
+        for (Zombie z: (ArrayList<Zombie>)zombies.clone()) {
             z.update(frame);
+
+            if (z.isDead())
+                zombies.remove(z);
         }
 
         if (limit > 0)
@@ -50,6 +55,11 @@ public class Zone {
             }
         }
         fsAdjCheck = 0;
+    }
+
+    public void addBox(Box b) {
+        if (boxes.indexOf(b) == -1)
+            boxes.add(b);
     }
 
     public static Zone getZone(float x, float y) {

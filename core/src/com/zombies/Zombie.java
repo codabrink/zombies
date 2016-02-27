@@ -13,8 +13,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.zombie.Zone;
 
 public class Zombie extends Unit implements Collideable{
-	
-	private C c;
 	private long lastAttack = System.currentTimeMillis();
 	private Player player;
 	private Random random = new Random();
@@ -22,7 +20,6 @@ public class Zombie extends Unit implements Collideable{
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super();
-		c = view.c;
 		this.box = box;
 		player = view.getPlayer();
 
@@ -30,45 +27,47 @@ public class Zombie extends Unit implements Collideable{
         storedPosition = position;
         storedBodData = new BodData("zombie", this);
 
-		speed = c.ZOMBIE_SPEED;
+		speed = C.ZOMBIE_SPEED;
         color = new Color(1, 0, 0, 1);
-		health = c.ZOMBIE_HEALTH;
+		health = C.ZOMBIE_HEALTH;
 
-        zone = Zone.getZone(position.x, position.y);
-        zone.zombies.add(this);
+        this.updateZone();
 	}
 
     @Override
 	public void load() {
+        loaded = true;
         if (body != null)
             return;
 
         shape = new CircleShape();
 		bDef.allowSleep = true;
 		bDef.fixedRotation = true;
-		bDef.linearDamping = c.LINEAR_DAMPING;
+		bDef.linearDamping = C.LINEAR_DAMPING;
 		bDef.position.set(storedPosition);
 		bDef.type = BodyType.DynamicBody;
 
 		body = view.getWorld().createBody(bDef);
-		shape.setRadius(c.ZOMBIE_SIZE * 0.75f);
+		shape.setRadius(C.ZOMBIE_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;
-		body.setMassData(mass);
+        body.setMassData(mass);
 		body.setUserData(storedBodData);
 
 		fDef.shape = shape;
 		fDef.density = 0.1f;
 
 		body.createFixture(fDef);
-        loaded = true;
+
+        if (GameView.activeZombies.indexOf(this) == -1)
+            GameView.activeZombies.add(this);
 	}
 
 	private void attack() {
 		mPos = attack.getBody().getPosition();
-		if (System.currentTimeMillis() < lastAttack + c.ZOMBIE_ATTACK_RATE) { return; }
-		if (body.getPosition().dst(attack.getBody().getPosition()) < c.ZOMBIE_SIZE * 2) {
-			attack.hurt(c.ZOMBIE_STRENGTH, this);
+		if (System.currentTimeMillis() < lastAttack + C.ZOMBIE_ATTACK_RATE) { return; }
+		if (body.getPosition().dst(attack.getBody().getPosition()) < C.ZOMBIE_SIZE * 2) {
+			attack.hurt(C.ZOMBIE_STRENGTH, this);
 			lastAttack = System.currentTimeMillis();
 		}
 	}
@@ -94,7 +93,7 @@ public class Zombie extends Unit implements Collideable{
 	}
 	
 	public void hitByBullet(Unit u) {
-		this.hurt(c.BULLET_DAMAGE_FACTOR, u);
+		this.hurt(C.BULLET_DAMAGE_FACTOR, u);
 	}
 	
 	@Override
@@ -105,7 +104,7 @@ public class Zombie extends Unit implements Collideable{
 			view.getPlayer().addZombieKill();
 		}
 		view.s.zombieKills ++;
-		view.s.score += c.SCORE_ZOMBIE_KILL;
+		view.s.score += C.SCORE_ZOMBIE_KILL;
         dead = true;
 	}
 	
@@ -122,7 +121,7 @@ public class Zombie extends Unit implements Collideable{
 
 		//handle sleeping
 		if (attack == null) {
-			if (random.nextFloat() <= c.ZOMBIE_AWARENESS && this.isVisionClear()) {
+			if (random.nextFloat() <= C.ZOMBIE_AWARENESS && this.isVisionClear()) {
 				if (random.nextBoolean() == true) {
 					attack = view.getPlayer();
 				} else {
@@ -141,12 +140,24 @@ public class Zombie extends Unit implements Collideable{
 		}
 		this.move();
 	}
-	
+
+    public void updateZone() {
+        Zone z;
+        if (body != null){
+            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
+        } else {
+            z = Zone.getZone(storedPosition.x, storedPosition.y);
+        }
+        if (z.zombies.indexOf(this) == -1)
+            z.zombies.add(this);
+        zone = z;
+    }
+
 	@Override
 	public void move() {
-        body.applyForce(mPos.sub(body.getPosition()).setLength(c.ZOMBIE_AGILITY), new Vector2(), true);
-		if (body.getLinearVelocity().len() > c.ZOMBIE_SPEED) { //Zombie is going too fast
-            body.setLinearVelocity(body.getLinearVelocity().setLength(c.ZOMBIE_SPEED));
+        body.applyForce(mPos.sub(body.getPosition()).setLength(C.ZOMBIE_AGILITY), new Vector2(), true);
+		if (body.getLinearVelocity().len() > C.ZOMBIE_SPEED) { //Zombie is going too fast
+            body.setLinearVelocity(body.getLinearVelocity().setLength(C.ZOMBIE_SPEED));
 		}
 	}
 }

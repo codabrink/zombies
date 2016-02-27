@@ -13,6 +13,7 @@ import com.powerups.ShotgunPickup;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.zombie.Carcass;
+import com.zombies.zombie.Zone;
 
 public class Box {
 	private ArrayList<Box> adjBoxes = new ArrayList<Box>();
@@ -29,7 +30,6 @@ public class Box {
 	private Room room;
 	private GameView view;
 	private Random random = new Random();
-	private C c;
 	private Floor floor;
 	
 	public Box(float x, float y, int indexX, int indexY) {
@@ -40,13 +40,18 @@ public class Box {
         this.indexY = indexY;
 
 		//create walls
-		walls.add(new Wall(this, 0, 0, c.BOX_WIDTH, 0, 0)); //top wall
-		walls.add(new Wall(this, c.BOX_WIDTH, 0, c.BOX_WIDTH, c.BOX_HEIGHT, 1)); //right wall
-		walls.add(new Wall(this, 0, c.BOX_HEIGHT, c.BOX_WIDTH, c.BOX_HEIGHT, 2)); //bottom wall
-		walls.add(new Wall(this, 0, 0, 0, c.BOX_HEIGHT, 3)); //left wall
+		walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
+		walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
+		walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
+		walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
 		
 		this.populateBox();
-	}
+
+        Zone.getZone(x, y).addBox(this);
+        Zone.getZone(x + C.BOX_WIDTH, y).addBox(this);
+        Zone.getZone(x + C.BOX_WIDTH, y + C.BOX_HEIGHT).addBox(this);
+        Zone.getZone(x, y + C.BOX_HEIGHT).addBox(this);
+    }
 
 	public void load() {
 		for (Unit z : zombies ) {
@@ -61,19 +66,19 @@ public class Box {
 	}
 
 	private void populateBox() {
-		if (c.ENABLE_CRATES && random.nextFloat() < c.CRATE_CHANCE) {
+		if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE) {
 			crates.add(new Crate(view, this.randomPoint()));
 		}
-		if (c.ENABLE_SURVIVORS && random.nextFloat() < c.SURVIVOR_CHANCE) {
+		if (C.ENABLE_SURVIVORS && random.nextFloat() < C.SURVIVOR_CHANCE) {
 			survivors.add(new Survivor(this, this.randomPoint()));
 		}
-		if (c.ENABLE_SHOTGUN && random.nextFloat() < c.SHOTGUN_CHANCE) {
+		if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE) {
 			powerups.add(new ShotgunPickup(view, this));
 		}
-		if (c.ENABLE_PISTOL && random.nextFloat() < c.PISTOL_CHANCE) {
+		if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE) {
 			powerups.add(new PistolPickup(view, this));
 		}
-		if (c.ENABLE_HEALTH && random.nextFloat() < c.HEALTH_CHANCE) {
+		if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE) {
 			powerups.add(new HealthPickup(view, this));
 		}
 	}
@@ -119,11 +124,11 @@ public class Box {
     public void removeSurvivor(Unit u) {survivors.remove(u);}
 	
 	public void addZombie() {
-        if (c.POPULATE_ZOMBIES) {
+        if (C.POPULATE_ZOMBIES) {
             zombies.add(new Zombie(view, this, this.randomPoint()));
         }
 	}
-	
+
 	public void addZombie(Unit u) {
 		zombies.add(u);
 	}
@@ -148,11 +153,11 @@ public class Box {
 		case 1:
 			return position;
 		case 2:
-			return position.cpy().add(c.BOX_WIDTH, 0);
+			return position.cpy().add(C.BOX_WIDTH, 0);
 		case 3:
-			return position.cpy().add(0, c.BOX_HEIGHT);
+			return position.cpy().add(0, C.BOX_HEIGHT);
 		case 4:
-			return position.cpy().add(c.BOX_WIDTH, c.BOX_HEIGHT);
+			return position.cpy().add(C.BOX_WIDTH, C.BOX_HEIGHT);
 		}
 		return new Vector2();
 	}
@@ -197,7 +202,7 @@ public class Box {
 	public ArrayList<Unit> getSurvivorList() {
 		return survivors;
 	}
-	
+
 	public ArrayList<Unit> getUnits() {
 		return zombies;
 	}
@@ -241,7 +246,7 @@ public class Box {
 	}
 	
 	public Vector2 randomPoint() {
-		return position.cpy().add(random.nextFloat() * c.BOX_WIDTH, random.nextFloat() * c.BOX_HEIGHT);
+		return position.cpy().add(random.nextFloat() * C.BOX_WIDTH, random.nextFloat() * C.BOX_HEIGHT);
 	}
 	
 	public Unit randomZombie() {
@@ -297,7 +302,7 @@ public class Box {
 	public void updatePlayerRecords() {
 		Player player = view.getPlayer();
 		//too far right
-		if (player.getX() > position.x + c.BOX_WIDTH) {
+		if (player.getX() > position.x + C.BOX_WIDTH) {
 			if (adjBoxes.get(1) != null) {
 				player.setBox(adjBoxes.get(1));
 			}
@@ -309,7 +314,7 @@ public class Box {
 			}
 		}
 		//too far below
-		if (player.getY() > position.y + c.BOX_HEIGHT) {
+		if (player.getY() > position.y + C.BOX_HEIGHT) {
 			if (adjBoxes.get(2) != null) {
 				player.setBox(adjBoxes.get(2));
 			}
@@ -324,7 +329,7 @@ public class Box {
 	
 	public void updateSurvivorRecords(Unit p) {
 		//too far right
-		if (p.getX() > position.x + c.BOX_WIDTH) {
+		if (p.getX() > position.x + C.BOX_WIDTH) {
 			if (adjBoxes.get(1) != null) {
 				p.setBox(adjBoxes.get(1));
                 survivors.remove(p);
@@ -340,7 +345,7 @@ public class Box {
 			}
 		}
 		//too far below
-		if (p.getY() > position.y + c.BOX_HEIGHT) {
+		if (p.getY() > position.y + C.BOX_HEIGHT) {
 			if (adjBoxes.get(2) != null) {
 				p.setBox(adjBoxes.get(2));
                 survivors.remove(p);
