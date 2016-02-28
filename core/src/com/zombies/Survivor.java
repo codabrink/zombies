@@ -145,7 +145,7 @@ public class Survivor extends Unit implements Collideable {
 		if (health < 0) {
 			//TODO let survivors die
 			//die(u);
-		}
+	}
 		lastAttack = System.currentTimeMillis();
 	}
 	

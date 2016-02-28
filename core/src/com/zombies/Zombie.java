@@ -17,6 +17,7 @@ public class Zombie extends Unit implements Collideable{
 	private Player player;
 	private Random random = new Random();
 	private Zone zone;
+    private String state = "dormant"; // dormant -> loaded -> active
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super();
@@ -34,9 +35,28 @@ public class Zombie extends Unit implements Collideable{
         this.updateZone();
 	}
 
+    public void setState(String state) {
+        if (state == "dead") {
+            unload();
+            view.removeActiveZombie(this);
+            zone.removeZombie(this);
+            view.s.zombieKills ++;
+            view.s.score += C.SCORE_ZOMBIE_KILL;
+        } else if (state == "dormant") {
+            unload();
+        } else if (state == "loaded") {
+            load();
+        } else if (state == "active") {
+            load();
+        }
+    }
+
+    public void die(Unit u) {
+        setState("dead");
+    }
+
     @Override
 	public void load() {
-        loaded = true;
         if (body != null)
             return;
 
@@ -77,7 +97,7 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (dead || !loaded) return;
+        if (state == "dead" || body == null) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
@@ -95,16 +115,6 @@ public class Zombie extends Unit implements Collideable{
 		this.hurt(C.BULLET_DAMAGE_FACTOR, u);
 	}
 	
-	@Override
-	public void die(Unit u) {
-		view.s.zombieKills ++;
-		view.s.score += C.SCORE_ZOMBIE_KILL;
-
-        view.removeActiveZombie(this);
-        zone.zombies.remove(this);
-        dead = true;
-	}
-	
 	private Vector2 randomClosePoint() {
 		float nx = body.getPosition().x + random.nextFloat() * 20 - 10;
 		float ny = body.getPosition().y + random.nextFloat() * 20 - 10;
@@ -114,15 +124,15 @@ public class Zombie extends Unit implements Collideable{
 	@Override
 	public void update(int frame) {
 		super.update(frame);
-        if (!loaded) {
+        if (state != "dormant") {
             if (storedPosition.dst(GameView.m.getPlayer().getBody().getPosition()) < 50)
-                load();
+                setState("active");
             else
                 return;
         }
 
         if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > C.ZONE_SIZE * 2)
-            this.unload();
+            setState("dormant");
 
 		//handle sleeping
 		if (attack == null) {

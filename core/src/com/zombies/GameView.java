@@ -432,6 +432,7 @@ public class GameView implements Screen {
     public boolean removeActiveZombie(Zombie z) {
         return activeZombies.remove(z);
     }
+    public ArrayList<Zombie> getActiveZombies() {return activeZombies;}
 
     public void addDebugDots(Vector2 p1, Vector2 p2) {
         debugDots.add(new DebugDots(this, p1, p2));

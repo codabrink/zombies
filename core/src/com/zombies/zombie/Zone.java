@@ -83,4 +83,8 @@ public class Zone {
             return z;
         }
     }
+
+    public boolean removeZombie(Zombie z) {
+        return zombies.remove(z);
+    }
 }
