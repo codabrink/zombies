@@ -16,7 +16,7 @@ public class Zombie extends Unit implements Collideable{
 	private long lastAttack = System.currentTimeMillis();
 	private Player player;
 	private Random random = new Random();
-	private Zone zone;
+	public Zone zone;
     private String state = "dormant"; // dormant -> loaded -> active
 
 	public Zombie(GameView view, Box box, Vector2 position) {
@@ -97,7 +97,7 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (state == "dead" || body == null) return;
+        if (state == "dead" ||	box.getRoom() != view.player.getRoom() ||	body == null) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
@@ -144,7 +144,11 @@ public class Zombie extends Unit implements Collideable{
 				}
 			}
 		}
-		
+
+		//update box
+		updateZone();
+		box = zone.getBox(body.getPosition().x, body.getPosition().y);
+
 		if (this.canChangeMPos()) {
 			if (attack != null) {
 				//move zombie
@@ -163,9 +167,7 @@ public class Zombie extends Unit implements Collideable{
         } else {
             z = Zone.getZone(storedPosition.x, storedPosition.y);
         }
-        if (z.zombies.indexOf(this) == -1)
-            z.zombies.add(this);
-        zone = z;
+		z.addZombie(this);
     }
 
 	@Override
@@ -174,5 +176,10 @@ public class Zombie extends Unit implements Collideable{
 		if (body.getLinearVelocity().len() > C.ZOMBIE_SPEED) { //Zombie is going too fast
             body.setLinearVelocity(body.getLinearVelocity().setLength(C.ZOMBIE_SPEED));
 		}
+	}
+
+	public void setZone(Zone z) {
+		zone.removeZombie(this);
+		z.addZombie(this);
 	}
 }

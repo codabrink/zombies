@@ -288,8 +288,14 @@ public class GameView implements Screen {
         HUDSpriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
+
+        player.update(frame);
         player.draw(spriteBatch, shapeRenderer);
 
+        for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
+            z.update(frame);
+            z.draw(spriteBatch, shapeRenderer);
+        }
         for (DebugDots dd: debugDots) {
             dd.draw(spriteBatch, shapeRenderer);
         }
@@ -300,15 +306,8 @@ public class GameView implements Screen {
         hud.update();
 
         frame++;
-
         if (frame > 2000)
             frame = 0;
-
-        player.update(frame);
-        for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
-            z.update(frame);
-            z.draw(spriteBatch, shapeRenderer);
-        }
     }
 
     protected void updateLists() {

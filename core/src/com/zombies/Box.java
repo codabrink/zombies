@@ -59,6 +59,10 @@ public class Box {
 	public void unload() {
 	}
 
+	public boolean insideBox(float x, float y) {
+		return (x > position.x && x < position.x + C.BOX_WIDTH && y > position.y && y < position.y + C.BOX_HEIGHT);
+	}
+
 	private void populateBox() {
 		if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE) {
 			crates.add(new Crate(view, this.randomPoint()));

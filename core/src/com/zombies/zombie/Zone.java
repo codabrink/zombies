@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class Zone {
     private int x, y, frame, fsAdjCheck=0;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
-    public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
+    private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
     public ArrayList<Box> boxes = new ArrayList<Box>();
 
     public Zone(int x, int y) {
@@ -84,6 +84,21 @@ public class Zone {
         }
     }
 
+    public Box getBox(float x, float y) {
+        for (Box b: boxes) {
+            if (b.insideBox(x, y))
+                return b;
+        }
+        return null;
+    }
+
+    public void addZombie(Zombie zombie) {
+        if (zombie.zone != null)
+            zombie.zone.removeZombie(zombie);
+        zombie.zone = this;
+        if (zombies.indexOf(zombie) == -1)
+            zombies.add(zombie);
+    }
     public boolean removeZombie(Zombie z) {
         return zombies.remove(z);
     }

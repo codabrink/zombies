@@ -173,8 +173,9 @@ public class Survivor extends Unit implements Collideable {
 		String type = ((BodData)f.getBody().getUserData()).getType();
 		Object o = ((BodData)f.getBody().getUserData()).getObject();
 	}
-	
+
 	public void handleShots() {
+
 		if (box.getRoom().isAlarmed()) {
 			if (target == null) {
 				if (playerInRoom()) {
