@@ -198,6 +198,7 @@ public class Survivor extends Unit implements Collideable {
 					return;
 				}
 				if (System.currentTimeMillis() > lastShot + fireRate) {
+                    return; //TODO fix fighting
                     Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).setLength(100);
                     gun.shoot(shot);
 
