@@ -1,11 +1,5 @@
-package com.zombies.zombie;
+package com.zombies;
 
-import com.zombies.Box;
-import com.zombies.C;
-import com.zombies.GameView;
-import com.zombies.Zombie;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +8,7 @@ import java.util.ArrayList;
 public class Zone {
     private int x, y, frame, fsAdjCheck=0;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
+    private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
     public ArrayList<Box> boxes = new ArrayList<Box>();
 
@@ -92,14 +87,29 @@ public class Zone {
         return null;
     }
 
-    public void addZombie(Zombie zombie) {
-        if (zombie.zone != null)
-            zombie.zone.removeZombie(zombie);
-        zombie.zone = this;
-        if (zombies.indexOf(zombie) == -1)
-            zombies.add(zombie);
+    public void addUnit(Unit u) {
+        if (u.zone != null)
+            u.zone.removeUnit(u);
+        u.zone = this;
+
+        if (u instanceof Zombie) {
+            Zombie z = (Zombie)u;
+            if (zombies.indexOf(z) == -1)
+                zombies.add(z);
+            return;
+        } else if (u instanceof Survivor) {
+            Survivor s = (Survivor)u;
+            if (survivors.indexOf(s) == -1)
+                survivors.add(s);
+            return;
+        }
+        throw new Error("Addition of class " + u.getClass() + " to zone is not supported.");
     }
-    public boolean removeZombie(Zombie z) {
-        return zombies.remove(z);
+    public boolean removeUnit(Unit u) {
+        if (u instanceof Zombie)
+            return zombies.remove((Zombie)u);
+        else if (u instanceof Survivor)
+            return survivors.remove((Survivor)u);
+        throw new Error("Removal of class " + u.getClass() + " from zone is not supported.");
     }
 }

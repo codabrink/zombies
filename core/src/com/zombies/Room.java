@@ -235,7 +235,7 @@ public class Room {
     public LinkedList<Unit> getAliveUnits() {
         LinkedList<Unit> units = new LinkedList<Unit>();
         for (Box b: boxes) {
-            units.addAll((Collection)b.getAliveUnits());
+            units.addAll((Collection)b.getUnits());
         }
         return units;
     }

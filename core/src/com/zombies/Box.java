@@ -1,7 +1,6 @@
 package com.zombies;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -13,7 +12,6 @@ import com.powerups.ShotgunPickup;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.zombie.Carcass;
-import com.zombies.zombie.Zone;
 
 public class Box {
 	private ArrayList<Box> adjBoxes = new ArrayList<Box>();
@@ -204,16 +202,7 @@ public class Box {
 	public ArrayList<Unit> getUnits() {
 		return zombies;
 	}
-    public ArrayList<Unit> getAliveUnits() {
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        for (Unit u: zombies) {
-            if (!u.dead && u.getBody() != null) {
-                units.add(u);
-            }
-        }
-        return units;
-    }
-	
+
 	public Wall getWall(int i) {
 		return walls.get(i);
 	}
@@ -277,11 +266,6 @@ public class Box {
 	}
 	
 	public void update(int frame) {
-        for (Unit u: (ArrayList<Unit>)survivors.clone()) {
-            u.update(frame);
-			updateSurvivorRecords(u);
-		}
-
 		for (Crate c: crates) {
 			c.update();
 		}
@@ -319,41 +303,6 @@ public class Box {
 		if (player.getY() < position.y) {
 			if (adjBoxes.get(0) != null) {
 				player.setBox(adjBoxes.get(0));
-			}
-		}
-	}
-	
-	public void updateSurvivorRecords(Unit p) {
-		//too far right
-		if (p.getX() > position.x + C.BOX_WIDTH) {
-			if (adjBoxes.get(1) != null) {
-				p.setBox(adjBoxes.get(1));
-                survivors.remove(p);
-				adjBoxes.get(1).addSurvivor(p);
-			}
-		}
-		//too far left
-		if (p.getX() < position.x) {
-			if (adjBoxes.get(3) != null) {
-				p.setBox(adjBoxes.get(3));
-				survivors.remove(p);
-				adjBoxes.get(3).addSurvivor(p);
-			}
-		}
-		//too far below
-		if (p.getY() > position.y + C.BOX_HEIGHT) {
-			if (adjBoxes.get(2) != null) {
-				p.setBox(adjBoxes.get(2));
-                survivors.remove(p);
-				adjBoxes.get(2).addSurvivor(p);
-			}
-		}
-		//too far above
-		if (p.getY() < position.y) {
-			if (adjBoxes.get(0) != null) {
-				p.setBox(adjBoxes.get(0));
-				survivors.remove(p);
-				adjBoxes.get(0).addSurvivor(p);
 			}
 		}
 	}

@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.zombies.zombie.Zone;
 
 public class Unit {
 	protected Unit attack = null;
@@ -21,7 +20,6 @@ public class Unit {
 	protected Body body;
 	protected Box box;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
-	protected boolean dead = false;
 	protected float diffX, diffY;
 	protected FixtureDef fDef = new FixtureDef();
 	protected short GROUP;
@@ -35,8 +33,8 @@ public class Unit {
 	protected float speed;
 	protected GameView view;
     protected Color color;
-    protected boolean loaded = false;
-    protected Zone zone;
+    public Zone zone;
+	protected String state = "dormant"; // dormant -> loaded -> active
 
     protected int frame = 0;
 
@@ -76,9 +74,11 @@ public class Unit {
             body.setLinearVelocity(body.getLinearVelocity().setLength(C.PLAYER_SPEED));
 		}
 	}
-	
+
+    public void setState(String state) {}
+
 	public void destroy() {
-        dead = true;
+        setState("dead");
 		view.getWorld().destroyBody(body);
 		shape.dispose();
         body.setUserData(null);
@@ -130,7 +130,7 @@ public class Unit {
 			return;
 		}
 		health -= zombieStrength;
-		if (health < 0 && !dead) {
+		if (health < 0 && state != "dead") {
 			u.victory();
 			die(u);
 		}
@@ -149,7 +149,7 @@ public class Unit {
 	}
 	
 	public boolean isDead() {
-		return dead;
+		return state == "dead";
 	}
 	
 	public boolean isVisionClear() {
@@ -211,13 +211,11 @@ public class Unit {
         view.getWorld().destroyBody(body);
         shape = null;
         body = null;
-
-        loaded = false;
 	}
 
 	public void update(int frame) {
         if (this.frame == frame) {
-			if (C.DEBUG) System.out.println("ERROR: something is checking this unit twice.");
+			if (C.DEBUG) System.out.println("ERROR: something is checking this unit twice. " + this.getClass().getName());
 			return;
 		}
         this.frame = frame;
@@ -231,4 +229,12 @@ public class Unit {
         else
             z = Zone.getZone(storedPosition.x, storedPosition.y);
     }
+	public void updateBox() {
+		if (body != null) {
+			box = zone.getBox(body.getPosition().x, body.getPosition().y);
+		} else {
+			box = zone.getBox(storedPosition.x, storedPosition.y);
+		}
+	}
+	public String getState() {return state;}
 }

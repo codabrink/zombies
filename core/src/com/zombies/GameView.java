@@ -1,7 +1,6 @@
 package com.zombies;
 
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -15,8 +14,6 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
-import com.sun.org.apache.xalan.internal.xsltc.dom.ArrayNodeListIterator;
-import com.zombies.zombie.Zone;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

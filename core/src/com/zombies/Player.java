@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.zombies.zombie.Zone;
 
 public class Player extends Unit implements Collideable {
 
@@ -99,11 +98,8 @@ public class Player extends Unit implements Collideable {
 			this.angle = angle;
 		}
 	}
-	
-	public void addSurvivor(Survivor s) {
-		survivors.add(s);
-	}
-	
+
+
 	public void addZombieKill() {
 		zombieKillCount++;
 	}
@@ -304,7 +300,8 @@ public class Player extends Unit implements Collideable {
 	public void update(int frame) {
 		box.getRoom().update(frame, 6);
 
-		Zone.getZone(body.getPosition().x, body.getPosition().y).update(frame, 1);
+        updateZone();
+		zone.update(frame, 1);
 
         //TODO this is temporary
         health = C.PLAYER_HEALTH;
@@ -318,14 +315,13 @@ public class Player extends Unit implements Collideable {
             g.update();
         }
 
-		for (Survivor s: survivors) {
+		for (Survivor s: (ArrayList<Survivor>)survivors.clone()) {
 			s.update(frame);
-			s.getBox().updateSurvivorRecords(s);
+
+            if (s.getState() == "dead")
+                survivors.remove(s);
 		}
-		
-		for(Survivor s: survivorKill) {
-			survivors.remove(s);
-		}
+
 		survivorKill.clear();
 		
 		for (Bullet b: bullets) {
@@ -346,7 +342,16 @@ public class Player extends Unit implements Collideable {
             z = Zone.getZone(body.getPosition().x, body.getPosition().y);
         else
             z = Zone.getZone(storedPosition.x, storedPosition.y);
-        if (zone != z)
-            z.load();
+        if (zone != z) {
+			System.out.println("Log: Zone changed.");
+			z.load();
+		}
+        zone = z;
     }
+    public void removeSurvivor(Survivor s) {survivors.remove(s);}
+    public void addSurvivor(Survivor s) {
+        if (survivors.indexOf(s) == -1)
+            survivors.add(s);
+    }
+
 }

@@ -10,14 +10,11 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zombies.zombie.Zone;
 
 public class Zombie extends Unit implements Collideable{
 	private long lastAttack = System.currentTimeMillis();
 	private Player player;
 	private Random random = new Random();
-	public Zone zone;
-    private String state = "dormant"; // dormant -> loaded -> active
 
 	public Zombie(GameView view, Box box, Vector2 position) {
 		super();
@@ -32,14 +29,14 @@ public class Zombie extends Unit implements Collideable{
         color = new Color(1, 0, 0, 1);
 		health = C.ZOMBIE_HEALTH;
 
-        this.updateZone();
+        updateZone();
 	}
 
     public void setState(String state) {
         if (state == "dead") {
             unload();
             view.removeActiveZombie(this);
-            zone.removeZombie(this);
+            zone.removeUnit(this);
             view.s.zombieKills ++;
             view.s.score += C.SCORE_ZOMBIE_KILL;
         } else if (state == "dormant") {
@@ -51,9 +48,13 @@ public class Zombie extends Unit implements Collideable{
         }
     }
 
-    public void die(Unit u) {
-        setState("dead");
-    }
+    public void die(Unit u) { setState("dead"); }
+
+	@Override
+	public void unload() {
+		view.removeActiveZombie(this);
+		super.unload();
+	}
 
     @Override
 	public void load() {
@@ -97,7 +98,7 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (state == "dead" || box.getRoom() != view.player.getRoom() || body == null) return;
+        if (body == null || box.getRoom() != view.player.getRoom()) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
@@ -116,9 +117,9 @@ public class Zombie extends Unit implements Collideable{
 	}
 	
 	private Vector2 randomClosePoint() {
-		float nx = body.getPosition().x + random.nextFloat() * 20 - 10;
-		float ny = body.getPosition().y + random.nextFloat() * 20 - 10;
-		return new Vector2(nx, ny);
+        float nx = body.getPosition().x + random.nextFloat() * 20 - 10;
+        float ny = body.getPosition().y + random.nextFloat() * 20 - 10;
+        return new Vector2(nx, ny);
 	}
 
 	@Override
@@ -131,8 +132,10 @@ public class Zombie extends Unit implements Collideable{
                 return;
         }
 
-        if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > C.ZONE_SIZE * 2)
+        if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > C.ZONE_SIZE * 2) {
             setState("dormant");
+            return;
+        }
 
 		//handle sleeping
 		if (attack == null) {
@@ -145,12 +148,8 @@ public class Zombie extends Unit implements Collideable{
 			}
 		}
 
-		//update box
-		updateZone();
-		box = zone.getBox(body.getPosition().x, body.getPosition().y);
-
 		if (this.canChangeMPos()) {
-			if (attack != null) {
+            if (attack != null) {
 				//move zombie
 				this.attack();
 			} else {
@@ -158,7 +157,19 @@ public class Zombie extends Unit implements Collideable{
 			}
 		}
 		this.move();
-	}
+
+        //update box
+        updateZone();
+        updateBox();
+    }
+
+    public void updateBox() {
+        if (body != null) {
+            box = zone.getBox(body.getPosition().x, body.getPosition().y);
+        } else {
+            box = zone.getBox(storedPosition.x, storedPosition.y);
+        }
+    }
 
     public void updateZone() {
         Zone z;
@@ -167,7 +178,7 @@ public class Zombie extends Unit implements Collideable{
         } else {
             z = Zone.getZone(storedPosition.x, storedPosition.y);
         }
-		z.addZombie(this);
+		z.addUnit(this);
     }
 
 	@Override
@@ -179,7 +190,7 @@ public class Zombie extends Unit implements Collideable{
 	}
 
 	public void setZone(Zone z) {
-		zone.removeZombie(this);
-		z.addZombie(this);
+		zone.removeUnit(this);
+		z.addUnit(this);
 	}
 }
