@@ -97,7 +97,7 @@ public class Zombie extends Unit implements Collideable{
 
     @Override
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (state == "dead" ||	box.getRoom() != view.player.getRoom() ||	body == null) return;
+        if (state == "dead" || box.getRoom() != view.player.getRoom() || body == null) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
