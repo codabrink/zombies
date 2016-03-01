@@ -6,9 +6,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.powerups.HealthPickup;
-import com.powerups.PistolPickup;
-import com.powerups.ShotgunPickup;
+import com.powerups.*;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.zombie.Carcass;
@@ -20,7 +18,7 @@ public class Box {
 	private ArrayList<Carcass> carcasses = new ArrayList<Carcass>();
 	private ArrayList<Unit> survivors = new ArrayList<Unit>();
 	private ArrayList<Crate> crates = new ArrayList<Crate>();
-	private LinkedList<Powerup> powerups = new LinkedList<Powerup>();
+	private LinkedList<com.powerups.Powerup> powerups = new LinkedList<com.powerups.Powerup>();
 	private boolean touched = false;
 	private boolean pathed = false;
     private Vector2 position;
@@ -44,12 +42,7 @@ public class Box {
 		walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
 		
 		this.populateBox();
-
-        Zone.getZone(x, y).addBox(this);
-        Zone.getZone(x + C.BOX_WIDTH, y).addBox(this);
-        Zone.getZone(x + C.BOX_WIDTH, y + C.BOX_HEIGHT).addBox(this);
-        Zone.getZone(x, y + C.BOX_HEIGHT).addBox(this);
-    }
+	}
 
 	public void load() {
 	}
@@ -104,7 +97,7 @@ public class Box {
     public float getY() {return position.y;}
 
 
-	public LinkedList<Powerup> getPowerups() {
+	public LinkedList<com.powerups.Powerup> getPowerups() {
 		return powerups;
 	}
 	
@@ -170,7 +163,7 @@ public class Box {
 		for (Crate c: crates) {
 			c.draw(spriteBatch, shapeRenderer);
 		}
-		for (Powerup p: powerups) {
+		for (com.powerups.Powerup p: powerups) {
 			p.draw(spriteBatch, shapeRenderer);
 		}
 		drawWalls();
@@ -258,6 +251,12 @@ public class Box {
 	public Box setRoom(Room room) {
 		this.room = room;
 		touched = true;
+
+		room.addZone(Zone.getZone(position.x, position.y)).addBox(this);
+		room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y)).addBox(this);
+		room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y + C.BOX_HEIGHT)).addBox(this);
+		room.addZone(Zone.getZone(position.x, position.y + C.BOX_HEIGHT)).addBox(this);
+
 		return this;
 	}
 	

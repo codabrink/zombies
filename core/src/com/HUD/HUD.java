@@ -1,10 +1,11 @@
-package com.zombies;
+package com.HUD;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.zombies.GameView;
 
 public class HUD implements InputProcessor{
 
@@ -25,7 +26,6 @@ public class HUD implements InputProcessor{
             view.getThumbpadLeft().render(spriteBatch);
             view.getThumbpadRight().render(spriteBatch);
         }
-		this.drawHealth(spriteBatch);
 		this.drawZombiesKilled(spriteBatch);
         this.drawDebug();
 	}
@@ -39,14 +39,6 @@ public class HUD implements InputProcessor{
         view.mh.sBatch.end();
         view.getHUDSpriteBatch().begin();
     }
-
-	private void drawHealth(SpriteBatch spriteBatch) {
-		spriteBatch.end();
-		view.mh.sBatch.begin();
-		view.mh.font.draw(view.mh.sBatch, "Health: " + String.valueOf((int)view.getPlayer().getHealth()), view.getWidth() - view.getWidth() / 2 - 40, 35);
-		view.mh.sBatch.end();
-		spriteBatch.begin();
-	}
 	
 	private void drawZombiesKilled(SpriteBatch spriteBatch) {
         if (true) return;

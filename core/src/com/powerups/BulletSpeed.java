@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 import com.zombies.Collideable;
 import com.zombies.GameView;
-import com.zombies.Powerup;
 
 public class BulletSpeed extends Powerup implements Collideable {
 

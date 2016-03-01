@@ -10,16 +10,26 @@ public class CameraHandle {
 	private Zombies main;
 	private PerspectiveCamera cam;
 	private Vector2 movement = new Vector2();
-	
+
+	private float zoom = 30;
+    private float lerp = 5f;
+
 	public CameraHandle(GameView view) {
 		this.view = view;
 		this.player = view.getPlayer();
 		this.main = view.getMain();
 	}
 	
-	public void update() {
+	public void update(float dt) {
 		cam = view.getCamera();
-		cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 50);
+
+        float dest = view.getPlayer().getBody().getLinearVelocity().len() * 4;
+        if (zoom < dest)
+            zoom += lerp * dt;
+        else if (zoom > dest && zoom > 30)
+            zoom -= lerp * dt;
+
+		cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, zoom);
         cam.update();
 		movement.mul(new Matrix3());
 	}

@@ -9,13 +9,9 @@ import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.Collideable;
 import com.zombies.GameView;
-import com.zombies.Powerup;
 import com.zombies.Unit;
 import com.guns.Shotgun;
 
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;

@@ -1,5 +1,6 @@
 package com.zombies;
 
+import com.HUD.*;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -24,6 +26,8 @@ public class GameView implements Screen {
     public static GameView m;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
     private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
+
+    public Hashtable<String, Integer> stats = new Hashtable<String, Integer>();
 
     //brought down a level
     private PerspectiveCamera cam;
@@ -45,7 +49,7 @@ public class GameView implements Screen {
     protected ThumbpadRight thumbpadRight;
     protected ShootButton shootButton;
     public MessageHandler mh;
-    private HUD hud = new HUD(this);
+    private com.HUD.HUD hud = new com.HUD.HUD(this);
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private int frame = 0;
 
@@ -68,7 +72,7 @@ public class GameView implements Screen {
         this.m = this;
         this.main = main;
 
-        cam = new PerspectiveCamera(45, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam = new PerspectiveCamera(15, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
@@ -103,7 +107,7 @@ public class GameView implements Screen {
         return shootButton;
     }
 
-    public HUD getHUD() {
+    public com.HUD.HUD getHUD() {
         return hud;
     }
 
@@ -250,12 +254,17 @@ public class GameView implements Screen {
         return world;
     }
 
+    private void resetFrameStats() {
+        stats.put("zombie_report", 0);
+    }
+
     @Override
-    public void render(float delta) {
+    public void render(float dt) {
+        resetFrameStats();
         updateLoop();
 
         handleContacts();
-        camHandle.update();
+        camHandle.update(dt);
 
         lightingCount ++;
         if (lightingCount == c.UPDATE_LIGHTING_INTERVAL) {
@@ -281,13 +290,15 @@ public class GameView implements Screen {
 
         HUDSpriteBatch.enableBlending();
         hud.render(HUDSpriteBatch);
-
         HUDSpriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
 
         player.update(frame);
         player.draw(spriteBatch, shapeRenderer);
+
+        DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
+        DebugText.addMessage("zombiereport", "Reporting Zombies: " + stats.get("zombie_report"));
 
         for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
             z.update(frame);
@@ -296,6 +307,7 @@ public class GameView implements Screen {
         for (DebugDots dd: debugDots) {
             dd.draw(spriteBatch, shapeRenderer);
         }
+        DebugText.render();
     }
 
     protected void updateLoop() {

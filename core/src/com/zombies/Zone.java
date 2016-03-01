@@ -1,5 +1,8 @@
 package com.zombies;
 
+import com.HUD.DebugText;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +13,8 @@ public class Zone {
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
-    public ArrayList<Box> boxes = new ArrayList<Box>();
+    private ArrayList<Box> boxes = new ArrayList<Box>();
+    private ArrayList<Room> rooms = new ArrayList<Room>();
 
     public Zone(int x, int y) {
         this.x = x;this.y = y;
@@ -26,6 +30,8 @@ public class Zone {
             if (fsAdjCheck > 20)
                 checkNearbyZones();
         }
+
+        DebugText.addMessage("rooms", "Rooms in zone: "+rooms.size());
 
         if (limit > 0)
             for (Zone z: adjZones) {
@@ -54,6 +60,10 @@ public class Zone {
     public void addBox(Box b) {
         if (boxes.indexOf(b) == -1)
             boxes.add(b);
+    }
+    public void addRoom(Room r) {
+        if (rooms.indexOf(r) == -1)
+            rooms.add(r);
     }
 
     public static Zone getZone(float x, float y) {

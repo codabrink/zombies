@@ -9,9 +9,7 @@ import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.Collideable;
 import com.zombies.GameView;
-import com.zombies.Powerup;
 import com.zombies.Unit;
-import com.guns.Pistol;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;

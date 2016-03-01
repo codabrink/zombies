@@ -199,6 +199,13 @@ public class Unit {
 
     }
 
+	public Vector2 getPosition() {
+		if (body != null)
+			return body.getPosition();
+		else
+			return storedPosition;
+	}
+
 	public void unload() {
         if (body == null)
             return;

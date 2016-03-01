@@ -26,6 +26,7 @@ public class Player extends Unit implements Collideable {
 	private float angle = 0;
 	private long lastAngleSet = System.currentTimeMillis();
 	private long angleLast = 1000l;
+	private HealthBar healthBar;
 
     private float radius, diameter;
 
@@ -35,8 +36,8 @@ public class Player extends Unit implements Collideable {
 		super();
 		this.box = box;
 
+		healthBar = new HealthBar();
 		box.getRoom().currentRoom();
-
         radius = C.PLAYER_SIZE * 0.5f;
         diameter = C.PLAYER_SIZE;
 
@@ -248,6 +249,8 @@ public class Player extends Unit implements Collideable {
         for (Survivor s: survivors) {
             s.draw(spriteBatch, shapeRenderer);
         }
+
+        healthBar.draw();
 	}
 	
 	public void renderGunInfo(SpriteBatch spriteBatch) {
@@ -298,13 +301,13 @@ public class Player extends Unit implements Collideable {
 	
 	@Override
 	public void update(int frame) {
-		box.getRoom().update(frame, 6);
+		box.getRoom().update(frame, 0);
 
         updateZone();
 		zone.update(frame, 1);
 
         //TODO this is temporary
-        health = C.PLAYER_HEALTH;
+        //health = C.PLAYER_HEALTH;
 
 //		applyMove();
 		box.updatePlayerRecords();

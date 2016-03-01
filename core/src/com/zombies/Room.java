@@ -22,6 +22,7 @@ public class Room {
 	private C c;
     private boolean loaded = false;
     private int frame;
+	private ArrayList<Zone> zones = new ArrayList<Zone>();
 
 	public Room(GameView view, ArrayList<Box> boxes) {
 		this.boxes = boxes;
@@ -42,6 +43,13 @@ public class Room {
         }
 
     }
+
+	public Zone addZone(Zone z) {
+		if (zones.indexOf(z) == -1)
+			zones.add(z);
+        z.addRoom(this);
+		return z;
+	}
 
 	public void currentRoom() {
 		load(); // load self
@@ -85,9 +93,8 @@ public class Room {
 	}
 	
 	public void addAdjRoom(Room r) {
-		if (!adjRooms.contains(r)) {
+		if (!adjRooms.contains(r))
 			adjRooms.add(r);
-		}
 	}
 	
 	public void alarm(Unit victim) {
@@ -230,6 +237,7 @@ public class Room {
         }
 
         for (Box b: boxes) b.update(frame);
+        draw(view.getSpriteBatch(), view.getShapeRenderer(), frame, distance);
     }
 
     public LinkedList<Unit> getAliveUnits() {

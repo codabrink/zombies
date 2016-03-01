@@ -9,7 +9,6 @@ import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.Collideable;
 import com.zombies.GameView;
-import com.zombies.Powerup;
 import com.zombies.Unit;
 import com.guns.Pistol;
 

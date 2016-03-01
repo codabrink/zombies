@@ -52,7 +52,6 @@ public class Zombie extends Unit implements Collideable{
 
 	@Override
 	public void unload() {
-		view.removeActiveZombie(this);
 		super.unload();
 	}
 
@@ -125,17 +124,20 @@ public class Zombie extends Unit implements Collideable{
 	@Override
 	public void update(int frame) {
 		super.update(frame);
-        if (state != "dormant") {
+        if (state == "dormant") {
             if (storedPosition.dst(GameView.m.getPlayer().getBody().getPosition()) < 50)
                 setState("active");
             else
                 return;
         }
 
-        if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > C.ZONE_SIZE * 2) {
+        if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > 60) {
+			System.out.println("going to sleep");
             setState("dormant");
             return;
         }
+
+        view.stats.put("zombie_report", view.stats.get("zombie_report") + 1);
 
 		//handle sleeping
 		if (attack == null) {
