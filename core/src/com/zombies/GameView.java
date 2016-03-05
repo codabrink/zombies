@@ -26,7 +26,7 @@ public class GameView implements Screen {
     public static GameView m;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
     private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
-    public static FontGen fontGen = new FontGen();
+    public static FontGen fontGen;
 
     public Hashtable<String, Integer> stats = new Hashtable<String, Integer>();
 
@@ -50,7 +50,7 @@ public class GameView implements Screen {
     protected ThumbpadRight thumbpadRight;
     protected ShootButton shootButton;
     public MessageHandler mh;
-    private com.HUD.HUD hud = new com.HUD.HUD(this);
+    private HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private int frame = 0;
 
@@ -69,10 +69,12 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombie = new LinkedList<DyingZombie>();
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
-    public GameView(Zombies main) {
+    public GameView() {
         this.m = this;
-        this.main = main;
+        this.main = Zombies.main;
 
+        fontGen = new FontGen();
+        hud = new HUD();
         cam = new PerspectiveCamera(15, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
@@ -87,7 +89,7 @@ public class GameView implements Screen {
         populateLevel();
         player = new Player(grid[1][1]);
         camHandle = new CameraHandle(this);
-        int radius = (int)(this.main.getWidth() * c.JOY_SIZE);
+        int radius = (int)(Gdx.graphics.getWidth() * c.JOY_SIZE);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
         shootButton = new ShootButton(this);
@@ -213,11 +215,11 @@ public class GameView implements Screen {
     }
 
     public int getWidth() {
-        return main.getWidth();
+        return Gdx.graphics.getWidth();
     }
 
     public int getHeight() {
-        return main.getHeight();
+        return Gdx.graphics.getHeight();
     }
 
     public void addPostZombie(PostponedZombie z) {

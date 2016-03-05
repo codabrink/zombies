@@ -1,94 +1,110 @@
 package com.zombies;
 
+import com.HUD.FontGen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import java.util.ArrayList;
 
 public class PreView implements Screen {
 
-	private SpriteBatch spriteBatch;
-	
-	protected Zombies main;
-	protected long startTime = System.currentTimeMillis();
-	
-	public PreView(Zombies main) {
-		this.main = main;
-		spriteBatch = new SpriteBatch();
-	}
+    private SpriteBatch spriteBatch;
 
-	@Override
-	public void render(float arg0) {
+    protected Zombies main;
+    protected long startTime = System.currentTimeMillis();
+    private int fontSize = 18;
+    protected BitmapFont font = FontGen.generateFont(fontSize, "serif-reg");
+    protected BitmapFont logoFont = FontGen.generateFont(36, "serif-reg", Color.RED);
+    protected ArrayList<String> intro = new ArrayList<String>();
+    protected float textStartHeight;
+
+    public PreView() {
+        this.main = Zombies.main;
+        spriteBatch = new SpriteBatch();
+
+        intro.add("Kill as many zombies as you can before dying.");
+        intro.add("There are health packs and guns scattered throughout the maze.");
+        intro.add("This is a pre-alpha build and is in heavy development.");
+        intro.add("Please be patient, updates and features are coming!");
+        intro.add("Touch the screen to continue.");
+
+        textStartHeight = Gdx.graphics.getHeight() / 2 + (intro.size() * fontSize * Gdx.graphics.getDensity());
+    }
+
+    @Override
+    public void render(float arg0) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		spriteBatch.begin();
-		spriteBatch.enableBlending();
-		spriteBatch.end();
-		main.view.mh.font.getData().setScale(.5f);
-		main.view.mh.sBatch.begin();
-		main.view.mh.font.draw(main.view.mh.sBatch, "ZOMBIE SURGE", 10, getHeight() / 2 + 50);
-		main.view.mh.font.draw(main.view.mh.sBatch, "Kill as many zombies as you can before dying.", 10, getHeight() / 2 + 30);
-		main.view.mh.font.draw(main.view.mh.sBatch, "There are health packs and guns scattered through the maze.", 10, getHeight() / 2 + 10);
-		main.view.mh.font.draw(main.view.mh.sBatch, "You have 3 other survivors with you. They'll follow.", 10, getHeight() / 2 - 10);
-		main.view.mh.font.draw(main.view.mh.sBatch, "Touch the screen to continue.", 10, getHeight() / 2 - 30);
-		main.view.mh.sBatch.end();
-		spriteBatch.begin();
-		spriteBatch.end();
-		Gdx.gl.glFlush();
-		handleKeys();
-	}
-	
-	private void handleKeys() {
-		for (int i=0; i<3; i++) {
-			if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
-				main.setScreen(main.view);
-			}
-		}
-	}
-	
-	public int getWidth() {
-		return main.getWidth();
-	}
-	
-	public int getHeight() {
-		return main.getHeight();
-	}
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        spriteBatch.begin();
+        logoFont.draw(spriteBatch, "Zombie Surge", 10, Gdx.graphics.getHeight() - 10);
+        int i = 0;
+        for(String s : intro) {
+            i++;
+            font.draw(spriteBatch, s, 10, textStartHeight - i * fontSize * Gdx.graphics.getDensity());
+        }
+        spriteBatch.end();
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
+        Gdx.gl.glFlush();
+        handleKeys();
+    }
 
-	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
+    private void handleKeys() {
+        for (int i=0; i<3; i++) {
+            if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
+                System.gc();
+                main.setScreen(new GameView());
+                System.gc();
+            }
+        }
+    }
 
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
+    public int getWidth() {
+        return Gdx.graphics.getWidth();
+    }
 
-	
+    public int getHeight() {
+        return Gdx.graphics.getHeight();
+    }
 
-	@Override
-	public void resize(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void hide() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+
+    @Override
+    public void resize(int arg0, int arg1) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void resume() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void show() {
+        // TODO Auto-generated method stub
+
+    }
 }

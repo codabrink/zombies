@@ -188,8 +188,8 @@ public class Player extends Unit implements Collideable {
         return b == body;
     }
 	
-	//@Override
-	//public void die(Unit u) {view.main.endGame();}
+	@Override
+	public void die(Unit u) {view.main.setScreen(new EndView());}
 	
 	public void setMove(float x, float y) {
 		if (Math.abs(x) < C.TILT_IGNORE) {
@@ -305,9 +305,6 @@ public class Player extends Unit implements Collideable {
 
         updateZone();
 		zone.update(frame, 1);
-
-        //TODO this is temporary
-        //health = C.PLAYER_HEALTH;
 
 //		applyMove();
 		box.updatePlayerRecords();

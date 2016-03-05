@@ -1,23 +1,45 @@
 package com.HUD;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class FontGen {
     public static BitmapFont font12, font16, font24, font72;
+    public static BitmapFont killFont;
 
     public FontGen() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/myfont.ttf"));
+        float density = Gdx.graphics.getDensity();
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/sans-reg.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 12;
-        font12 = generator.generateFont(parameter);
-        parameter.size = 16;
-        font16 = generator.generateFont(parameter);
-        parameter.size = 24;
+        parameter.size = (int)(density * 24);
         font24 = generator.generateFont(parameter);
-        parameter.size = 72;
-        font72 = generator.generateFont(parameter);
+
+        parameter.size = (int)(density * 48);
+        parameter.color = Color.RED;
+        parameter.borderWidth = 1;
+        parameter.borderColor = Color.WHITE;
+        killFont = generator.generateFont(parameter);
+
         generator.dispose();
+    }
+
+    public static BitmapFont generateFont(int size, String font) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/" + font + ".ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = (int)(Gdx.graphics.getDensity() * size);
+        return generator.generateFont(parameter);
+    }
+
+    public static BitmapFont generateFont(int size, String font, Color color) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/" + font + ".ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = (int)(Gdx.graphics.getDensity() * size);
+        parameter.color = color;
+        parameter.borderWidth = 1;
+        parameter.borderColor = Color.WHITE;
+        return generator.generateFont(parameter);
     }
 }

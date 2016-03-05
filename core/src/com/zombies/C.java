@@ -76,7 +76,7 @@ public class C {
 	public static float ZONE_SIZE = 100;
 
     //DEBUG
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 
 	public static boolean POPULATE_ZOMBIES = true;

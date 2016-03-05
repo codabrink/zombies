@@ -12,8 +12,8 @@ public class HUD implements InputProcessor{
 	GameView view;
     private String debugMessage = "";
 	
-	public HUD(GameView view) {
-		this.view = view;
+	public HUD() {
+		this.view = GameView.m;
 	}
 
     public void update() {
@@ -39,15 +39,9 @@ public class HUD implements InputProcessor{
         view.mh.sBatch.end();
         view.getHUDSpriteBatch().begin();
     }
-	
-	private void drawZombiesKilled(SpriteBatch spriteBatch) {
-        if (true) return;
-		spriteBatch.end();
-		view.mh.sBatch.begin();
-        //view.mh.font.setScale(2);
-		view.mh.font.draw(view.mh.sBatch, "Zombies Killed: " + String.valueOf((int)view.s.zombieKills), view.getWidth() - view.getWidth() / 2 - 40, 20);
-		view.mh.sBatch.end();
-		spriteBatch.begin();
+
+    private void drawZombiesKilled(SpriteBatch spriteBatch) {
+        view.fontGen.killFont.draw(spriteBatch, String.valueOf(view.s.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
 	}
 
     @Override
