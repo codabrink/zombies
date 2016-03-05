@@ -75,7 +75,7 @@ public class GameView implements Screen {
 
         fontGen = new FontGen();
         hud = new HUD();
-        cam = new PerspectiveCamera(15, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
