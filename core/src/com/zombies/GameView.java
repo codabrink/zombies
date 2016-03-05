@@ -26,6 +26,7 @@ public class GameView implements Screen {
     public static GameView m;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
     private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
+    public static FontGen fontGen = new FontGen();
 
     public Hashtable<String, Integer> stats = new Hashtable<String, Integer>();
 
@@ -286,11 +287,6 @@ public class GameView implements Screen {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
 //		renderer.draw(view.getWorld());
-        HUDSpriteBatch.begin();
-
-        HUDSpriteBatch.enableBlending();
-        hud.render(HUDSpriteBatch);
-        HUDSpriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();
 
@@ -304,6 +300,12 @@ public class GameView implements Screen {
             z.update(frame);
             z.draw(spriteBatch, shapeRenderer);
         }
+
+        HUDSpriteBatch.begin();
+        HUDSpriteBatch.enableBlending();
+        hud.render(HUDSpriteBatch);
+        HUDSpriteBatch.end();
+
         for (DebugDots dd: debugDots) {
             dd.draw(spriteBatch, shapeRenderer);
         }

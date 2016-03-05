@@ -6,9 +6,9 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.powerups.*;
 
 import com.badlogic.gdx.math.Vector2;
+import com.powerups.*;
 import com.zombies.zombie.Carcass;
 
 public class Box {
@@ -159,6 +159,9 @@ public class Box {
 		}
 		for (Unit u: survivors) {
 			u.draw(spriteBatch, shapeRenderer);
+		}
+		for (com.powerups.Powerup p: powerups) {
+			p.draw(spriteBatch, shapeRenderer);
 		}
 		for (Crate c: crates) {
 			c.draw(spriteBatch, shapeRenderer);

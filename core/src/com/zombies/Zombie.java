@@ -2,6 +2,7 @@ package com.zombies;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -86,6 +87,7 @@ public class Zombie extends Unit implements Collideable{
 		mPos = attack.getBody().getPosition();
 		if (System.currentTimeMillis() < lastAttack + C.ZOMBIE_ATTACK_RATE) { return; }
 		if (body.getPosition().dst(attack.getBody().getPosition()) < C.ZOMBIE_SIZE * 2) {
+			Gdx.input.vibrate(100);
 			attack.hurt(C.ZOMBIE_STRENGTH, this);
 			lastAttack = System.currentTimeMillis();
 		}

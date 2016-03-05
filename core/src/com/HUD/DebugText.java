@@ -1,8 +1,10 @@
 package com.HUD;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.zombies.GameView;
 
 import java.util.Hashtable;
@@ -14,17 +16,17 @@ import java.util.Map;
  */
 public class DebugText {
     public static Hashtable<String,String> m = new Hashtable<String, String>();
+    private static SpriteBatch spriteBatch = new SpriteBatch();
 
     public static void render() {
         GameView view = GameView.m;
-        view.mh.sBatch.begin();
+        spriteBatch.begin();
         int i = 1;
         for (Map.Entry<String, String> e : m.entrySet()) {
-            view.mh.font.draw(view.mh.sBatch, e.getValue(), 0, view.getHeight() - i * 20);
+            view.fontGen.font24.draw(spriteBatch, e.getValue(), 0, view.getHeight() - i * 20);
             i++;
         }
-        view.mh.sBatch.end();
-
+        spriteBatch.end();
     }
     public static void clearMessages() {
         m = new Hashtable<String, String>();
