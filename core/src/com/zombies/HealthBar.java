@@ -1,9 +1,6 @@
 package com.zombies;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
-import java.awt.Shape;
 
 public class HealthBar {
 
@@ -15,7 +12,7 @@ public class HealthBar {
 	private ShapeRenderer shapeRenderer;
 
 	public HealthBar() {
-        view = GameView.m;
+        view = GameView.gv;
 		shapeRenderer = new ShapeRenderer();
 	}
 	

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.RayCastCallback;
 
 public class Gun {
 
@@ -22,7 +21,7 @@ public class Gun {
 	protected Texture texture;
 
 	public Gun(Unit unit) {
-		this.view = GameView.m;
+		this.view = GameView.gv;
 		this.unit = unit;
 		gb = new GunBox(view, this);
 	}

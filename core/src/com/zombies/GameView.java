@@ -18,13 +18,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.data.Stats;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class GameView implements Screen {
 
-    public static GameView m;
+    public static GameView gv;
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
     private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
     public static FontGen fontGen;
@@ -66,7 +65,7 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView() {
-        this.m = this;
+        this.gv = this;
         this.main = Zombies.main;
 
         fontGen = new FontGen();

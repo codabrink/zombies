@@ -15,7 +15,7 @@ public class DebugText {
     public static void render() {
         if (!C.DEBUG)
             return;
-        GameView view = GameView.m;
+        GameView view = GameView.gv;
         spriteBatch.begin();
         int i = 1;
         for (Map.Entry<String, String> e : m.entrySet()) {

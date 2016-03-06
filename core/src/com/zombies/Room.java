@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -23,7 +22,7 @@ public class Room {
     private ArrayList<Zone> zones = new ArrayList<Zone>();
 
     public Room(ArrayList<Box> boxes) {
-        view = GameView.m;
+        view = GameView.gv;
         this.boxes = boxes;
         for (Box b: boxes) {
             b.setRoom(this);
@@ -65,7 +64,7 @@ public class Room {
     }
 
     public Room(Box box) {
-        view = GameView.m;
+        view = GameView.gv;
         size = random.nextInt(C.MAX_ROOM_SIZE - C.MIN_ROOM_SIZE) + C.MIN_ROOM_SIZE;
         boxes.add(box.setRoom(this));
         while (boxes.size() < size) {

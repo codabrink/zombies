@@ -127,7 +127,7 @@ public class Zombie extends Unit implements Collideable{
 	public void update(int frame) {
 		super.update(frame);
         if (state == "dormant") {
-            if (storedPosition.dst(GameView.m.getPlayer().getBody().getPosition()) < 50)
+            if (storedPosition.dst(GameView.gv.getPlayer().getBody().getPosition()) < 50)
                 setState("active");
             else
                 return;

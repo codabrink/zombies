@@ -30,7 +30,7 @@ public class Box {
 	
 	public Box(float x, float y, int indexX, int indexY) {
         position = new Vector2(x, y);
-		this.view = GameView.m;
+		this.view = GameView.gv;
 		this.floor = new Floor(view, this);
         this.indexX = indexX;
         this.indexY = indexY;

@@ -24,7 +24,7 @@ public class Wall implements Collideable {
 		this.x2 = x2;
 		this.y2 = y2;
 		this.box = box;
-		this.view = GameView.m;
+		this.view = GameView.gv;
 		this.index = index;
 		
 		//set up arraylists

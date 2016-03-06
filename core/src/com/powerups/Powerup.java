@@ -8,7 +8,7 @@ public class Powerup {
 	protected GameView view;
 	
 	public Powerup() {
-		this.view = GameView.m;
+		this.view = GameView.gv;
 	}
 	
 	public void update() {}

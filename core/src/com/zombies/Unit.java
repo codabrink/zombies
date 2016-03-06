@@ -51,7 +51,7 @@ public class Unit {
 
 	public Unit() {
 		shape = new CircleShape();
-		this.view = GameView.m;
+		this.view = GameView.gv;
 	}
 	
 	public void addGun(Gun g) {
