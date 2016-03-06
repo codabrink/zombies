@@ -9,8 +9,8 @@ import com.zombies.GameView;
 
 public class BulletSpeed extends Powerup implements Collideable {
 
-	public BulletSpeed(GameView view) {
-		super(view);
+	public BulletSpeed() {
+		super();
 	}
 
 	@Override

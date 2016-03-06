@@ -22,11 +22,9 @@ public class Crate implements Collideable  {
 	private Random random = new Random();
 	private float height, width;
 	private GameView view;
-	private C c;
 
 	public Crate(GameView view, Vector2 position) {
 		this.view = view;
-		this.c = view.c;
 		
 		height = 2f;
 		width = 2f;
@@ -65,13 +63,13 @@ public class Crate implements Collideable  {
 	public Vector2 getPoint(int i) {
 		switch (i) {
 		case 1:
-			return new Vector2(body.getPosition().x - c.PLAYER_SIZE * 2 + width, body.getPosition().y - c.PLAYER_SIZE * 2 + height);
+			return new Vector2(body.getPosition().x - C.PLAYER_SIZE * 2 + width, body.getPosition().y - C.PLAYER_SIZE * 2 + height);
 		case 2:
-			return new Vector2(body.getPosition().x + width * 2 + c.PLAYER_SIZE * 2 + width, body.getPosition().y - c.PLAYER_SIZE * 2 + height);
+			return new Vector2(body.getPosition().x + width * 2 + C.PLAYER_SIZE * 2 + width, body.getPosition().y - C.PLAYER_SIZE * 2 + height);
 		case 3:
-			return new Vector2(body.getPosition().x + width * 2 + c.PLAYER_SIZE * 2 + width, body.getPosition().y + height * 2 + c.PLAYER_SIZE * 2 + height);
+			return new Vector2(body.getPosition().x + width * 2 + C.PLAYER_SIZE * 2 + width, body.getPosition().y + height * 2 + C.PLAYER_SIZE * 2 + height);
 		case 4:
-			return new Vector2(body.getPosition().x - c.PLAYER_SIZE * 2 + width, body.getPosition().y + height * 2 + c.PLAYER_SIZE * 2 + height);
+			return new Vector2(body.getPosition().x - C.PLAYER_SIZE * 2 + width, body.getPosition().y + height * 2 + C.PLAYER_SIZE * 2 + height);
 		}
 		return null;
 	}
@@ -94,36 +92,36 @@ public class Crate implements Collideable  {
 			Vector2 position = u.getBody().getPosition();
 			if (position.x < body.getPosition().x) {
 				if (view.getPlayer().getBody().getPosition().y < position.y) {
-					u.shove(-10, -height, c.CRATE_MPOS_DURATION);
+					u.shove(-10, -height, C.CRATE_MPOS_DURATION);
 					return;
 				} else {
-					u.shove(-10, height, c.CRATE_MPOS_DURATION);
+					u.shove(-10, height, C.CRATE_MPOS_DURATION);
 					return;
 				}
 			}
 			else if (position.x > body.getPosition().x + width * 2) {
 				if (view.getPlayer().getBody().getPosition().y < position.y) {
-					u.shove(10, -height, c.CRATE_MPOS_DURATION);
+					u.shove(10, -height, C.CRATE_MPOS_DURATION);
 					return;
 				} else {
-					u.shove(10, height, c.CRATE_MPOS_DURATION);
+					u.shove(10, height, C.CRATE_MPOS_DURATION);
 					return;
 				}
 			}
 			else if (position.y < body.getPosition().y) {
 				if (view.getPlayer().getBody().getPosition().x < position.x) {
-					u.shove(-width, -10, c.CRATE_MPOS_DURATION);
+					u.shove(-width, -10, C.CRATE_MPOS_DURATION);
 					return;
 				} else {
-					u.shove(width, -10, c.CRATE_MPOS_DURATION);
+					u.shove(width, -10, C.CRATE_MPOS_DURATION);
 				}
 			}
 			else if (position.y > body.getPosition().y + height * 2) {
 				if (view.getPlayer().getBody().getPosition().x < position.x) {
-					u.shove(-width, 10, c.CRATE_MPOS_DURATION);
+					u.shove(-width, 10, C.CRATE_MPOS_DURATION);
 					return;
 				} else {
-					u.shove(width, 10, c.CRATE_MPOS_DURATION);
+					u.shove(width, 10, C.CRATE_MPOS_DURATION);
 					return;
 				}
 			}

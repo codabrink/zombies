@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public class Floor {
-	private C c;
 	private Box box;
 	private float size;
 	private int updateInt;
@@ -24,11 +23,10 @@ public class Floor {
 	private Texture t;
 
 	public Floor(GameView view, Box box) {
-		this.c = view.c;
 		this.box = box;
 		this.view = view;
-		size = c.BOX_HEIGHT / 2.0f;
-		this.updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
+		size = C.BOX_HEIGHT / 2.0f;
+		this.updateInt = random.nextInt(C.UPDATE_LIGHTING_INTERVAL);
 
 		if (random.nextBoolean()) {
 			t = view.getMeshes().floor1Texture;
@@ -40,7 +38,7 @@ public class Floor {
 
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         spriteBatch.begin();
-        spriteBatch.draw(t, box.getX(), box.getY(), c.BOX_HEIGHT, c.BOX_WIDTH, c.BOX_WIDTH, c.BOX_HEIGHT, 1, 1, 0, 0, 0, t.getWidth(), t.getHeight(), false, false);
+        spriteBatch.draw(t, box.getX(), box.getY(), C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_WIDTH, C.BOX_HEIGHT, 1, 1, 0, 0, 0, t.getWidth(), t.getHeight(), false, false);
         spriteBatch.end();
 	}
 }

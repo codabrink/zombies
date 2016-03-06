@@ -1,7 +1,6 @@
 package com.zombies;
 
 public class Statistics {
-	
 	public int deaths = 0;
 	public int zombieKills = 0;
 	public float damageTaken = 0;

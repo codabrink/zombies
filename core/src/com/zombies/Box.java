@@ -62,13 +62,13 @@ public class Box {
 			survivors.add(new Survivor(this, this.randomPoint()));
 		}
 		if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE) {
-			powerups.add(new ShotgunPickup(view, this));
+			powerups.add(new ShotgunPickup(this));
 		}
 		if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE) {
-			powerups.add(new PistolPickup(view, this));
+			powerups.add(new PistolPickup(this));
 		}
 		if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE) {
-			powerups.add(new HealthPickup(view, this));
+			powerups.add(new HealthPickup(this));
 		}
 	}
 

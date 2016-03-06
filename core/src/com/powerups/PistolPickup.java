@@ -33,14 +33,11 @@ public class PistolPickup extends Powerup implements Collideable {
 	private CircleShape shape;
 	private Mesh squareMesh;
 	private float[] verticies;
-	private GameView view;
 	private Box box;
 	private Random random = new Random();
 
-	public PistolPickup(GameView view, Box box) {
-		super(view);
-		this.c = view.c;
-		this.view = view;
+	public PistolPickup(Box box) {
+		super();
 		this.box = box;
 		shape = new CircleShape();
 		

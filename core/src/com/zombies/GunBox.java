@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 
 public class GunBox {
-
 	private GameView view;
 	private Gun gun;
 	private Texture texture;
@@ -22,7 +21,7 @@ public class GunBox {
 	}
 	
 	public void render(int num, SpriteBatch spriteBatch) {
-		this.size = view.getWidth() * view.c.GUNBOX_WIDTH;
+		this.size = view.getWidth() * C.GUNBOX_WIDTH;
 		this.x = view.getWidth() - size * num;
 		float scale = size / texture.getWidth();
 		if (view.getPlayer().getGun() == gun) {

@@ -28,21 +28,17 @@ public class HealthPickup extends Powerup implements Collideable {
 
 	private BodyDef bDef = new BodyDef();
 	private Body body;
-	private C c;
 	private FixtureDef fDef = new FixtureDef();
 	private float radius = 1f;
 	private CircleShape shape;
 	private Mesh squareMesh;
 	private float[] verticies;
-	private GameView view;
 	private Box box;
 	private Random random = new Random();
 	private Sound heal = Gdx.audio.newSound(Gdx.files.internal("data/sound/heal.mp3"));
 	
-	public HealthPickup(GameView view, Box box) {
-		super(view);
-		this.c = view.c;
-		this.view = view;
+	public HealthPickup(Box box) {
+		super();
 		this.box = box;
 		shape = new CircleShape();
 		
@@ -55,7 +51,7 @@ public class HealthPickup extends Powerup implements Collideable {
 		bDef.type = BodyType.DynamicBody;
 		
 		body = view.getWorld().createBody(bDef);
-		shape.setRadius(c.PLAYER_SIZE * 0.75f);
+		shape.setRadius(C.PLAYER_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;
 		body.setMassData(mass);

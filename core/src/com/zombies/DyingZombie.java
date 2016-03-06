@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 
 public class DyingZombie {
-	
-	private C c;
 	private Vector2 position;
 	private float span = 0;
 	private long length = 500l;
@@ -19,9 +17,8 @@ public class DyingZombie {
 	private GameView view;
 	
 	public DyingZombie(GameView view, Vector2 position) {
-		c = view.c;
 		
-		size = c.ZOMBIE_SIZE / 6f;
+		size = C.ZOMBIE_SIZE / 6f;
 		this.position = position;
 		this.view = view;
 		

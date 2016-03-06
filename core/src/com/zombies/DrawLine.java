@@ -10,7 +10,6 @@ public class DrawLine {
 
 	private Vector2 v1, v2;
 	private Mesh mesh;
-	private C c;
 	private float[] verticies;
 	private GameView view;
 	private Random random = new Random();
@@ -22,9 +21,8 @@ public class DrawLine {
 	public DrawLine(GameView view, float x1, float y1, float x2, float y2) {
 		v1 = new Vector2(x1, y1);
 		v2 = new Vector2(x2, y2);
-		this.c = view.c;
 		this.view = view;
-		updateInt = random.nextInt(c.UPDATE_LIGHTING_INTERVAL);
+		updateInt = random.nextInt(C.UPDATE_LIGHTING_INTERVAL);
 
         height = y1 - y2;
         width = x1 - x2;

@@ -41,7 +41,7 @@ public class HUD implements InputProcessor{
     }
 
     private void drawZombiesKilled(SpriteBatch spriteBatch) {
-        view.fontGen.killFont.draw(spriteBatch, String.valueOf(view.s.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
+        view.fontGen.killFont.draw(spriteBatch, String.valueOf(view.stats.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
 	}
 
     @Override

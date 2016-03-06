@@ -126,7 +126,7 @@ public class Survivor extends Unit implements Collideable {
 	public void die(Unit u) {
 		if (state == "dead") return;
 		view.getPlayer().removeSurvivor(this);
-		view.s.survivorsLost ++;
+		view.stats.survivorsLost ++;
 	}
 	
 	@Override
@@ -139,7 +139,6 @@ public class Survivor extends Unit implements Collideable {
 			return;
 		}
 		health -= zombieStrength;
-		view.s.damageTaken += zombieStrength;
 		if (health < 0) {
 			//TODO let survivors die
 			//die(u);
@@ -205,7 +204,7 @@ public class Survivor extends Unit implements Collideable {
                     //bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
 					
 					lastShot = System.currentTimeMillis();
-					view.s.survivorShots ++;
+					view.stats.survivorShots ++;
 				}
 			}
 		}
@@ -237,8 +236,8 @@ public class Survivor extends Unit implements Collideable {
 			setState("found");
 			box.removeSurvivor(this);
 			view.getPlayer().addSurvivor(this);
-			view.s.survivorsFound ++;
-			view.s.score += C.SCORE_FIND_SURVIVOR;
+			view.stats.survivorsFound ++;
+			view.stats.score += C.SCORE_FIND_SURVIVOR;
 		}
 		
 		for (Bullet b: bullets) {

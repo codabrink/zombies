@@ -58,7 +58,7 @@ public class Shotgun extends Gun {
                 killRoster.get(r.nextInt(killRoster.size())).die(unit);
 		}
 		unit.getBox().getRoom().alarm(unit);
-		view.s.shots ++;
+		view.stats.playerShots ++;
 		ammo--;
 		shoot.play();
 	}

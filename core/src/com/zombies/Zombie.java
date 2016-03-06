@@ -38,8 +38,8 @@ public class Zombie extends Unit implements Collideable{
             unload();
             view.removeActiveZombie(this);
             zone.removeUnit(this);
-            view.s.zombieKills ++;
-            view.s.score += C.SCORE_ZOMBIE_KILL;
+            view.stats.zombieKills ++;
+            view.stats.score += C.SCORE_ZOMBIE_KILL;
         } else if (state == "dormant") {
             unload();
         } else if (state == "loaded") {
@@ -138,8 +138,6 @@ public class Zombie extends Unit implements Collideable{
             setState("dormant");
             return;
         }
-
-        view.stats.put("zombie_report", view.stats.get("zombie_report") + 1);
 
 		//handle sleeping
 		if (attack == null) {

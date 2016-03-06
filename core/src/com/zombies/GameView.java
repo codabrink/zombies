@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
+import com.data.Stats;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -27,8 +28,7 @@ public class GameView implements Screen {
     public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
     private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
     public static FontGen fontGen;
-
-    public Hashtable<String, Integer> stats = new Hashtable<String, Integer>();
+    public static Stats stats = new Stats();
 
     //brought down a level
     private PerspectiveCamera cam;
@@ -59,10 +59,6 @@ public class GameView implements Screen {
     private Box2DDebugRenderer debugRenderer;
     private Matrix4 debugMatrix;
 
-    //public objects
-    public C c = new C();
-    public Statistics s = new Statistics();
-
     //lists
     LinkedList<PostponedZombie> postZombie = new LinkedList<PostponedZombie>();
     LinkedList<PostponedZombie> postZombieDump = new LinkedList<PostponedZombie>();
@@ -81,7 +77,7 @@ public class GameView implements Screen {
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
 
-        grid = new Box[c.GRID_WIDTH + 1][c.GRID_HEIGHT + 1];
+        grid = new Box[C.GRID_WIDTH + 1][C.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
         setReferences();
         generateLevel();
@@ -89,7 +85,7 @@ public class GameView implements Screen {
         populateLevel();
         player = new Player(grid[1][1]);
         camHandle = new CameraHandle(this);
-        int radius = (int)(Gdx.graphics.getWidth() * c.JOY_SIZE);
+        int radius = (int)(Gdx.graphics.getWidth() * C.JOY_SIZE);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
         shootButton = new ShootButton(this);
@@ -100,7 +96,7 @@ public class GameView implements Screen {
     }
 
     private void addSurvivors() {
-        if (!c.POPULATE_SURVIVORS) return;
+        if (!C.POPULATE_SURVIVORS) return;
         for (int i=1;i<=10;i++) {
             randomBox().addSurvivor();
         }
@@ -128,12 +124,12 @@ public class GameView implements Screen {
     public ThumbpadRight getThumbpadRight() { return thumbpadRight;}
 
     public void populateLevel() {
-        for (int i=1;i<=c.GRID_WIDTH;i++){
-            for (int j=1;j<=c.GRID_HEIGHT;j++){
+        for (int i = 1; i <= C.GRID_WIDTH; i++){
+            for (int j = 1; j <= C.GRID_HEIGHT; j++){
                 if (random.nextFloat() < 0.6f) {
-                    for (int k=0; k<= random.nextInt(c.BOX_MAX_ZOMBIES) + 2; k++) {
+                    for (int k=0; k<= random.nextInt(C.BOX_MAX_ZOMBIES) + 2; k++) {
                         grid[i][j].addZombie();
-                        s.numZombies ++;
+                        stats.numZombies ++;
                     }
                 }
             }
@@ -141,26 +137,26 @@ public class GameView implements Screen {
     }
 
     public Box randomBox(){
-        return grid[random.nextInt(c.GRID_WIDTH)+1][random.nextInt(c.GRID_HEIGHT)+1];
+        return grid[random.nextInt(C.GRID_WIDTH)+1][random.nextInt(C.GRID_HEIGHT)+1];
     }
 
     protected void generateLevel() {
-        for (int i=1;i<=c.GRID_HEIGHT;i++){
-            for (int j=1;j<=c.GRID_WIDTH;j++){
+        for (int i = 1; i <= C.GRID_HEIGHT; i++){
+            for (int j = 1; j <= C.GRID_WIDTH; j++){
                 if (!grid[j][i].isTouched()){
-                    new Room(this, grid[j][i]);
+                    new Room(grid[j][i]);
                 }
             }
         }
-        for (int i=1;i<=c.GRID_HEIGHT;i++){
-            for (int j=1;j<=c.GRID_WIDTH;j++){
+        for (int i = 1; i <= C.GRID_HEIGHT; i++){
+            for (int j = 1; j <= C.GRID_WIDTH; j++){
                 if (!grid[j][i].isPathed()) {
-                    grid[j][i].path(c.PATH_LENGTH);
+                    grid[j][i].path(C.PATH_LENGTH);
                 }
             }
         }
-        for (int i=1;i<=c.GRID_HEIGHT;i++) {
-            for (int j = 1; j <= c.GRID_WIDTH; j++) {
+        for (int i = 1; i <= C.GRID_HEIGHT;i++) {
+            for (int j = 1; j <= C.GRID_WIDTH; j++) {
                 grid[j][i].getRoom().findAdjacentRooms();
             }
         }
@@ -179,26 +175,26 @@ public class GameView implements Screen {
     }
 
     protected void setReferences(){
-        for (int i=1;i<=c.GRID_WIDTH;i++){
-            for (int j=1;j<=c.GRID_HEIGHT;j++){
-                grid[i][j] = new Box((i - 1) * c.BOX_WIDTH, (j - 1) * c.BOX_HEIGHT, i, j);
+        for (int i = 1; i <= C.GRID_WIDTH; i++){
+            for (int j = 1; j <= C.GRID_HEIGHT; j++){
+                grid[i][j] = new Box((i - 1) * C.BOX_WIDTH, (j - 1) * C.BOX_HEIGHT, i, j);
             }
         }
-        for (int i=1;i<=c.GRID_WIDTH;i++){
-            for (int j=1;j<=c.GRID_HEIGHT;j++){
+        for (int i = 1; i <= C.GRID_WIDTH; i++){
+            for (int j = 1; j <= C.GRID_HEIGHT; j++){
                 if (j > 1){
                     grid[i][j].addAdjBox(grid[i][j - 1]);
                 }
                 else {
                     grid[i][j].addAdjBox(null);
                 }
-                if (i < c.GRID_WIDTH){
+                if (i < C.GRID_WIDTH){
                     grid[i][j].addAdjBox(grid[i + 1][j]);
                 }
                 else {
                     grid[i][j].addAdjBox(null);
                 }
-                if (j < c.GRID_HEIGHT){
+                if (j < C.GRID_HEIGHT){
                     grid[i][j].addAdjBox(grid[i][j + 1]);
                 }
                 else {
@@ -257,24 +253,19 @@ public class GameView implements Screen {
         return world;
     }
 
-    private void resetFrameStats() {
-        stats.put("zombie_report", 0);
-    }
-
     @Override
     public void render(float dt) {
-        resetFrameStats();
         updateLoop();
 
         handleContacts();
         camHandle.update(dt);
 
         lightingCount ++;
-        if (lightingCount == c.UPDATE_LIGHTING_INTERVAL) {
-            c.UPDATE_LIGHTING = true;
+        if (lightingCount == C.UPDATE_LIGHTING_INTERVAL) {
+            C.UPDATE_LIGHTING = true;
             lightingCount = 0;
         } else {
-            c.UPDATE_LIGHTING = false;
+            C.UPDATE_LIGHTING = false;
         }
 
         shapeRenderer.setProjectionMatrix(cam.combined);
@@ -296,7 +287,6 @@ public class GameView implements Screen {
         player.draw(spriteBatch, shapeRenderer);
 
         DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
-        DebugText.addMessage("zombiereport", "Reporting Zombies: " + stats.get("zombie_report"));
 
         for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
             z.update(frame);
@@ -423,7 +413,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysAndroid() {
-        if (c.ENABLE_ACCEL) {
+        if (C.ENABLE_ACCEL) {
             player.setMove(-Gdx.input.getPitch(), Gdx.input.getRoll());
         }
     }

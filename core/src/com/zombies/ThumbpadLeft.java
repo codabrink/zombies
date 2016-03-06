@@ -30,7 +30,7 @@ public class ThumbpadLeft extends Thumbpad {
     }
 
     public void update() {
-        if (down && !view.c.ENABLE_ACCEL) {
+        if (down && !C.ENABLE_ACCEL) {
             view.player.getBody().applyForce(touch, new Vector2(), true);
         }
     }
