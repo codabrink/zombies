@@ -1,14 +1,16 @@
 package com.zombies;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.math.Vector2;
-import com.powerups.*;
+import com.powerups.HealthPickup;
+import com.powerups.PistolPickup;
+import com.powerups.Powerup;
+import com.powerups.ShotgunPickup;
 import com.zombies.zombie.Carcass;
 
 public class Box {
@@ -18,7 +20,7 @@ public class Box {
     private ArrayList<Carcass> carcasses = new ArrayList<Carcass>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
-    private LinkedList<com.powerups.Powerup> powerups = new LinkedList<com.powerups.Powerup>();
+    private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private boolean touched = false;
     private boolean pathed = false;
     private Vector2 position;
@@ -34,6 +36,20 @@ public class Box {
         this.floor = new Floor(view, this);
         this.indexX = indexX;
         this.indexY = indexY;
+
+        //create walls
+        walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
+        walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
+        walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
+        walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
+
+        this.populateBox();
+    }
+
+    public Box(float x, float y) {
+        position = new Vector2(x, y);
+        this.view = GameView.gv;
+        this.floor = new Floor(view, this);
 
         //create walls
         walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
@@ -99,8 +115,7 @@ public class Box {
     public float getX() {return position.x;}
     public float getY() {return position.y;}
 
-
-    public LinkedList<com.powerups.Powerup> getPowerups() {
+    public ArrayList<Powerup> getPowerups() {
         return powerups;
     }
 
@@ -192,7 +207,7 @@ public class Box {
         for (Crate c: crates) {
             c.draw(spriteBatch, shapeRenderer);
         }
-        for (com.powerups.Powerup p: powerups) {
+        for (Powerup p: powerups) {
             p.draw(spriteBatch, shapeRenderer);
         }
         drawWalls();

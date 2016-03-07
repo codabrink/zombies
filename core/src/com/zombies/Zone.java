@@ -1,6 +1,7 @@
 package com.zombies;
 
 import com.HUD.DebugText;
+import com.badlogic.gdx.math.Vector2;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -9,7 +10,8 @@ import java.util.ArrayList;
  * Created by coda on 2/27/2016.
  */
 public class Zone {
-    private int x, y, frame, fsAdjCheck=0;
+    private Vector2 position;
+    private int frame, fsAdjCheck=0;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
@@ -17,7 +19,7 @@ public class Zone {
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
     public Zone(int x, int y) {
-        this.x = x;this.y = y;
+        position = new Vector2(x, y);
     }
 
     public void update(int frame, int limit) {
@@ -40,8 +42,8 @@ public class Zone {
     }
 
     private void checkNearbyZones() {
-        for (int i = y-1; i <= y+1; i++) {
-            for (int j = x-1; j <= x+1; j++) {
+        for (float i = position.y-1; i <= position.y+1; i++) {
+            for (float j = position.x-1; j <= position.x+1; j++) {
                 Zone z = Zone.getZone(j, i);
                 if (z != this && adjZones.indexOf(z) != -1) {
                     adjZones.add(z);
@@ -122,4 +124,9 @@ public class Zone {
             return survivors.remove((Survivor)u);
         throw new Error("Removal of class " + u.getClass() + " from zone is not supported.");
     }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+    public ArrayList<Box> getBoxes() { return boxes; }
 }
