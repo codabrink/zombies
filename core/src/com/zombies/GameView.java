@@ -2,6 +2,7 @@ package com.zombies;
 
 import com.HUD.*;
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -22,23 +23,21 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class GameView implements Screen {
-
-    public static GameView gv;
-    public static ArrayList<ArrayList<Zone>> zones = new ArrayList<ArrayList<Zone>>();
-    private static ArrayList<Zombie> activeZombies = new ArrayList<Zombie>();
     public static FontGen fontGen;
-    public static Stats stats = new Stats();
+    public static GameView gv;
 
-    //brought down a level
+    public ArrayList<ArrayList<Zone>> zones;
+    private ArrayList<Zombie> activeZombies;
+
+    public Stats stats;
+
     private PerspectiveCamera cam;
     private SpriteBatch HUDSpriteBatch;
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
 
-    //regular variables
     protected Player player;
     protected World world;
-    protected Zombies main;
     protected Box grid[][];
 
     protected Random random = new Random();
@@ -65,17 +64,22 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView() {
-        this.gv = this;
-        this.main = Zombies.main;
-
         fontGen = new FontGen();
-        hud = new HUD();
+
         cam = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
+    }
 
+    private void reset() {
+        setGv(this);
+        zones = new ArrayList<ArrayList<Zone>>();
+        activeZombies = new ArrayList<Zombie>();
+        stats = new Stats();
+
+        hud = new HUD();
         grid = new Box[C.GRID_WIDTH + 1][C.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
         setReferences();
@@ -113,8 +117,8 @@ public class GameView implements Screen {
         mh.addMessage(m);
     }
 
-    public Zombies getMain() {
-        return main;
+    public Game getGame() {
+        return Zombies.game;
     }
 
     public ThumbpadLeft getThumbpadLeft() {
@@ -337,8 +341,8 @@ public class GameView implements Screen {
                 return;
             if ((BodData)f1.getBody().getUserData() == null || (BodData)f2.getBody().getUserData() == null)
                 return;
-            Collideable c1 = (Collideable)((BodData)f1.getBody().getUserData()).getObject();
-            Collideable c2 = (Collideable)((BodData)f2.getBody().getUserData()).getObject();
+            com.interfaces.Collideable c1 = (com.interfaces.Collideable)((BodData)f1.getBody().getUserData()).getObject();
+            com.interfaces.Collideable c2 = (com.interfaces.Collideable)((BodData)f2.getBody().getUserData()).getObject();
             c1.handleCollision(f2);
             c2.handleCollision(f1);
         }
@@ -376,8 +380,7 @@ public class GameView implements Screen {
 
     @Override
     public void show() {
-        // TODO Auto-generated method stub
-
+        reset();
     }
 
     private void handleKeysDesktop() {
@@ -411,6 +414,10 @@ public class GameView implements Screen {
 
     }
 
+    public void end() {
+        Zombies.game.setScreen(new EndView(stats));
+    }
+
     private void handleKeysAndroid() {
         if (C.ENABLE_ACCEL) {
             player.setMove(-Gdx.input.getPitch(), Gdx.input.getRoll());
@@ -434,6 +441,7 @@ public class GameView implements Screen {
         return activeZombies.remove(z);
     }
     public ArrayList<Zombie> getActiveZombies() {return activeZombies;}
+    private static void setGv(GameView view) {gv = view;}
 
     public void addDebugDots(Vector2 p1, Vector2 p2) {
         debugDots.add(new DebugDots(this, p1, p2));

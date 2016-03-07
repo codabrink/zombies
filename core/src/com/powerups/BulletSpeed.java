@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import com.zombies.Collideable;
-import com.zombies.GameView;
+import com.interfaces.Collideable;
 
 public class BulletSpeed extends Powerup implements Collideable {
 

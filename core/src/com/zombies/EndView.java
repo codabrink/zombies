@@ -1,6 +1,7 @@
 package com.zombies;
 
 import com.HUD.FontGen;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,12 +11,10 @@ import com.data.Stats;
 public class EndView implements Screen {
 
     private SpriteBatch spriteBatch;
-    protected Zombies main;
     private long startTime = System.currentTimeMillis();
     private Stats stats;
 
     public EndView(Stats stats) {
-        this.main = Zombies.main;
         this.stats = stats;
         spriteBatch = new SpriteBatch();
     }
@@ -36,7 +35,7 @@ public class EndView implements Screen {
         for (int i=0; i<3; i++) {
             if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
                 System.gc();
-                main.setScreen(new GameView());
+                Zombies.game.setScreen(new GameView());
                 System.gc();
             }
         }

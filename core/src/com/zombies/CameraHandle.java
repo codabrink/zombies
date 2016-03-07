@@ -7,9 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 public class CameraHandle {
 	private GameView view;
 	private Player player;
-	private Zombies main;
 	private PerspectiveCamera cam;
-	private Vector2 movement = new Vector2();
 
 	private float zoom = 40;
     private float lerp = 5f;
@@ -17,7 +15,6 @@ public class CameraHandle {
 	public CameraHandle(GameView view) {
 		this.view = view;
 		this.player = view.getPlayer();
-		this.main = view.getMain();
 	}
 	
 	public void update(float dt) {

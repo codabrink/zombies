@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-public class Crate implements Collideable  {
+public class Crate implements com.interfaces.Collideable {
 	
 	private Body body;
 	private PolygonShape shape;

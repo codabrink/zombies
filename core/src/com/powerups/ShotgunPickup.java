@@ -7,8 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
 import com.zombies.Box;
 import com.zombies.C;
-import com.zombies.Collideable;
-import com.zombies.GameView;
+import com.interfaces.Collideable;
 import com.zombies.Unit;
 import com.guns.Shotgun;
 

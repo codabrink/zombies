@@ -1,4 +1,4 @@
-package com.zombies;
+package com.interfaces;
 
 import com.badlogic.gdx.physics.box2d.Fixture;
 

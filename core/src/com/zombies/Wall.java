@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-public class Wall implements Collideable {
+public class Wall implements com.interfaces.Collideable {
 	private float x1, y1, x2, y2;
 	private Box box;
 	private Body body;

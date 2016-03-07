@@ -1,6 +1,7 @@
 package com.zombies;
 
 import com.HUD.FontGen;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -14,7 +15,6 @@ public class PreView implements Screen {
 
     private SpriteBatch spriteBatch;
 
-    protected Zombies main;
     protected long startTime = System.currentTimeMillis();
     private int fontSize = 18;
     protected BitmapFont font = FontGen.generateFont(fontSize, "serif-reg");
@@ -23,7 +23,6 @@ public class PreView implements Screen {
     protected float textStartHeight;
 
     public PreView() {
-        this.main = Zombies.main;
         spriteBatch = new SpriteBatch();
 
         intro.add("Kill as many zombies as you can before dying.");
@@ -56,7 +55,7 @@ public class PreView implements Screen {
         for (int i=0; i<3; i++) {
             if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
                 System.gc();
-                main.setScreen(new GameView());
+                Zombies.game.setScreen(new GameView());
                 System.gc();
             }
         }

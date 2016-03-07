@@ -73,10 +73,10 @@ public class Zone {
         // get x row
         ArrayList<Zone> rowX;
         try {
-            rowX = GameView.zones.get(indX);
+            rowX = GameView.gv.zones.get(indX);
         } catch (IndexOutOfBoundsException e) {
             rowX = new ArrayList<Zone>();
-            GameView.zones.add(indX, rowX);
+            GameView.gv.zones.add(indX, rowX);
         }
 
         // get zone

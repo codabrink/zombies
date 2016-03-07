@@ -229,19 +229,7 @@ public class Unit {
     }
 	
 	public void victory() {}
-    public void updateZone() {
-        Zone z;
-        if (body != null)
-            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
-        else
-            z = Zone.getZone(storedPosition.x, storedPosition.y);
-    }
-	public void updateBox() {
-		if (body != null) {
-			box = zone.getBox(body.getPosition().x, body.getPosition().y);
-		} else {
-			box = zone.getBox(storedPosition.x, storedPosition.y);
-		}
-	}
+    protected void updateZone() {}
+	protected void updateBox() {}
 	public String getState() {return state;}
 }

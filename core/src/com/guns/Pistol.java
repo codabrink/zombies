@@ -62,7 +62,6 @@ public class Pistol extends Gun {
 
 		unit.getBox().getRoom().alarm(unit);
 		view.stats.playerShots ++;
-		if (ammo > 0) ammo--;
 		shoot.play(0.2f);
 	}
 	

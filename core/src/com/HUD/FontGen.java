@@ -17,10 +17,9 @@ public class FontGen {
         parameter.size = (int)(density * 24);
         font24 = generator.generateFont(parameter);
 
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/square.ttf"));
         parameter.size = (int)(density * 48);
         parameter.color = Color.RED;
-        parameter.borderWidth = 1;
-        parameter.borderColor = Color.WHITE;
         killFont = generator.generateFont(parameter);
 
         generator.dispose();
