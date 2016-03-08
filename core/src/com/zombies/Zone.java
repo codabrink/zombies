@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by coda on 2/27/2016.
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 public class Zone {
     private Vector2 position;
     private int frame, fsAdjCheck=0;
+    private static Random r = new Random();
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
@@ -129,4 +131,5 @@ public class Zone {
         return position;
     }
     public ArrayList<Box> getBoxes() { return boxes; }
+    public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
 }

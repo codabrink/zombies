@@ -29,6 +29,7 @@ public class Box {
     private GameView view;
     private Random random = new Random();
     private Floor floor;
+    public float height = C.BOX_SIZE, width = C.BOX_SIZE;
 
     public Box(float x, float y, int indexX, int indexY) {
         position = new Vector2(x, y);
@@ -281,7 +282,30 @@ public class Box {
         return u;
     }
 
-    public void removeWall(Box box){
+    public void removeWall(Wall w) {
+        w.removeWall();
+        walls.remove(w);
+    }
+
+    // new
+    public void removePotentialWall(Box box) {
+        for (Wall w : walls) {
+            for (Wall ww : box.getWalls()) {
+                if (w.isVertical() == ww.isVertical()) {
+                    if (w.isVertical() && w.getP1().x == ww.getP1().x) {
+                        removeWall(w);
+                        box.removeWall(ww);
+                    } else if (w.getP1().y == ww.getP1().x) {
+                        removeWall(w);
+                        box.removeWall(ww);
+                    }
+                }
+            }
+        }
+    }
+
+    // old
+    public void removeWall(Box box) {
         if (!adjBoxes.contains(box)) return;
         int i = adjBoxes.indexOf(box);
         walls.get(i).removeWall();

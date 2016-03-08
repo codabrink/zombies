@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Wall implements com.interfaces.Collideable {
 	private float x1, y1, x2, y2;
+	private Vector2 p1, p2;
+	private boolean vertical = false;
 	private Box box;
 	private Body body;
 	private ArrayList<EdgeShape> shapes;
@@ -23,10 +25,14 @@ public class Wall implements com.interfaces.Collideable {
 		this.y1 = y1;
 		this.x2 = x2;
 		this.y2 = y2;
+		p1 = new Vector2(x1, y1);
+		p2 = new Vector2(x2, y2);
 		this.box = box;
 		this.view = GameView.gv;
 		this.index = index;
-		
+
+        vertical = (y1 == y2);
+
 		//set up arraylists
 		shapes = new ArrayList<EdgeShape>();
 		lines = new ArrayList<DrawLine>();
@@ -133,10 +139,13 @@ public class Wall implements com.interfaces.Collideable {
 		}
 	}
 
+    public boolean isVertical() { return vertical; }
+    public Vector2 getP1() { return p1; }
+    public Vector2 getP2() { return p2; }
+
 	@Override
 	public void handleCollision(Fixture f) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 }
