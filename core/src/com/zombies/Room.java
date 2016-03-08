@@ -203,7 +203,7 @@ public class Room {
         //remove walls
         for (Box b: boxes) {
             for (Box bb: boxes) {
-                b.removeWall(bb);
+                b.removePotentialWall(bb);
             }
         }
     }

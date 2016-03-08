@@ -38,7 +38,8 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
             unload();
             view.removeActiveZombie(this);
             zone.removeUnit(this);
-            box.removeUnit(this);
+            if (box != null)
+                box.removeUnit(this);
             view.stats.zombieKills ++;
             view.stats.score += C.SCORE_ZOMBIE_KILL;
         } else if (state == "dormant") {
@@ -100,7 +101,8 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (body == null || box.getRoom() != view.player.getRoom()) return;
+        if (body == null) return;
+        if (box != null && box.getRoom() != view.getPlayer().getRoom()) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);

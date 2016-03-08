@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.Powerup;
@@ -165,10 +166,11 @@ public class Box {
     }
 
     public void createDoor(Box box) {
-        if (!adjBoxes.contains(box)) return;
-        int i = adjBoxes.indexOf(box);
-        if (walls.get(i) != null)
-            walls.get(i).makeDoor();
+        Wall[] walls = adjWalls(box);
+        if (walls instanceof Wall[]) {
+            walls[0].makeDoor();
+            walls[1].makeDoor();
+        }
     }
 
     public void drawFloor(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
@@ -265,7 +267,6 @@ public class Box {
                 box = adjBoxes.get(i);
             }
             createDoor(box);
-            box.createDoor(this);
             box.path(level - 1);
         }
     }
@@ -289,19 +290,26 @@ public class Box {
 
     // new
     public void removePotentialWall(Box box) {
-        for (Wall w : walls) {
-            for (Wall ww : box.getWalls()) {
+        Wall[] walls = adjWalls(box);
+        if (walls instanceof Wall[]) {
+            removeWall(walls[0]);
+            box.removeWall(walls[1]);
+        }
+    }
+
+    private Wall[] adjWalls(Box box) {
+        for (Wall w : (ArrayList<Wall>)walls.clone()) {
+            for (Wall ww : (ArrayList<Wall>)box.getWalls().clone()) {
                 if (w.isVertical() == ww.isVertical()) {
                     if (w.isVertical() && w.getP1().x == ww.getP1().x) {
-                        removeWall(w);
-                        box.removeWall(ww);
-                    } else if (w.getP1().y == ww.getP1().x) {
-                        removeWall(w);
-                        box.removeWall(ww);
+                        return new Wall[]{w, ww};
+                    } else if (!w.isVertical() && w.getP1().y == ww.getP1().y) {
+                        return new Wall[]{w, ww};
                     }
                 }
             }
         }
+        return null;
     }
 
     // old
