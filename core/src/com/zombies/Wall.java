@@ -9,7 +9,6 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Wall implements com.interfaces.Collideable {
-	private float x1, y1, x2, y2;
 	private Vector2 p1, p2;
 	private boolean vertical = false;
 	private Box box;
@@ -21,12 +20,8 @@ public class Wall implements com.interfaces.Collideable {
 	int index;
 	
 	public Wall(Box box, float x1, float y1, float x2, float y2, int index) {
-		this.x1 = x1;
-		this.y1 = y1;
-		this.x2 = x2;
-		this.y2 = y2;
-		p1 = new Vector2(x1, y1);
-		p2 = new Vector2(x2, y2);
+		p1 = new Vector2(x1 + box.getX(), y1 + box.getY());
+		p2 = new Vector2(x2 + box.getX(), y2 + box.getY());
 		this.box = box;
 		this.view = GameView.gv;
 		this.index = index;
@@ -37,8 +32,8 @@ public class Wall implements com.interfaces.Collideable {
 		shapes = new ArrayList<EdgeShape>();
 		lines = new ArrayList<DrawLine>();
 		
-		lines.add(new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x2 + box.getX(), y2 + box.getY()));
-		
+		lines.add(new DrawLine(view, x1 + box.getX(), p1.y, p2.x, p2.y));
+
 		//set up physics
 		body = view.getWorld().createBody(new BodyDef());
         EdgeShape shape = new EdgeShape();
@@ -84,7 +79,7 @@ public class Wall implements com.interfaces.Collideable {
 			l.draw();
 		}
 	}
-	
+
 	public boolean isDoor() {
 		return door;
 	}
@@ -96,13 +91,13 @@ public class Wall implements com.interfaces.Collideable {
 		EdgeShape s1 = new EdgeShape();
 		EdgeShape s2 = new EdgeShape();
 		DrawLine d1 = null, d2 = null;
-		if (x1 == x2) {
-			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + box.getX(), y1 + C.BOX_HEIGHT / 2f - C.PLAYER_SIZE * C.DOOR_SIZE + box.getY());
-			d2 = new DrawLine(view, x1 + box.getX(), y1 + C.BOX_HEIGHT / 2f + C.PLAYER_SIZE * C.DOOR_SIZE + box.getY(), x1 + box.getX(), y2 + box.getY());
+		if (p1.x == p2.x) {
+			d1 = new DrawLine(view, p1.x, p1.y, p1.x, p1.y + C.BOX_HEIGHT / 2f - C.PLAYER_SIZE * C.DOOR_SIZE);
+			d2 = new DrawLine(view, p1.x, p1.y + C.BOX_HEIGHT / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, p1.x, p2.y);
 		}
-		else if (y1 == y2) {
-			d1 = new DrawLine(view, x1 + box.getX(), y1 + box.getY(), x1 + C.BOX_WIDTH / 2f - C.PLAYER_SIZE * C.DOOR_SIZE + box.getX(), y1 + box.getY());
-			d2 = new DrawLine(view, x1 + box.getX() + C.BOX_WIDTH / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, y1 + box.getY(), x2 + box.getX(), y1 + box.getY());
+		else if (p1.y == p2.y) {
+			d1 = new DrawLine(view, p1.x, p1.y, p1.x + C.BOX_WIDTH / 2f - C.PLAYER_SIZE * C.DOOR_SIZE, p1.y);
+			d2 = new DrawLine(view, p1.x + C.BOX_WIDTH / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, p1.y, p2.x, p1.y);
 		}
 		lines.add(d1);
 		lines.add(d2);
@@ -116,7 +111,7 @@ public class Wall implements com.interfaces.Collideable {
 	
 	public Vector2 doorPosition() {
 		if (isDoor()) {
-			return new Vector2((x1 + x2) / 2.0f + box.getX(), (y1 + y2) / 2.0f + box.getY());
+			return new Vector2((p1.x+p2.x)/2, (p1.y+p2.y)/2);
 		} else {
 			return null;
 		}

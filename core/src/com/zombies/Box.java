@@ -292,6 +292,8 @@ public class Box {
     public void removePotentialWall(Box box) {
         Wall[] walls = adjWalls(box);
         if (walls instanceof Wall[]) {
+            if (walls[0] == walls[1])
+                System.out.println("oops");
             removeWall(walls[0]);
             box.removeWall(walls[1]);
         }
@@ -300,12 +302,8 @@ public class Box {
     private Wall[] adjWalls(Box box) {
         for (Wall w : (ArrayList<Wall>)walls.clone()) {
             for (Wall ww : (ArrayList<Wall>)box.getWalls().clone()) {
-                if (w.isVertical() == ww.isVertical()) {
-                    if (w.isVertical() && w.getP1().x == ww.getP1().x) {
-                        return new Wall[]{w, ww};
-                    } else if (!w.isVertical() && w.getP1().y == ww.getP1().y) {
-                        return new Wall[]{w, ww};
-                    }
+                if (w.getP1().dst(ww.getP1()) == 0.0f && w.getP2().dst(ww.getP2()) == 0.0f) {
+                    return new Wall[]{w, ww};
                 }
             }
         }
@@ -349,8 +347,7 @@ public class Box {
 
     private void updateWalls() {
         for (Wall w: walls) {
-            if (w != null)
-                w.update();
+            w.update();
         }
     }
 
