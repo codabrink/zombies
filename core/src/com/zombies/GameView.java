@@ -82,13 +82,8 @@ public class GameView implements Screen {
         hud = new HUD();
         grid = new Box[C.GRID_WIDTH + 1][C.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
-        setReferences();
-        generateLevel();
-        addSurvivors();
-        populateLevel();
-        player = new Player(grid[1][1]);
+        player = new Player(new Vector2(0, 0));
         camHandle = new CameraHandle(this);
-        int radius = (int)(Gdx.graphics.getWidth() * C.JOY_SIZE);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
         shootButton = new ShootButton(this);
@@ -160,7 +155,7 @@ public class GameView implements Screen {
         }
         for (int i = 1; i <= C.GRID_HEIGHT;i++) {
             for (int j = 1; j <= C.GRID_WIDTH; j++) {
-                grid[j][i].getRoom().findAdjacentRooms();
+                //grid[j][i].getRoom().findAdjacentRooms();
             }
         }
     }
@@ -175,42 +170,6 @@ public class GameView implements Screen {
 
     public Box[][] getGrid() {
         return grid;
-    }
-
-    protected void setReferences(){
-        for (int i = 1; i <= C.GRID_WIDTH; i++){
-            for (int j = 1; j <= C.GRID_HEIGHT; j++){
-                grid[i][j] = new Box((i - 1) * C.BOX_WIDTH, (j - 1) * C.BOX_HEIGHT, i, j);
-            }
-        }
-        for (int i = 1; i <= C.GRID_WIDTH; i++){
-            for (int j = 1; j <= C.GRID_HEIGHT; j++){
-                if (j > 1){
-                    grid[i][j].addAdjBox(grid[i][j - 1]);
-                }
-                else {
-                    grid[i][j].addAdjBox(null);
-                }
-                if (i < C.GRID_WIDTH){
-                    grid[i][j].addAdjBox(grid[i + 1][j]);
-                }
-                else {
-                    grid[i][j].addAdjBox(null);
-                }
-                if (j < C.GRID_HEIGHT){
-                    grid[i][j].addAdjBox(grid[i][j + 1]);
-                }
-                else {
-                    grid[i][j].addAdjBox(null);
-                }
-                if (i > 1){
-                    grid[i][j].addAdjBox(grid[i - 1][j]);
-                }
-                else {
-                    grid[i][j].addAdjBox(null);
-                }
-            }
-        }
     }
 
     public int getWidth() {

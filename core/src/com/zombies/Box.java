@@ -15,7 +15,6 @@ import com.powerups.ShotgunPickup;
 import com.zombies.zombie.Carcass;
 
 public class Box {
-    private ArrayList<Box> adjBoxes = new ArrayList<Box>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Carcass> carcasses = new ArrayList<Carcass>();
@@ -93,27 +92,6 @@ public class Box {
         }
     }
 
-    public void addAdjBox(Box box) {
-        adjBoxes.add(box);
-    }
-    public boolean isAdjacent(Box box) { return adjBoxes.contains(box); }
-    public int adjDirection(Box box) {
-        int dX = box.getIndexX() - this.indexX;
-        int dY = box.getIndexY() - this.indexY;
-        if (dX != 0 && dY != 0 || box == this) { return -1; }
-        if (dX == -1)
-            return 4;
-        if (dX == 1)
-            return 2;
-        if (dY == -1)
-            return 1;
-        if (dY == 1)
-            return 3;
-        return -1;
-    }
-
-    public int getIndexX() {return indexX;}
-    public int getIndexY() {return indexY;}
     public float getX() {return position.x;}
     public float getY() {return position.y;}
 
@@ -223,14 +201,6 @@ public class Box {
         }
     }
 
-    public Box getBox(int i) {
-        return adjBoxes.get(i);
-    }
-
-    public ArrayList<Box> getBoxes() {
-        return adjBoxes;
-    }
-
     public Room getRoom() {
         return room;
     }
@@ -264,7 +234,7 @@ public class Box {
             int i = 0;
             while (box == null) {
                 i = random.nextInt(3);
-                box = adjBoxes.get(i);
+                // TODO actually path
             }
             createDoor(box);
             box.path(level - 1);

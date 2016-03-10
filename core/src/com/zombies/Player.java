@@ -32,22 +32,18 @@ public class Player extends Unit implements com.interfaces.Collideable {
 
     private int zombieKillCount = 0;
 
-    public Player(Box box) {
+    public Player(Vector2 position) {
         super();
-        this.box = box;
 
         healthBar = new HealthBar();
-        box.getRoom().currentRoom();
         radius = C.PLAYER_SIZE * 0.5f;
         diameter = C.PLAYER_SIZE;
 
         GROUP = -1;
-
         speed = C.PLAYER_SPEED;
-
         health = C.PLAYER_HEALTH;
 
-        guns.add(new Pistol(this, 50));
+        guns.add(new Pistol(this, -1));
 
         bDef.allowSleep = false;
         bDef.fixedRotation = true;

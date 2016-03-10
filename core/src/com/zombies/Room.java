@@ -63,32 +63,6 @@ public class Room {
         loaded = false;
     }
 
-    public Room(Box box) {
-        view = GameView.gv;
-        size = random.nextInt(C.MAX_ROOM_SIZE - C.MIN_ROOM_SIZE) + C.MIN_ROOM_SIZE;
-        boxes.add(box.setRoom(this));
-        while (boxes.size() < size) {
-            ArrayList<Box> tempList = new ArrayList<Box>();
-            for (Box b: boxes) {
-                for (Box bb: b.getBoxes()){
-                    if (bb != null && !bb.isTouched()) {
-                        tempList.add(bb);
-                    }
-                }
-            }
-            if (tempList.size() == 0) { //no available boxes to add to room
-                break;
-            }
-            boxes.add(tempList.get(random.nextInt(tempList.size())).setRoom(this));
-        }
-        this.removeWalls();
-    }
-
-    public void addAdjRoom(Room r) {
-        if (!adjRooms.contains(r))
-            adjRooms.add(r);
-    }
-
     public void alarm(Unit victim) {
         if (!alarmed) {
             for (Box b: boxes) {
@@ -205,15 +179,6 @@ public class Room {
             for (Box bb: boxes) {
                 if (b != bb)
                     b.removePotentialWall(bb);
-            }
-        }
-    }
-
-    public void findAdjacentRooms() {
-        for (Box b: boxes) {
-            for (Box bb: b.getBoxes()) {
-                if (bb != null && bb.getRoom() != null)
-                    bb.getRoom().addAdjRoom(this);
             }
         }
     }
