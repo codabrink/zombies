@@ -204,7 +204,7 @@ public class Player extends Unit implements com.interfaces.Collideable {
         } else {
             mY = (y - C.TILT_IGNORE) * C.TILT_SENSITIVITY;
         }
-        this.suggestAngle((float)Math.toDegrees(Math.atan2(y, x)));
+        this.suggestAngle((float) Math.toDegrees(Math.atan2(y, x)));
     }
 
     public Vector2 getDirection() {
@@ -303,13 +303,11 @@ public class Player extends Unit implements com.interfaces.Collideable {
 
     @Override
     public void update(int frame) {
+        updateBox();
         box.getRoom().update(frame, 0);
 
         updateZone();
         zone.update(frame, 1);
-
-//		applyMove();
-        box.updatePlayerRecords();
 
         this.handleHealth();
 
@@ -335,6 +333,10 @@ public class Player extends Unit implements com.interfaces.Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
             this.applyMove();
         }
+    }
+
+    protected void updateBox() {
+        setBox(zone.getBox(body.getPosition().x, body.getPosition().y));
     }
 
     @Override

@@ -38,6 +38,7 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
             unload();
             view.removeActiveZombie(this);
             zone.removeUnit(this);
+            box.removeUnit(this);
             if (box != null)
                 box.removeUnit(this);
             view.stats.zombieKills ++;

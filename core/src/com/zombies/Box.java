@@ -292,8 +292,6 @@ public class Box {
     public void removePotentialWall(Box box) {
         Wall[] walls = adjWalls(box);
         if (walls instanceof Wall[]) {
-            if (walls[0] == walls[1])
-                System.out.println("oops");
             removeWall(walls[0]);
             box.removeWall(walls[1]);
         }
@@ -308,18 +306,6 @@ public class Box {
             }
         }
         return null;
-    }
-
-    // old
-    public void removeWall(Box box) {
-        if (!adjBoxes.contains(box)) return;
-        int i = adjBoxes.indexOf(box);
-        walls.get(i).removeWall();
-        walls.set(i, null);
-    }
-
-    public void setBorder(Box box, int i) {
-        adjBoxes.add(i, box);
     }
 
     public Box setRoom(Room room) {
@@ -348,34 +334,6 @@ public class Box {
     private void updateWalls() {
         for (Wall w: walls) {
             w.update();
-        }
-    }
-
-    public void updatePlayerRecords() {
-        Player player = view.getPlayer();
-        //too far right
-        if (player.getX() > position.x + C.BOX_WIDTH) {
-            if (adjBoxes.get(1) != null) {
-                player.setBox(adjBoxes.get(1));
-            }
-        }
-        //too far left
-        if (player.getX() < position.x) {
-            if (adjBoxes.get(3) != null) {
-                player.setBox(adjBoxes.get(3));
-            }
-        }
-        //too far below
-        if (player.getY() > position.y + C.BOX_HEIGHT) {
-            if (adjBoxes.get(2) != null) {
-                player.setBox(adjBoxes.get(2));
-            }
-        }
-        //too far above
-        if (player.getY() < position.y) {
-            if (adjBoxes.get(0) != null) {
-                player.setBox(adjBoxes.get(0));
-            }
         }
     }
 }
