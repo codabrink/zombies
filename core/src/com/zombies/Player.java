@@ -35,6 +35,11 @@ public class Player extends Unit implements com.interfaces.Collideable {
     public Player(Vector2 position) {
         super();
 
+        storedPosition = position;
+
+        updateZone();
+        updateBox();
+
         healthBar = new HealthBar();
         radius = C.PLAYER_SIZE * 0.5f;
         diameter = C.PLAYER_SIZE;
@@ -48,7 +53,7 @@ public class Player extends Unit implements com.interfaces.Collideable {
         bDef.allowSleep = false;
         bDef.fixedRotation = true;
         bDef.linearDamping = C.LINEAR_DAMPING;
-        bDef.position.set(box.randomPoint());
+        bDef.position.set(position);
         bDef.type = BodyType.DynamicBody;
 
         body = view.getWorld().createBody(bDef);
@@ -63,7 +68,7 @@ public class Player extends Unit implements com.interfaces.Collideable {
         fDef.filter.groupIndex = GROUP;
 
         body.createFixture(fDef);
-        updateZone();
+
     }
 
     public float getHealth() {
@@ -229,7 +234,8 @@ public class Player extends Unit implements com.interfaces.Collideable {
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        box.getRoom().draw(spriteBatch, shapeRenderer, frame, 1);
+        if (box != null)
+            box.getRoom().draw(spriteBatch, shapeRenderer, frame, 1);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
@@ -267,13 +273,8 @@ public class Player extends Unit implements com.interfaces.Collideable {
 
     @Override
     public void setBox(Box b) {
-        if (b.getRoom() != box.getRoom()) {
-            for(Survivor s : survivors) {
-                // TODO: update to exact point
-                s.pushPointOfInterest(new Vector2(body.getPosition()));
-            }
+        if (b != null)
             b.getRoom().currentRoom();
-        }
         box = b;
     }
 
@@ -300,7 +301,8 @@ public class Player extends Unit implements com.interfaces.Collideable {
     @Override
     public void update(int frame) {
         updateBox();
-        box.getRoom().update(frame, 0);
+        if (box != null)
+            box.getRoom().update(frame, 0);
 
         updateZone();
         zone.update(frame, 1);
@@ -332,7 +334,10 @@ public class Player extends Unit implements com.interfaces.Collideable {
     }
 
     protected void updateBox() {
-        setBox(zone.getBox(body.getPosition().x, body.getPosition().y));
+        if (body != null)
+            setBox(zone.getBox(body.getPosition().x, body.getPosition().y));
+        else
+            setBox(zone.getBox(storedPosition.x, storedPosition.y));
     }
 
     @Override

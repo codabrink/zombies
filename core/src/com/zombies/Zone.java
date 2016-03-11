@@ -2,8 +2,8 @@ package com.zombies;
 
 import com.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
+import com.map.MapGen;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,6 +22,11 @@ public class Zone {
 
     public Zone(int x, int y) {
         position = new Vector2(x, y);
+
+    }
+
+    public void generate() {
+        MapGen.fillZone(this);
     }
 
     public void update(int frame, int limit) {
@@ -33,6 +38,12 @@ public class Zone {
             fsAdjCheck++;
             if (fsAdjCheck > 20)
                 checkNearbyZones();
+        }
+
+        for (Box b: boxes) {
+            b.drawFloor(GameView.gv.getSpriteBatch(), GameView.gv.getShapeRenderer());
+            b.drawBox(GameView.gv.getSpriteBatch(), GameView.gv.getShapeRenderer());
+
         }
 
         DebugText.addMessage("rooms", "Rooms in zone: "+rooms.size());
@@ -59,15 +70,6 @@ public class Zone {
         for (Zombie z: (ArrayList<Zombie>)zombies.clone()) {
             z.load();
         }
-    }
-
-    public void addBox(Box b) {
-        if (boxes.indexOf(b) == -1)
-            boxes.add(b);
-    }
-    public void addRoom(Room r) {
-        if (rooms.indexOf(r) == -1)
-            rooms.add(r);
     }
 
     public static Zone getZone(float x, float y) {
@@ -131,5 +133,14 @@ public class Zone {
         return position;
     }
     public ArrayList<Box> getBoxes() { return boxes; }
+    public void addRoom(Room r) {
+        if (rooms.indexOf(r) == -1)
+            rooms.add(r);
+        for (Box b : r.getBoxes()) {
+            if (boxes.indexOf(b) == -1)
+                boxes.add(b);
+        }
+    }
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
+    public Box  randomBox() {return boxes.get(r.nextInt(boxes.size()));}
 }

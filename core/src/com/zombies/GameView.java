@@ -82,7 +82,13 @@ public class GameView implements Screen {
         hud = new HUD();
         grid = new Box[C.GRID_WIDTH + 1][C.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
-        player = new Player(new Vector2(0, 0));
+
+        // generate the initial zone
+        Zone z = Zone.getZone(0f, 0f);
+        z.generate();
+        Box initialBox = z.randomBox();
+
+        player = new Player(initialBox.randomPoint());
         camHandle = new CameraHandle(this);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
@@ -121,43 +127,9 @@ public class GameView implements Screen {
     }
     public ThumbpadRight getThumbpadRight() { return thumbpadRight;}
 
-    public void populateLevel() {
-        for (int i = 1; i <= C.GRID_WIDTH; i++){
-            for (int j = 1; j <= C.GRID_HEIGHT; j++){
-                if (random.nextFloat() < 0.6f) {
-                    for (int k=0; k<= random.nextInt(C.BOX_MAX_ZOMBIES) + 2; k++) {
-                        grid[i][j].addZombie();
-                        stats.numZombies ++;
-                    }
-                }
-            }
-        }
-    }
 
     public Box randomBox(){
         return grid[random.nextInt(C.GRID_WIDTH)+1][random.nextInt(C.GRID_HEIGHT)+1];
-    }
-
-    protected void generateLevel() {
-        for (int i = 1; i <= C.GRID_HEIGHT; i++){
-            for (int j = 1; j <= C.GRID_WIDTH; j++){
-                if (!grid[j][i].isTouched()){
-                    new Room(grid[j][i]);
-                }
-            }
-        }
-        for (int i = 1; i <= C.GRID_HEIGHT; i++){
-            for (int j = 1; j <= C.GRID_WIDTH; j++){
-                if (!grid[j][i].isPathed()) {
-                    grid[j][i].path(C.PATH_LENGTH);
-                }
-            }
-        }
-        for (int i = 1; i <= C.GRID_HEIGHT;i++) {
-            for (int j = 1; j <= C.GRID_WIDTH; j++) {
-                //grid[j][i].getRoom().findAdjacentRooms();
-            }
-        }
     }
 
     public int getLightingCount() {
@@ -264,6 +236,8 @@ public class GameView implements Screen {
             dd.draw(spriteBatch, shapeRenderer);
         }
         DebugText.render();
+
+        //debugRenderer.render(world, cam.combined);
     }
 
     protected void updateLoop() {

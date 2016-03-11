@@ -60,7 +60,8 @@ public class Pistol extends Gun {
         if (killRoster.size() > 0)
             killRoster.get(r.nextInt(killRoster.size())).die(unit);
 
-		unit.getBox().getRoom().alarm(unit);
+		if (unit.getBox() != null)
+			unit.getBox().getRoom().alarm(unit);
 		view.stats.playerShots ++;
 		shoot.play(0.2f);
 	}

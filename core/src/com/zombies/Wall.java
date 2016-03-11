@@ -1,16 +1,19 @@
 package com.zombies;
 
 import java.util.ArrayList;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.util.MyVector2;
+import com.util.Util;
 
 public class Wall implements com.interfaces.Collideable {
 	private Vector2 p1, p2;
-	private boolean vertical = false;
+    private MyVector2 p;
+    private ArrayList<Float> holes = new ArrayList<Float>();
+
 	private Box box;
 	private Body body;
 	private ArrayList<EdgeShape> shapes;
@@ -18,32 +21,31 @@ public class Wall implements com.interfaces.Collideable {
 	private GameView view;
 	public boolean door = false;
 	int index;
-	
-	public Wall(Box box, float x1, float y1, float x2, float y2, int index) {
-		p1 = new Vector2(x1 + box.getX(), y1 + box.getY());
-		p2 = new Vector2(x2 + box.getX(), y2 + box.getY());
-		this.box = box;
-		this.view = GameView.gv;
-		this.index = index;
 
-        vertical = (y1 == y2);
+    public Wall(Box box, float x, float y, float length, float angle) {
+        view = GameView.gv;
+        this.box = box;
 
-		//set up arraylists
-		shapes = new ArrayList<EdgeShape>();
-		lines = new ArrayList<DrawLine>();
-		
-		lines.add(new DrawLine(view, x1 + box.getX(), p1.y, p2.x, p2.y));
+        p = new MyVector2(x, y, length, angle);
+        shapes = new ArrayList<EdgeShape>();
+        lines = new ArrayList<DrawLine>();
 
-		//set up physics
-		body = view.getWorld().createBody(new BodyDef());
+        lines.add(new DrawLine(p.cpy().add(box.getPosition()), p.end().add(box.getPosition())));
+
+        //set up physics
+        body = view.getWorld().createBody(new BodyDef());
         EdgeShape shape = new EdgeShape();
-		shape.set(new Vector2(x1, y1), new Vector2(x2, y2));
-		shapes.add(shape);
-		body.createFixture(shape, 0);
-		body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
-		body.setUserData(new BodData("wall", this));
-	}
-	
+        shape.set(p, p.end());
+        shapes.add(shape);
+        body.createFixture(shape, 0);
+        body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
+        body.setUserData(new BodData("wall", this));
+    }
+
+    public void makeDoor() {
+
+    }
+
 	public Zombie spawnZobie() {
 		if (isDoor()) {
 			Zombie z = new Zombie(view, box, doorPosition());
@@ -85,29 +87,7 @@ public class Wall implements com.interfaces.Collideable {
 	}
 	
 	public Body getBody() {return body;}
-	
-	public void makeDoor() {
-		removeWall();
-		EdgeShape s1 = new EdgeShape();
-		EdgeShape s2 = new EdgeShape();
-		DrawLine d1 = null, d2 = null;
-		if (p1.x == p2.x) {
-			d1 = new DrawLine(view, p1.x, p1.y, p1.x, p1.y + C.BOX_HEIGHT / 2f - C.PLAYER_SIZE * C.DOOR_SIZE);
-			d2 = new DrawLine(view, p1.x, p1.y + C.BOX_HEIGHT / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, p1.x, p2.y);
-		}
-		else if (p1.y == p2.y) {
-			d1 = new DrawLine(view, p1.x, p1.y, p1.x + C.BOX_WIDTH / 2f - C.PLAYER_SIZE * C.DOOR_SIZE, p1.y);
-			d2 = new DrawLine(view, p1.x + C.BOX_WIDTH / 2f + C.PLAYER_SIZE * C.DOOR_SIZE, p1.y, p2.x, p1.y);
-		}
-		lines.add(d1);
-		lines.add(d2);
-		s1.set(d1.getV1(box), d1.getV2(box));
-		s2.set(d2.getV1(box), d2.getV2(box));
-		body.createFixture(s1, 0);
-		body.createFixture(s2, 0);
-		
-		door = true;
-	}
+
 	
 	public Vector2 doorPosition() {
 		if (isDoor()) {
@@ -134,13 +114,16 @@ public class Wall implements com.interfaces.Collideable {
 		}
 	}
 
-    public boolean isVertical() { return vertical; }
-    public Vector2 getP1() { return p1; }
-    public Vector2 getP2() { return p2; }
+    private void createHole(Vector2 holePosition, float holeSize) {
+
+    }
+
+    public Vector2 getP1() { return p; }
+    public Vector2 getP2() { return p.end(); }
 
 	@Override
 	public void handleCollision(Fixture f) {
-		// TODO Auto-generated method stub
+		createHole(f.getBody().getPosition(), 3f);
 	}
 	
 }

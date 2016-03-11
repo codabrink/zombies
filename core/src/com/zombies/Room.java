@@ -28,7 +28,6 @@ public class Room {
             b.setRoom(this);
         }
         this.removeWalls();
-
     }
 
     public void doorsTo(Room room) {
@@ -177,8 +176,9 @@ public class Room {
         //remove walls
         for (Box b: boxes) {
             for (Box bb: boxes) {
-                if (b != bb)
-                    b.removePotentialWall(bb);
+                if (b != bb) {
+                    //b.removePotentialWall(bb);
+                }
             }
         }
     }

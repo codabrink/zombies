@@ -39,10 +39,10 @@ public class Box {
         this.indexY = indexY;
 
         //create walls
-        walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
-        walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
-        walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
-        walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
+//        walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
+//        walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
+//        walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
+//        walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
 
         this.populateBox();
     }
@@ -52,13 +52,11 @@ public class Box {
         this.view = GameView.gv;
         this.floor = new Floor(view, this);
 
-        //create walls
-        walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
-        walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
-        walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
-        walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
-
-        this.populateBox();
+        walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
+        walls.add(new Wall(this, width, 0,      height, 90)); // right wall
+        walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
+        walls.add(new Wall(this, 0,     0,      height, 90)); // left wall
+        //this.populateBox();
     }
 
     public void load() {
@@ -282,10 +280,10 @@ public class Box {
         this.room = room;
         touched = true;
 
-        room.addZone(Zone.getZone(position.x, position.y)).addBox(this);
-        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y)).addBox(this);
-        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y + C.BOX_HEIGHT)).addBox(this);
-        room.addZone(Zone.getZone(position.x, position.y + C.BOX_HEIGHT)).addBox(this);
+        room.addZone(Zone.getZone(position.x, position.y));
+        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y));
+        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y + C.BOX_HEIGHT));
+        room.addZone(Zone.getZone(position.x, position.y + C.BOX_HEIGHT));
 
         return this;
     }

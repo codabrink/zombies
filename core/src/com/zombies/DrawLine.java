@@ -5,60 +5,26 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Disposable;
+import com.util.MyVector2;
+import com.util.Util;
 
 public class DrawLine {
 
-	private Vector2 v1, v2;
-	private Mesh mesh;
-	private float[] verticies;
-	private GameView view;
-	private Random random = new Random();
-	private int updateInt;
-	private int wallTexture = random.nextInt(3) + 1;
-    private ShapeRenderer shapeRenderer;
-    private float height, width;
+	private Vector2 p1, p2;
+    GameView view;
 
-	public DrawLine(GameView view, float x1, float y1, float x2, float y2) {
-		v1 = new Vector2(x1, y1);
-		v2 = new Vector2(x2, y2);
-		this.view = view;
-		updateInt = random.nextInt(C.UPDATE_LIGHTING_INTERVAL);
-
-        height = y1 - y2;
-        width = x1 - x2;
-
-        shapeRenderer = view.getShapeRenderer();
+	public DrawLine(Vector2 p1, Vector2 p2) {
+        this.p1 = p1;
+        this.p2 = p2;
+        view = GameView.gv;
 	}
 	
 	public void draw() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 1, 1, 1);
-        shapeRenderer.line(v1.x * view.scale, v1.y * view.scale, v2.x * view.scale, v2.y * view.scale);
-        shapeRenderer.end();
-	}
-
-	public Vector2 getV1(Box box) {
-		return new Vector2(v1.x - box.getX(), v1.y - box.getY());
-	}
-	
-	public Vector2 getV2(Box box) {
-		return new Vector2(v2.x - box.getX(), v2.y - box.getY());
-	}
-	
-	public float getX1() {
-		return v1.x;
-	}
-	
-	public float getX2() {
-		return v2.x;
-	}
-	
-	public float getY1() {
-		return v1.y;
-	}
-	
-	public float getY2() {
-		return v2.y;
+        view.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        view.getShapeRenderer().setColor(1, 1, 1, 1);
+        view.getShapeRenderer().line(p1.x * view.scale, p1.y * view.scale, p2.x * view.scale, p2.y * view.scale);
+        view.getShapeRenderer().end();
 	}
 
 	public void update() {}
