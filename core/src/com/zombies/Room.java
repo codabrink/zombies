@@ -123,27 +123,6 @@ public class Room {
         return null;
     }
 
-    public void flood(int number) {
-        long i = 0l;
-        do {
-            for (Box b: boxes) {
-                for (Wall w: b.getWalls()) {
-                    if (w != null && w.isDoor()) {
-                        int l = random.nextInt(7) + 1;
-                        for (int k=1; k<=l; k++) {
-                            view.addPostZombie(new PostponedZombie(view, b, w.doorPosition(), w.getVector(), view.getPlayer(), i));
-                        }
-                        number -= l;
-                        i += 100l;
-                        if (number <= 0) {
-                            return;
-                        }
-                    }
-                }
-            }
-        } while (number > 0);
-    }
-
     public ArrayList<Box> getBoxes() {
         return boxes;
     }
@@ -177,7 +156,7 @@ public class Room {
         for (Box b: boxes) {
             for (Box bb: boxes) {
                 if (b != bb) {
-                    //b.removePotentialWall(bb);
+                    b.removePotentialWall(bb);
                 }
             }
         }

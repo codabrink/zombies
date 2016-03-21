@@ -17,5 +17,6 @@ public class Zombies extends Game {
 
     @Override
     public void resize(int width, int height) {
+
     }
 }

@@ -7,8 +7,9 @@ import com.zombies.Zombies;
 public class DesktopLauncher {
     public static boolean DESKTOP = true;
 
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new Zombies(), config);
-	}
+    public static void main (String[] arg) {
+        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.resizable = true;
+        new LwjglApplication(new Zombies(), config);
+    }
 }

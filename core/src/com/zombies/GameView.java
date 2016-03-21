@@ -6,6 +6,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.data.Stats;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -26,7 +28,8 @@ public class GameView implements Screen {
     public static FontGen fontGen;
     public static GameView gv;
 
-    public ArrayList<ArrayList<Zone>> zones;
+    public HashMap<String, Zone> zones;
+
     private ArrayList<Zombie> activeZombies;
 
     public Stats stats;
@@ -66,7 +69,7 @@ public class GameView implements Screen {
     public GameView() {
         fontGen = new FontGen();
 
-        cam = new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
@@ -75,7 +78,7 @@ public class GameView implements Screen {
 
     private void reset() {
         setGv(this);
-        zones = new ArrayList<ArrayList<Zone>>();
+        zones = new HashMap<String, Zone>();
         activeZombies = new ArrayList<Zombie>();
         stats = new Stats();
 
@@ -300,9 +303,9 @@ public class GameView implements Screen {
     }
 
     @Override
-    public void resize(int arg0, int arg1) {
-        // TODO Auto-generated method stub
-
+    public void resize(int width, int height) {
+        cam = new PerspectiveCamera(C.FOV, width, height);
+        System.out.println("resize");
     }
 
     @Override
@@ -329,9 +332,22 @@ public class GameView implements Screen {
             player.getBody().applyForce(new Vector2(-strength, 0), new Vector2(), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-
             player.getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            player.getBody().setTransform(player.getBody().getPosition().add(0, 10), player.getBody().getAngle());
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            player.getBody().setTransform(player.getBody().getPosition().add(10, 0), player.getBody().getAngle());
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -10), player.getBody().getAngle());
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            player.getBody().setTransform(player.getBody().getPosition().add(-10, 0), player.getBody().getAngle());
+        }
+
 
         for (int i=0; i<3; i++) {
             if (Gdx.input.isTouched(i)) {

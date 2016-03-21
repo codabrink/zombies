@@ -20,9 +20,11 @@ public class Zone {
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
-    public Zone(int x, int y) {
-        position = new Vector2(x, y);
+    public int numRooms = 100; // number of rooms that are supposed to exist in the zone
+    public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
+    public Zone(float x, float y) {
+        position = new Vector2(x, y);
     }
 
     public void generate() {
@@ -33,6 +35,8 @@ public class Zone {
         if (this.frame == frame)
             return;
         this.frame = frame;
+
+        MapGen.update(this); // generate the map
 
         if (adjZones.size() < 8) {
             fsAdjCheck++;
@@ -75,24 +79,14 @@ public class Zone {
     public static Zone getZone(float x, float y) {
         int indX = (int)(x / C.ZONE_SIZE);
         int indY = (int)(y / C.ZONE_SIZE);
+        System.out.println(indY);
 
-        // get x row
-        ArrayList<Zone> rowX;
-        try {
-            rowX = GameView.gv.zones.get(indX);
-        } catch (IndexOutOfBoundsException e) {
-            rowX = new ArrayList<Zone>();
-            GameView.gv.zones.add(indX, rowX);
+        Zone z = GameView.gv.zones.get("row"+indY+"column"+indX);
+        if (z == null) {
+            z = new Zone(indX * C.ZONE_SIZE, indY * C.ZONE_SIZE);
+            GameView.gv.zones.put("row"+indY+"column"+indX, z);
         }
-
-        // get zone
-        try {
-            return rowX.get(indY);
-        } catch (IndexOutOfBoundsException e) {
-            Zone z = new Zone(indX, indY);
-            rowX.add(indY, z);
-            return z;
-        }
+        return z;
     }
 
     public Box getBox(float x, float y) {
@@ -133,6 +127,7 @@ public class Zone {
         return position;
     }
     public ArrayList<Box> getBoxes() { return boxes; }
+    public ArrayList<Room> getRooms() { return rooms; }
     public void addRoom(Room r) {
         if (rooms.indexOf(r) == -1)
             rooms.add(r);
@@ -142,5 +137,10 @@ public class Zone {
         }
     }
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
-    public Box  randomBox() {return boxes.get(r.nextInt(boxes.size()));}
+    public Box  randomBox() {
+        if (boxes.size() > 0)
+            return boxes.get(r.nextInt(boxes.size()));
+        else
+            return null;
+    }
 }

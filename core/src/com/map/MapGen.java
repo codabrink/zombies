@@ -10,6 +10,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class MapGen {
+    public static void update(Zone z) {
+        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
+            Room room = genRoom(z, z.randomPosition());
+            if (room != null)
+                z.addRoom(room);
+            else
+                z.roomGenFailureCount++;
+        }
+    }
+
     public static void fillZone(Zone z) {
         Random r = new Random();
 
