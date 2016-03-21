@@ -77,9 +77,8 @@ public class Zone {
     }
 
     public static Zone getZone(float x, float y) {
-        int indX = (int)(x / C.ZONE_SIZE);
-        int indY = (int)(y / C.ZONE_SIZE);
-        System.out.println(indY);
+        int indX = (int)Math.floor(x / C.ZONE_SIZE);
+        int indY = (int)Math.floor(y / C.ZONE_SIZE);
 
         Zone z = GameView.gv.zones.get("row"+indY+"column"+indX);
         if (z == null) {
