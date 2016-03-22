@@ -20,7 +20,7 @@ public class Zone {
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
-    public int numRooms = 100; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 10; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
@@ -41,7 +41,7 @@ public class Zone {
         if (adjZones.size() < 8) {
             fsAdjCheck++;
             if (fsAdjCheck > 20)
-                checkNearbyZones();
+                findAdjZones();
         }
 
         for (Box b: boxes) {
@@ -50,7 +50,7 @@ public class Zone {
 
         }
 
-        DebugText.addMessage("rooms", "Rooms in zone: "+rooms.size());
+        DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
 
         if (limit > 0)
             for (Zone z: adjZones) {
@@ -58,14 +58,21 @@ public class Zone {
             }
     }
 
-    private void checkNearbyZones() {
-        for (float i = position.y-1; i <= position.y+1; i++) {
-            for (float j = position.x-1; j <= position.x+1; j++) {
-                Zone z = Zone.getZone(j, i);
-                if (z != this && adjZones.indexOf(z) != -1) {
-                    adjZones.add(z);
-                }
-            }
+    public void findAdjZones() {
+        // java is the absolute freaking worst...
+        float[] zonePositions = {position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
+        position.x - C.ZONE_SIZE, position.y,
+        position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,
+        position.x, position.y + C.ZONE_SIZE,
+        position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE,
+        position.x + C.ZONE_SIZE, position.y,
+        position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE,
+        position.x, position.y - C.ZONE_SIZE};
+
+        for (int i=0;i<zonePositions.length;i+=2) {
+            Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
+            if (z != this && adjZones.indexOf(z) == -1)
+                adjZones.add(z);
         }
         fsAdjCheck = 0;
     }
@@ -127,6 +134,12 @@ public class Zone {
     }
     public ArrayList<Box> getBoxes() { return boxes; }
     public ArrayList<Room> getRooms() { return rooms; }
+    public ArrayList<Zone> getAdjZones() { return adjZones; }
+    public ArrayList<Zone> getAdjZonesPlusSelf() {
+        ArrayList<Zone> allZones = (ArrayList<Zone>)adjZones.clone();
+        allZones.add(this);
+        return allZones;
+    }
     public void addRoom(Room r) {
         if (rooms.indexOf(r) == -1)
             rooms.add(r);

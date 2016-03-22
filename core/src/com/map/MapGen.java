@@ -11,6 +11,10 @@ import java.util.Random;
 
 public class MapGen {
     public static void update(Zone z) {
+        // needs to be done during generation, not creation
+        if (z.getAdjZones().size() < 8)
+            z.findAdjZones();
+
         if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
             Room room = genRoom(z, z.randomPosition());
             if (room != null)
@@ -22,6 +26,10 @@ public class MapGen {
 
     public static void fillZone(Zone z) {
         Random r = new Random();
+
+        // needs to be done during generation, not creation
+        if (z.getAdjZones().size() < 8)
+            z.findAdjZones();
 
         for (int i=0;i<=10;i++) {
             Room room = genRoom(z, z.randomPosition());
@@ -78,17 +86,19 @@ public class MapGen {
     }
 
     private static boolean collides(Zone z, Vector2 boxPosition, float width, float height) {
-        for (Box b : z.getBoxes()) {
-            if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-            } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
+        for (Zone zone : z.getAdjZonesPlusSelf()) {
+            for (Box b : zone.getBoxes()) {
+                if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
+                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
+                        return true;
+                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
+                        return true;
+                } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
+                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
+                        return true;
+                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
+                        return true;
+                }
             }
         }
         return false;

@@ -16,7 +16,6 @@ import com.zombies.zombie.Carcass;
 public class Box {
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
-    private ArrayList<Carcass> carcasses = new ArrayList<Carcass>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
