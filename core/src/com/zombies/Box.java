@@ -258,12 +258,11 @@ public class Box {
     public void removePotentialWall(Box box) {
         Wall[] walls = adjWalls(box);
         if (walls instanceof Wall[]) {
-            new Color();
-            Color c = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1f);
-            walls[0].setColor(c);
-            walls[1].setColor(c);
-            //removeWall(walls[0]);
-            //box.removeWall(walls[1]);
+            //Color c = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1f);
+            //walls[0].setColor(c);
+            //walls[1].setColor(c);
+            removeWall(walls[0]);
+            box.removeWall(walls[1]);
         }
     }
 
