@@ -53,8 +53,6 @@ public class Wall implements com.interfaces.Collideable {
     }
 
     public boolean samePositionAs(Wall w) {
-        if (this == w)
-            System.out.println("Wall - Wall compared against itself.");
         return (absoluteP1().dst(w.absoluteP1()) == 0.0 && p1.angle() == w.getP1().angle());
     }
 

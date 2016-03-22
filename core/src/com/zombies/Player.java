@@ -305,7 +305,7 @@ public class Player extends Unit implements com.interfaces.Collideable {
             box.getRoom().update(frame, 0);
 
         updateZone();
-        zone.update(frame, 2);
+        zone.update(frame, 0);
 
         this.handleHealth();
 
