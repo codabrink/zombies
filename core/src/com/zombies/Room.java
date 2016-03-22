@@ -174,6 +174,7 @@ public class Room {
         }
 
         for (Box b: boxes) b.update(frame);
+
         draw(view.getSpriteBatch(), view.getShapeRenderer(), frame, distance);
     }
 

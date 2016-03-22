@@ -83,7 +83,6 @@ public class GameView implements Screen {
         stats = new Stats();
 
         hud = new HUD();
-        grid = new Box[C.GRID_WIDTH + 1][C.GRID_HEIGHT + 1];
         world = new World(new Vector2(), true);
 
         // generate the initial zone

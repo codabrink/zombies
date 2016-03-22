@@ -6,6 +6,7 @@ import com.zombies.C;
 import com.zombies.Room;
 import com.zombies.Zone;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -31,7 +32,7 @@ public class MapGen {
         if (z.getAdjZones().size() < 8)
             z.findAdjZones();
 
-        for (int i=0;i<=10;i++) {
+        for (int i=0;i<=0;i++) {
             Room room = genRoom(z, z.randomPosition());
             if (room != null)
                 z.addRoom(room);
@@ -45,7 +46,7 @@ public class MapGen {
         ArrayList<Box> boxes = new ArrayList<Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = new Vector2(r.nextFloat() * C.ZONE_SIZE + z.getPosition().x, r.nextFloat() * C.ZONE_SIZE + z.getPosition().y);
-            if (!collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT, boxes)) {
+            if (!collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
                 boxes.add(new Box(boxPosition.x, boxPosition.y));
                 break;
             }
@@ -54,85 +55,43 @@ public class MapGen {
         if (boxes.size() == 0)
             return null;
 
-        int roomSize = r.nextInt(5), loops = 0;
+        int roomSize = r.nextInt(3) + 30, loops = 0;
         while (boxes.size() <= roomSize && boxes.size() > 0) {
             if (true) { // TODO add randomness for perfect or imperfect alignment later
                 Box b = boxes.get(r.nextInt(boxes.size()));
+                Vector2 proposedPosition = new Vector2();
                 switch (r.nextInt(3)) {
                     case 0: // top
-                        if (!collides(z, b.getPosition().cpy().add(0, b.height), b.width, b.height, boxes))
-                            boxes.add(new Box(b.getPosition().x, b.getPosition().y + b.height));
+                        proposedPosition = b.getPosition().cpy().add(0, b.height);
                         break;
                     case 1: // right
-                        if (!collides(z, b.getPosition().cpy().add(b.width, 0), b.width, b.height, boxes))
-                            boxes.add(new Box(b.getPosition().x + b.width, b.getPosition().y));
+                        proposedPosition = b.getPosition().cpy().add(b.width, 0);
                         break;
                     case 2: // bottom
-                        if (!collides(z, b.getPosition().cpy().sub(0, b.height), b.width, b.height, boxes))
-                            boxes.add(new Box(b.getPosition().x, b.getPosition().y - b.height));
+                        proposedPosition = b.getPosition().cpy().sub(0, b.height);
                         break;
                     case 3: // left
-                        if (!collides(z, b.getPosition().cpy().sub(b.width, 0), b.width, b.height, boxes))
-                            boxes.add(new Box(b.getPosition().x - b.width, b.getPosition().y));
+                        proposedPosition = b.getPosition().cpy().sub(b.width, 0);
                         break;
                 }
+                if (!collides(z, b.getPosition().cpy().sub(b.width, 0), b.width, b.height) && doesNotDupe(proposedPosition, boxes))
+                    boxes.add(new Box(proposedPosition.x, proposedPosition.y));
             }
+
             loops++;
-            if (loops > 10) // catch infinite loops
-                break;
+            //if (loops > 10) // catch infinite loops
+                //break;
         }
 
         return new Room(boxes);
     }
 
-
-    private static boolean collides(ArrayList<Box> boxes, Vector2 boxPosition, float width, float height) {
-        for (Box b : boxes) {
-            if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-            } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-            }
+    private static boolean doesNotDupe(Vector2 proposedPosition, ArrayList<Box> boxes) {
+        for (Box b: boxes) {
+            if (b.getPosition().dst(proposedPosition) == 0.0)
+                return false;
         }
-        return false;
-    }
-
-    private static boolean collides(Zone z, Vector2 boxPosition, float width, float height, ArrayList<Box> extraBoxes) {
-        for (Box b : extraBoxes) {
-            if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-            } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
-                if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-                else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                    return true;
-            }
-        }
-        for (Zone zone : z.getAdjZonesPlusSelf()) {
-            for (Box b : zone.getBoxes()) {
-                if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
-                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
-                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                }
-            }
-        }
-        return false;
+        return true;
     }
 
     private static boolean collides(Zone z, Vector2 boxPosition, float width, float height) {
