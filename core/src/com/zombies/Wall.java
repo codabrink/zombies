@@ -38,7 +38,7 @@ public class Wall implements com.interfaces.Collideable {
         shape.set(p1, p1.end());
         shapes.add(shape);
         body.createFixture(shape, 0);
-        body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
+        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
         body.setUserData(new BodData("wall", this));
     }
 
@@ -81,7 +81,7 @@ public class Wall implements com.interfaces.Collideable {
     public void removeWall() {
         view.getWorld().destroyBody(body);
         body = view.getWorld().createBody(new BodyDef());
-        body.setTransform(new Vector2(box.getX(), box.getY()), body.getAngle());
+        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
         lines = new ArrayList<DrawLine>();
     }
 

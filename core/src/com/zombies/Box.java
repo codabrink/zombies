@@ -88,8 +88,8 @@ public class Box {
         }
     }
 
-    public float getX() {return position.x;}
-    public float getY() {return position.y;}
+    public float x() {return position.x;}
+    public float y() {return position.y;}
 
     public ArrayList<Powerup> getPowerups() {
         return powerups;

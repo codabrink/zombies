@@ -38,7 +38,7 @@ public class Floor {
 
 	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         spriteBatch.begin();
-        spriteBatch.draw(t, box.getX(), box.getY(), C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_WIDTH, C.BOX_HEIGHT, 1, 1, 0, 0, 0, t.getWidth(), t.getHeight(), false, false);
+        spriteBatch.draw(t, box.x(), box.y(), C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_WIDTH, C.BOX_HEIGHT, 1, 1, 0, 0, 0, t.getWidth(), t.getHeight(), false, false);
         spriteBatch.end();
 	}
 }

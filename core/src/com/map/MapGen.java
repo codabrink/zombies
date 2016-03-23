@@ -74,47 +74,53 @@ public class MapGen {
                         proposedPosition = b.getPosition().cpy().sub(b.width, 0);
                         break;
                 }
-                if (!collides(z, b.getPosition().cpy().sub(b.width, 0), b.width, b.height) && doesNotDupe(proposedPosition, boxes))
+                if (!collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT) && doesNotDupe(proposedPosition, boxes))
                     boxes.add(new Box(proposedPosition.x, proposedPosition.y));
             }
 
             loops++;
-            //if (loops > 10) // catch infinite loops
-                //break;
+            if (loops > roomSize * 4) // catch infinite loops
+                break;
         }
 
         return new Room(boxes);
     }
 
-    private static boolean doesNotDupe(Vector2 proposedPosition, ArrayList<Box> boxes) {
+    private static boolean doesNotDupe(Vector2 p, ArrayList<Box> boxes) {
         for (Box b: boxes) {
-            if (b.getPosition().dst(proposedPosition) == 0.0)
+            if (b.getPosition().dst(p) <= 1f)
                 return false;
         }
         return true;
     }
 
-    private static boolean collides(Zone z, Vector2 boxPosition, float width, float height) {
+    private static boolean collides(Zone z, Vector2 p, float w, float h) {
         for (Zone zone : z.getAdjZonesPlusSelf()) {
             for (Box b : zone.getBoxes()) {
-                if (within(boxPosition.x, b.getPosition().x, b.getPosition().x + b.width)) {
-                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                } else if (within(boxPosition.x + width, b.getPosition().x, b.getPosition().x + b.width)) {
-                    if (within(boxPosition.y, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                    else if (within(boxPosition.y + height, b.getPosition().y, b.getPosition().y + b.height))
-                        return true;
-                }
+                if (rectOverlap(b, p, w, h))
+                    return true;
             }
         }
         return false;
     }
 
-    // is a within b and c?
-    private static boolean within(float a, float b, float c) {
-        return a > b && a < c || a < b && a > c;
+    private static boolean collides(ArrayList<Box> boxes, Vector2 p, float w, float h) {
+        for (Box b: boxes) {
+            if (rectOverlap(b, p, w, h))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean rectOverlap(Box b, Vector2 p, float w, float h) {
+        boolean xOverlap = valueInRange(b.x(), p.x, p.x + w) ||
+                valueInRange(p.x, b.x(), b.x() + b.width);
+        boolean yOverlap = valueInRange(b.y(), p.y, p.y + h) ||
+                valueInRange(p.y, b.y(), b.y() + b.height);
+        return xOverlap && yOverlap;
+    }
+
+    private static boolean valueInRange(float value, float min, float max) {
+        return (value > min) && (value < max);
     }
 }
