@@ -6,11 +6,14 @@ import com.zombies.C;
 import com.zombies.Room;
 import com.zombies.Zone;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class MapGen {
+
+    static char[] DIRECTIONS = {'n', 'e', 's', 'w'};
+
     public static void update(Zone z) {
         // needs to be done during generation, not creation
         if (z.getAdjZones().size() < 8)
@@ -43,39 +46,66 @@ public class MapGen {
 
     private static Room genRoom(Zone z, Vector2 position) {
         Random r = new Random();
-        ArrayList<Box> boxes = new ArrayList<Box>();
+        HashMap<String, Box> boxMap = new HashMap<String, Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = new Vector2(r.nextFloat() * C.ZONE_SIZE + z.getPosition().x, r.nextFloat() * C.ZONE_SIZE + z.getPosition().y);
             if (!collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
-                boxes.add(new Box(boxPosition.x, boxPosition.y));
+                Box b = new Box(boxPosition.x, boxPosition.y);
+                b.BMKey = "0,0";
+                boxMap.put("0,0", b);
                 break;
             }
         }
 
-        if (boxes.size() == 0)
+        if (boxMap.size() == 0)
             return null;
 
         int roomSize = r.nextInt(3) + 30, loops = 0;
-        while (boxes.size() <= roomSize && boxes.size() > 0) {
+        while (boxMap.size() <= roomSize && boxMap.size() > 0) {
             if (true) { // TODO add randomness for perfect or imperfect alignment later
-                Box b = boxes.get(r.nextInt(boxes.size()));
+                Object[] boxMapArray = boxMap.values().toArray(); // so we can grab a random box
+
+                // find a box with at least one open side
+                Box b;
+                do {
+                    b = (Box)boxMapArray[r.nextInt(boxMapArray.length)];
+                } while (b.getAdjBoxes().size() == 4);
+
+                // find said open side (this can be improved)
+                char[] directions = {'n', 'e', 's', 'w'};
+                char direction;
+                do {
+                    direction = directions[r.nextInt(4)];
+                } while (b.getAdjBox(direction) != null);
+
+                int[] newBMLocation = b.getBMLocation();
+
+                // rasterize that direction
                 Vector2 proposedPosition = new Vector2();
-                switch (r.nextInt(3)) {
-                    case 0: // top
+                switch (direction) {
+                    case 'n': // top
                         proposedPosition = b.getPosition().cpy().add(0, b.height);
+                        newBMLocation[1]++;
                         break;
-                    case 1: // right
+                    case 'e': // right
                         proposedPosition = b.getPosition().cpy().add(b.width, 0);
+                        newBMLocation[0]++;
                         break;
-                    case 2: // bottom
+                    case 's': // bottom
                         proposedPosition = b.getPosition().cpy().sub(0, b.height);
+                        newBMLocation[1]--;
                         break;
-                    case 3: // left
+                    case 'w': // left
                         proposedPosition = b.getPosition().cpy().sub(b.width, 0);
+                        newBMLocation[0]--;
                         break;
                 }
-                if (!collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT) && doesNotDupe(proposedPosition, boxes))
-                    boxes.add(new Box(proposedPosition.x, proposedPosition.y));
+                if (!collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
+                    Box bb = new Box(proposedPosition.x, proposedPosition.y);
+                    bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
+                    boxMap.put(bb.BMKey, bb);
+                    associate(bb, boxMap);
+                }
             }
 
             loops++;
@@ -83,15 +113,22 @@ public class MapGen {
                 break;
         }
 
-        return new Room(boxes);
+        return new Room(boxMap.values());
     }
 
-    private static boolean doesNotDupe(Vector2 p, ArrayList<Box> boxes) {
-        for (Box b: boxes) {
-            if (b.getPosition().dst(p) <= 1f)
-                return false;
+    private static void associate(Box b, HashMap<String, Box> boxMap) {
+        int[] BMLocation = b.getBMLocation();
+        int[] modifiers = {0, -1, 1, 0, 0, 1, -1, 0};
+        for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
+            Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
+            if (bb == null)
+                continue;
+
+            b.setAdjBox(DIRECTIONS[i/2], bb);
+
+            int oppositeDirection = i/2 < 2 ? i/2 + 2 : i/2 - 2;
+            bb.setAdjBox(DIRECTIONS[oppositeDirection], b);
         }
-        return true;
     }
 
     private static boolean collides(Zone z, Vector2 p, float w, float h) {

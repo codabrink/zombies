@@ -1,9 +1,9 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -11,7 +11,6 @@ import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.Powerup;
 import com.powerups.ShotgunPickup;
-import com.zombies.zombie.Carcass;
 
 public class Box {
     private ArrayList<Wall> walls = new ArrayList<Wall>();
@@ -19,6 +18,7 @@ public class Box {
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
+    private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
     private boolean touched = false;
     private boolean pathed = false;
     private Vector2 position;
@@ -28,6 +28,9 @@ public class Box {
     private Random random = new Random();
     private Floor floor;
     public float height = C.BOX_SIZE, width = C.BOX_SIZE;
+
+    public String BMKey;
+    private int[] boxMapLocation;
 
     public Box(float x, float y, int indexX, int indexY) {
         position = new Vector2(x, y);
@@ -53,7 +56,7 @@ public class Box {
         walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
         walls.add(new Wall(this, width, 0,      height, 90)); // right wall
         walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
-        walls.add(new Wall(this, 0,     0,      height, 90)); // left wall
+        walls.add(new Wall(this, 0, 0, height, 90)); // left wall
         //this.populateBox();
     }
 
@@ -288,6 +291,14 @@ public class Box {
         return this;
     }
 
+    public void setAdjBox(Character direction, Box box) {
+        adjBoxes.put(direction, box);
+    }
+    public Box getAdjBox(Character direction) {
+        return adjBoxes.get(direction);
+    }
+    public HashMap<Character, Box> getAdjBoxes() {return adjBoxes;}
+
     public void touch(){
         touched = true;
     }
@@ -303,5 +314,14 @@ public class Box {
         for (Wall w: walls) {
             w.update();
         }
+    }
+
+    public int[] getBMLocation() {
+        String[] stringLocations = BMKey.split(",");
+        int[] locations = new int[2];
+        for (String l: stringLocations) {
+            locations[locations.length-1] = Integer.parseInt(l);
+        }
+        return locations;
     }
 }

@@ -21,9 +21,9 @@ public class Room {
     private int frame;
     private ArrayList<Zone> zones = new ArrayList<Zone>();
 
-    public Room(ArrayList<Box> boxes) {
+    public Room(Collection<Box> boxes) {
         view = GameView.gv;
-        this.boxes = boxes;
+        this.boxes = new ArrayList<Box>(boxes);
         for (Box b: boxes) {
             b.setRoom(this);
         }
