@@ -60,7 +60,7 @@ public class MapGen {
         if (boxMap.size() == 0)
             return null;
 
-        int roomSize = r.nextInt(3) + 30, loops = 0;
+        int roomSize = r.nextInt(3) + 10, loops = 0;
         while (boxMap.size() <= roomSize && boxMap.size() > 0) {
             if (true) { // TODO add randomness for perfect or imperfect alignment later
                 Object[] boxMapArray = boxMap.values().toArray(); // so we can grab a random box
@@ -72,10 +72,9 @@ public class MapGen {
                 } while (b.getAdjBoxes().size() == 4);
 
                 // find said open side (this can be improved)
-                char[] directions = {'n', 'e', 's', 'w'};
                 char direction;
                 do {
-                    direction = directions[r.nextInt(4)];
+                    direction = DIRECTIONS[r.nextInt(4)];
                 } while (b.getAdjBox(direction) != null);
 
                 int[] newBMLocation = b.getBMLocation();
@@ -113,12 +112,13 @@ public class MapGen {
                 break;
         }
 
+        System.out.println("Room size: "+boxMap.size());
         return new Room(boxMap.values());
     }
 
     private static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
-        int[] modifiers = {0, -1, 1, 0, 0, 1, -1, 0};
+        int[] modifiers = {0, 1, 1, 0, 0, -1, -1, 0};
         for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
             Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
             if (bb == null)
@@ -128,6 +128,8 @@ public class MapGen {
 
             int oppositeDirection = i/2 < 2 ? i/2 + 2 : i/2 - 2;
             bb.setAdjBox(DIRECTIONS[oppositeDirection], b);
+
+            System.out.println("Associating " + b.BMKey + " with " + bb.BMKey + ": " + DIRECTIONS[i/2] + " -> " + DIRECTIONS[oppositeDirection]);
         }
     }
 

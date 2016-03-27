@@ -20,7 +20,7 @@ public class Zone {
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
-    public int numRooms = 3; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 0; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {

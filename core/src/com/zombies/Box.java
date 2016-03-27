@@ -53,10 +53,10 @@ public class Box {
         this.view = GameView.gv;
         this.floor = new Floor(view, this);
 
-        walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
-        walls.add(new Wall(this, width, 0,      height, 90)); // right wall
-        walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
-        walls.add(new Wall(this, 0, 0, height, 90)); // left wall
+//        walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
+//        walls.add(new Wall(this, width, 0,      height, 90)); // right wall
+//        walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
+//        walls.add(new Wall(this, 0, 0, height, 90)); // left wall
         //this.populateBox();
     }
 
