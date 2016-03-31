@@ -1,7 +1,10 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.Color;
@@ -15,11 +18,9 @@ import com.util.MyVector2;
 
 public class Wall implements com.interfaces.Collideable {
     private MyVector2 p1;
-    private ArrayList<Float> holes = new ArrayList<Float>();
-
     private Box box;
     private Body body;
-    private ArrayList<EdgeShape> shapes;
+    private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private ArrayList<DrawLine> lines;
     private GameView view;
     public boolean door = false;
@@ -98,33 +99,47 @@ public class Wall implements com.interfaces.Collideable {
     }
 
     public void createHole(Vector2 holePosition, float holeSize) {
-        if (exploded)
-            return;
-        // if holePosition is not on line, this function will
-        // swing the vector2 onto the line using p1 as the axis
-        float dst = body.getPosition().dst(holePosition);
-
         view.getWorld().destroyBody(body);
         body = view.getWorld().createBody(new BodyDef());
         body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
         body.setUserData(new BodData("wall", this));
         lines = new ArrayList<DrawLine>();
 
-        MyVector2 v1 = new MyVector2(0, 0, Math.max(dst - holeSize / 2, 0), p1.angle());
-        MyVector2 v2 = new MyVector2(v1.project(dst + holeSize / 2), Math.max(p1.len() - dst - holeSize / 2, 0), p1.angle());
+        // if holePosition is not on line, this function will
+        // swing the vector2 onto the line using p1 as the axis
+        float dst = body.getPosition().dst(holePosition);
+        holes.put(dst, holeSize);
+        System.out.println("holes size: "+holes.size());
+        ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
+        Collections.sort(holePositions);
 
-        if (dst > holeSize / 2) {
-            EdgeShape shape = new EdgeShape();
-            shape.set(v1, v1.end());
-            lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
-            body.createFixture(shape, 0);
+        MyVector2 vo, v1, v2;
+
+        for (int i=0;i<holePositions.size();i++) {
+            vo = new MyVector2(0, 0, Math.max(holePositions.get(i) - holeSize / 2, 0), p1.angle());
+            v1 = i == 0 ? vo : new MyVector2(vo.project(holePositions.get(i-1) + holeSize / 2), Math.max(holePositions.get(i) - holeSize / 2 - (holePositions.get(i-1) + holeSize / 2), 0), p1.angle());
+            float wallSegmentLength = (i + 1 == holePositions.size() ? p1.len() : holePositions.get(i + 1)) - holePositions.get(i) - holeSize / 2;
+            v2 = new MyVector2(vo.project(holePositions.get(i) + holeSize / 2), Math.max(wallSegmentLength, 0), p1.angle());
+
+            //MyVector2 v1 = new MyVector2(0, 0, Math.max(dst - holeSize / 2, 0), p1.angle());
+            //MyVector2 v2 = new MyVector2(v1.project(dst + holeSize / 2), Math.max(p1.len() - dst - holeSize / 2, 0), p1.angle());
+
+            if (v1.len() > 0) {
+                EdgeShape shape = new EdgeShape();
+                shape.set(v1, v1.end());
+                lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
+                lines.get(lines.size()-1).setColor(Color.PURPLE);
+                body.createFixture(shape, 0);
+            }
+
+            if (v2.len() > 0) {
+                EdgeShape shape2 = new EdgeShape();
+                shape2.set(v2, v2.end());
+                body.createFixture(shape2, 0);
+                lines.add(new DrawLine(v2.cpy().add(body.getPosition()), v2.end().cpy().add(body.getPosition())));
+                lines.get(lines.size()-1).setColor(Color.ORANGE);
+            }
         }
-
-        EdgeShape shape2 = new EdgeShape();
-        shape2.set(v2, v2.end());
-        body.createFixture(shape2, 0);
-        lines.add(new DrawLine(v2.cpy().add(body.getPosition()), v2.end().cpy().add(body.getPosition())));
-        exploded = true;
     }
 
     public Vector2 getP1() { return p1; }
