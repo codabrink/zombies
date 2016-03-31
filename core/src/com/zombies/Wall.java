@@ -35,8 +35,8 @@ public class Wall implements com.interfaces.Collideable {
 
         //set up physics
         EdgeShape shape = new EdgeShape();
-        MyVector2 myv = new MyVector2(0, 0, length, angle);
-        shape.set(myv, myv.end());
+        MyVector2 shapeVector = new MyVector2(0, 0, length, angle);
+        shape.set(shapeVector, shapeVector.end());
         body = view.getWorld().createBody(new BodyDef());
         body.createFixture(shape, 0);
         body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
@@ -98,30 +98,30 @@ public class Wall implements com.interfaces.Collideable {
     }
 
     public void createHole(Vector2 holePosition, float holeSize) {
+        if (exploded)
+            return;
         // if holePosition is not on line, this function will
         // swing the vector2 onto the line using p1 as the axis
         float dst = body.getPosition().dst(holePosition);
-        System.out.println(dst);
-        if (true) return;
 
         view.getWorld().destroyBody(body);
         body = view.getWorld().createBody(new BodyDef());
-        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
+        body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
         body.setUserData(new BodData("wall", this));
         lines = new ArrayList<DrawLine>();
 
-        System.out.println("Hole position: " + holePosition.x + "," + holePosition.y);
-        System.out.println("dst: " + dst);
+        MyVector2 v1 = new MyVector2(0, 0, dst - holeSize / 2, p1.angle());
+        MyVector2 v2 = new MyVector2(v1.project(dst + holeSize / 2), p1.len() - dst - holeSize / 2, p1.angle());
+
         EdgeShape shape = new EdgeShape();
-        shape.set(p1, p1.project(dst - holeSize / 2));
-        lines.add(new DrawLine(p1.add(box.getPosition()), p1.project(dst - holeSize / 2).add(box.getPosition())));
+        shape.set(v1, v1.end());
+        lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
         body.createFixture(shape, 0);
 
         EdgeShape shape2 = new EdgeShape();
-        shape.set(p1.project(dst + holeSize / 2), p1.end());
-        lines.add(new DrawLine(p1.project(dst + holeSize / 2).add(box.getPosition()), p1.end().add(box.getPosition())));
+        shape.set(v2, v2.end());
         body.createFixture(shape2, 0);
-
+        lines.add(new DrawLine(v2.cpy().add(body.getPosition()), v2.end().cpy().add(body.getPosition())));
         exploded = true;
     }
 
@@ -132,7 +132,7 @@ public class Wall implements com.interfaces.Collideable {
 
     @Override
     public void handleCollision(Fixture f) {
-        createHole(f.getBody().getPosition(), 3f);
+        createHole(f.getBody().getPosition(), 5f);
     }
 
 }

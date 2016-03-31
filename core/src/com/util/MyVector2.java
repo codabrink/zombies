@@ -10,6 +10,11 @@ public class MyVector2 extends Vector2 {
         this.length = length;
         this.angle = angle;
     }
+    public MyVector2(Vector2 v, float length, float angle) {
+        super(v.x, v.y);
+        this.length = length;
+        this.angle = angle;
+    }
 
     public Vector2 end() {
         //System.out.println((float)(len() * Math.cos(angle  * (Math.PI/180))));
