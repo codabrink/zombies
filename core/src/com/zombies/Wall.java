@@ -110,16 +110,18 @@ public class Wall implements com.interfaces.Collideable {
         body.setUserData(new BodData("wall", this));
         lines = new ArrayList<DrawLine>();
 
-        MyVector2 v1 = new MyVector2(0, 0, dst - holeSize / 2, p1.angle());
-        MyVector2 v2 = new MyVector2(v1.project(dst + holeSize / 2), p1.len() - dst - holeSize / 2, p1.angle());
+        MyVector2 v1 = new MyVector2(0, 0, Math.max(dst - holeSize / 2, 0), p1.angle());
+        MyVector2 v2 = new MyVector2(v1.project(dst + holeSize / 2), Math.max(p1.len() - dst - holeSize / 2, 0), p1.angle());
 
-        EdgeShape shape = new EdgeShape();
-        shape.set(v1, v1.end());
-        lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
-        body.createFixture(shape, 0);
+        if (dst > holeSize / 2) {
+            EdgeShape shape = new EdgeShape();
+            shape.set(v1, v1.end());
+            lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
+            body.createFixture(shape, 0);
+        }
 
         EdgeShape shape2 = new EdgeShape();
-        shape.set(v2, v2.end());
+        shape2.set(v2, v2.end());
         body.createFixture(shape2, 0);
         lines.add(new DrawLine(v2.cpy().add(body.getPosition()), v2.end().cpy().add(body.getPosition())));
         exploded = true;
