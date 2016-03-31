@@ -48,6 +48,10 @@ public class Bullet {
                     stopFixture = fixture;
                     return 0;
                 }
+                if (bodData.getType() == "wall") {
+                    System.out.println("Creating a hole");
+                    ((Wall)bodData.getObject()).createHole(point, 12);
+                }
                 return 0;
             }
         };

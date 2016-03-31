@@ -1,6 +1,8 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.utils.Array;
 import com.util.MyVector2;
 
 public class Wall implements com.interfaces.Collideable {
@@ -21,25 +24,24 @@ public class Wall implements com.interfaces.Collideable {
     private GameView view;
     public boolean door = false;
     int index;
+    private boolean exploded = false;
 
-    public Wall(Box box, float x, float y, float length, float angle) {
+    public Wall(Box box, Vector2 position, float length, float angle) {
         view = GameView.gv;
         this.box = box;
 
-        p1 = new MyVector2(x, y, length, angle);
-        shapes = new ArrayList<EdgeShape>();
+        p1 = new MyVector2(position.x, position.y, length, angle);
         lines = new ArrayList<DrawLine>();
 
-        lines.add(new DrawLine(p1.cpy().add(box.getPosition()), p1.end().add(box.getPosition())));
-
         //set up physics
-        body = view.getWorld().createBody(new BodyDef());
         EdgeShape shape = new EdgeShape();
-        shape.set(p1, p1.end());
-        shapes.add(shape);
+        MyVector2 myv = new MyVector2(0, 0, length, angle);
+        shape.set(myv, myv.end());
+        body = view.getWorld().createBody(new BodyDef());
         body.createFixture(shape, 0);
-        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
+        body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
         body.setUserData(new BodData("wall", this));
+        lines.add(new DrawLine(p1, p1.end()));
     }
 
     public void makeDoor() {
@@ -95,8 +97,32 @@ public class Wall implements com.interfaces.Collideable {
         }
     }
 
-    private void createHole(Vector2 holePosition, float holeSize) {
+    public void createHole(Vector2 holePosition, float holeSize) {
+        // if holePosition is not on line, this function will
+        // swing the vector2 onto the line using p1 as the axis
+        float dst = body.getPosition().dst(holePosition);
+        System.out.println(dst);
+        if (true) return;
 
+        view.getWorld().destroyBody(body);
+        body = view.getWorld().createBody(new BodyDef());
+        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
+        body.setUserData(new BodData("wall", this));
+        lines = new ArrayList<DrawLine>();
+
+        System.out.println("Hole position: " + holePosition.x + "," + holePosition.y);
+        System.out.println("dst: " + dst);
+        EdgeShape shape = new EdgeShape();
+        shape.set(p1, p1.project(dst - holeSize / 2));
+        lines.add(new DrawLine(p1.add(box.getPosition()), p1.project(dst - holeSize / 2).add(box.getPosition())));
+        body.createFixture(shape, 0);
+
+        EdgeShape shape2 = new EdgeShape();
+        shape.set(p1.project(dst + holeSize / 2), p1.end());
+        lines.add(new DrawLine(p1.project(dst + holeSize / 2).add(box.getPosition()), p1.end().add(box.getPosition())));
+        body.createFixture(shape2, 0);
+
+        exploded = true;
     }
 
     public Vector2 getP1() { return p1; }

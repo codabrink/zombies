@@ -14,7 +14,11 @@ public class MyVector2 extends Vector2 {
     public Vector2 end() {
         //System.out.println((float)(len() * Math.cos(angle  * (Math.PI/180))));
         //System.out.println((float)(len() * Math.sin(angle * (Math.PI/180))));
-        return cpy().add((float)(len() * Math.cos(angle  * (Math.PI/180))), (float)(len() * Math.sin(angle * (Math.PI/180))));
+        return cpy().add((float)(len() * Math.cos(angle * (Math.PI/180))), (float)(len() * Math.sin(angle * (Math.PI/180))));
+    }
+
+    public Vector2 project(float dst) {
+        return cpy().add((float)(dst * Math.cos(angle * (Math.PI/180))), (float)(dst * Math.sin(angle * (Math.PI/180))));
     }
 
     public float angle() {

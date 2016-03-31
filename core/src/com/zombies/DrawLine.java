@@ -13,6 +13,7 @@ public class DrawLine {
 	public DrawLine(Vector2 p1, Vector2 p2) {
         this.p1 = p1;
         this.p2 = p2;
+        System.out.println("New line at " + p1.x + "," + p1.y + "  " + p2.x + "," + p2.y);
         view = GameView.gv;
         color = Color.WHITE;
 	}

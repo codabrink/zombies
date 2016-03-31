@@ -93,13 +93,13 @@ public class Box {
 
     public void genOuterWalls() {
         if (adjBoxes.get('n') == null)
-            walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
+            walls.add(new Wall(this, position.cpy().add(0, height), width,  0 )); // top wall
         if (adjBoxes.get('e') == null)
-            walls.add(new Wall(this, width, 0,      height, 90)); // right wall
+            walls.add(new Wall(this, position.cpy().add(width, 0), height, 90)); // right wall
         if (adjBoxes.get('s') == null)
-            walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
+            walls.add(new Wall(this, position.cpy(), width,  0 )); // bottom wall
         if (adjBoxes.get('w') == null)
-            walls.add(new Wall(this, 0, 0, height, 90)); // left wall
+            walls.add(new Wall(this, position.cpy(), height, 90)); // left wall
     }
 
     public float x() {return position.x;}
