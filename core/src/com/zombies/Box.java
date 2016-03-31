@@ -91,6 +91,17 @@ public class Box {
         }
     }
 
+    public void genOuterWalls() {
+        if (adjBoxes.get('n') == null)
+            walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
+        if (adjBoxes.get('e') == null)
+            walls.add(new Wall(this, width, 0,      height, 90)); // right wall
+        if (adjBoxes.get('s') == null)
+            walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
+        if (adjBoxes.get('w') == null)
+            walls.add(new Wall(this, 0, 0, height, 90)); // left wall
+    }
+
     public float x() {return position.x;}
     public float y() {return position.y;}
 
@@ -319,9 +330,8 @@ public class Box {
     public int[] getBMLocation() {
         String[] stringLocations = BMKey.split(",");
         int[] locations = new int[2];
-        for (String l: stringLocations) {
-            locations[locations.length-1] = Integer.parseInt(l);
-        }
+        locations[0] = Integer.parseInt(stringLocations[0]);
+        locations[1] = Integer.parseInt(stringLocations[1]);
         return locations;
     }
 }

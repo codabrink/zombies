@@ -75,6 +75,12 @@ public class Room {
         }
     }
 
+    public void genOuterWalls() {
+        for (Box b: boxes) {
+            b.genOuterWalls();
+        }
+    }
+
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, int frame, int distance) {
         if (this.frame == frame)
             return;

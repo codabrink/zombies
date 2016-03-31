@@ -84,24 +84,25 @@ public class MapGen {
                 switch (direction) {
                     case 'n': // top
                         proposedPosition = b.getPosition().cpy().add(0, b.height);
-                        newBMLocation[1]++;
+                        newBMLocation[1] = newBMLocation[1] + 1;
                         break;
                     case 'e': // right
                         proposedPosition = b.getPosition().cpy().add(b.width, 0);
-                        newBMLocation[0]++;
+                        newBMLocation[0] = newBMLocation[0] + 1;
                         break;
                     case 's': // bottom
                         proposedPosition = b.getPosition().cpy().sub(0, b.height);
-                        newBMLocation[1]--;
+                        newBMLocation[1] = newBMLocation[1] - 1;
                         break;
                     case 'w': // left
                         proposedPosition = b.getPosition().cpy().sub(b.width, 0);
-                        newBMLocation[0]--;
+                        newBMLocation[0] = newBMLocation[0] - 1;
                         break;
                 }
                 if (!collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
                     Box bb = new Box(proposedPosition.x, proposedPosition.y);
                     bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
+                    //System.out.println("new box at: " +bb.BMKey);
                     boxMap.put(bb.BMKey, bb);
                     associate(bb, boxMap);
                 }
@@ -113,11 +114,15 @@ public class MapGen {
         }
 
         System.out.println("Room size: "+boxMap.size());
-        return new Room(boxMap.values());
+
+        Room room = new Room(boxMap.values());
+        room.genOuterWalls();
+        return room;
     }
 
     private static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
+        //System.out.println(BMLocation[0] +","+BMLocation[1]);
         int[] modifiers = {0, 1, 1, 0, 0, -1, -1, 0};
         for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
             Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
