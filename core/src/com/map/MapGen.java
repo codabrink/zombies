@@ -49,7 +49,7 @@ public class MapGen {
         HashMap<String, Box> boxMap = new HashMap<String, Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = new Vector2(r.nextFloat() * C.ZONE_SIZE + z.getPosition().x, r.nextFloat() * C.ZONE_SIZE + z.getPosition().y);
-            if (!collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
+            if (collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
                 Box b = new Box(boxPosition.x, boxPosition.y);
                 b.BMKey = "0,0";
                 boxMap.put("0,0", b);
@@ -99,7 +99,7 @@ public class MapGen {
                         newBMLocation[0]--;
                         break;
                 }
-                if (!collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT)) {
+                if (collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
                     Box bb = new Box(proposedPosition.x, proposedPosition.y);
                     bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
                     boxMap.put(bb.BMKey, bb);
@@ -132,14 +132,14 @@ public class MapGen {
         }
     }
 
-    private static boolean collides(Zone z, Vector2 p, float w, float h) {
+    public static Box collides(Zone z, Vector2 p, float w, float h) {
         for (Zone zone : z.getAdjZonesPlusSelf()) {
             for (Box b : zone.getBoxes()) {
                 if (rectOverlap(b, p, w, h))
-                    return true;
+                    return b;
             }
         }
-        return false;
+        return null;
     }
 
     private static boolean collides(ArrayList<Box> boxes, Vector2 p, float w, float h) {

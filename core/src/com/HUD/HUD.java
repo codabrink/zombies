@@ -3,6 +3,7 @@ package com.HUD;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zombies.GameView;
 
@@ -102,6 +103,8 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean scrolled(int amount) {
-        return false;
+        PerspectiveCamera c = view.getCamera();
+        c.position.set(c.position.x, c.position.y, c.position.z + amount * 2);
+        return true;
     }
 }

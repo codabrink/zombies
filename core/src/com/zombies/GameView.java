@@ -6,7 +6,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -43,7 +42,7 @@ public class GameView implements Screen {
     protected World world;
     protected Box grid[][];
 
-    protected Random random = new Random();
+    public Random random = new Random();
     protected CameraHandle camHandle;
     protected Meshes meshes = new Meshes();
     protected int lightingCount = 0;
@@ -70,6 +69,7 @@ public class GameView implements Screen {
         fontGen = new FontGen();
 
         cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.position.set(0, 0, 60);
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();

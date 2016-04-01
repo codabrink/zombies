@@ -327,6 +327,34 @@ public class Box {
         }
     }
 
+    public float edge(char direction) {
+        switch(direction) {
+            case 'n':
+                return position.y + height;
+            case 'e':
+                return position.x + width;
+            case 's':
+                return position.y;
+            case 'w':
+                return position.x;
+        }
+        return 0;
+    }
+
+    public float oppositeEdge(char direction) {
+        switch(direction) {
+            case 'n':
+                return edge('s');
+            case 'e':
+                return edge('w');
+            case 's':
+                return edge('n');
+            case 'w':
+                return edge('e');
+        }
+        return 0;
+    }
+
     public int[] getBMLocation() {
         String[] stringLocations = BMKey.split(",");
         int[] locations = new int[2];

@@ -3,9 +3,6 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -13,12 +10,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.utils.Array;
 import com.util.MyVector2;
 
 public class Wall implements com.interfaces.Collideable {
     private MyVector2 p1;
-    private Box box;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private ArrayList<DrawLine> lines;
@@ -27,9 +22,8 @@ public class Wall implements com.interfaces.Collideable {
     int index;
     private boolean exploded = false;
 
-    public Wall(Box box, Vector2 position, float length, float angle) {
+    public Wall(Vector2 position, float length, float angle) {
         view = GameView.gv;
-        this.box = box;
 
         p1 = new MyVector2(position.x, position.y, length, angle);
         lines = new ArrayList<DrawLine>();
@@ -55,11 +49,7 @@ public class Wall implements com.interfaces.Collideable {
         }
     }
 
-    public boolean samePositionAs(Wall w) {
-        return (absoluteP1().dst(w.absoluteP1()) == 0.0 && p1.angle() == w.getP1().angle());
-    }
-
-    public void draw() {
+        public void draw() {
         for (DrawLine l: lines) {
             l.draw();
         }
@@ -79,13 +69,6 @@ public class Wall implements com.interfaces.Collideable {
             return null;
         }
         return null;
-    }
-
-    public void removeWall() {
-        view.getWorld().destroyBody(body);
-        body = view.getWorld().createBody(new BodyDef());
-        body.setTransform(new Vector2(box.x(), box.y()), body.getAngle());
-        lines = new ArrayList<DrawLine>();
     }
 
     public void unload() {
@@ -109,7 +92,6 @@ public class Wall implements com.interfaces.Collideable {
         // swing the vector2 onto the line using p1 as the axis
         float dst = body.getPosition().dst(holePosition);
         holes.put(dst, holeSize);
-        System.out.println("holes size: "+holes.size());
         ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
         Collections.sort(holePositions);
 
@@ -144,8 +126,6 @@ public class Wall implements com.interfaces.Collideable {
 
     public Vector2 getP1() { return p1; }
     public Vector2 getP2() { return p1.end(); }
-    public Vector2 absoluteP1() { return box.getPosition().cpy().add(p1); }
-    public Vector2 absoluteP2() { return box.getPosition().cpy().add(p1.end()); }
 
     @Override
     public void handleCollision(Fixture f) {

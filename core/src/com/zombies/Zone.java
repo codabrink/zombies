@@ -2,7 +2,7 @@ package com.zombies;
 
 import com.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
-import com.map.MapGen;
+import com.map.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -149,7 +149,7 @@ public class Zone {
         }
     }
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
-    public Box  randomBox() {
+    public Box randomBox() {
         if (boxes.size() > 0)
             return boxes.get(r.nextInt(boxes.size()));
         else

@@ -18,7 +18,7 @@ public class Unit {
 	protected Unit attack = null;
 	protected BodyDef bDef = new BodyDef();
 	protected Body body;
-	protected Box box;
+	public Box box;
 	protected LinkedList<Bullet> bullets = new LinkedList<Bullet>();
 	protected float diffX, diffY;
 	protected FixtureDef fDef = new FixtureDef();
