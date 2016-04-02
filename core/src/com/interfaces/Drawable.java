@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 /**
  * Created by coda on 3/31/2016.
  */
-public interface Renderable {
+public interface Drawable {
+    public String className();
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer);
 }

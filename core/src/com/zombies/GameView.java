@@ -35,8 +35,8 @@ public class GameView implements Screen {
 
     private PerspectiveCamera cam;
     private SpriteBatch HUDSpriteBatch;
-    private SpriteBatch spriteBatch;
-    private ShapeRenderer shapeRenderer;
+    public SpriteBatch spriteBatch;
+    public ShapeRenderer shapeRenderer;
 
     protected Player player;
     protected World world;

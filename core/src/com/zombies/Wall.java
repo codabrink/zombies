@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -49,9 +51,9 @@ public class Wall implements com.interfaces.Collideable {
         }
     }
 
-        public void draw() {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         for (DrawLine l: lines) {
-            l.draw();
+            l.draw(spriteBatch, shapeRenderer);
         }
     }
 

@@ -1,8 +1,10 @@
 package com.map;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Box;
 import com.zombies.C;
+import com.zombies.GameView;
 import com.zombies.Room;
 import com.zombies.Zone;
 
@@ -12,7 +14,7 @@ import java.util.Random;
 
 public class MapGen {
 
-    static char[] DIRECTIONS = {'n', 'e', 's', 'w'};
+    public static char[] DIRECTIONS = {'n', 'e', 's', 'w'};
 
     public static void update(Zone z) {
         // needs to be done during generation, not creation
@@ -42,6 +44,12 @@ public class MapGen {
             else
                 break;
         }
+    }
+
+    private static Hallway genHallway(Room r) {
+        Random rnd = GameView.gv.random;
+        Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
+        return new Hallway(b, b.getRandomOpenDirection(), 2);
     }
 
     private static Room genRoom(Zone z, Vector2 position) {
@@ -114,6 +122,7 @@ public class MapGen {
 
         Room room = new Room(boxMap.values());
         room.genOuterWalls();
+        genHallway(room);
         return room;
     }
 

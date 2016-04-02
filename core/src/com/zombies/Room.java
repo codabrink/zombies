@@ -20,12 +20,15 @@ public class Room {
     private boolean loaded = false;
     private int frame;
     private ArrayList<Zone> zones = new ArrayList<Zone>();
+    private ArrayList<Box> outerBoxes = new ArrayList<Box>();
 
     public Room(Collection<Box> boxes) {
         view = GameView.gv;
         this.boxes = new ArrayList<Box>(boxes);
         for (Box b: boxes) {
             b.setRoom(this);
+            if (b.getAdjBoxes().size() < 4)
+                outerBoxes.add(b);
         }
     }
 
@@ -84,9 +87,6 @@ public class Room {
         if (this.frame == frame)
             return;
         this.frame = frame;
-        for (Box b : boxes) {
-            b.drawFloor(spriteBatch, shapeRenderer);
-        }
         for (Box b: boxes) {
             b.drawBox(spriteBatch, shapeRenderer);
         }
@@ -94,15 +94,6 @@ public class Room {
         if (distance > 0) {
             for (Room r : adjRooms) {
                 r.draw(spriteBatch, shapeRenderer, frame, distance - 1);
-            }
-        }
-    }
-
-    public void drawWalls(int frame) {
-        for (Box b: boxes) {
-            b.drawWalls();
-            for (Unit z: b.getUnits()) {
-                z.update(frame);
             }
         }
     }
@@ -149,7 +140,7 @@ public class Room {
         return true;
     }
 
-    public Box randomBox() {
+    public Box getRandomBox() {
         if (!boxes.isEmpty()) {
             return boxes.get(random.nextInt(boxes.size()));
         }
@@ -180,4 +171,7 @@ public class Room {
         return units;
     }
 
+    public ArrayList<Box> getOuterBoxes() {
+        return outerBoxes;
+    }
 }

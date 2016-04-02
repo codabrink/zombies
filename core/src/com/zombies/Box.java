@@ -7,6 +7,7 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.map.MapGen;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.Powerup;
@@ -74,21 +75,16 @@ public class Box {
     }
 
     private void populateBox() {
-        if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE) {
+        if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE)
             crates.add(new Crate(view, this.randomPoint()));
-        }
-        if (C.ENABLE_SURVIVORS && random.nextFloat() < C.SURVIVOR_CHANCE) {
+        if (C.ENABLE_SURVIVORS && random.nextFloat() < C.SURVIVOR_CHANCE)
             survivors.add(new Survivor(this.randomPoint()));
-        }
-        if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE) {
+        if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE)
             powerups.add(new ShotgunPickup(this));
-        }
-        if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE) {
+        if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE)
             powerups.add(new PistolPickup(this));
-        }
-        if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE) {
+        if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE)
             powerups.add(new HealthPickup(this));
-        }
     }
 
     public void genOuterWalls() {
@@ -107,6 +103,22 @@ public class Box {
 
     public ArrayList<Powerup> getPowerups() {
         return powerups;
+    }
+
+    public char[] getOpenDirections() {
+        char[] openDirections = new char[4];
+        int i = 0;
+        for (char c: MapGen.DIRECTIONS) {
+            if (adjBoxes.get(c) == null) {
+                openDirections[i] = c;
+                i++;
+            }
+        }
+        return openDirections;
+    }
+    public char getRandomOpenDirection() {
+        char[] openDirections = getOpenDirections();
+        return openDirections[random.nextInt(openDirections.length)];
     }
 
     public Survivor addSurvivor() {
@@ -157,10 +169,6 @@ public class Box {
 
     }
 
-    public void drawFloor(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        floor.draw(spriteBatch, shapeRenderer);
-    }
-
     public Vector2 getPosition() {
         return position;
     }
@@ -180,6 +188,7 @@ public class Box {
     }
 
     public void drawBox(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        floor.draw(spriteBatch, shapeRenderer);
         for (Unit u: zombies) {
             if (u != view.getPlayer()) {
                 u.draw(spriteBatch, shapeRenderer);
@@ -197,13 +206,8 @@ public class Box {
         for (Powerup p: powerups) {
             p.draw(spriteBatch, shapeRenderer);
         }
-        drawWalls();
-    }
-
-    public void drawWalls() {
         for (Wall w: walls) {
-            if (w != null)
-                w.draw();
+            w.draw(spriteBatch, shapeRenderer);
         }
     }
 

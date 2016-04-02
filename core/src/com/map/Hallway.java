@@ -3,30 +3,26 @@ package com.map;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.interfaces.Renderable;
+import com.interfaces.Drawable;
 import com.zombies.Box;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * Created by coda on 3/31/2016.
  */
-public class Hallway implements Renderable {
+public class Hallway implements Drawable {
     public static int MAX_HALLWAY_SEGMENTS = 3;
     public static float WIDTH = 2;
 
     ArrayList<Vector2> axises = new ArrayList<Vector2>();
     private Random r;
-    private ArrayList<Zone> zones;
+    private ArrayList<Zone> zones = new ArrayList<Zone>();
+    private ArrayList<Wall> walls = new ArrayList<Wall>();
     private char lastDirection;
 
     public Hallway(Box b, char direction, float width) {
@@ -73,34 +69,37 @@ public class Hallway implements Renderable {
     }
 
     private void move(float[] modifiers) {
-        Vector2 newPosition = axises.get(axises.size()).cpy().add(modifiers[0], modifiers[1]);
+        Vector2 newPosition = axises.get(axises.size()-1).cpy().add(modifiers[0], modifiers[1]);
         Box b = collides(newPosition);
         if (b != null) {
             // reign back hallway
             float edge = b.oppositeEdge(lastDirection);
-            if (modifiers[0] != 0) modifiers[0] = edge;
-            else if (modifiers[1] != 0) modifiers[1] = edge;
+            if (modifiers[0] != 0) newPosition.x = edge;
+            else if (modifiers[1] != 0) newPosition.y = edge;
+            axises.add(newPosition);
         } else if (axises.size() < MAX_HALLWAY_SEGMENTS) {
+            axises.add(newPosition);
             char newDirection;
             do {
                 newDirection = MapGen.DIRECTIONS[r.nextInt(4)];
             } while(newDirection != lastDirection);
             move(newDirection);
         } else {
+            axises.add(newPosition);
             rasterize();
         }
     }
 
     private void rasterize() {
         for (int i = 0; i < axises.size(); i++) {
-            if (i == 0) {
-                // north wall
-
-            }
+            if (i < axises.size() - 1)
+                walls.addAll(parallelWalls(axises.get(i), axises.get(i + 1)));
+            Zone.getZone(axises.get(i)).addRenderable(this);
         }
+
     }
 
-    private Array<Wall> parallelWalls(Vector2 v1, Vector2 v2) {
+    private ArrayList<Wall> parallelWalls(Vector2 v1, Vector2 v2) {
         float a = Math.abs(v1.y - v2.y);
         float b = Math.abs(v1.x - v2.x);
         float c = (float)Math.sqrt(a*a+b*b);
@@ -110,7 +109,7 @@ public class Hallway implements Renderable {
         double angleLeft  = angle - Math.toRadians(90);
 
         float radius = WIDTH / 2;
-        Array<Wall> walls = new Array<Wall>();
+        ArrayList<Wall> walls = new ArrayList<Wall>();
         Vector2 w1 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleRight)), (float)(radius*Math.acos(angleRight))));
         Vector2 w2 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleLeft)), (float)(radius*Math.acos(angleLeft))));
 
@@ -131,7 +130,7 @@ public class Hallway implements Renderable {
     private Box collides(Vector2 v) {
         Box b;
         for (Zone z: zones) {
-            b = MapGen.collides(z, v, 0, 0);
+            b = MapGen.collides(z, v, 1, 1);
             if (b != null)
                 return b;
         }
@@ -146,7 +145,14 @@ public class Hallway implements Renderable {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public String className() {
+        return "Hallway";
+    }
 
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        for (Wall w: walls) {
+            w.draw(spriteBatch, shapeRenderer);
+        }
     }
 }

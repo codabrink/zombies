@@ -2,6 +2,7 @@ package com.zombies;
 
 import com.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.Drawable;
 import com.map.*;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class Zone {
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
+    private ArrayList<Drawable> renderables = new ArrayList<Drawable>();
 
     public int numRooms = 20; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
@@ -45,9 +47,10 @@ public class Zone {
         }
 
         for (Box b: boxes) {
-            b.drawFloor(GameView.gv.getSpriteBatch(), GameView.gv.getShapeRenderer());
-            b.drawBox(GameView.gv.getSpriteBatch(), GameView.gv.getShapeRenderer());
-
+            b.drawBox(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+        }
+        for (Drawable r: renderables) {
+            r.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
         }
 
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
@@ -93,6 +96,9 @@ public class Zone {
             GameView.gv.zones.put("row"+indY+"column"+indX, z);
         }
         return z;
+    }
+    public static Zone getZone(Vector2 v) {
+        return getZone(v.x, v.y);
     }
 
     public Box getBox(float x, float y) {
@@ -147,6 +153,10 @@ public class Zone {
             if (boxes.indexOf(b) == -1)
                 boxes.add(b);
         }
+    }
+    public void addRenderable(Drawable r) {
+        if (renderables.indexOf(r) == -1)
+            renderables.add(r);
     }
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
     public Box randomBox() {
