@@ -348,7 +348,6 @@ public class Player extends Unit implements com.interfaces.Collideable {
         else
             z = Zone.getZone(storedPosition.x, storedPosition.y);
         if (zone != z) {
-            if (C.DEBUG) System.out.println("Log: Zone changed.");
             z.load();
         }
         zone = z;

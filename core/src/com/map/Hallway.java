@@ -24,9 +24,11 @@ public class Hallway implements Drawable {
     private ArrayList<Zone> zones = new ArrayList<Zone>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private char lastDirection;
+    private Box originBox;
 
     public Hallway(Box b, char direction, float width) {
         r = GameView.gv.random;
+        originBox = b;
         // assuming the box direction is null (empty)
         switch(direction) {
             case 'n':
@@ -110,8 +112,8 @@ public class Hallway implements Drawable {
 
         float radius = WIDTH / 2;
         ArrayList<Wall> walls = new ArrayList<Wall>();
-        Vector2 w1 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleRight)), (float)(radius*Math.acos(angleRight))));
-        Vector2 w2 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleLeft)), (float)(radius*Math.acos(angleLeft))));
+        Vector2 w1 = new Vector2(v1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
+        Vector2 w2 = new Vector2(v1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
         walls.add(new Wall(w1, v1.dst(v2), (float)angle));
         walls.add(new Wall(w2, v1.dst(v2), (float)angle));
@@ -131,7 +133,7 @@ public class Hallway implements Drawable {
         Box b;
         for (Zone z: zones) {
             b = MapGen.collides(z, v, 1, 1);
-            if (b != null)
+            if (b != null && b != originBox)
                 return b;
         }
         return null;
