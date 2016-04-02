@@ -16,7 +16,7 @@ import java.util.Random;
  * Created by coda on 3/31/2016.
  */
 public class Hallway implements Drawable {
-    public static int MAX_HALLWAY_SEGMENTS = 3;
+    public static int MAX_HALLWAY_SEGMENTS = 20;
     public static float WIDTH = 2;
 
     ArrayList<Vector2> axises = new ArrayList<Vector2>();
@@ -71,6 +71,7 @@ public class Hallway implements Drawable {
     }
 
     private void move(float[] modifiers) {
+        updateZones();
         Vector2 newPosition = axises.get(axises.size()-1).cpy().add(modifiers[0], modifiers[1]);
         Box b = collides(newPosition);
         if (b != null) {
@@ -84,7 +85,7 @@ public class Hallway implements Drawable {
             char newDirection;
             do {
                 newDirection = MapGen.DIRECTIONS[r.nextInt(4)];
-            } while(newDirection != lastDirection);
+            } while(newDirection == lastDirection);
             move(newDirection);
         } else {
             axises.add(newPosition);
@@ -95,13 +96,13 @@ public class Hallway implements Drawable {
     private void rasterize() {
         for (int i = 0; i < axises.size(); i++) {
             if (i < axises.size() - 1)
-                walls.addAll(parallelWalls(axises.get(i), axises.get(i + 1)));
-            Zone.getZone(axises.get(i)).addRenderable(this);
+                createParallelWalls(axises.get(i), axises.get(i + 1));
+            Zone.getZone(axises.get(i)).addDrawable(this);
         }
 
     }
 
-    private ArrayList<Wall> parallelWalls(Vector2 v1, Vector2 v2) {
+    private void createParallelWalls(Vector2 v1, Vector2 v2) {
         float a = Math.abs(v1.y - v2.y);
         float b = Math.abs(v1.x - v2.x);
         float c = (float)Math.sqrt(a*a+b*b);
@@ -111,13 +112,11 @@ public class Hallway implements Drawable {
         double angleLeft  = angle - Math.toRadians(90);
 
         float radius = WIDTH / 2;
-        ArrayList<Wall> walls = new ArrayList<Wall>();
         Vector2 w1 = new Vector2(v1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(v1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
-        walls.add(new Wall(w1, v1.dst(v2), (float)angle));
-        walls.add(new Wall(w2, v1.dst(v2), (float)angle));
-        return walls;
+        walls.add(new Wall(w1, v1.dst(v2), (float)Math.toDegrees(angle)));
+        walls.add(new Wall(w2, v1.dst(v2), (float)Math.toDegrees(angle)));
     }
 
     private void updateZones() {
@@ -132,9 +131,17 @@ public class Hallway implements Drawable {
     private Box collides(Vector2 v) {
         Box b;
         for (Zone z: zones) {
-            b = MapGen.collides(z, v, 1, 1);
+            b = MapGen.collides(z, v, WIDTH, WIDTH);
             if (b != null && b != originBox)
                 return b;
+        }
+        //TODO: this definitely checks zones twice
+        for (Zone z: zones) {
+            for (Zone zz: z.getAdjZones()) {
+                b = MapGen.collides(zz, v, 1, 1);
+                if (b != null && b != originBox)
+                    return b;
+            }
         }
         return null;
     }

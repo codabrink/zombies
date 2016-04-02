@@ -22,7 +22,7 @@ public class Zone {
     private ArrayList<Room> rooms = new ArrayList<Room>();
     private ArrayList<Drawable> renderables = new ArrayList<Drawable>();
 
-    public int numRooms = 20; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 2; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
@@ -154,7 +154,7 @@ public class Zone {
                 boxes.add(b);
         }
     }
-    public void addRenderable(Drawable r) {
+    public void addDrawable(Drawable r) {
         if (renderables.indexOf(r) == -1)
             renderables.add(r);
     }

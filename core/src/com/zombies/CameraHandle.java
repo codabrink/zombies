@@ -21,7 +21,7 @@ public class CameraHandle {
         float dest = view.getPlayer().getBody().getLinearVelocity().len() * 4;
         if (zoom < dest)
             zoom += lerp * dt;
-        else if (zoom > dest && zoom > 40)
+        else if (zoom > dest && zoom > 60)
             zoom -= lerp * dt;
 
         cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, zoom);

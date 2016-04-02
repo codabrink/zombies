@@ -151,14 +151,6 @@ public class MapGen {
         return null;
     }
 
-    private static boolean collides(ArrayList<Box> boxes, Vector2 p, float w, float h) {
-        for (Box b: boxes) {
-            if (rectOverlap(b, p, w, h))
-                return true;
-        }
-        return false;
-    }
-
     private static boolean rectOverlap(Box b, Vector2 p, float w, float h) {
         boolean xOverlap = valueInRange(b.x(), p.x, p.x + w) ||
                 valueInRange(p.x, b.x(), b.x() + b.width);
