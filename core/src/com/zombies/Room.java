@@ -27,7 +27,6 @@ public class Room {
         for (Box b: boxes) {
             b.setRoom(this);
         }
-        this.removeWalls();
     }
 
     public void doorsTo(Room room) {
@@ -155,17 +154,6 @@ public class Room {
             return boxes.get(random.nextInt(boxes.size()));
         }
         return null;
-    }
-
-    public void removeWalls() {
-        //remove walls
-        for (Box b: boxes) {
-            for (Box bb: boxes) {
-                if (b != bb) {
-                    b.removePotentialWall(bb);
-                }
-            }
-        }
     }
 
     public void update(int frame, int distance) {

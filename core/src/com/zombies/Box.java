@@ -93,13 +93,13 @@ public class Box {
 
     public void genOuterWalls() {
         if (adjBoxes.get('n') == null)
-            walls.add(new Wall(this, position.cpy().add(0, height), width,  0 )); // top wall
+            walls.add(new Wall(position.cpy().add(0, height), width,  0 )); // top wall
         if (adjBoxes.get('e') == null)
-            walls.add(new Wall(this, position.cpy().add(width, 0), height, 90)); // right wall
+            walls.add(new Wall(position.cpy().add(width, 0), height, 90)); // right wall
         if (adjBoxes.get('s') == null)
-            walls.add(new Wall(this, position.cpy(), width,  0 )); // bottom wall
+            walls.add(new Wall(position.cpy(), width,  0 )); // bottom wall
         if (adjBoxes.get('w') == null)
-            walls.add(new Wall(this, position.cpy(), height, 90)); // left wall
+            walls.add(new Wall(position.cpy(), height, 90)); // left wall
     }
 
     public float x() {return position.x;}
@@ -153,12 +153,8 @@ public class Box {
         zombies.add(u);
     }
 
-    public void createDoor(Box box) {
-        Wall[] walls = adjWalls(box);
-        if (walls instanceof Wall[]) {
-            walls[0].makeDoor();
-            walls[1].makeDoor();
-        }
+    public void createDoor(char direction) {
+
     }
 
     public void drawFloor(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
@@ -238,17 +234,7 @@ public class Box {
     }
 
     public void path(int level) {
-        if (level > 0) {
-            pathed = true;
-            Box box = null;
-            int i = 0;
-            while (box == null) {
-                i = random.nextInt(3);
-                // TODO actually path
-            }
-            createDoor(box);
-            box.path(level - 1);
-        }
+
     }
 
     public Vector2 randomPoint() {
@@ -261,33 +247,6 @@ public class Box {
         }
         Unit u = zombies.get(random.nextInt(zombies.size()));
         return u;
-    }
-
-    public void removeWall(Wall w) {
-        w.removeWall();
-        walls.remove(w);
-    }
-
-    // new
-    public void removePotentialWall(Box box) {
-        Wall[] walls = adjWalls(box);
-        if (walls instanceof Wall[]) {
-            //Color c = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1f);
-            //walls[0].setColor(c);
-            //walls[1].setColor(c);
-            removeWall(walls[0]);
-            box.removeWall(walls[1]);
-        }
-    }
-
-    private Wall[] adjWalls(Box box) {
-        for (Wall w : (ArrayList<Wall>)walls.clone()) {
-            for (Wall ww : (ArrayList<Wall>)box.getWalls().clone()) {
-                if (w.samePositionAs(ww))
-                    return new Wall[]{w, ww};
-            }
-        }
-        return null;
     }
 
     public Box setRoom(Room room) {

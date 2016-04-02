@@ -21,7 +21,8 @@ import java.util.Set;
  * Created by coda on 3/31/2016.
  */
 public class Hallway implements Renderable {
-    public static int MAX_HALLWAY_LENGTH = 3;
+    public static int MAX_HALLWAY_SEGMENTS = 3;
+    public static float WIDTH = 2;
 
     ArrayList<Vector2> axises = new ArrayList<Vector2>();
     private Random r;
@@ -79,7 +80,7 @@ public class Hallway implements Renderable {
             float edge = b.oppositeEdge(lastDirection);
             if (modifiers[0] != 0) modifiers[0] = edge;
             else if (modifiers[1] != 0) modifiers[1] = edge;
-        } else if (axises.size() < MAX_HALLWAY_LENGTH) {
+        } else if (axises.size() < MAX_HALLWAY_SEGMENTS) {
             char newDirection;
             do {
                 newDirection = MapGen.DIRECTIONS[r.nextInt(4)];
@@ -99,7 +100,7 @@ public class Hallway implements Renderable {
         }
     }
 
-    private Set<Wall> parallelWalls(Vector2 v1, Vector2 v2) {
+    private Array<Wall> parallelWalls(Vector2 v1, Vector2 v2) {
         float a = Math.abs(v1.y - v2.y);
         float b = Math.abs(v1.x - v2.x);
         float c = (float)Math.sqrt(a*a+b*b);
@@ -108,9 +109,14 @@ public class Hallway implements Renderable {
         double angleRight = angle + Math.toRadians(90);
         double angleLeft  = angle - Math.toRadians(90);
 
+        float radius = WIDTH / 2;
         Array<Wall> walls = new Array<Wall>();
-        //TODO: I'm here
-        float[] w1 = {};
+        Vector2 w1 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleRight)), (float)(radius*Math.acos(angleRight))));
+        Vector2 w2 = new Vector2(v1.cpy().add((float)(radius*Math.asin(angleLeft)), (float)(radius*Math.acos(angleLeft))));
+
+        walls.add(new Wall(w1, v1.dst(v2), (float)angle));
+        walls.add(new Wall(w2, v1.dst(v2), (float)angle));
+        return walls;
     }
 
     private void updateZones() {
