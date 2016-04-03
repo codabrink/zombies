@@ -19,7 +19,7 @@ import java.util.Random;
  * Created by coda on 3/31/2016.
  */
 public class Hallway {
-    public static int MAX_HALLWAY_SEGMENTS = 20;
+    public static int MAX_HALLWAY_SEGMENTS = 4;
 
     ArrayList<Vector2> axises = new ArrayList<Vector2>();
     private Random r;
@@ -74,7 +74,7 @@ public class Hallway {
     }
 
     private void move(float[] modifiers) {
-        HallwaySegment hs = new HallwaySegment(axises.get(axises.size()-1), axises.get(axises.size()-1).add(modifiers[0], modifiers[1]), diameter);
+        HallwaySegment hs = new HallwaySegment(axises.get(axises.size()-1), axises.get(axises.size()-1).cpy().add(modifiers[0], modifiers[1]), diameter);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height);
 
         if (o != null) {
@@ -83,6 +83,7 @@ public class Hallway {
             if (modifiers[0] != 0) hs.a2.x = edge;
             else if (modifiers[1] != 0) hs.a2.y = edge;
             hallwaySegments.add(hs);
+            materialize();
         } else if (axises.size() < MAX_HALLWAY_SEGMENTS) {
             hallwaySegments.add(hs);
             char newDirection;
