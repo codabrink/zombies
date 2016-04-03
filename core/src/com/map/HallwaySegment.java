@@ -17,6 +17,7 @@ import java.util.LinkedList;
  * Created by coda on 4/2/16.
  */
 public class HallwaySegment implements Overlappable, Drawable {
+    private static int DRAWABLE_LAYER = 3;
     public Vector2 a1, a2, position;
     public float diameter, radius, width, height;
     private char direction;
@@ -79,10 +80,10 @@ public class HallwaySegment implements Overlappable, Drawable {
     }
 
     private void registerWithZone() {
-        Zone.getZone(position).addDrawable(this);
-        Zone.getZone(position.cpy().add(0, height)).addDrawable(this);
-        Zone.getZone(position.cpy().add(width, height)).addDrawable(this);
-        Zone.getZone(position.cpy().add(width, 0)).addDrawable(this);
+        Zone.getZone(position).addDrawable(this, DRAWABLE_LAYER);
+        Zone.getZone(position.cpy().add(0, height)).addDrawable(this, DRAWABLE_LAYER);
+        Zone.getZone(position.cpy().add(width, height)).addDrawable(this, DRAWABLE_LAYER);
+        Zone.getZone(position.cpy().add(width, 0)).addDrawable(this, DRAWABLE_LAYER);
     }
 
     @Override
@@ -92,7 +93,9 @@ public class HallwaySegment implements Overlappable, Drawable {
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-
+        for (Wall w: walls) {
+            w.draw(spriteBatch, shapeRenderer);
+        }
     }
 
     @Override

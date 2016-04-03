@@ -23,14 +23,17 @@ public class Zone {
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
-    private ArrayList<Drawable> renderables = new ArrayList<Drawable>();
+    private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
     private LinkedList<Overlappable> overlappables = new LinkedList<Overlappable>();
 
-    public int numRooms = 2; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 1; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
         position = new Vector2(x, y);
+        for (int i=0;i<=4;i++) {
+            drawablesList.add(new ArrayList<Drawable>());
+        }
     }
 
     public void generate() {
@@ -53,8 +56,10 @@ public class Zone {
         for (Box b: boxes) {
             b.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
         }
-        for (Drawable r: renderables) {
-            r.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+        for (ArrayList<Drawable> drawables: drawablesList) {
+            for (Drawable r : drawables) {
+                r.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+            }
         }
 
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
@@ -158,10 +163,15 @@ public class Zone {
                 boxes.add(b);
         }
     }
-    public void addDrawable(Drawable r) {
-        if (renderables.indexOf(r) == -1)
-            renderables.add(r);
+    public void addDrawable(Drawable d, int layer) {
+        ArrayList<Drawable> drawables = drawablesList.get(layer);
+        if (drawables.indexOf(d) == -1)
+            drawables.add(d);
     }
+    public void addDrawable(Drawable d) {
+        addDrawable(d, 0);
+    }
+
     public void addOverlappable(Overlappable o) {
         if (overlappables.indexOf(o) == -1)
             overlappables.add(o);
