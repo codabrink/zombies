@@ -16,7 +16,7 @@ import java.util.Random;
 public class Zone {
     private Vector2 position;
     private int frame, fsAdjCheck=0;
-    private static Random r = new Random();
+    private static Random r;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
@@ -30,14 +30,31 @@ public class Zone {
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
+        r = GameView.gv.random;
         position = new Vector2(x, y);
-        for (int i=0;i<=4;i++) {
+        for (int i=0;i<=C.DRAW_LAYERS;i++) {
             drawablesList.add(new ArrayList<Drawable>());
         }
+        numRooms = r.nextInt(10);
     }
 
     public void generate() {
         MapGen.fillZone(this);
+    }
+
+    public void draw(int frame, int limit, int layer) {
+        if (this.frame == frame)
+            return;
+        this.frame = frame;
+
+        for (Drawable d: drawablesList.get(layer)) {
+            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+        }
+
+        if (limit > 0)
+            for (Zone z: adjZones) {
+                z.draw(frame, limit - 1, layer);
+            }
     }
 
     public void update(int frame, int limit) {
@@ -56,11 +73,7 @@ public class Zone {
         for (Box b: boxes) {
             b.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
         }
-        for (ArrayList<Drawable> drawables: drawablesList) {
-            for (Drawable r : drawables) {
-                r.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
-            }
-        }
+
 
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
 

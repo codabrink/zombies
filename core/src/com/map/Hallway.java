@@ -1,15 +1,9 @@
 package com.map;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.interfaces.Collideable;
 import com.interfaces.Overlappable;
-import com.interfaces.Drawable;
-import com.util.Geometry;
 import com.zombies.Box;
 import com.zombies.GameView;
-import com.zombies.Wall;
 import com.zombies.Zone;
 
 import java.util.ArrayList;

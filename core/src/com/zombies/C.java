@@ -73,6 +73,8 @@ public class C {
     public static float ZOMBIE_STRENGTH = 7f;
     public static float ZOOM_LEVEL = 0f;
 
+    public static int DRAW_LAYERS=3;
+
     public static float ZONE_SIZE = 100;
 
     public static float FOV = 60;

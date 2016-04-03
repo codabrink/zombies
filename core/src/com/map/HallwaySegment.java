@@ -17,7 +17,7 @@ import java.util.LinkedList;
  * Created by coda on 4/2/16.
  */
 public class HallwaySegment implements Overlappable, Drawable {
-    private static int DRAWABLE_LAYER = 3;
+    private static int DRAWABLE_LAYER = 1;
     public Vector2 a1, a2, position;
     public float diameter, radius, width, height;
     private char direction;

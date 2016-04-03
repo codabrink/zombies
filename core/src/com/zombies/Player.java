@@ -234,9 +234,6 @@ public class Player extends Unit implements Collideable {
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        if (box != null)
-            box.getRoom().draw(spriteBatch, shapeRenderer, frame, 1);
-
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
         shapeRenderer.rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float)Math.toDegrees(body.getAngle()));
@@ -304,6 +301,9 @@ public class Player extends Unit implements Collideable {
 
         updateZone();
         zone.update(frame, 1);
+        for (int i=0;i<=C.DRAW_LAYERS;i++) {
+            zone.draw(frame, 1, i);
+        }
 
         this.handleHealth();
 

@@ -27,6 +27,7 @@ public class Room {
         this.boxes = new ArrayList<Box>(boxes);
         for (Box b: boxes) {
             b.setRoom(this);
+            Zone.getZone(b.getPosition()).addDrawable(b, 0);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
@@ -87,21 +88,6 @@ public class Room {
     public void genOuterWalls() {
         for (Box b: boxes) {
             b.genOuterWalls();
-        }
-    }
-
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, int frame, int distance) {
-        if (this.frame == frame)
-            return;
-        this.frame = frame;
-        for (Box b: boxes) {
-            b.draw(spriteBatch, shapeRenderer);
-        }
-
-        if (distance > 0) {
-            for (Room r : adjRooms) {
-                r.draw(spriteBatch, shapeRenderer, frame, distance - 1);
-            }
         }
     }
 
@@ -166,8 +152,6 @@ public class Room {
         }
 
         for (Box b: boxes) b.update(frame);
-
-        draw(view.getSpriteBatch(), view.getShapeRenderer(), frame, distance);
     }
 
     public LinkedList<Unit> getAliveUnits() {
