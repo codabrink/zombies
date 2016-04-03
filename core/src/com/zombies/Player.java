@@ -301,8 +301,6 @@ public class Player extends Unit implements Collideable {
     @Override
     public void update(int frame) {
         updateBox();
-        if (box != null)
-            box.getRoom().update(frame, 0);
 
         updateZone();
         zone.update(frame, 1);
