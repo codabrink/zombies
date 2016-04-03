@@ -1,8 +1,11 @@
 package com.zombies;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+
+import jdk.nashorn.internal.runtime.Debug;
 
 public class DebugDots {
 
@@ -12,17 +15,21 @@ public class DebugDots {
     Vector2 p1;
     Vector2 p2;
     private float radius = 0.5f;
+    private Color color;
 
-    public DebugDots(GameView view, Vector2 p1, Vector2 p2) {
+    public DebugDots(Vector2 p1) {
         this.p1 = p1;
-        this.p2 = p2;
+        color = new Color(1, 0, 1, 1);
+    }
+    public DebugDots(Vector2 p1, Color c) {
+        this.p1 = p1;
+        color = c;
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 0, 1, 1);
+        shapeRenderer.setColor(color);
         shapeRenderer.rect(p1.x - radius, p1.y - radius, radius * 2, radius * 2);
-        shapeRenderer.rect(p2.x - radius, p2.y - radius, radius * 2, radius * 2);
         shapeRenderer.end();
     }
 }

@@ -46,9 +46,12 @@ public class MapGen {
         }
     }
 
-    private static Hallway genHallway(Room r) {
+    public static Hallway genHallway(Room r) {
         Random rnd = GameView.gv.random;
         Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
+        return genHallway(b);
+    }
+    public static Hallway genHallway(Box b) {
         return new Hallway(b, b.getRandomOpenDirection(), 2);
     }
 

@@ -1,5 +1,6 @@
 package com.map;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -8,6 +9,7 @@ import com.interfaces.Collideable;
 import com.interfaces.Drawable;
 import com.interfaces.Overlappable;
 import com.util.Geometry;
+import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
 
@@ -36,21 +38,24 @@ public class HallwaySegment implements Overlappable, Drawable {
     public void materialize() {
         calculateInfo(); // do this a second time
         createWalls();
-        registerWithZone();
+        registerDrawable();
     }
 
     private void createWalls() {
-        float a = Math.abs(a1.y - a2.y);
-        float b = Math.abs(a1.x - a2.x);
-        float c = (float)Math.sqrt(a*a+b*b);
+        GameView.gv.addDebugDots(a1, Color.GREEN);
+        GameView.gv.addDebugDots(a2, Color.RED);
+        float dy = a2.y - a1.y;
+        float dx = a2.x - a1.x;
+        double angle = Math.atan(dy / dx);
 
-        double angle = Math.asin(a/c);
         double angleRight = angle + Math.toRadians(90);
         double angleLeft  = angle - Math.toRadians(90);
 
         float radius = diameter / 2;
         Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
+
+        System.out.println("rad: "+angle+", deg: "+Math.toDegrees(angle) + ", dx: "+dx+", dy: "+dy);
 
         walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
@@ -79,7 +84,7 @@ public class HallwaySegment implements Overlappable, Drawable {
             direction = 's';
     }
 
-    private void registerWithZone() {
+    private void registerDrawable() {
         Zone.getZone(position).addDrawable(this, DRAWABLE_LAYER);
         Zone.getZone(position.cpy().add(0, height)).addDrawable(this, DRAWABLE_LAYER);
         Zone.getZone(position.cpy().add(width, height)).addDrawable(this, DRAWABLE_LAYER);

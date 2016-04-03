@@ -86,20 +86,21 @@ public class Box implements Drawable, Overlappable {
         return powerups;
     }
 
-    public char[] getOpenDirections() {
-        char[] openDirections = new char[4];
-        int i = 0;
+    public ArrayList<Character> getOpenDirections() {
+        ArrayList<Character> openDirections = new ArrayList<Character>();
         for (char c: MapGen.DIRECTIONS) {
             if (adjBoxes.get(c) == null) {
-                openDirections[i] = c;
-                i++;
+                openDirections.add(openDirections.size(), c);
             }
         }
         return openDirections;
     }
     public char getRandomOpenDirection() {
-        char[] openDirections = getOpenDirections();
-        return openDirections[random.nextInt(openDirections.length)];
+        ArrayList<Character> openDirections = getOpenDirections();
+        if (openDirections.size() > 0)
+            return openDirections.get(random.nextInt(openDirections.size()));
+        else
+            return ' ';
     }
 
     public Survivor addSurvivor() {

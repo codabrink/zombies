@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.map.MapGen;
 import com.util.MyVector2;
 
 public class Wall implements com.interfaces.Collideable {
@@ -133,5 +135,4 @@ public class Wall implements com.interfaces.Collideable {
     public void handleCollision(Fixture f) {
         createHole(f.getBody().getPosition(), 5f);
     }
-
 }

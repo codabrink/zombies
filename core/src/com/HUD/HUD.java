@@ -5,7 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.map.MapGen;
+import com.zombies.Box;
 import com.zombies.GameView;
+import com.zombies.Zone;
 
 public class HUD implements InputProcessor{
 
@@ -46,6 +49,28 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean keyDown(int keycode) {
+        if (keycode == 43) { // o
+            Box b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
+            String out = "";
+            for (char direction : MapGen.DIRECTIONS) {
+                if (b != null) {
+                    Box bb = b.getAdjBox(direction);
+                    out += "direction: " + direction + ": ";
+                    if (bb == null)
+                        out += "NULL, ";
+                    else
+                        out += bb + ", ";
+
+                }
+            }
+            System.out.println(out);
+        } if (keycode == 36) { // h (hallway)
+            Box b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
+            if (b != null)
+                MapGen.genHallway(b);
+        }
+
+
         return false;
     }
 

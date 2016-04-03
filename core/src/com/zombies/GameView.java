@@ -6,6 +6,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -392,8 +393,10 @@ public class GameView implements Screen {
     private static void setGv(GameView view) {gv = view;}
 
     public void addDebugDots(Vector2 p1, Vector2 p2) {
-        debugDots.add(new DebugDots(this, p1, p2));
+        debugDots.add(new DebugDots(p1));
+        debugDots.add(new DebugDots(p2));
     }
+    public void addDebugDots(Vector2 p1, Color c) { debugDots.add(new DebugDots(p1, c)); }
     public void clearDebugDots() {
         debugDots = new LinkedList<DebugDots>();
     }

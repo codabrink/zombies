@@ -7,13 +7,15 @@ import com.zombies.GameView;
 import com.zombies.Zone;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
  * Created by coda on 3/31/2016.
  */
 public class Hallway {
-    public static int MAX_HALLWAY_SEGMENTS = 4;
+    public static int MAX_HALLWAY_SEGMENTS = 1;
 
     ArrayList<Vector2> axises = new ArrayList<Vector2>();
     private Random r;
@@ -27,6 +29,7 @@ public class Hallway {
         originBox = b;
         diameter = width;
         // assuming the box direction is null (empty)
+        System.out.println("direction: " + direction);
         switch(direction) {
             case 'n':
                 axises.add(new Vector2(horizBoxRange(b, width), b.getPosition().y + b.height));
@@ -69,22 +72,25 @@ public class Hallway {
 
     private void move(float[] modifiers) {
         HallwaySegment hs = new HallwaySegment(axises.get(axises.size()-1), axises.get(axises.size()-1).cpy().add(modifiers[0], modifiers[1]), diameter);
-        Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height);
+        Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new LinkedList<Overlappable>(Arrays.asList(originBox)));
 
-        if (o != null) {
-            // reign back hallway
-            float edge = o.oppositeEdge(lastDirection);
-            if (modifiers[0] != 0) hs.a2.x = edge;
-            else if (modifiers[1] != 0) hs.a2.y = edge;
-            hallwaySegments.add(hs);
-            materialize();
-        } else if (axises.size() < MAX_HALLWAY_SEGMENTS) {
-            hallwaySegments.add(hs);
-            char newDirection;
-            do {
-                newDirection = MapGen.DIRECTIONS[r.nextInt(4)];
-            } while(newDirection == lastDirection);
-            move(newDirection);
+        if (hallwaySegments.size() < MAX_HALLWAY_SEGMENTS) {
+            if (o != null && o != originBox) {
+                System.out.println("Ends in a collision");
+                // reign back hallway
+                float edge = o.oppositeEdge(lastDirection);
+                if (modifiers[0] != 0) hs.a2.set(edge, hs.a2.y);
+                else if (modifiers[1] != 0) hs.a2.set(hs.a2.x, edge);
+                hallwaySegments.add(hs);
+                materialize();
+            } else {
+                hallwaySegments.add(hs);
+                char newDirection;
+                do {
+                    newDirection = MapGen.DIRECTIONS[r.nextInt(4)];
+                } while (newDirection == lastDirection);
+                move(newDirection);
+            }
         } else {
             materialize();
         }

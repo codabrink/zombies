@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class Zone {
     private Vector2 position;
-    private int frame, fsAdjCheck=0;
+    private int frame, fsAdjCheck=0, layer;
     private static Random r;
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
@@ -43,9 +43,10 @@ public class Zone {
     }
 
     public void draw(int frame, int limit, int layer) {
-        if (this.frame == frame)
+        if (this.frame == frame && this.layer == layer)
             return;
         this.frame = frame;
+        this.layer = layer;
 
         for (Drawable d: drawablesList.get(layer)) {
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
@@ -130,6 +131,9 @@ public class Zone {
         }
         return null;
     }
+    public Box getBox(Vector2 v) {
+        return getBox(v.x, v.y);
+    }
 
     public void addUnit(Unit u) {
         if (u.zone != null)
@@ -192,15 +196,42 @@ public class Zone {
     public LinkedList<Overlappable> getOverlappables() {
         return overlappables;
     }
-    public Overlappable checkOverlap(float x, float y, float w, float h) {
+
+    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, LinkedList<Overlappable> ignore) {
         for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h))
-                return o;
+            if (o.overlaps(x, y, w, h)) {
+                if (ignore != null) {
+                    boolean shouldIgnore = false;
+                    for (Overlappable ig : ignore) {
+                        if (ig == o) {
+                            shouldIgnore = true;
+                            break;
+                        }
+                    }
+                    if (!shouldIgnore)
+                        return o;
+                } else {
+                    return o;
+                }
+            }
+        }
+        if (limit > 0) {
+            for (Zone z : adjZones) {
+                Overlappable o = checkOverlap(x, y, w, h, limit - 1, ignore);
+                if (o != null)
+                    return o;
+            }
         }
         return null;
     }
-    public Overlappable checkOverlap(Vector2 v, float w, float h) {
-        return checkOverlap(v.x, v.y, w, h);
+    public Overlappable checkOverlap(float x, float y, float w, float h, int limit) {
+        return checkOverlap(x, y, w, h, limit, null);
+    }
+    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
+        return checkOverlap(v.x, v.y, w, h, limit, null);
+    }
+    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, LinkedList<Overlappable> ignore) {
+        return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
 
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
