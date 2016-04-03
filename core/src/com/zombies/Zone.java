@@ -3,9 +3,11 @@ package com.zombies;
 import com.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Drawable;
+import com.interfaces.Overlappable;
 import com.map.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -20,7 +22,9 @@ public class Zone {
     private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
+
     private ArrayList<Drawable> renderables = new ArrayList<Drawable>();
+    private LinkedList<Overlappable> overlappables = new LinkedList<Overlappable>();
 
     public int numRooms = 2; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
@@ -47,7 +51,7 @@ public class Zone {
         }
 
         for (Box b: boxes) {
-            b.drawBox(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+            b.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
         }
         for (Drawable r: renderables) {
             r.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
@@ -158,6 +162,24 @@ public class Zone {
         if (renderables.indexOf(r) == -1)
             renderables.add(r);
     }
+    public void addOverlappable(Overlappable o) {
+        if (overlappables.indexOf(o) == -1)
+            overlappables.add(o);
+    }
+    public LinkedList<Overlappable> getOverlappables() {
+        return overlappables;
+    }
+    public Overlappable checkOverlap(float x, float y, float w, float h) {
+        for (Overlappable o: overlappables) {
+            if (o.overlaps(x, y, w, h))
+                return o;
+        }
+        return null;
+    }
+    public Overlappable checkOverlap(Vector2 v, float w, float h) {
+        return checkOverlap(v.x, v.y, w, h);
+    }
+
     public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
     public Box randomBox() {
         if (boxes.size() > 0)

@@ -7,13 +7,16 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.Overlappable;
+import com.interfaces.Drawable;
 import com.map.MapGen;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.Powerup;
 import com.powerups.ShotgunPickup;
+import com.util.Geometry;
 
-public class Box {
+public class Box implements Drawable, Overlappable {
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
@@ -33,32 +36,10 @@ public class Box {
     public String BMKey;
     private int[] boxMapLocation;
 
-    public Box(float x, float y, int indexX, int indexY) {
-        position = new Vector2(x, y);
-        this.view = GameView.gv;
-        this.floor = new Floor(view, this);
-        this.indexX = indexX;
-        this.indexY = indexY;
-
-        //create walls
-//        walls.add(new Wall(this, 0, 0, C.BOX_WIDTH, 0, 0)); //top wall
-//        walls.add(new Wall(this, C.BOX_WIDTH, 0, C.BOX_WIDTH, C.BOX_HEIGHT, 1)); //right wall
-//        walls.add(new Wall(this, 0, C.BOX_HEIGHT, C.BOX_WIDTH, C.BOX_HEIGHT, 2)); //bottom wall
-//        walls.add(new Wall(this, 0, 0, 0, C.BOX_HEIGHT, 3)); //left wall
-
-        this.populateBox();
-    }
-
     public Box(float x, float y) {
         position = new Vector2(x, y);
         this.view = GameView.gv;
         this.floor = new Floor(view, this);
-
-//        walls.add(new Wall(this, 0,     height, width,  0 )); // top wall
-//        walls.add(new Wall(this, width, 0,      height, 90)); // right wall
-//        walls.add(new Wall(this, 0,     0,      width,  0 )); // bottom wall
-//        walls.add(new Wall(this, 0, 0, height, 90)); // left wall
-        //this.populateBox();
     }
 
     public void load() {
@@ -187,7 +168,8 @@ public class Box {
         return new Vector2();
     }
 
-    public void drawBox(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         floor.draw(spriteBatch, shapeRenderer);
         for (Unit u: zombies) {
             if (u != view.getPlayer()) {
@@ -261,6 +243,7 @@ public class Box {
         room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y));
         room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y + C.BOX_HEIGHT));
         room.addZone(Zone.getZone(position.x, position.y + C.BOX_HEIGHT));
+        room.registerOverlappable();
 
         return this;
     }
@@ -290,6 +273,25 @@ public class Box {
         }
     }
 
+    // Box Map Location - used during room generation in MapGen.java
+    public int[] getBMLocation() {
+        String[] stringLocations = BMKey.split(",");
+        int[] locations = new int[2];
+        locations[0] = Integer.parseInt(stringLocations[0]);
+        locations[1] = Integer.parseInt(stringLocations[1]);
+        return locations;
+    }
+
+    @Override
+    public String className() {
+        return "Box";
+    }
+
+    @Override
+    public boolean overlaps(float x, float y, float w, float h) {
+        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    }
+    @Override
     public float edge(char direction) {
         switch(direction) {
             case 'n':
@@ -303,7 +305,7 @@ public class Box {
         }
         return 0;
     }
-
+    @Override
     public float oppositeEdge(char direction) {
         switch(direction) {
             case 'n':
@@ -318,11 +320,4 @@ public class Box {
         return 0;
     }
 
-    public int[] getBMLocation() {
-        String[] stringLocations = BMKey.split(",");
-        int[] locations = new int[2];
-        locations[0] = Integer.parseInt(stringLocations[0]);
-        locations[1] = Integer.parseInt(stringLocations[1]);
-        return locations;
-    }
 }

@@ -45,6 +45,13 @@ public class Room {
         z.addRoom(this);
         return z;
     }
+    public void registerOverlappable() {
+        for (Zone z: zones) {
+            for (Box b: boxes) {
+                z.addOverlappable(b);
+            }
+        }
+    }
 
     public void currentRoom() {
         load(); // load self
@@ -88,7 +95,7 @@ public class Room {
             return;
         this.frame = frame;
         for (Box b: boxes) {
-            b.drawBox(spriteBatch, shapeRenderer);
+            b.draw(spriteBatch, shapeRenderer);
         }
 
         if (distance > 0) {

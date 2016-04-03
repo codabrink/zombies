@@ -13,8 +13,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.interfaces.Collideable;
 
-public class Player extends Unit implements com.interfaces.Collideable {
+public class Player extends Unit implements Collideable {
 
     private long beginAttacks = System.currentTimeMillis();
     private long lastAttack = System.currentTimeMillis();
@@ -68,7 +69,6 @@ public class Player extends Unit implements com.interfaces.Collideable {
         fDef.filter.groupIndex = GROUP;
 
         body.createFixture(fDef);
-
     }
 
     public float getHealth() {
