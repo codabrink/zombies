@@ -52,7 +52,7 @@ public class MapGen {
         return genHallway(b);
     }
     public static Hallway genHallway(Box b) {
-        return new Hallway(b, b.getRandomOpenDirection(), 2);
+        return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
 
     private static Room genRoom(Zone z, Vector2 position) {

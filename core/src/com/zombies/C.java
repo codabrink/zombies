@@ -80,7 +80,7 @@ public class C {
     public static float FOV = 60;
 
     //DEBUG
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
 
     public static boolean POPULATE_ZOMBIES = true;

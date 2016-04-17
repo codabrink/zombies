@@ -26,7 +26,7 @@ public class Zone {
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
     private LinkedList<Overlappable> overlappables = new LinkedList<Overlappable>();
 
-    public int numRooms = 1; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 20; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
@@ -35,7 +35,7 @@ public class Zone {
         for (int i=0;i<=C.DRAW_LAYERS;i++) {
             drawablesList.add(new ArrayList<Drawable>());
         }
-        numRooms = r.nextInt(10);
+        numRooms = r.nextInt(numRooms);
     }
 
     public void generate() {
@@ -85,7 +85,6 @@ public class Zone {
     }
 
     public void findAdjZones() {
-        // java is the absolute freaking worst...
         float[] zonePositions = {position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
         position.x - C.ZONE_SIZE, position.y,
         position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,

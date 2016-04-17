@@ -39,6 +39,7 @@ public class HallwaySegment implements Overlappable, Drawable {
         calculateInfo(); // do this a second time
         createWalls();
         registerDrawable();
+        registerOverlappable();
     }
 
     private void createWalls() {
@@ -46,16 +47,16 @@ public class HallwaySegment implements Overlappable, Drawable {
         GameView.gv.addDebugDots(a2, Color.RED);
         float dy = a2.y - a1.y;
         float dx = a2.x - a1.x;
-        double angle = Math.atan(dy / dx);
+        double angle = Math.atan2(dy, dx);
 
-        double angleRight = angle + Math.toRadians(90);
-        double angleLeft  = angle - Math.toRadians(90);
+        double angleRight = angle + Math.PI / 2;
+        double angleLeft  = angle - Math.PI / 2;
 
         float radius = diameter / 2;
         Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
-        System.out.println("rad: "+angle+", deg: "+Math.toDegrees(angle) + ", dx: "+dx+", dy: "+dy);
+        System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
 
         walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
@@ -89,6 +90,13 @@ public class HallwaySegment implements Overlappable, Drawable {
         Zone.getZone(position.cpy().add(0, height)).addDrawable(this, DRAWABLE_LAYER);
         Zone.getZone(position.cpy().add(width, height)).addDrawable(this, DRAWABLE_LAYER);
         Zone.getZone(position.cpy().add(width, 0)).addDrawable(this, DRAWABLE_LAYER);
+    }
+
+    private void registerOverlappable() {
+        Zone.getZone(position).addOverlappable(this);
+        Zone.getZone(position.cpy().add(0, height)).addOverlappable(this);
+        Zone.getZone(position.cpy().add(width, height)).addOverlappable(this);
+        Zone.getZone(position.cpy().add(width, 0)).addOverlappable(this);
     }
 
     @Override
