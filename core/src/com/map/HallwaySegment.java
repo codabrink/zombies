@@ -23,12 +23,14 @@ public class HallwaySegment implements Overlappable, Drawable {
     public Vector2 a1, a2, position;
     public float diameter, radius, width, height;
     private char direction;
+    private Wall originWall;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 a1, Vector2 a2, float width) {
+    public HallwaySegment(Vector2 a1, Vector2 a2, float width, Wall originWall) {
         this.a1  = a1;
         this.a2  = a2;
+        this.originWall = originWall;
         diameter = width;
         radius   = width / 2;
 
@@ -38,6 +40,7 @@ public class HallwaySegment implements Overlappable, Drawable {
     public void materialize() {
         calculateInfo(); // do this a second time
         createWalls();
+        removeWalls();
         registerDrawable();
     }
 
@@ -46,7 +49,7 @@ public class HallwaySegment implements Overlappable, Drawable {
         GameView.gv.addDebugDots(a2, Color.RED);
         float dy = a2.y - a1.y;
         float dx = a2.x - a1.x;
-        double angle = Math.atan(dy / dx);
+        double angle = Math.atan2(dy, dx);
 
         double angleRight = angle + Math.toRadians(90);
         double angleLeft  = angle - Math.toRadians(90);
@@ -55,10 +58,14 @@ public class HallwaySegment implements Overlappable, Drawable {
         Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
-        System.out.println("rad: "+angle+", deg: "+Math.toDegrees(angle) + ", dx: "+dx+", dy: "+dy);
+        System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
 
         walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
+    }
+
+    private void removeWalls() {
+        this.originWall.createHole(a1, diameter);
     }
 
     private void calculateInfo() {

@@ -133,6 +133,9 @@ public class Wall implements com.interfaces.Collideable {
 
     @Override
     public void handleCollision(Fixture f) {
-        createHole(f.getBody().getPosition(), 5f);
+
+        if (C.ENABLE_WALL_DESRUCTION) {
+            createHole(f.getBody().getPosition(), 5f);
+        }
     }
 }

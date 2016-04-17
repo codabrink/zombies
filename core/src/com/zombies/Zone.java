@@ -234,7 +234,21 @@ public class Zone {
         return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
 
-    public Vector2 randomPosition() { return position.cpy().add(r.nextFloat() * C.ZONE_SIZE, r.nextFloat() * C.ZONE_SIZE); }
+    public Vector2 randomPosition() {
+        float randomX = r.nextFloat() * C.ZONE_SIZE;
+        float randomY = r.nextFloat() * C.ZONE_SIZE;
+        return position.cpy().add(randomX, randomY);
+    }
+
+    public Vector2 randomDiscreetPosition(int numIncrements) {
+        float randomX = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
+        float randomY = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
+        System.out.println(randomX);
+        System.out.println(randomY);
+        System.out.println(position.cpy().add(randomX, randomY));
+        return position.cpy().add(randomX, randomY);
+    }
+
     public Box randomBox() {
         if (boxes.size() > 0)
             return boxes.get(r.nextInt(boxes.size()));

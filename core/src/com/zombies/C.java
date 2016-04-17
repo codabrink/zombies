@@ -2,6 +2,7 @@ package com.zombies;
 
 public class C {
     public static boolean ENABLE_ACCEL = false;
+    public static boolean ENABLE_WALL_DESRUCTION = false;
     public static int BOX_HEIGHT = 15;
     public static int BOX_MAX_ZOMBIES = 8;
     public static int BOX_SIZE = 15; //x-y size of the small grid for each box

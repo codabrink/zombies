@@ -22,7 +22,7 @@ public class MapGen {
             z.findAdjZones();
 
         if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z, z.randomPosition());
+            Room room = genRoom(z);
             if (room != null)
                 z.addRoom(room);
             else
@@ -38,7 +38,7 @@ public class MapGen {
             z.findAdjZones();
 
         for (int i=0;i<=0;i++) {
-            Room room = genRoom(z, z.randomPosition());
+            Room room = genRoom(z);
             if (room != null)
                 z.addRoom(room);
             else
@@ -51,15 +51,16 @@ public class MapGen {
         Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
         return genHallway(b);
     }
+
     public static Hallway genHallway(Box b) {
         return new Hallway(b, b.getRandomOpenDirection(), 2);
     }
 
-    private static Room genRoom(Zone z, Vector2 position) {
+    private static Room genRoom(Zone z) {
         Random r = new Random();
         HashMap<String, Box> boxMap = new HashMap<String, Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = new Vector2(r.nextFloat() * C.ZONE_SIZE + z.getPosition().x, r.nextFloat() * C.ZONE_SIZE + z.getPosition().y);
+            Vector2 boxPosition = z.randomDiscreetPosition(20);
             if (collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
                 Box b = new Box(boxPosition.x, boxPosition.y);
                 b.BMKey = "0,0";
@@ -163,6 +164,6 @@ public class MapGen {
     }
 
     private static boolean valueInRange(float value, float min, float max) {
-        return (value > min) && (value < max);
+        return (value >= min) && (value <= max);
     }
 }
