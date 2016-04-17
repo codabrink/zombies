@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.Drawable;
 
 public class DrawLine {
 
@@ -18,15 +19,13 @@ public class DrawLine {
         color = Color.WHITE;
 	}
 
-
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(color);
         shapeRenderer.line(p1.x * view.scale, p1.y * view.scale, p2.x * view.scale, p2.y * view.scale);
         shapeRenderer.end();
 	}
 
-	public void update() {}
     public void setColor(Color c) {
         color = c;
     }

@@ -197,21 +197,10 @@ public class GameView implements Screen {
         handleContacts();
         camHandle.update(dt);
 
-        lightingCount ++;
-        if (lightingCount == C.UPDATE_LIGHTING_INTERVAL) {
-            C.UPDATE_LIGHTING = true;
-            lightingCount = 0;
-        } else {
-            C.UPDATE_LIGHTING = false;
-        }
-
         shapeRenderer.setProjectionMatrix(cam.combined);
         spriteBatch.setProjectionMatrix(cam.combined);
 
         //lists
-        this.updateLists();
-        this.clearDumps();
-
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -224,11 +213,6 @@ public class GameView implements Screen {
         player.draw(spriteBatch, shapeRenderer);
 
         DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
-
-        for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
-            z.update(frame);
-            z.draw(spriteBatch, shapeRenderer);
-        }
 
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
@@ -250,13 +234,6 @@ public class GameView implements Screen {
         frame++;
         if (frame > 2000)
             frame = 0;
-    }
-
-    protected void updateLists() {
-        for (DyingZombie z: dyingZombie) {
-            z.update();
-            z.draw();
-        }
     }
 
     protected void handleKeys() {

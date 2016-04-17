@@ -164,26 +164,6 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         floor.draw(spriteBatch, shapeRenderer);
-        for (Unit u: zombies) {
-            if (u != view.getPlayer()) {
-                u.draw(spriteBatch, shapeRenderer);
-            }
-        }
-        for (Unit u: survivors) {
-            u.draw(spriteBatch, shapeRenderer);
-        }
-        for (com.powerups.Powerup p: powerups) {
-            p.draw(spriteBatch, shapeRenderer);
-        }
-        for (Crate c: crates) {
-            c.draw(spriteBatch, shapeRenderer);
-        }
-        for (Powerup p: powerups) {
-            p.draw(spriteBatch, shapeRenderer);
-        }
-        for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer);
-        }
     }
 
     public Room getRoom() {

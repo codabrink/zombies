@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -14,11 +13,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.interfaces.Collideable;
+import com.interfaces.Drawable;
 import com.interfaces.Loadable;
-import com.map.MapGen;
 import com.util.MyVector2;
 
-public class Wall implements Collideable, Loadable {
+public class Wall implements Collideable, Loadable, Drawable {
     private MyVector2 p1;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
@@ -43,6 +42,8 @@ public class Wall implements Collideable, Loadable {
         body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
         body.setUserData(new BodData("wall", this));
         lines.add(new DrawLine(p1, p1.end()));
+
+        Zone.getZone(position).addDrawable(this, 1);
     }
 
     public void makeDoor() {
@@ -55,7 +56,13 @@ public class Wall implements Collideable, Loadable {
         }
     }
 
+    @Override
+    public String className() {
+        return null;
+    }
+
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+        if (true) return;
         for (DrawLine l: lines) {
             l.draw(spriteBatch, shapeRenderer);
         }
@@ -78,9 +85,6 @@ public class Wall implements Collideable, Loadable {
     }
 
     public void update() {
-        for (DrawLine d: lines) {
-            d.update();
-        }
     }
 
     public void createHole(Vector2 holePosition, float holeSize) {
@@ -125,9 +129,6 @@ public class Wall implements Collideable, Loadable {
             }
         }
     }
-
-    public Vector2 getP1() { return p1; }
-    public Vector2 getP2() { return p1.end(); }
 
     @Override
     public void handleCollision(Fixture f) {

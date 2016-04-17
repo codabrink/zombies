@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.zombies.Bullet;
-import com.zombies.GameView;
 import com.zombies.Gun;
 import com.zombies.Message;
 import com.zombies.Unit;
@@ -60,8 +59,8 @@ public class Pistol extends Gun {
         if (killRoster.size() > 0)
             killRoster.get(r.nextInt(killRoster.size())).die(unit);
 
-		if (unit.getBox() != null)
-			unit.getBox().getRoom().alarm(unit);
+		//if (unit.getBox() != null)
+//			unit.getBox().getRoom().alarm(unit);
 		view.stats.playerShots ++;
 		shoot.play(0.2f);
 	}

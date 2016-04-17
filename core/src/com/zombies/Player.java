@@ -307,7 +307,7 @@ public class Player extends Unit implements Collideable {
             g.update();
         }
 
-        for (Survivor s: (ArrayList<Survivor>)survivors.clone()) {
+        for (Survivor s: survivors) {
             s.update(frame);
 
             if (s.getState() == "dead")
@@ -336,6 +336,8 @@ public class Player extends Unit implements Collideable {
         Zone z;
         z = Zone.getZone(body.getPosition());
         if (zone != z) {
+            if (zone != null)
+                zone.unload();
             z.load();
         }
         zone = z;

@@ -75,12 +75,12 @@ public class C {
 
     public static int DRAW_LAYERS=3;
 
-    public static float ZONE_SIZE = 100;
+    public static float ZONE_SIZE = 50;
 
     public static float FOV = 60;
 
     //DEBUG
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
 
     public static boolean POPULATE_ZOMBIES = true;

@@ -30,7 +30,7 @@ public class Zone implements Loadable {
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
 
-    public int numRooms = 20; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 2; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
@@ -68,10 +68,6 @@ public class Zone implements Loadable {
         this.frame = frame;
 
         MapGen.update(this); // generate the map
-
-        if (adjZones.size() < 8 && limit != 0) {
-            findAdjZones();
-        }
 
         for (Object o: objects)
             if (o instanceof Updateable)
@@ -171,6 +167,7 @@ public class Zone implements Loadable {
         if (o instanceof Box)
             removeBox((Box) o);
 
+        drawablesList.remove(o);
         return objects.remove(o);
     }
 
