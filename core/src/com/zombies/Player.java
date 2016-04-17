@@ -36,11 +36,6 @@ public class Player extends Unit implements Collideable {
     public Player(Vector2 position) {
         super();
 
-        storedPosition = position;
-
-        updateZone();
-        updateBox();
-
         healthBar = new HealthBar();
         radius = C.PLAYER_SIZE * 0.5f;
         diameter = C.PLAYER_SIZE;
@@ -69,6 +64,9 @@ public class Player extends Unit implements Collideable {
         fDef.filter.groupIndex = GROUP;
 
         body.createFixture(fDef);
+
+        updateZone();
+        updateBox();
     }
 
     public float getHealth() {
@@ -270,8 +268,6 @@ public class Player extends Unit implements Collideable {
 
     @Override
     public void setBox(Box b) {
-        if (b != null)
-            b.getRoom().currentRoom();
         box = b;
     }
 
@@ -332,19 +328,13 @@ public class Player extends Unit implements Collideable {
     }
 
     protected void updateBox() {
-        if (body != null)
-            setBox(zone.getBox(body.getPosition().x, body.getPosition().y));
-        else
-            setBox(zone.getBox(storedPosition.x, storedPosition.y));
+        setBox(zone.getBox(body.getPosition()));
     }
 
     @Override
     protected void updateZone() {
         Zone z;
-        if (body != null)
-            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
-        else
-            z = Zone.getZone(storedPosition.x, storedPosition.y);
+        z = Zone.getZone(body.getPosition());
         if (zone != z) {
             z.load();
         }

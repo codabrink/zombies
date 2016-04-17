@@ -24,7 +24,7 @@ public class MapGen {
         if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
             Room room = genRoom(z, z.randomPosition());
             if (room != null)
-                z.addRoom(room);
+                z.addObject(room);
             else
                 z.roomGenFailureCount++;
         }
@@ -40,7 +40,7 @@ public class MapGen {
         for (int i=0;i<=0;i++) {
             Room room = genRoom(z, z.randomPosition());
             if (room != null)
-                z.addRoom(room);
+                z.addObject(room);
             else
                 break;
         }

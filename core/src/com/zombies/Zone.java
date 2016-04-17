@@ -2,8 +2,12 @@ package com.zombies;
 
 import com.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.Collideable;
 import com.interfaces.Drawable;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
+import com.interfaces.Updateable;
 import com.map.*;
 
 import java.util.ArrayList;
@@ -13,18 +17,18 @@ import java.util.Random;
 /**
  * Created by coda on 2/27/2016.
  */
-public class Zone {
+public class Zone implements Loadable {
     private Vector2 position;
     private int frame, fsAdjCheck=0, layer;
     private static Random r;
+    public boolean loaded = false;
+
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
-    private ArrayList<Survivor> survivors = new ArrayList<Survivor>();
-    private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
+    private ArrayList objects = new ArrayList();
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
-    private LinkedList<Overlappable> overlappables = new LinkedList<Overlappable>();
 
     public int numRooms = 20; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
@@ -65,16 +69,13 @@ public class Zone {
 
         MapGen.update(this); // generate the map
 
-        if (adjZones.size() < 8) {
-            fsAdjCheck++;
-            if (fsAdjCheck > 20)
-                findAdjZones();
+        if (adjZones.size() < 8 && limit != 0) {
+            findAdjZones();
         }
 
-        for (Box b: boxes) {
-            b.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
-        }
-
+        for (Object o: objects)
+            if (o instanceof Updateable)
+                ((Updateable) o).update();
 
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
 
@@ -102,10 +103,23 @@ public class Zone {
         fsAdjCheck = 0;
     }
 
+    @Override
     public void load() {
-        for (Zombie z: (ArrayList<Zombie>)zombies.clone()) {
-            z.load();
-        }
+        for (Object o: objects)
+            if (o instanceof Loadable)
+                ((Loadable) o).load();
+        loaded = true;
+    }
+
+    @Override
+    public void unload() {
+        for (Object o: objects)
+            if (o instanceof Loadable)
+                ((Loadable) o).unload();
+        for (Zone z: adjZones)
+            if (z.loaded)
+                z.unload();
+        loaded = false;
     }
 
     public static Zone getZone(float x, float y) {
@@ -134,30 +148,30 @@ public class Zone {
         return getBox(v.x, v.y);
     }
 
-    public void addUnit(Unit u) {
-        if (u.zone != null)
-            u.zone.removeUnit(u);
-        u.zone = this;
+    public void addObject(HasZone o) {
+        if (o.getZone() != null)
+            o.getZone().removeObject(o);
+        o.setZone(this);
 
-        if (u instanceof Zombie) {
-            Zombie z = (Zombie)u;
-            if (zombies.indexOf(z) == -1)
-                zombies.add(z);
-            return;
-        } else if (u instanceof Survivor) {
-            Survivor s = (Survivor)u;
-            if (survivors.indexOf(s) == -1)
-                survivors.add(s);
-            return;
-        }
-        throw new Error("Addition of class " + u.getClass() + " to zone is not supported.");
+        if (objects.indexOf(o) == -1)
+            objects.add(o);
+
+        // KEEP RECORDS
+        if (o instanceof Room)
+            addRoom((Room) o);
+        if (o instanceof Box)
+            addBox((Box) o);
     }
-    public boolean removeUnit(Unit u) {
-        if (u instanceof Zombie)
-            return zombies.remove((Zombie)u);
-        else if (u instanceof Survivor)
-            return survivors.remove((Survivor)u);
-        throw new Error("Removal of class " + u.getClass() + " from zone is not supported.");
+    public boolean removeObject(HasZone o) {
+        o.setZone(null);
+
+        // KEEP RECORDS
+        if (o instanceof Room)
+            removeRoom((Room) o);
+        if (o instanceof Box)
+            removeBox((Box) o);
+
+        return objects.remove(o);
     }
 
     public Vector2 getPosition() {
@@ -171,33 +185,40 @@ public class Zone {
         allZones.add(this);
         return allZones;
     }
-    public void addRoom(Room r) {
+
+    private void addRoom(Room r) {
         if (rooms.indexOf(r) == -1)
             rooms.add(r);
         for (Box b : r.getBoxes()) {
-            if (boxes.indexOf(b) == -1)
-                boxes.add(b);
+            Zone.getZone(b.getCenter()).addObject(b);
         }
     }
+    private void addBox(Box b) {
+        if (boxes.indexOf(b) == -1)
+            boxes.add(b);
+    }
+    private void removeRoom(Room r) {
+        rooms.remove(r);
+        for (Box b : r.getBoxes()) {
+            removeObject(b);
+        }
+    }
+    private void removeBox(Box b) {
+        boxes.remove(b);
+    }
+
     public void addDrawable(Drawable d, int layer) {
         ArrayList<Drawable> drawables = drawablesList.get(layer);
         if (drawables.indexOf(d) == -1)
             drawables.add(d);
     }
-    public void addDrawable(Drawable d) {
-        addDrawable(d, 0);
-    }
-
-    public void addOverlappable(Overlappable o) {
-        if (overlappables.indexOf(o) == -1)
-            overlappables.add(o);
-    }
-    public LinkedList<Overlappable> getOverlappables() {
-        return overlappables;
-    }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, LinkedList<Overlappable> ignore) {
-        for (Overlappable o: overlappables) {
+        for (Object oo: objects) {
+            if (!(oo instanceof Overlappable))
+                continue;
+            Overlappable o = (Overlappable) oo;
+
             if (o.overlaps(x, y, w, h)) {
                 if (ignore != null) {
                     boolean shouldIgnore = false;

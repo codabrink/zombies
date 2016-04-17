@@ -66,16 +66,14 @@ public class Survivor extends Unit implements Collideable {
 
     @Override
     protected void updateBox() {
-        Vector2 position = (body != null ? body.getPosition() : storedPosition);
         updateZone();
-        box = zone.getBox(position.x, position.y);
+        box = zone.getBox(body.getPosition());
         box.addUnit(this);
     }
     @Override
     protected void updateZone() {
-        Vector2 position = (body != null ? body.getPosition() : storedPosition);
-        zone = Zone.getZone(position.x, position.y);
-        zone.addUnit(this);
+        zone = Zone.getZone(body.getPosition());
+        zone.addObject(this);
     }
 
 

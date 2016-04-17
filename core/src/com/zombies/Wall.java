@@ -13,10 +13,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.interfaces.Collideable;
+import com.interfaces.Loadable;
 import com.map.MapGen;
 import com.util.MyVector2;
 
-public class Wall implements com.interfaces.Collideable {
+public class Wall implements Collideable, Loadable {
     private MyVector2 p1;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
@@ -75,10 +77,6 @@ public class Wall implements com.interfaces.Collideable {
         return null;
     }
 
-    public void unload() {
-        // unload the wall
-    }
-
     public void update() {
         for (DrawLine d: lines) {
             d.update();
@@ -134,5 +132,15 @@ public class Wall implements com.interfaces.Collideable {
     @Override
     public void handleCollision(Fixture f) {
         createHole(f.getBody().getPosition(), 5f);
+    }
+
+    @Override
+    public void load() {
+        body.setActive(true);
+    }
+
+    @Override
+    public void unload() {
+        body.setActive(false);
     }
 }

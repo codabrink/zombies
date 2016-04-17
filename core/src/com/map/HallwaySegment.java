@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.interfaces.Collideable;
 import com.interfaces.Drawable;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.util.Geometry;
 import com.zombies.GameView;
@@ -18,11 +18,12 @@ import java.util.LinkedList;
 /**
  * Created by coda on 4/2/16.
  */
-public class HallwaySegment implements Overlappable, Drawable {
+public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
     public Vector2 a1, a2, position;
     public float diameter, radius, width, height;
     private char direction;
+    private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
 
     // only handles modulus 90 degree angles
@@ -93,10 +94,11 @@ public class HallwaySegment implements Overlappable, Drawable {
     }
 
     private void registerOverlappable() {
-        Zone.getZone(position).addOverlappable(this);
-        Zone.getZone(position.cpy().add(0, height)).addOverlappable(this);
-        Zone.getZone(position.cpy().add(width, height)).addOverlappable(this);
-        Zone.getZone(position.cpy().add(width, 0)).addOverlappable(this);
+        Zone.getZone(getCenter()).addObject(this);
+    }
+
+    private Vector2 getCenter() {
+        return position.cpy().add(width / 2, height / 2);
     }
 
     @Override
@@ -144,5 +146,27 @@ public class HallwaySegment implements Overlappable, Drawable {
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public void load() {
+        for (Wall w: walls)
+            w.load();
+    }
+
+    @Override
+    public void unload() {
+        for (Wall w: walls)
+            w.unload();
+    }
+
+    @Override
+    public Zone getZone() {
+        return zone;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+        zone = z;
     }
 }
