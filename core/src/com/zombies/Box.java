@@ -40,7 +40,7 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     public Box(float x, float y) {
         position = new Vector2(x, y);
         this.view = GameView.gv;
-        this.floor = new Floor(view, this);
+        this.floor = new Floor(this);
     }
 
     public boolean insideBox(float x, float y) {
@@ -164,6 +164,7 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
         floor.draw(spriteBatch, shapeRenderer);
+
     }
 
     public Room getRoom() {

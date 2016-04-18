@@ -9,6 +9,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.data.Stats;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +43,8 @@ public class GameView implements Screen {
     private SpriteBatch HUDSpriteBatch;
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
+    public ModelBatch modelBatch;
+    public Environment environment;
 
     protected Player player;
     protected World world;
@@ -100,6 +107,11 @@ public class GameView implements Screen {
         //meshes.main.play();
 
         Gdx.input.setInputProcessor(hud);
+
+        modelBatch = new ModelBatch();
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
     }
 
     private void addSurvivors() {
