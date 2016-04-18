@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -157,11 +158,11 @@ public class Survivor extends Unit implements Collideable {
         lastAttack = System.currentTimeMillis();
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         if (state == "dead") {
             return;
         }
-        gun.draw(spriteBatch, shapeRenderer);
+        gun.draw(spriteBatch, shapeRenderer, modelBatch);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 1, 1);

@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.data.Stats;
+import com.util.Assets;
 
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class GameView implements Screen {
     public ShapeRenderer shapeRenderer;
     public ModelBatch modelBatch;
     public Environment environment;
+    private Assets assets = new Assets();
 
     protected Player player;
     protected World world;
@@ -111,7 +113,7 @@ public class GameView implements Screen {
         modelBatch = new ModelBatch();
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        environment.add(player.pointLight);
     }
 
     private void addSurvivors() {
@@ -222,7 +224,7 @@ public class GameView implements Screen {
         handleKeys();
 
         player.update(frame);
-        player.draw(spriteBatch, shapeRenderer);
+        player.draw(spriteBatch, shapeRenderer, modelBatch);
 
         DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
 
@@ -232,10 +234,9 @@ public class GameView implements Screen {
         HUDSpriteBatch.end();
 
         for (DebugDots dd: debugDots) {
-            dd.draw(spriteBatch, shapeRenderer);
+            dd.draw(spriteBatch, shapeRenderer, modelBatch);
         }
         DebugText.render();
-
         //debugRenderer.render(world, cam.combined);
     }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -99,7 +100,7 @@ public class Unit implements Collideable, Loadable, HasZone {
         return new Vector2(nx, ny);
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {}
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {}
 
 	public Body getBody() {return body;}
 	public Box getBox() {

@@ -1,6 +1,7 @@
 package com.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
@@ -8,5 +9,5 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  */
 public interface Drawable {
     public String className();
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer);
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch);
 }

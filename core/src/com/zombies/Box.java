@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.HasZone;
@@ -162,9 +163,8 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        floor.draw(spriteBatch, shapeRenderer);
-
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        floor.draw(spriteBatch, shapeRenderer, modelBatch);
     }
 
     public Room getRoom() {

@@ -2,6 +2,7 @@ package com.map;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Drawable;
@@ -57,7 +58,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
-        System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
+        //System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
 
         walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
@@ -107,9 +108,9 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer);
+            w.draw(spriteBatch, shapeRenderer, modelBatch);
         }
     }
 

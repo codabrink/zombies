@@ -1,6 +1,7 @@
 package com.powerups;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.GameView;
 
@@ -13,5 +14,5 @@ public class Powerup {
 	
 	public void update() {}
 	
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {}
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {}
 }

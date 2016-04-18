@@ -5,6 +5,9 @@ import java.util.Random;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,6 +31,7 @@ public class Player extends Unit implements Collideable {
     private long lastAngleSet = System.currentTimeMillis();
     private long angleLast = 1000l;
     private HealthBar healthBar;
+    public PointLight pointLight = new PointLight();
 
     private float radius, diameter;
 
@@ -231,7 +235,7 @@ public class Player extends Unit implements Collideable {
         survivorKill.add(s);
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
         shapeRenderer.rect(body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, diameter, diameter, 1, 1, (float)Math.toDegrees(body.getAngle()));
@@ -243,10 +247,10 @@ public class Player extends Unit implements Collideable {
         shapeRenderer.end();
 
         for (Gun g: guns) {
-            g.draw(spriteBatch, shapeRenderer);
+            g.draw(spriteBatch, shapeRenderer, modelBatch);
         }
         for (Survivor s: survivors) {
-            s.draw(spriteBatch, shapeRenderer);
+            s.draw(spriteBatch, shapeRenderer, modelBatch);
         }
 
         healthBar.draw();
@@ -294,9 +298,10 @@ public class Player extends Unit implements Collideable {
     @Override
     public void update(int frame) {
         updateBox();
-
         updateZone();
         zone.update(frame, 1);
+
+        pointLight.set(Color.WHITE, body.getPosition().x, body.getPosition().y, 10, 100);
         for (int i=0;i<=C.DRAW_LAYERS;i++) {
             zone.draw(frame, 1, i);
         }

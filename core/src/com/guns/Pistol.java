@@ -1,6 +1,7 @@
 package com.guns;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
@@ -37,9 +38,9 @@ public class Pistol extends Gun {
 	}
 
 	@Override
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
 		for (Bullet b: bullets) {
-			b.draw(spriteBatch, shapeRenderer);
+			b.draw(spriteBatch, shapeRenderer, modelBatch);
 		}
 	}
 	

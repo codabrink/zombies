@@ -53,7 +53,7 @@ public class Zone implements Loadable {
         this.layer = layer;
 
         for (Drawable d: drawablesList.get(layer)) {
-            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer);
+            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
         }
 
         if (limit > 0)

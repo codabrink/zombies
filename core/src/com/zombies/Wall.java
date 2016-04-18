@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -61,10 +62,10 @@ public class Wall implements Collideable, Loadable, Drawable {
         return null;
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         if (true) return;
         for (DrawLine l: lines) {
-            l.draw(spriteBatch, shapeRenderer);
+            l.draw(spriteBatch, shapeRenderer, modelBatch);
         }
     }
 

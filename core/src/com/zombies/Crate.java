@@ -3,6 +3,7 @@ package com.zombies;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -54,7 +55,7 @@ public class Crate implements com.interfaces.Collideable {
 		float boxHeight = 2f;
 	}
 	
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         spriteBatch.begin();
         spriteBatch.draw(view.getMeshes().crateTexture, body.getPosition().x - width, body.getPosition().y - height, width, height, width * 2, height * 2, 1, 1, body.getAngle(), 0, 0, 32, 32, false, false);
         spriteBatch.end();
