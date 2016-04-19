@@ -7,8 +7,7 @@ public class CameraHandle {
     private Player player;
     private PerspectiveCamera cam;
 
-    private float zoom = 60;
-    private float lerp = 5f;
+    private float zoom = 50 * C.scale;
 
     public CameraHandle(GameView view) {
         this.view = view;
@@ -17,13 +16,6 @@ public class CameraHandle {
 
     public void update(float dt) {
         cam = view.getCamera();
-
-        float dest = view.getPlayer().getBody().getLinearVelocity().len() * 4;
-        if (zoom < dest)
-            zoom += lerp * dt;
-        else if (zoom > dest && zoom > 60)
-            zoom -= lerp * dt;
-
         cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, zoom);
         cam.update();
     }

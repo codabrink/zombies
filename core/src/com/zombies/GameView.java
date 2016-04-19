@@ -9,6 +9,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +22,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.data.Stats;
+import com.util.Assets;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +44,9 @@ public class GameView implements Screen {
     private SpriteBatch HUDSpriteBatch;
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
+    public ModelBatch modelBatch;
+    public Environment environment;
+    private Assets assets = new Assets();
 
     protected Player player;
     protected World world;
@@ -100,6 +109,11 @@ public class GameView implements Screen {
         //meshes.main.play();
 
         Gdx.input.setInputProcessor(hud);
+
+        modelBatch = new ModelBatch();
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        environment.add(player.pointLight);
     }
 
     private void addSurvivors() {
@@ -197,21 +211,10 @@ public class GameView implements Screen {
         handleContacts();
         camHandle.update(dt);
 
-        lightingCount ++;
-        if (lightingCount == C.UPDATE_LIGHTING_INTERVAL) {
-            C.UPDATE_LIGHTING = true;
-            lightingCount = 0;
-        } else {
-            C.UPDATE_LIGHTING = false;
-        }
-
         shapeRenderer.setProjectionMatrix(cam.combined);
         spriteBatch.setProjectionMatrix(cam.combined);
 
         //lists
-        this.updateLists();
-        this.clearDumps();
-
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -221,14 +224,9 @@ public class GameView implements Screen {
         handleKeys();
 
         player.update(frame);
-        player.draw(spriteBatch, shapeRenderer);
+        player.draw(spriteBatch, shapeRenderer, modelBatch);
 
         DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
-
-        for (Zombie z: (ArrayList<Zombie>)activeZombies.clone()) {
-            z.update(frame);
-            z.draw(spriteBatch, shapeRenderer);
-        }
 
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
@@ -236,10 +234,9 @@ public class GameView implements Screen {
         HUDSpriteBatch.end();
 
         for (DebugDots dd: debugDots) {
-            dd.draw(spriteBatch, shapeRenderer);
+            dd.draw(spriteBatch, shapeRenderer, modelBatch);
         }
         DebugText.render();
-
         //debugRenderer.render(world, cam.combined);
     }
 
@@ -250,13 +247,6 @@ public class GameView implements Screen {
         frame++;
         if (frame > 2000)
             frame = 0;
-    }
-
-    protected void updateLists() {
-        for (DyingZombie z: dyingZombie) {
-            z.update();
-            z.draw();
-        }
     }
 
     protected void handleKeys() {
@@ -320,7 +310,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 150;
+        float strength = 10 * C.scale;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
@@ -336,16 +326,16 @@ public class GameView implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, 10), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(10, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_SIZE, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -10), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-10, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_SIZE, 0), player.getBody().getAngle());
         }
 
 

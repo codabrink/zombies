@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -13,8 +14,12 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.interfaces.Collideable;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 
-public class Unit {
+public class Unit implements Collideable, Loadable, HasZone {
+	protected Zone zone;
 	protected Unit attack = null;
 	protected BodyDef bDef = new BodyDef();
 	protected Body body;
@@ -33,12 +38,10 @@ public class Unit {
 	protected float speed;
 	protected GameView view;
     protected Color color;
-    public Zone zone;
 	protected String state = "dormant"; // dormant -> loaded -> active
 
     protected int frame = 0;
 
-    protected Vector2 storedPosition;
     protected BodData storedBodData;
 
 	private RayCastCallback vision = new RayCastCallback() {
@@ -97,7 +100,7 @@ public class Unit {
         return new Vector2(nx, ny);
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {}
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {}
 
 	public Body getBody() {return body;}
 	public Box getBox() {
@@ -196,28 +199,15 @@ public class Unit {
 	}
 
     public void load() {
-
+		body.setActive(true);
     }
 
 	public Vector2 getPosition() {
-		if (body != null)
-			return body.getPosition();
-		else
-			return storedPosition;
+		return body.getPosition();
 	}
 
 	public void unload() {
-        if (body == null)
-            return;
-
-        storedPosition = body.getPosition();
-        storedBodData = ((BodData)body.getUserData());
-
-        shape.dispose();
-        body.setUserData(null);
-        view.getWorld().destroyBody(body);
-        shape = null;
-        body = null;
+		body.setActive(false);
 	}
 
 	public void update(int frame) {
@@ -232,4 +222,17 @@ public class Unit {
     protected void updateZone() {}
 	protected void updateBox() {}
 	public String getState() {return state;}
+	@Override
+	public Zone getZone() {
+		return zone;
+	}
+	@Override
+	public void setZone(Zone z) {
+		zone = z;
+	}
+
+	@Override
+	public void handleCollision(Fixture f) {
+
+	}
 }

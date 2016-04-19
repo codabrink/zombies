@@ -3,6 +3,7 @@ package com.powerups;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
 import com.zombies.Box;
@@ -74,7 +75,7 @@ public class PistolPickup extends Powerup implements Collideable {
 	}
 	
 	@Override
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         spriteBatch.begin();
         spriteBatch.draw(view.getMeshes().pistolTexture, body.getPosition().x - radius, body.getPosition().y - radius, radius, radius, radius * 2, radius * 2, 1, 1, body.getAngle(), 0, 0, 256, 256, false, false);
         spriteBatch.end();

@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.interfaces.Drawable;
 import com.map.MapGen;
@@ -16,7 +19,7 @@ import com.powerups.Powerup;
 import com.powerups.ShotgunPickup;
 import com.util.Geometry;
 
-public class Box implements Drawable, Overlappable {
+public class Box implements Drawable, Overlappable, Loadable, HasZone {
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
@@ -24,8 +27,6 @@ public class Box implements Drawable, Overlappable {
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
     private HashMap<Character, Wall> wallsByDirection = new HashMap<Character, Wall>();
-    private boolean touched = false;
-    private boolean pathed = false;
     private Vector2 position;
     private int indexX, indexY;
     private Room room;
@@ -33,6 +34,7 @@ public class Box implements Drawable, Overlappable {
     private Random random = new Random();
     private Floor floor;
     public float height = C.BOX_SIZE, width = C.BOX_SIZE;
+    private Zone z;
 
     public String BMKey;
     private int[] boxMapLocation;
@@ -40,16 +42,7 @@ public class Box implements Drawable, Overlappable {
     public Box(float x, float y) {
         position = new Vector2(x, y);
         this.view = GameView.gv;
-        this.floor = new Floor(view, this);
-    }
-
-    public void load() {
-        for (Unit z : zombies) {
-            z.load();
-        }
-    }
-
-    public void unload() {
+        this.floor = new Floor(this);
     }
 
     public boolean insideBox(float x, float y) {
@@ -179,28 +172,8 @@ public class Box implements Drawable, Overlappable {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
-        floor.draw(spriteBatch, shapeRenderer);
-        for (Unit u: zombies) {
-            if (u != view.getPlayer()) {
-                u.draw(spriteBatch, shapeRenderer);
-            }
-        }
-        for (Unit u: survivors) {
-            u.draw(spriteBatch, shapeRenderer);
-        }
-        for (com.powerups.Powerup p: powerups) {
-            p.draw(spriteBatch, shapeRenderer);
-        }
-        for (Crate c: crates) {
-            c.draw(spriteBatch, shapeRenderer);
-        }
-        for (Powerup p: powerups) {
-            p.draw(spriteBatch, shapeRenderer);
-        }
-        for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer);
-        }
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        floor.draw(spriteBatch, shapeRenderer, modelBatch);
     }
 
     public Room getRoom() {
@@ -223,18 +196,6 @@ public class Box implements Drawable, Overlappable {
 
     public HashMap<Character, Wall> getWallsByDirection() { return wallsByDirection; }
 
-    public boolean isPathed() {
-        return pathed;
-    }
-
-    public boolean isTouched() {
-        return touched;
-    }
-
-    public void path(int level) {
-
-    }
-
     public Vector2 randomPoint() {
         return position.cpy().add(random.nextFloat() * C.BOX_WIDTH, random.nextFloat() * C.BOX_HEIGHT);
     }
@@ -247,16 +208,12 @@ public class Box implements Drawable, Overlappable {
         return u;
     }
 
+    public Vector2 getCenter() {
+        return position.cpy().add(width / 2, height / 2);
+    }
+
     public Box setRoom(Room room) {
         this.room = room;
-        touched = true;
-
-        room.addZone(Zone.getZone(position.x, position.y));
-        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y));
-        room.addZone(Zone.getZone(position.x + C.BOX_WIDTH, position.y + C.BOX_HEIGHT));
-        room.addZone(Zone.getZone(position.x, position.y + C.BOX_HEIGHT));
-        room.registerOverlappable();
-
         return this;
     }
 
@@ -268,22 +225,6 @@ public class Box implements Drawable, Overlappable {
     }
     public HashMap<Character, Box> getAdjBoxes() {return adjBoxes;}
 
-    public void touch(){
-        touched = true;
-    }
-
-    public void update(int frame) {
-        for (Crate c: crates) {
-            c.update();
-        }
-        updateWalls();
-    }
-
-    private void updateWalls() {
-        for (Wall w: walls) {
-            w.update();
-        }
-    }
 
     // Box Map Location - used during room generation in MapGen.java
     public int[] getBMLocation() {
@@ -332,4 +273,22 @@ public class Box implements Drawable, Overlappable {
         return 0;
     }
 
+    @Override
+    public void load() {
+        for (Wall w: walls)
+            w.load();
+    }
+    @Override
+    public void unload() {
+        for (Wall w: walls)
+            w.unload();
+    }
+    @Override
+    public Zone getZone() {
+        return z;
+    }
+    @Override
+    public void setZone(Zone z) {
+        this.z = z;
+    }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.Bullet;
 import com.zombies.C;
@@ -33,9 +34,9 @@ public class Shotgun extends Gun {
 	}
 
 	@Override
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
 		for (Bullet b: bullets) {
-			b.draw(spriteBatch, shapeRenderer);
+			b.draw(spriteBatch, shapeRenderer, modelBatch);
 		}
 	}
 	

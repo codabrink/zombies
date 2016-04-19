@@ -31,7 +31,7 @@ public class Hallway {
         originBox = b;
         diameter = width;
         // assuming the box direction is null (empty)
-        System.out.println("direction: " + direction);
+        //System.out.println("direction: " + direction);
         switch(direction) {
             case 'n':
                 originWall = b.getWallsByDirection().get('n');
@@ -80,7 +80,7 @@ public class Hallway {
 
         if (hallwaySegments.size() < MAX_HALLWAY_SEGMENTS) {
             if (o != null && o != originBox) {
-                System.out.println("Ends in a collision");
+                //System.out.println("Ends in a collision");
                 // reign back hallway
                 float edge = o.oppositeEdge(lastDirection);
                 if (modifiers[0] != 0) hs.a2.set(edge, hs.a2.y);

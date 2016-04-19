@@ -1,16 +1,18 @@
 package com.zombies;
 
 public class C {
+    public static float scale = 0.8f;
+
     public static boolean ENABLE_ACCEL = false;
     public static boolean ENABLE_WALL_DESRUCTION = false;
-    public static int BOX_HEIGHT = 15;
+    public static float BOX_HEIGHT = 10 * scale;
     public static int BOX_MAX_ZOMBIES = 8;
-    public static int BOX_SIZE = 15; //x-y size of the small grid for each box
-    public static int BOX_WIDTH = 15;
+    public static float BOX_SIZE = 15 * scale;
+    public static float BOX_WIDTH = 15 * scale;
     public static int BULLET_DAMAGE_FACTOR = 2;
     public static long BULLET_LIFE = 300;
     public static float BULLET_SPEED = 100f;
-    public static float BULLET_RADIUS = 0.1f;
+    public static float BULLET_RADIUS = 0.1f * scale;
     public static float CANVAS_SCALE = 3;
     public static long CRATE_MPOS_DURATION = 500l;
     public static boolean DEV_MODE = true;
@@ -33,7 +35,7 @@ public class C {
     public static float HEALTH_RESTORE_RATE = 2f;
     public static float JOY_SIZE = .15f; //size of the joy stick
     public static float LIGHT_DIST = 25f;
-    public static float LINEAR_DAMPING = 0.9f;
+    public static float LINEAR_DAMPING = 2.5f;
     public static boolean LOG_ORIENTATION = false;
     public static int MAX_BULLETS = 4;
     public static int MAX_ROOM_SIZE = 7;
@@ -43,8 +45,8 @@ public class C {
     public static float PLAYER_AGILITY = 5f;
     public static long PLAYER_FIRE_RATE =  125;
     public static float PLAYER_HEALTH = 100;
-    public static float PLAYER_SIZE = 1f; //player draw size
-    public static float PLAYER_SPEED = 10f; //how fast the player will move
+    public static float PLAYER_SIZE = 1f * scale;
+    public static float PLAYER_SPEED = 10f * scale;
     public static long PULSE_RATE = 800l;
     public static long RESTORE_HEALTH_TIME = 2000;
     public static float ROOM_ALPHA_RATE = 2f;
@@ -76,7 +78,7 @@ public class C {
 
     public static int DRAW_LAYERS=3;
 
-    public static float ZONE_SIZE = 100;
+    public static float ZONE_SIZE = 100 * scale;
 
     public static float FOV = 60;
 

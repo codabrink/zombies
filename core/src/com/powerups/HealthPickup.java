@@ -3,6 +3,7 @@ package com.powerups;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
 import com.zombies.Box;
@@ -75,7 +76,7 @@ public class HealthPickup extends Powerup implements Collideable {
 	}
 
 	@Override
-	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+	public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         //TODO: Draw health pickups.
 
         /*

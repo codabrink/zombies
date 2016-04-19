@@ -2,11 +2,12 @@ package com.map;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.interfaces.Collideable;
 import com.interfaces.Drawable;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.util.Geometry;
 import com.zombies.GameView;
@@ -18,12 +19,13 @@ import java.util.LinkedList;
 /**
  * Created by coda on 4/2/16.
  */
-public class HallwaySegment implements Overlappable, Drawable {
+public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
     public Vector2 a1, a2, position;
     public float diameter, radius, width, height;
     private char direction;
     private Wall originWall;
+    private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
 
     // only handles modulus 90 degree angles
@@ -42,6 +44,7 @@ public class HallwaySegment implements Overlappable, Drawable {
         createWalls();
         removeWalls();
         registerDrawable();
+        registerOverlappable();
     }
 
     private void createWalls() {
@@ -51,14 +54,14 @@ public class HallwaySegment implements Overlappable, Drawable {
         float dx = a2.x - a1.x;
         double angle = Math.atan2(dy, dx);
 
-        double angleRight = angle + Math.toRadians(90);
-        double angleLeft  = angle - Math.toRadians(90);
+        double angleRight = angle + Math.PI / 2;
+        double angleLeft  = angle - Math.PI / 2;
 
         float radius = diameter / 2;
         Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
         Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
 
-        System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
+        //System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
 
         walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
@@ -92,10 +95,15 @@ public class HallwaySegment implements Overlappable, Drawable {
     }
 
     private void registerDrawable() {
-        Zone.getZone(position).addDrawable(this, DRAWABLE_LAYER);
-        Zone.getZone(position.cpy().add(0, height)).addDrawable(this, DRAWABLE_LAYER);
-        Zone.getZone(position.cpy().add(width, height)).addDrawable(this, DRAWABLE_LAYER);
-        Zone.getZone(position.cpy().add(width, 0)).addDrawable(this, DRAWABLE_LAYER);
+        Zone.getZone(getCenter()).addDrawable(this, 0);
+    }
+
+    private void registerOverlappable() {
+        Zone.getZone(getCenter()).addObject(this);
+    }
+
+    private Vector2 getCenter() {
+        return position.cpy().add(width / 2, height / 2);
     }
 
     @Override
@@ -104,9 +112,9 @@ public class HallwaySegment implements Overlappable, Drawable {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer);
+            w.draw(spriteBatch, shapeRenderer, modelBatch);
         }
     }
 
@@ -143,5 +151,27 @@ public class HallwaySegment implements Overlappable, Drawable {
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public void load() {
+        for (Wall w: walls)
+            w.load();
+    }
+
+    @Override
+    public void unload() {
+        for (Wall w: walls)
+            w.unload();
+    }
+
+    @Override
+    public Zone getZone() {
+        return zone;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+        zone = z;
     }
 }

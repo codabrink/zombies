@@ -5,14 +5,18 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.interfaces.Collideable;
+import com.interfaces.HasZone;
+import com.interfaces.Loadable;
 
-public class Zombie extends Unit implements com.interfaces.Collideable {
+public class Zombie extends Unit {
     private long lastAttack = System.currentTimeMillis();
     private Player player;
     private Random random = new Random();
@@ -22,13 +26,31 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
         this.box = box;
         player = view.getPlayer();
 
-        // I kinda hate you, Java...
-        storedPosition = position;
         storedBodData = new BodData("zombie", this);
 
         speed = C.ZOMBIE_SPEED;
         color = new Color(1, 0, 0, 1);
         health = C.ZOMBIE_HEALTH;
+
+        shape = new CircleShape();
+        bDef.allowSleep = true;
+        bDef.fixedRotation = true;
+        bDef.linearDamping = C.LINEAR_DAMPING;
+        bDef.position.set(position);
+        bDef.type = BodyType.DynamicBody;
+
+        body = view.getWorld().createBody(bDef);
+        shape.setRadius(C.ZOMBIE_SIZE * 0.75f);
+        MassData mass = new MassData();
+        mass.mass = .1f;
+        body.setMassData(mass);
+        body.setUserData(storedBodData);
+
+        fDef.shape = shape;
+        fDef.density = 0.1f;
+
+        body.createFixture(fDef);
+        body.setActive(false);
 
         updateZone();
     }
@@ -36,8 +58,7 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
     public void setState(String state) {
         if (state == "dead") {
             unload();
-            view.removeActiveZombie(this);
-            zone.removeUnit(this);
+            zone.removeObject(this);
             box.removeUnit(this);
             if (box != null)
                 box.removeUnit(this);
@@ -64,24 +85,6 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
         if (body != null)
             return;
 
-        shape = new CircleShape();
-        bDef.allowSleep = true;
-        bDef.fixedRotation = true;
-        bDef.linearDamping = C.LINEAR_DAMPING;
-        bDef.position.set(storedPosition);
-        bDef.type = BodyType.DynamicBody;
-
-        body = view.getWorld().createBody(bDef);
-        shape.setRadius(C.ZOMBIE_SIZE * 0.75f);
-        MassData mass = new MassData();
-        mass.mass = .1f;
-        body.setMassData(mass);
-        body.setUserData(storedBodData);
-
-        fDef.shape = shape;
-        fDef.density = 0.1f;
-
-        body.createFixture(fDef);
 
         view.addActiveZombie(this);
     }
@@ -101,7 +104,7 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         if (body == null) return;
         if (box != null && box.getRoom() != view.getPlayer().getRoom()) return;
 
@@ -131,7 +134,7 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
     public void update(int frame) {
         super.update(frame);
         if (state == "dormant") {
-            if (storedPosition.dst(GameView.gv.getPlayer().getBody().getPosition()) < 50)
+            if (body.getPosition().dst(GameView.gv.getPlayer().getBody().getPosition()) < 50)
                 setState("active");
             else
                 return;
@@ -170,21 +173,13 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
     }
 
     public void updateBox() {
-        if (body != null) {
-            box = zone.getBox(body.getPosition().x, body.getPosition().y);
-        } else {
-            box = zone.getBox(storedPosition.x, storedPosition.y);
-        }
+        box = zone.getBox(body.getPosition().x, body.getPosition().y);
     }
 
     public void updateZone() {
         Zone z;
-        if (body != null){
-            z = Zone.getZone(body.getPosition().x, body.getPosition().y);
-        } else {
-            z = Zone.getZone(storedPosition.x, storedPosition.y);
-        }
-        z.addUnit(this);
+        z = Zone.getZone(body.getPosition().x, body.getPosition().y);
+        z.addObject(this);
     }
 
     @Override
@@ -196,7 +191,6 @@ public class Zombie extends Unit implements com.interfaces.Collideable {
     }
 
     public void setZone(Zone z) {
-        zone.removeUnit(this);
-        z.addUnit(this);
+        z.addObject(this);
     }
 }

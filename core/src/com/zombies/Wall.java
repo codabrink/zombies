@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.map.MapGen;
+import com.interfaces.Collideable;
+import com.interfaces.Drawable;
+import com.interfaces.Loadable;
 import com.util.MyVector2;
 
-public class Wall implements com.interfaces.Collideable {
+public class Wall implements Collideable, Loadable, Drawable {
     private MyVector2 p1;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
@@ -41,6 +43,8 @@ public class Wall implements com.interfaces.Collideable {
         body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
         body.setUserData(new BodData("wall", this));
         lines.add(new DrawLine(p1, p1.end()));
+
+        Zone.getZone(position).addDrawable(this, 1);
     }
 
     public void makeDoor() {
@@ -53,9 +57,14 @@ public class Wall implements com.interfaces.Collideable {
         }
     }
 
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer) {
+    @Override
+    public String className() {
+        return null;
+    }
+
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         for (DrawLine l: lines) {
-            l.draw(spriteBatch, shapeRenderer);
+            l.draw(spriteBatch, shapeRenderer, modelBatch);
         }
     }
 
@@ -75,14 +84,7 @@ public class Wall implements com.interfaces.Collideable {
         return null;
     }
 
-    public void unload() {
-        // unload the wall
-    }
-
     public void update() {
-        for (DrawLine d: lines) {
-            d.update();
-        }
     }
 
     public void createHole(Vector2 holePosition, float holeSize) {
@@ -128,14 +130,21 @@ public class Wall implements com.interfaces.Collideable {
         }
     }
 
-    public Vector2 getP1() { return p1; }
-    public Vector2 getP2() { return p1.end(); }
-
     @Override
     public void handleCollision(Fixture f) {
 
         if (C.ENABLE_WALL_DESRUCTION) {
             createHole(f.getBody().getPosition(), 5f);
         }
+    }
+
+    @Override
+    public void load() {
+        body.setActive(true);
+    }
+
+    @Override
+    public void unload() {
+        body.setActive(false);
     }
 }

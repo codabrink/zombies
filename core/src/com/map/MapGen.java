@@ -24,7 +24,7 @@ public class MapGen {
         if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
             Room room = genRoom(z);
             if (room != null)
-                z.addRoom(room);
+                z.addObject(room);
             else
                 z.roomGenFailureCount++;
         }
@@ -40,7 +40,7 @@ public class MapGen {
         for (int i=0;i<=0;i++) {
             Room room = genRoom(z);
             if (room != null)
-                z.addRoom(room);
+                z.addObject(room);
             else
                 break;
         }
@@ -53,7 +53,7 @@ public class MapGen {
     }
 
     public static Hallway genHallway(Box b) {
-        return new Hallway(b, b.getRandomOpenDirection(), 2);
+        return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
 
     private static Room genRoom(Zone z) {
