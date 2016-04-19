@@ -11,7 +11,6 @@ import com.util.Assets;
 
 public class Floor {
     private Box box;
-    private Random random = new Random();
     private ModelInstance floorModelInstance;
 
     public Floor(Box box) {

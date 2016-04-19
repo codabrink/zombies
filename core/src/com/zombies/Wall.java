@@ -63,7 +63,6 @@ public class Wall implements Collideable, Loadable, Drawable {
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        if (true) return;
         for (DrawLine l: lines) {
             l.draw(spriteBatch, shapeRenderer, modelBatch);
         }
