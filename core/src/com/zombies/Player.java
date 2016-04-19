@@ -306,7 +306,7 @@ public class Player extends Unit implements Collideable {
         updateZone();
         zone.update(frame, 1);
 
-        pointLight.set(0.5f, 0.5f, 0.5f, body.getPosition().x, body.getPosition().y, 50, 3000);
+        pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 15, 300);
 
         for (int i=0;i<=C.DRAW_LAYERS;i++) {
             zone.draw(frame, 1, i);

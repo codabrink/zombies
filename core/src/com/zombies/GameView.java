@@ -310,7 +310,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 150;
+        float strength = 10 * C.scale;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
@@ -326,16 +326,16 @@ public class GameView implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, 10), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(10, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_SIZE, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -10), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-10, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_SIZE, 0), player.getBody().getAngle());
         }
 
 

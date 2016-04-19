@@ -132,7 +132,7 @@ public class Wall implements Collideable, Loadable, Drawable {
 
     @Override
     public void handleCollision(Fixture f) {
-        createHole(f.getBody().getPosition(), 5f);
+        createHole(f.getBody().getPosition(), C.PLAYER_SIZE * 2);
     }
 
     @Override

@@ -30,14 +30,18 @@ public class DrawLine {
         this.p2 = p2;
         view = GameView.gv;
         color = Color.WHITE;
-        float dx = p1.x - p2.x, dy = p1.y - p2.y, angle = (float)Math.atan2(dx, dy);
+        float dx = p2.x - p1.x, dy = p2.y - p1.y;
+        double angle = Math.atan2(dy, dx);
 
-        model = Assets.mb.createBox(p1.dst(p2), 0.1f, 10f,
+        model = Assets.mb.createBox(Math.max(p2.x - p1.x, 0.1f), Math.max(p2.y - p1.y, 0.1f), C.BOX_HEIGHT,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 Usage.Position | Usage.Normal);
         instance = new ModelInstance(model);
-        instance.transform.rotate(Vector3.Z, angle);
-        instance.transform.setTranslation(p1.x, p1.y, 0);
+
+        System.out.println(Math.cos(angle));
+        dx = (float)(p1.dst(p2) * Math.cos(angle) / 2);
+        dy = (float)(p1.dst(p2) * Math.sin(angle) / 2);
+        instance.transform.setTranslation(p1.x + dx, p1.y + dy, C.BOX_HEIGHT / 2);
 	}
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {

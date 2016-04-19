@@ -7,7 +7,7 @@ public class CameraHandle {
     private Player player;
     private PerspectiveCamera cam;
 
-    private float zoom = 60;
+    private float zoom = 50 * C.scale;
 
     public CameraHandle(GameView view) {
         this.view = view;
