@@ -85,23 +85,4 @@ public class C {
 
     public static boolean POPULATE_ZOMBIES = true;
     public static boolean POPULATE_SURVIVORS = true;
-
-    public static final String vertexShader = "attribute vec2 a_position;\n"+
-            "attribute vec4 a_color;\n"+
-            "uniform mat4 u_projTrans;\n"+
-            "varying vec4 vColor;\n"+
-            "void main() {\n"+
-            "    vColor = a_color;\n"+
-            "      gl_Position = u_projTrans * vec4(a_position.xy, 0.0, 1.0);\n"+
-            "}";
-
-
-
-    public static final String fragmentShader = "#ifdef GL_ES\n"+
-            "precision mediump float;\n"+
-            "#endif\n"+
-            "varying vec4 vColor;\n"+
-            "void main() {\n"+
-            "    gl_FragColor = vColor;\n"+
-            "}";
 }

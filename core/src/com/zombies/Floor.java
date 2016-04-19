@@ -17,7 +17,7 @@ public class Floor {
     public Floor(Box box) {
         this.box = box;
         floorModelInstance = new ModelInstance(Assets.a.get("data/models/floor.g3dj", Model.class));
-        floorModelInstance.transform.setToTranslation(box.getPosition().x, box.getPosition().y, 0);
+        floorModelInstance.transform.setToTranslation(box.getPosition().x + box.width / 2, box.getPosition().y + box.height / 2, 0);
         floorModelInstance.transform.rotate(Vector3.X, 90);
         floorModelInstance.transform.scale(Assets.FLOOR_SCALE, Assets.FLOOR_SCALE, Assets.FLOOR_SCALE);
     }

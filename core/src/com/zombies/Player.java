@@ -1,5 +1,6 @@
 package com.zombies;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,7 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +20,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.interfaces.Collideable;
+
+import box2dLight.DirectionalLight;
 
 public class Player extends Unit implements Collideable {
 
@@ -301,7 +306,8 @@ public class Player extends Unit implements Collideable {
         updateZone();
         zone.update(frame, 1);
 
-        pointLight.set(Color.WHITE, body.getPosition().x, body.getPosition().y, 10, 100);
+        pointLight.set(0.5f, 0.5f, 0.5f, body.getPosition().x, body.getPosition().y, 50, 3000);
+
         for (int i=0;i<=C.DRAW_LAYERS;i++) {
             zone.draw(frame, 1, i);
         }
