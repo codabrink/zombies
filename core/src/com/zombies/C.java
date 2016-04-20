@@ -4,7 +4,7 @@ public class C {
     public static float scale = 0.8f;
 
     public static boolean ENABLE_ACCEL = false;
-    public static boolean ENABLE_WALL_DESRUCTION = false;
+    public static boolean ENABLE_WALL_DESRUCTION = true;
     public static float BOX_HEIGHT = 10 * scale;
     public static int BOX_MAX_ZOMBIES = 8;
     public static float BOX_SIZE = 15 * scale;

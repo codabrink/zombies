@@ -260,9 +260,6 @@ public class Zone implements Loadable {
     public Vector2 randomDiscreetPosition(int numIncrements) {
         float randomX = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
         float randomY = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
-        System.out.println(randomX);
-        System.out.println(randomY);
-        System.out.println(position.cpy().add(randomX, randomY));
         return position.cpy().add(randomX, randomY);
     }
 

@@ -157,9 +157,13 @@ public class MapGen {
 
     private static boolean rectOverlap(Box b, Vector2 p, float w, float h) {
         boolean xOverlap = valueInRange(b.x(), p.x, p.x + w) ||
-                valueInRange(p.x, b.x(), b.x() + b.width);
+                valueInRange(b.x() + b.width, p.x, p.x + w) ||
+                valueInRange(p.x, b.x(), b.x() + b.width) ||
+                valueInRange(p.x + w, b.x(), b.x() + b.width);
         boolean yOverlap = valueInRange(b.y(), p.y, p.y + h) ||
-                valueInRange(p.y, b.y(), b.y() + b.height);
+                valueInRange(b.y() + b.height, p.y, p.y + h) ||
+                valueInRange(p.y, b.y(), b.y() + b.height) ||
+                valueInRange(p.y + h, b.y(), b.y() + b.height);
         return xOverlap && yOverlap;
     }
 
