@@ -30,7 +30,7 @@ public class Zone implements Loadable {
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
 
-    public int numRooms = 20; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 2; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate
 
     public Zone(float x, float y) {
@@ -149,8 +149,7 @@ public class Zone implements Loadable {
             o.getZone().removeObject(o);
         o.setZone(this);
 
-        if (objects.indexOf(o) == -1)
-            objects.add(o);
+        objects.add(o);
 
         // KEEP RECORDS
         if (o instanceof Room)
@@ -208,6 +207,10 @@ public class Zone implements Loadable {
         ArrayList<Drawable> drawables = drawablesList.get(layer);
         if (drawables.indexOf(d) == -1)
             drawables.add(d);
+    }
+    public void addDrawableNoCheck(Drawable d, int layer) {
+        ArrayList<Drawable> drawables = drawablesList.get(layer);
+        drawables.add(d);
     }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, LinkedList<Overlappable> ignore) {

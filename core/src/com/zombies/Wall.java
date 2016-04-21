@@ -44,7 +44,7 @@ public class Wall implements Collideable, Loadable, Drawable {
         body.setUserData(new BodData("wall", this));
         lines.add(new DrawLine(p1, p1.end()));
 
-        Zone.getZone(position).addDrawable(this, 1);
+        Zone.getZone(position).addDrawableNoCheck(this, 1);
     }
 
     public void makeDoor() {

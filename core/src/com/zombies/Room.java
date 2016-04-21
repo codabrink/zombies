@@ -32,7 +32,7 @@ public class Room implements Loadable, HasZone {
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
-            Zone.getZone(b.getPosition()).addDrawable(b, 0);
+            Zone.getZone(b.getPosition()).addDrawableNoCheck(b, 0);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
