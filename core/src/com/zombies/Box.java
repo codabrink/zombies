@@ -26,6 +26,7 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
+    private HashMap<Character, Wall> wallsByDirection = new HashMap<Character, Wall>();
     private Vector2 position;
     private int indexX, indexY;
     private Room room;
@@ -62,14 +63,22 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     }
 
     public void genOuterWalls() {
-        if (adjBoxes.get('n') == null)
-            walls.add(new Wall(position.cpy().add(0, height), width,  0 )); // top wall
-        if (adjBoxes.get('e') == null)
+        if (adjBoxes.get('n') == null) {
+            walls.add(new Wall(position.cpy().add(0, height), width, 0)); // top wall
+            wallsByDirection.put('n', walls.get(walls.size() - 1));
+        }
+        if (adjBoxes.get('e') == null) {
             walls.add(new Wall(position.cpy().add(width, 0), height, 90)); // right wall
-        if (adjBoxes.get('s') == null)
-            walls.add(new Wall(position.cpy(), width,  0 )); // bottom wall
-        if (adjBoxes.get('w') == null)
+            wallsByDirection.put('e', walls.get(walls.size() - 1));
+        }
+        if (adjBoxes.get('s') == null) {
+            walls.add(new Wall(position.cpy(), width, 0)); // bottom wall
+            wallsByDirection.put('s', walls.get(walls.size() - 1));
+        }
+        if (adjBoxes.get('w') == null) {
             walls.add(new Wall(position.cpy(), height, 90)); // left wall
+            wallsByDirection.put('w', walls.get(walls.size() - 1));
+        }
     }
 
     public float x() {return position.x;}
@@ -184,6 +193,8 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     }
 
     public ArrayList<Wall> getWalls() { return walls; }
+
+    public HashMap<Character, Wall> getWallsByDirection() { return wallsByDirection; }
 
     public Vector2 randomPoint() {
         return position.cpy().add(random.nextFloat() * C.BOX_WIDTH, random.nextFloat() * C.BOX_HEIGHT);

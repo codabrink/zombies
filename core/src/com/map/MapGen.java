@@ -22,7 +22,7 @@ public class MapGen {
             z.findAdjZones();
 
         if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z, z.randomPosition());
+            Room room = genRoom(z);
             if (room != null)
                 z.addObject(room);
             else
@@ -38,7 +38,7 @@ public class MapGen {
             z.findAdjZones();
 
         for (int i=0;i<=0;i++) {
-            Room room = genRoom(z, z.randomPosition());
+            Room room = genRoom(z);
             if (room != null)
                 z.addObject(room);
             else
@@ -51,15 +51,16 @@ public class MapGen {
         Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
         return genHallway(b);
     }
+
     public static Hallway genHallway(Box b) {
         return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
 
-    private static Room genRoom(Zone z, Vector2 position) {
+    private static Room genRoom(Zone z) {
         Random r = new Random();
         HashMap<String, Box> boxMap = new HashMap<String, Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = new Vector2(r.nextFloat() * C.ZONE_SIZE + z.getPosition().x, r.nextFloat() * C.ZONE_SIZE + z.getPosition().y);
+            Vector2 boxPosition = z.randomDiscreetPosition(20);
             if (collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
                 Box b = new Box(boxPosition.x, boxPosition.y);
                 b.BMKey = "0,0";
@@ -156,13 +157,17 @@ public class MapGen {
 
     private static boolean rectOverlap(Box b, Vector2 p, float w, float h) {
         boolean xOverlap = valueInRange(b.x(), p.x, p.x + w) ||
-                valueInRange(p.x, b.x(), b.x() + b.width);
+                valueInRange(b.x() + b.width, p.x, p.x + w) ||
+                valueInRange(p.x, b.x(), b.x() + b.width) ||
+                valueInRange(p.x + w, b.x(), b.x() + b.width);
         boolean yOverlap = valueInRange(b.y(), p.y, p.y + h) ||
-                valueInRange(p.y, b.y(), b.y() + b.height);
+                valueInRange(b.y() + b.height, p.y, p.y + h) ||
+                valueInRange(p.y, b.y(), b.y() + b.height) ||
+                valueInRange(p.y + h, b.y(), b.y() + b.height);
         return xOverlap && yOverlap;
     }
 
     private static boolean valueInRange(float value, float min, float max) {
-        return (value > min) && (value < max);
+        return (value >= min) && (value <= max);
     }
 }

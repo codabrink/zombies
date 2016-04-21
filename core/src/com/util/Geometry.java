@@ -14,6 +14,6 @@ public class Geometry {
     }
 
     private static boolean valueInRange(float value, float min, float max) {
-        return (value > min) && (value < max);
+        return (value >= min) && (value <= max);
     }
 }
