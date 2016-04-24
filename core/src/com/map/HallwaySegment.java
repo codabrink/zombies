@@ -21,19 +21,22 @@ import java.util.LinkedList;
  */
 public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
-    public Vector2 a1, a2, position;
+    public Vector2 p1, p2, position;
     public float diameter, radius, width, height;
     private char direction;
     private Wall originWall;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
+    private double startDeltaAngle, endDeltaAngle = 0; // change in angle from the last hallway segment
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 a1, Vector2 a2, float width, Wall originWall) {
-        this.a1  = a1;
-        this.a2  = a2;
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double startDeltaAngle) {
+        this.p1 = p1;
+        this.p2 = p2;
         this.originWall = originWall;
-        diameter = width;
+        this.startDeltaAngle = startDeltaAngle;
+        this.endDeltaAngle = endDeltaAngle;
+        this.diameter = diameter;
         radius   = width / 2;
 
         calculateInfo();
@@ -48,49 +51,51 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     }
 
     private void createWalls() {
-        GameView.gv.addDebugDots(a1, Color.GREEN);
-        GameView.gv.addDebugDots(a2, Color.RED);
-        float dy = a2.y - a1.y;
-        float dx = a2.x - a1.x;
+        GameView.gv.addDebugDots(p1, Color.GREEN);
+        GameView.gv.addDebugDots(p2, Color.RED);
+        float dy = p2.y - p1.y;
+        float dx = p2.x - p1.x;
         double angle = Math.atan2(dy, dx);
 
-        double angleRight = angle + Math.PI / 2;
-        double angleLeft  = angle - Math.PI / 2;
+        double w1p1a = angle + Math.PI / 2 + startDeltaAngle; // w1p1a stands for "Wall 1, Point 1 Angle"
+        double w1p2a = angle + Math.PI / 2 + endDeltaAngle;
+        double w2p1a = angle - Math.PI / 2 + startDeltaAngle;
+        double w2p2a = angle - Math.PI / 2 + endDeltaAngle;
 
         float radius = diameter / 2;
-        Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
-        Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
+        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(radius * Math.cos(w1p1a)), (float)(radius * Math.sin(w1p1a)))); // starting point of the wall
+        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w1p2a)), (float)(radius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        Vector2 w2p1 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w2p1a)), (float)(radius * Math.sin(w2p1a))));
+        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w2p2a)), (float)(radius * Math.sin(w2p2a))));
 
-        //System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
-
-        walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
-        walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
+        walls.add(new Wall(w1p1, w1p1.dst(w1p2), (float) Math.toDegrees(angle)));
+        walls.add(new Wall(w2p1, w2p1.dst(w2p2), (float) Math.toDegrees(angle)));
     }
 
     private void removeWalls() {
-        this.originWall.createHole(a1, diameter);
+        this.originWall.createHole(p1, diameter);
     }
 
     private void calculateInfo() {
         // calculate position
-        if (a1.x < a2.x || a1.y < a2.y) {
-            position = new Vector2(a1.x - radius, a1.y - radius);
+        if (p1.x < p2.x || p1.y < p2.y) {
+            position = new Vector2(p1.x - radius, p1.y - radius);
         } else {
-            position = new Vector2(a2.x - radius, a2.y - radius);
+            position = new Vector2(p2.x - radius, p2.y - radius);
         }
 
         // calculate width and height
-        width = Math.abs(a1.x - a2.x) + diameter;
-        height = Math.abs(a1.y - a2.y) + diameter;
+        width = Math.abs(p1.x - p2.x) + diameter;
+        height = Math.abs(p1.y - p2.y) + diameter;
 
         // calculate direction
-        if (a1.x < a2.x)
+        if (p1.x < p2.x)
             direction = 'e';
-        else if (a1.x > a2.x)
+        else if (p1.x > p2.x)
             direction = 'w';
-        else if (a1.y < a2.y)
+        else if (p1.y < p2.y)
             direction = 'n';
-        else if (a1.y > a2.y)
+        else if (p1.y > p2.y)
             direction = 's';
     }
 
@@ -106,8 +111,10 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         return position.cpy().add(width / 2, height / 2);
     }
 
-    public Vector2 getA1() {return a1;}
-    public Vector2 getA2() {return a2;}
+    public Vector2 getP1() {return p1;}
+    public Vector2 getP2() {return p2;}
+
+    public void setEndDeltaAngle(double endDeltaAngle) {this.endDeltaAngle = endDeltaAngle;}
 
     @Override
     public String className() {

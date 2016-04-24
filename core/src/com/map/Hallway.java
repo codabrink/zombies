@@ -7,12 +7,9 @@ import com.zombies.Box;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Random;
-import java.util.Vector;
 
 /**
  * Created by coda on 3/31/2016.
@@ -27,8 +24,10 @@ public class Hallway {
     private Box originBox;
     private Wall originWall;
     private float diameter;
+    private double totalAngle = 0;
 
     public Hallway(Box b, char direction, float width) {
+        long startTime = System.currentTimeMillis();
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
@@ -52,10 +51,10 @@ public class Hallway {
                 break;
         }
         originWall = b.getWallsByDirection().get(direction);
-        tryToMove(angle);
+        tryToMove(angle, startTime, 0);
     }
 
-    private float hallwayLength() { return r.nextFloat() * 10 + 5; }
+    private float hallwayLength() { return r.nextFloat() * 10 + 15; }
 
     private Vector2 calculateNewAxis(double angle) {
         Vector2 a = axes.get(axes.size() - 1).cpy();
@@ -63,29 +62,51 @@ public class Hallway {
         return a.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
     }
 
-    private void tryToMove(double angle) {
+    private void tryToMove(double angle, double startDeltaAngle, long startTime) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall);
+        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall, startDeltaAngle);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
         if (o == null)
             o = Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
 
-        // if it's not the origin box or intersecting on the first axis
-        if (o != null && o != originBox && (axes.size() <= 1 || (o instanceof Box && !originBox.isAdjacent((Box)o)))) {
-            hs.a2.set(o.intersectPointOfLine(hs.a1, hs.a2));
-            hallwaySegments.add(hs);
-            materialize();
-        } else {
-            hallwaySegments.add(hs);
-            axes.add(hs.getA2());
+        // I would love to use lambdas here to reduce redundancy, but that's not introduced until Java 8, so... yeah
+        if (o != null) {
+            if (axes.size() > 1) { // is fist segment
+                if (o instanceof Box && o != originBox && !originBox.isAdjacent((Box)o)) { // is not an origin box or adjacent box
+                    Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging..
+                    hs.p2.set(ip);
+                    addHallwaySegment(hs);
+                    materialize();
+                } else { // collision is an origin box or adjacent box
+                    addHallwaySegment(hs);
+                }
+            } else { // is a second or more segment
+                Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging...
+                hs.p2.set(ip);
+                addHallwaySegment(hs);
+                materialize();
+            }
+         } else { // in the clear, just add the segment
+            addHallwaySegment(hs);
         }
 
-        // max turn is +\- 90 degrees
-        // TODO: allow straight movement
-        if (axes.size() - 1 < MAX_HALLWAY_SEGMENTS)
-            tryToMove(angle + (r.nextBoolean() ? 90 : -90));
-        else
+        if (hallwaySegments.size() - 1 < MAX_HALLWAY_SEGMENTS) {
+            double nextDeltaAngle = 0;
+            switch (r.nextInt(2)) {
+                case 0: nextDeltaAngle = -Math.PI / 2; break;
+                case 1: nextDeltaAngle = 0; break;
+                case 2: nextDeltaAngle = Math.PI / 2; break;
+            }
+            ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setEndDeltaAngle(nextDeltaAngle);
+            tryToMove(angle + nextDeltaAngle, nextDeltaAngle, startTime);
+        } else {
             materialize();
+        }
+    }
+
+    private void addHallwaySegment(HallwaySegment hs) {
+        hallwaySegments.add(hs);
+        axes.add(hs.getP2());
     }
 
     private void materialize() {

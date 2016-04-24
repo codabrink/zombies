@@ -282,12 +282,16 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
 
     @Override
     public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        Vector2 g = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        // left line
+        Vector2 ip = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // top line
+            ip = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // right line
+            ip = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // bottom line
+            ip = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
 
-        if (g == null)
-            System.out.println();
-
-        return g;
+        return ip;
     }
 
     @Override
