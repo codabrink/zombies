@@ -213,23 +213,17 @@ public class Zone implements Loadable {
         drawables.add(d);
     }
 
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, LinkedList<Overlappable> ignore) {
-        for (Object oo: objects) {
-            if (!(oo instanceof Overlappable))
+    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
+        for (Object obj: objects) {
+            if (!(obj instanceof Overlappable))
                 continue;
-            Overlappable o = (Overlappable) oo;
+            Overlappable o = (Overlappable) obj;
 
             if (o.overlaps(x, y, w, h)) {
                 if (ignore != null) {
-                    boolean shouldIgnore = false;
-                    for (Overlappable ig : ignore) {
-                        if (ig == o) {
-                            shouldIgnore = true;
-                            break;
-                        }
-                    }
-                    if (!shouldIgnore)
-                        return o;
+                    if (ignore.indexOf(o) != -1)
+                        continue;
+                    return o;
                 } else {
                     return o;
                 }
@@ -250,7 +244,7 @@ public class Zone implements Loadable {
     public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
         return checkOverlap(v.x, v.y, w, h, limit, null);
     }
-    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, LinkedList<Overlappable> ignore) {
+    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
 

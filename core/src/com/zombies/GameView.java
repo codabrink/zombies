@@ -310,7 +310,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 10 * C.scale;
+        float strength = 50 * C.scale;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);

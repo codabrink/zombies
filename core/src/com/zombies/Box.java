@@ -224,6 +224,13 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return adjBoxes.get(direction);
     }
     public HashMap<Character, Box> getAdjBoxes() {return adjBoxes;}
+    public boolean isAdjacent(Box b) {
+        for (Box bb: adjBoxes.values()) {
+            if (b == bb)
+                return true;
+        }
+        return false;
+    }
 
 
     // Box Map Location - used during room generation in MapGen.java
@@ -271,6 +278,16 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        Vector2 g = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+
+        if (g == null)
+            System.out.println();
+
+        return g;
     }
 
     @Override

@@ -102,9 +102,12 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         Zone.getZone(getCenter()).addObject(this);
     }
 
-    private Vector2 getCenter() {
+    public Vector2 getCenter() {
         return position.cpy().add(width / 2, height / 2);
     }
+
+    public Vector2 getA1() {return a1;}
+    public Vector2 getA2() {return a2;}
 
     @Override
     public String className() {
@@ -151,6 +154,20 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        // left line
+        Vector2 i = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // top line
+            i = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // right line
+            i = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // bottom line
+            i = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+
+        return i;
     }
 
     @Override
