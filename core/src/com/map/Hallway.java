@@ -15,12 +15,11 @@ import java.util.Random;
  * Created by coda on 3/31/2016.
  */
 public class Hallway {
-    public static int MAX_HALLWAY_SEGMENTS = 5;
+    public static int MAX_HALLWAY_SEGMENTS = 2;
 
     ArrayList<Vector2> axes = new ArrayList<Vector2>();
     private Random r;
     private ArrayList<Overlappable> hallwaySegments = new ArrayList<Overlappable>();
-    private char lastDirection;
     private Box originBox;
     private Wall originWall;
     private float diameter;
@@ -51,7 +50,7 @@ public class Hallway {
                 break;
         }
         originWall = b.getWallsByDirection().get(direction);
-        tryToMove(angle, startTime, 0);
+        tryToMove(angle, 0);
     }
 
     private float hallwayLength() { return r.nextFloat() * 10 + 15; }
@@ -62,7 +61,7 @@ public class Hallway {
         return a.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
     }
 
-    private void tryToMove(double angle, double startDeltaAngle, long startTime) {
+    private void tryToMove(double angle, double startDeltaAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
         HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall, startDeltaAngle);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
@@ -98,7 +97,7 @@ public class Hallway {
                 case 2: nextDeltaAngle = Math.PI / 2; break;
             }
             ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setEndDeltaAngle(nextDeltaAngle);
-            tryToMove(angle + nextDeltaAngle, nextDeltaAngle, startTime);
+            tryToMove(angle + nextDeltaAngle, nextDeltaAngle);
         } else {
             materialize();
         }

@@ -196,10 +196,8 @@ public class Wall implements Collideable, Loadable, Drawable {
 
     @Override
     public void handleCollision(Fixture f) {
-
-        System.out.println("collision" + System.currentTimeMillis());
         if (C.ENABLE_WALL_DESRUCTION) {
-            createHole(f.getBody().getPosition(), 5f);
+            //createHole(f.getBody().getPosition(), 5f);
         }
     }
 

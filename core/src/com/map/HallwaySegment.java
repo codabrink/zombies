@@ -35,7 +35,6 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         this.p2 = p2;
         this.originWall = originWall;
         this.startDeltaAngle = startDeltaAngle;
-        this.endDeltaAngle = endDeltaAngle;
         this.diameter = diameter;
         radius   = width / 2;
 
@@ -57,16 +56,18 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         float dx = p2.x - p1.x;
         double angle = Math.atan2(dy, dx);
 
-        double w1p1a = angle + Math.PI / 2 + startDeltaAngle; // w1p1a stands for "Wall 1, Point 1 Angle"
-        double w1p2a = angle + Math.PI / 2 + endDeltaAngle;
-        double w2p1a = angle - Math.PI / 2 + startDeltaAngle;
-        double w2p2a = angle - Math.PI / 2 + endDeltaAngle;
+        double w1p1a = angle + Math.PI / 2 + startDeltaAngle * 1.5; // w1p1a stands for "Wall 1, Point 1 Angle"
+        double w1p2a = angle + Math.PI / 2 + endDeltaAngle * 1.5;
+        double w2p1a = angle - Math.PI / 2 + startDeltaAngle * 1.5;
+        double w2p2a = angle - Math.PI / 2 + endDeltaAngle * 1.5;
 
         float radius = diameter / 2;
-        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(radius * Math.cos(w1p1a)), (float)(radius * Math.sin(w1p1a)))); // starting point of the wall
-        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w1p2a)), (float)(radius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        Vector2 w2p1 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w2p1a)), (float)(radius * Math.sin(w2p1a))));
-        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(radius * Math.cos(w2p2a)), (float)(radius * Math.sin(w2p2a))));
+        float sradius = startDeltaAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
+        float eradius = endDeltaAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
+        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w1p1a)), (float)(sradius * Math.sin(w1p1a)))); // starting point of the wall
+        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w1p2a)), (float)(eradius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w2p1a)), (float)(sradius * Math.sin(w2p1a))));
+        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w2p2a)), (float)(eradius * Math.sin(w2p2a))));
 
         walls.add(new Wall(w1p1, w1p1.dst(w1p2), (float) Math.toDegrees(angle)));
         walls.add(new Wall(w2p1, w2p1.dst(w2p2), (float) Math.toDegrees(angle)));
