@@ -19,36 +19,31 @@ import com.interfaces.Loadable;
 import com.util.MyVector2;
 
 public class Wall implements Collideable, Loadable, Drawable {
-    private MyVector2 p1;
+    private Vector2 p1, p2, center;
+    private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private ArrayList<DrawLine> lines;
     private GameView view;
-    public boolean door = false;
-    int index;
-    private boolean exploded = false;
 
-    public Wall(Vector2 position, float length, float angle) {
+    public Wall(Vector2 p1, Vector2 p2) {
         view = GameView.gv;
-
-        p1 = new MyVector2(position.x, position.y, length, angle);
+        this.p1 = p1;
+        this.p2 = p2;
+        center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         lines = new ArrayList<DrawLine>();
+        angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
         //set up physics
         EdgeShape shape = new EdgeShape();
-        MyVector2 shapeVector = new MyVector2(0, 0, length, angle);
-        shape.set(shapeVector, shapeVector.end());
+        shape.set(new Vector2(0, 0), new Vector2(p1.dst(p2), 0));
         body = view.getWorld().createBody(new BodyDef());
         body.createFixture(shape, 0);
-        body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
+        body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
-        lines.add(new DrawLine(p1, p1.end()));
 
-        Zone.getZone(position).addDrawableNoCheck(this, 1);
-    }
-
-    public void makeDoor() {
-
+        lines.add(new DrawLine(p1, p2));
+        Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
     }
 
     public void setColor(Color c) {
@@ -68,24 +63,7 @@ public class Wall implements Collideable, Loadable, Drawable {
         }
     }
 
-    public boolean isDoor() {
-        return door;
-    }
-
     public Body getBody() {return body;}
-
-
-    public Vector2 doorPosition() {
-        if (isDoor()) {
-            //return new Vector2((p1.x+p2.x)/2, (p1.y+p2.y)/2);
-        } else {
-            return null;
-        }
-        return null;
-    }
-
-    public void update() {
-    }
 
     public void createHole(Vector2 holePosition, float holeSize) {
         view.getWorld().destroyBody(body);

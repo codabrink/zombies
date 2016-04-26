@@ -64,19 +64,19 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
 
     public void genOuterWalls() {
         if (adjBoxes.get('n') == null) {
-            walls.add(new Wall(position.cpy().add(0, height), width, 0)); // top wall
+            walls.add(new Wall(position.cpy().add(0, height), position.cpy().add(width, height))); // top wall
             wallsByDirection.put('n', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('e') == null) {
-            walls.add(new Wall(position.cpy().add(width, 0), height, 90)); // right wall
+            walls.add(new Wall(position.cpy().add(width, 0), position.cpy().add(width, height))); // right wall
             wallsByDirection.put('e', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('s') == null) {
-            walls.add(new Wall(position.cpy(), width, 0)); // bottom wall
+            walls.add(new Wall(position.cpy(), position.cpy().add(width, 0))); // bottom wall
             wallsByDirection.put('s', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('w') == null) {
-            walls.add(new Wall(position.cpy(), height, 90)); // left wall
+            walls.add(new Wall(position.cpy(), position.cpy().add(0, height))); // left wall
             wallsByDirection.put('w', walls.get(walls.size() - 1));
         }
     }

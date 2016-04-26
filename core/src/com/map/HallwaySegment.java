@@ -69,8 +69,8 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         Vector2 w2p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w2p1a)), (float)(sradius * Math.sin(w2p1a))));
         Vector2 w2p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w2p2a)), (float)(eradius * Math.sin(w2p2a))));
 
-        walls.add(new Wall(w1p1, w1p1.dst(w1p2), (float) Math.toDegrees(angle)));
-        walls.add(new Wall(w2p1, w2p1.dst(w2p2), (float) Math.toDegrees(angle)));
+        walls.add(new Wall(w1p1, w1p2));
+        walls.add(new Wall(w2p1, w2p2));
     }
 
     private void removeWalls() {
