@@ -101,18 +101,19 @@ public class Wall implements Collideable, Loadable, Drawable {
 
         HashMap<Float, Float> consolidatedHoles;
         ArrayList<Float> holePositions;
+        float nextHoleEndPoint;
+        float nextHoleStartPoint;
+        float thisHoleEndPoint;
+        float thisHoleStartPoint;
+        boolean lastHoleConsolidated;
 
-        // if there are more than 2 holes, check if any overlap and can be joined.
+        // if there are multiple holes, check if any overlap and can be joined.
         while (holes.size() >= 2) {
 
             consolidatedHoles = new HashMap<Float, Float>();
             holePositions = new ArrayList<Float>(holes.keySet());
             Collections.sort(holePositions);
-            float nextHoleEndPoint;
-            float nextHoleStartPoint;
-            float thisHoleEndPoint;
-            float thisHoleStartPoint;
-            boolean lastHoleConsolidated = false;
+            lastHoleConsolidated = false;
 
             for (int i = 0; i <= holePositions.size() - 2; i++) {
 
@@ -177,7 +178,7 @@ public class Wall implements Collideable, Loadable, Drawable {
             // if this is the last hole in the wall, draw the wall segment after it too.
             if (i == holePositions.size() - 1) {
 
-                // v2 describes the wall segment after this wall.
+                // v2 describes the wall segment after this hole.
                 v2 = new MyVector2((float)((holePositions.get(i) + holes.get(holePositions.get(i)) / 2) * Math.cos(p1.angle() * Math.PI / 180)),
                         (float)((holePositions.get(i) + holes.get(holePositions.get(i)) / 2) * Math.sin(p1.angle() * Math.PI / 180)),
                         Math.max(p1.len() - (holePositions.get(i) + holes.get(holePositions.get(i)) / 2), 0),

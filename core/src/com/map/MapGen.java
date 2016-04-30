@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Box;
 import com.zombies.C;
+import com.zombies.DrawLine;
 import com.zombies.GameView;
 import com.zombies.Room;
 import com.zombies.Zone;

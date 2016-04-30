@@ -112,6 +112,18 @@ public class Room implements Loadable, HasZone {
         return null;
     }
 
+    public ArrayList<Wall> getWalls() {
+        ArrayList<Wall> roomWalls = new ArrayList<Wall>();
+
+        for (Box box: boxes) {
+            for (Wall wall: box.getWalls()) {
+                roomWalls.add(wall);
+            }
+        }
+
+        return roomWalls;
+    }
+
     public ArrayList<Box> getBoxes() {
         return boxes;
     }
