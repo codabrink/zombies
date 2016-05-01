@@ -352,6 +352,7 @@ public class Player extends Unit implements Collideable {
         if (zone != z) {
             if (zone != null)
                 zone.unload();
+
             z.load();
         }
         zone = z;

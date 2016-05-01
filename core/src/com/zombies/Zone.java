@@ -115,6 +115,10 @@ public class Zone implements Loadable {
             if (o instanceof Loadable)
                 ((Loadable) o).load();
         loaded = true;
+
+        for (Zone z: adjZones)
+            if (!z.loaded)
+                z.load();
     }
 
     @Override
@@ -122,10 +126,11 @@ public class Zone implements Loadable {
         for (Object o: objects)
             if (o instanceof Loadable)
                 ((Loadable) o).unload();
+        loaded = false;
+
         for (Zone z: adjZones)
             if (z.loaded)
                 z.unload();
-        loaded = false;
     }
 
     public static Zone getZone(float x, float y) {

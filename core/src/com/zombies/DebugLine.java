@@ -7,9 +7,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Drawable;
 
-/**
- * Created by Farrah on 4/28/2016.
- */
 public class DebugLine implements Drawable {
 
     private Color color;
