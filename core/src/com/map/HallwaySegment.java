@@ -27,16 +27,17 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     private Wall originWall;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private double fromAngle, toAngle = 0; // change in angle from the last hallway segment
+    private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double fromAngle) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double previousSegmentAngle) {
         this.p1 = p1;
         this.p2 = p2;
+        this.angle = Geometry.getAngleFromPoints(p1, p2);
+        this.previousSegmentAngle = previousSegmentAngle;
         this.originWall = originWall;
-        this.fromAngle = fromAngle;
         this.diameter = diameter;
-        radius   = width / 2;
+        radius = diameter / 2;
 
         calculateInfo();
     }
@@ -52,22 +53,25 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     private void createWalls() {
         GameView.gv.addDebugDots(p1, Color.GREEN);
         GameView.gv.addDebugDots(p2, Color.RED);
-        float dy = p2.y - p1.y;
-        float dx = p2.x - p1.x;
-        double angle = Math.atan2(dy, dx);
 
-        double w1p1a = angle - Math.PI / 2 + fromAngle * 1.5; // w1p1a stands for "Wall 1, Point 1 Angle"
-        double w1p2a = angle - Math.PI / 2 + toAngle * 1.5;
-        double w2p1a = angle + Math.PI / 2 + fromAngle * 1.5;
-        double w2p2a = angle + Math.PI / 2 + toAngle * 1.5;
+        // p1aa = Point 1 Angle Average
+        double p1aa = (previousSegmentAngle + angle) / 2,
+                p2aa = (nextSegmentAngle + angle) / 2;
 
-        float radius = diameter / 2;
-        float sradius = fromAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
-        float eradius = toAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
-        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w1p1a)), (float)(sradius * Math.sin(w1p1a)))); // starting point of the wall
-        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w1p2a)), (float)(eradius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w2p1a)), (float)(sradius * Math.sin(w2p1a))));
-        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w2p2a)), (float)(eradius * Math.sin(w2p2a))));
+        // Wall 1 is on the left
+        // Wall 2 is on the right
+        // Point 1 is at the beginning
+        // Point 2 is at the end
+        double w1p1a = p1aa + Math.PI / 2;
+        double w1p2a = p2aa + Math.PI / 2;
+        double w2p1a = p1aa - Math.PI / 2;
+        double w2p2a = p2aa - Math.PI / 2;
+
+        double cornerRadius = radius * Math.sqrt(2);
+        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w1p1a)), (float)(cornerRadius * Math.sin(w1p1a)))); // starting point of the wall
+        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w1p2a)), (float)(cornerRadius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w2p1a)), (float)(cornerRadius * Math.sin(w2p1a))));
+        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w2p2a)), (float)(cornerRadius * Math.sin(w2p2a))));
 
         walls.add(new Wall(w1p1, w1p2));
         walls.add(new Wall(w2p1, w2p2));
@@ -115,7 +119,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public Vector2 getP1() {return p1;}
     public Vector2 getP2() {return p2;}
 
-    public void setToAngle(double toAngle) {this.toAngle = toAngle;}
+    public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
 
     @Override
     public String className() {

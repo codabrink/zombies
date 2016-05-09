@@ -46,4 +46,9 @@ public class Geometry {
         }
         return null;
     }
+
+    public static double getAngleFromPoints(Vector2 p1, Vector2 p2) {
+        float dx = p2.x - p1.x, dy = p2.y - p1.y;
+        return Math.atan2(dy, dx);
+    }
 }
