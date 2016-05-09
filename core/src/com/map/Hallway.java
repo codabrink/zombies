@@ -50,7 +50,7 @@ public class Hallway {
                 break;
         }
         originWall = b.getWallsByDirection().get(direction);
-        tryToMove(angle, 0);
+        tryToMove(angle, angle);
     }
 
     private float hallwayLength() { return r.nextFloat() * 10 + 15; }
@@ -61,9 +61,9 @@ public class Hallway {
         return a.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
     }
 
-    private void tryToMove(double angle, double startDeltaAngle) {
+    private void tryToMove(double angle, double fromAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall, startDeltaAngle);
+        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall, fromAngle);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
         if (o == null)
             o = Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
@@ -96,8 +96,8 @@ public class Hallway {
                 case 1: nextDeltaAngle = 0; break;
                 case 2: nextDeltaAngle = Math.PI / 2; break;
             }
-            ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setEndDeltaAngle(nextDeltaAngle);
-            tryToMove(angle + nextDeltaAngle, nextDeltaAngle);
+            ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setToAngle(angle + nextDeltaAngle);
+            tryToMove(angle + nextDeltaAngle, angle);
         } else {
             materialize();
         }

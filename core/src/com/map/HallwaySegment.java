@@ -27,14 +27,14 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     private Wall originWall;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private double startDeltaAngle, endDeltaAngle = 0; // change in angle from the last hallway segment
+    private double fromAngle, toAngle = 0; // change in angle from the last hallway segment
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double startDeltaAngle) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double fromAngle) {
         this.p1 = p1;
         this.p2 = p2;
         this.originWall = originWall;
-        this.startDeltaAngle = startDeltaAngle;
+        this.fromAngle = fromAngle;
         this.diameter = diameter;
         radius   = width / 2;
 
@@ -56,14 +56,14 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         float dx = p2.x - p1.x;
         double angle = Math.atan2(dy, dx);
 
-        double w1p1a = angle + Math.PI / 2 + startDeltaAngle * 1.5; // w1p1a stands for "Wall 1, Point 1 Angle"
-        double w1p2a = angle + Math.PI / 2 + endDeltaAngle * 1.5;
-        double w2p1a = angle - Math.PI / 2 + startDeltaAngle * 1.5;
-        double w2p2a = angle - Math.PI / 2 + endDeltaAngle * 1.5;
+        double w1p1a = angle - Math.PI / 2 + fromAngle * 1.5; // w1p1a stands for "Wall 1, Point 1 Angle"
+        double w1p2a = angle - Math.PI / 2 + toAngle * 1.5;
+        double w2p1a = angle + Math.PI / 2 + fromAngle * 1.5;
+        double w2p2a = angle + Math.PI / 2 + toAngle * 1.5;
 
         float radius = diameter / 2;
-        float sradius = startDeltaAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
-        float eradius = endDeltaAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
+        float sradius = fromAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
+        float eradius = toAngle == 0 ? radius : (float)(radius * Math.sqrt(2));
         Vector2 w1p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w1p1a)), (float)(sradius * Math.sin(w1p1a)))); // starting point of the wall
         Vector2 w1p2 = new Vector2(p2.cpy().add((float)(eradius * Math.cos(w1p2a)), (float)(eradius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
         Vector2 w2p1 = new Vector2(p1.cpy().add((float)(sradius * Math.cos(w2p1a)), (float)(sradius * Math.sin(w2p1a))));
@@ -115,7 +115,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public Vector2 getP1() {return p1;}
     public Vector2 getP2() {return p2;}
 
-    public void setEndDeltaAngle(double endDeltaAngle) {this.endDeltaAngle = endDeltaAngle;}
+    public void setToAngle(double toAngle) {this.toAngle = toAngle;}
 
     @Override
     public String className() {
