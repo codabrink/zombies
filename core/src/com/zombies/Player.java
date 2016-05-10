@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.HUD.DebugText;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -306,6 +307,8 @@ public class Player extends Unit implements Collideable {
         updateZone();
         zone.update(frame, 1);
 
+        DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
+
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 15, 300);
 
         for (int i=0;i<=C.DRAW_LAYERS;i++) {
@@ -349,6 +352,7 @@ public class Player extends Unit implements Collideable {
         if (zone != z) {
             if (zone != null)
                 zone.unload();
+
             z.load();
         }
         zone = z;

@@ -1,6 +1,10 @@
 package com.zombies;
 
 import com.HUD.DebugText;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Collideable;
 import com.interfaces.Drawable;
@@ -26,6 +30,7 @@ public class Zone implements Loadable {
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
     private ArrayList objects = new ArrayList();
     private ArrayList<Box> boxes = new ArrayList<Box>();
+    private ArrayList<DrawLine> borderLines = new ArrayList<DrawLine>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
@@ -40,6 +45,11 @@ public class Zone implements Loadable {
             drawablesList.add(new ArrayList<Drawable>());
         }
         numRooms = r.nextInt(numRooms);
+
+        if (C.ENABLE_DEBUG_LINES) {
+            addDrawableNoCheck(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)), 1);
+            addDrawableNoCheck(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)), 1);
+        }
     }
 
     public void generate() {
@@ -105,6 +115,10 @@ public class Zone implements Loadable {
             if (o instanceof Loadable)
                 ((Loadable) o).load();
         loaded = true;
+
+        for (Zone z: adjZones)
+            if (!z.loaded)
+                z.load();
     }
 
     @Override
@@ -112,10 +126,11 @@ public class Zone implements Loadable {
         for (Object o: objects)
             if (o instanceof Loadable)
                 ((Loadable) o).unload();
+        loaded = false;
+
         for (Zone z: adjZones)
             if (z.loaded)
                 z.unload();
-        loaded = false;
     }
 
     public static Zone getZone(float x, float y) {

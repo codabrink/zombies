@@ -108,6 +108,7 @@ public class Wall implements Collideable, Loadable, Drawable {
         consolidateHoles();
 
         ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
+
         Collections.sort(holePositions);
         Vector2 v1, v2;
         float length;
