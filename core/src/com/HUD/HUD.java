@@ -63,7 +63,6 @@ public class HUD implements InputProcessor{
 
                 }
             }
-            System.out.println(out);
         } if (keycode == 36) { // h (hallway)
             Box b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
             if (b != null)

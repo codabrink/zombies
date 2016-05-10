@@ -21,20 +21,23 @@ import java.util.LinkedList;
  */
 public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
-    public Vector2 a1, a2, position;
+    public Vector2 p1, p2, position;
     public float diameter, radius, width, height;
     private char direction;
     private Wall originWall;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
+    private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 a1, Vector2 a2, float width, Wall originWall) {
-        this.a1  = a1;
-        this.a2  = a2;
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double previousSegmentAngle) {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.angle = Geometry.getAngleFromPoints(p1, p2);
+        this.previousSegmentAngle = previousSegmentAngle;
         this.originWall = originWall;
-        diameter = width;
-        radius   = width / 2;
+        this.diameter = diameter;
+        radius = diameter / 2;
 
         calculateInfo();
     }
@@ -48,49 +51,56 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     }
 
     private void createWalls() {
-        GameView.gv.addDebugDots(a1, Color.GREEN);
-        GameView.gv.addDebugDots(a2, Color.RED);
-        float dy = a2.y - a1.y;
-        float dx = a2.x - a1.x;
-        double angle = Math.atan2(dy, dx);
+        GameView.gv.addDebugDots(p1, Color.GREEN);
+        GameView.gv.addDebugDots(p2, Color.RED);
 
-        double angleRight = angle + Math.PI / 2;
-        double angleLeft  = angle - Math.PI / 2;
+        // p1aa = Point 1 Angle Average
+        double p1aa = (previousSegmentAngle + angle) / 2,
+                p2aa = (nextSegmentAngle + angle) / 2;
 
-        float radius = diameter / 2;
-        Vector2 w1 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleRight)), (float)(radius*Math.sin(angleRight))));
-        Vector2 w2 = new Vector2(a1.cpy().add((float)(radius*Math.cos(angleLeft)), (float)(radius*Math.sin(angleLeft))));
+        // Wall 1 is on the left
+        // Wall 2 is on the right
+        // Point 1 is at the beginning
+        // Point 2 is at the end
+        double w1p1a = p1aa + Math.PI / 2;
+        double w1p2a = p2aa + Math.PI / 2;
+        double w2p1a = p1aa - Math.PI / 2;
+        double w2p2a = p2aa - Math.PI / 2;
 
-        //System.out.println("rad: " + angle + ", deg: " + Math.toDegrees(angle) + ", dx: " + dx + ", dy: " + dy);
+        double cornerRadius = Math.sqrt(radius*radius+radius*radius);
+        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w1p1a)), (float)(cornerRadius * Math.sin(w1p1a)))); // starting point of the wall
+        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w1p2a)), (float)(cornerRadius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w2p1a)), (float)(cornerRadius * Math.sin(w2p1a))));
+        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w2p2a)), (float)(cornerRadius * Math.sin(w2p2a))));
 
-        walls.add(new Wall(w1, a1.dst(a2), (float) Math.toDegrees(angle)));
-        walls.add(new Wall(w2, a1.dst(a2), (float) Math.toDegrees(angle)));
+        walls.add(new Wall(w1p1, w1p2));
+        walls.add(new Wall(w2p1, w2p2));
     }
 
     private void removeWalls() {
-        this.originWall.createHole(a1, diameter);
+        this.originWall.createHole(p1, diameter);
     }
 
     private void calculateInfo() {
         // calculate position
-        if (a1.x < a2.x || a1.y < a2.y) {
-            position = new Vector2(a1.x - radius, a1.y - radius);
+        if (p1.x < p2.x || p1.y < p2.y) {
+            position = new Vector2(p1.x - radius, p1.y - radius);
         } else {
-            position = new Vector2(a2.x - radius, a2.y - radius);
+            position = new Vector2(p2.x - radius, p2.y - radius);
         }
 
         // calculate width and height
-        width = Math.abs(a1.x - a2.x) + diameter;
-        height = Math.abs(a1.y - a2.y) + diameter;
+        width = Math.abs(p1.x - p2.x) + diameter;
+        height = Math.abs(p1.y - p2.y) + diameter;
 
         // calculate direction
-        if (a1.x < a2.x)
+        if (p1.x < p2.x)
             direction = 'e';
-        else if (a1.x > a2.x)
+        else if (p1.x > p2.x)
             direction = 'w';
-        else if (a1.y < a2.y)
+        else if (p1.y < p2.y)
             direction = 'n';
-        else if (a1.y > a2.y)
+        else if (p1.y > p2.y)
             direction = 's';
     }
 
@@ -102,9 +112,14 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         Zone.getZone(getCenter()).addObject(this);
     }
 
-    private Vector2 getCenter() {
+    public Vector2 getCenter() {
         return position.cpy().add(width / 2, height / 2);
     }
+
+    public Vector2 getP1() {return p1;}
+    public Vector2 getP2() {return p2;}
+
+    public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
 
     @Override
     public String className() {
@@ -151,6 +166,20 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        // left line
+        Vector2 i = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // top line
+            i = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // right line
+            i = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+        if (i == null) // bottom line
+            i = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+
+        return i;
     }
 
     @Override

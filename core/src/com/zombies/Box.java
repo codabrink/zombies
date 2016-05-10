@@ -64,19 +64,19 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
 
     public void genOuterWalls() {
         if (adjBoxes.get('n') == null) {
-            walls.add(new Wall(position.cpy().add(0, height), width, 0)); // top wall
+            walls.add(new Wall(position.cpy().add(0, height), position.cpy().add(width, height))); // top wall
             wallsByDirection.put('n', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('e') == null) {
-            walls.add(new Wall(position.cpy().add(width, 0), height, 90)); // right wall
+            walls.add(new Wall(position.cpy().add(width, 0), position.cpy().add(width, height))); // right wall
             wallsByDirection.put('e', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('s') == null) {
-            walls.add(new Wall(position.cpy(), width, 0)); // bottom wall
+            walls.add(new Wall(position.cpy(), position.cpy().add(width, 0))); // bottom wall
             wallsByDirection.put('s', walls.get(walls.size() - 1));
         }
         if (adjBoxes.get('w') == null) {
-            walls.add(new Wall(position.cpy(), height, 90)); // left wall
+            walls.add(new Wall(position.cpy(), position.cpy().add(0, height))); // left wall
             wallsByDirection.put('w', walls.get(walls.size() - 1));
         }
     }
@@ -224,6 +224,13 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return adjBoxes.get(direction);
     }
     public HashMap<Character, Box> getAdjBoxes() {return adjBoxes;}
+    public boolean isAdjacent(Box b) {
+        for (Box bb: adjBoxes.values()) {
+            if (b == bb)
+                return true;
+        }
+        return false;
+    }
 
 
     // Box Map Location - used during room generation in MapGen.java
@@ -271,6 +278,20 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
                 return edge('e');
         }
         return 0;
+    }
+
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        // left line
+        Vector2 ip = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // top line
+            ip = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // right line
+            ip = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+        if (ip == null) // bottom line
+            ip = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+
+        return ip;
     }
 
     @Override
