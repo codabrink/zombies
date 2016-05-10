@@ -17,7 +17,6 @@ import com.interfaces.Collideable;
 import com.interfaces.Drawable;
 import com.interfaces.Loadable;
 import com.util.Geometry;
-import com.util.MyVector2;
 
 public class Wall implements Collideable, Loadable, Drawable {
     private Vector2 p1, p2, center;
@@ -66,105 +65,93 @@ public class Wall implements Collideable, Loadable, Drawable {
 
     public Body getBody() {return body;}
 
-    public void createHole(Vector2 holePosition, float holeSize) {
+    public void consolidateHoles() {
+        ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
+        Collections.sort(holePositions);
+        for (int i = 0; i < holePositions.size() - 1; i++) {
+            Float holePosition, nextHolePosition, holeRadius, nextHoleRadius;
+            holePosition = holePositions.get(i);
+            holeRadius = holes.get(holePosition) / 2;
+            nextHolePosition = holePositions.get(i + 1);
+            nextHoleRadius = holes.get(nextHolePosition) / 2;
+
+            if (holePosition + holeRadius > nextHolePosition - nextHoleRadius) {
+                float newHolePosition, newHoleSize;
+                newHolePosition = ((nextHolePosition + nextHoleRadius) + (holePosition - holeRadius)) / 2;
+                newHoleSize = ((nextHolePosition + nextHoleRadius) - (holePosition - holeRadius));
+
+                // consolidate the two holes
+                holes.remove(holePosition);
+                holes.remove(nextHolePosition);
+                holes.put(newHolePosition, newHoleSize);
+
+                consolidateHoles(); // rinse and repeat
+                return;
+            }
+        }
+    }
+
+    public void createHole(Vector2 holePoint, float holeSize) {
+        float dst = p1.dst(holePoint);
+        if (dst > p1.dst(p2))
+            return; // this is beyond the scope of the wall
+
         view.getWorld().destroyBody(body);
         body = view.getWorld().createBody(new BodyDef());
-        body.setTransform(new Vector2(p1.x, p1.y), body.getAngle());
+        body.setTransform(p1, body.getAngle());
         body.setUserData(new BodData("wall", this));
         lines = new ArrayList<DrawLine>();
 
         // if holePosition is not on line, this function will
         // swing the vector2 onto the line using p1 as the axis
-        float dst = body.getPosition().dst(holePosition);
         holes.put(dst, holeSize);
+        consolidateHoles();
 
-        HashMap<Float, Float> consolidatedHoles;
-        ArrayList<Float> holePositions;
-
-        // if there are more than 2 holes, check if any overlap and can be joined.
-        while (holes.size() >= 2) {
-
-            consolidatedHoles = new HashMap<Float, Float>();
-            holePositions = new ArrayList<Float>(holes.keySet());
-            Collections.sort(holePositions);
-            float nextHoleEndPoint, nextHoleStartPoint, thisHoleEndPoint, thisHoleStartPoint;
-            boolean lastHoleConsolidated = false;
-
-            for (int i = 0; i <= holePositions.size() - 2; i++) {
-
-                thisHoleEndPoint = holePositions.get(i) + holes.get(holePositions.get(i)) / 2;
-                nextHoleStartPoint = holePositions.get(i + 1) - holes.get(holePositions.get(i + 1)) / 2;
-
-                if (thisHoleEndPoint >= nextHoleStartPoint) {
-                    thisHoleStartPoint = holePositions.get(i) - holes.get(holePositions.get(i)) / 2;
-                    nextHoleEndPoint = holePositions.get(i + 1) + holes.get(holePositions.get(i + 1)) / 2;
-                    consolidatedHoles.put(thisHoleStartPoint + (nextHoleEndPoint - thisHoleStartPoint) / 2, nextHoleEndPoint - thisHoleStartPoint);
-
-                    if (i == holePositions.size() - 2) {
-                        lastHoleConsolidated = true;
-                    }
-
-                    // skip the next iteration, because the next hole has been absorbed into this one.
-                    i = i + 1;
-                } else {
-                    consolidatedHoles.put(holePositions.get(i), holes.get(holePositions.get(i)));
-                }
-            }
-
-            // the last hole is not iterated over on its own, so make sure it gets included.
-            if (!lastHoleConsolidated) {
-                consolidatedHoles.put(holePositions.get(holePositions.size() - 1), holes.get(holePositions.get(holePositions.size() - 1)));
-            }
-
-            // System.out.println("Consolidated: " + consolidatedHoles);
-            // System.out.println("Original:     " + holes);
-
-            if (consolidatedHoles.equals(holes)) {
-                break;
-            } else {
-                holes = consolidatedHoles;
-            }
-        }
-
-        holePositions = new ArrayList<Float>(holes.keySet());
+        ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
         Collections.sort(holePositions);
-        Vector2 v1;
-        MyVector2 vo, v2;
+        Vector2 v1, v2;
+        float length;
 
-        for (int i=0;i<holePositions.size();i++) {
-
-            // distance to current hole starting point and wall angle.
-            vo = new MyVector2(0, 0, Math.max(holePositions.get(i) - holes.get(holePositions.get(i)) / 2, 0), p1.angle());
+        for (int i = 0; i < holePositions.size(); i++) {
             // v1 describes the wall segment before this hole.
             // the position of the end of the last hole (or the start of the wall if there isn't one),
             // the distance between the start of the last hole and the beginning of this one, the wall angle.
-            v1 = (i == 0 ? vo : new Vector2((float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.cos(p1.angle() * Math.PI / 180)),
-                    (float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.sin(p1.angle() * Math.PI / 180))));
+            float holePosition = holePositions.get(i);
+            float holeDiameter = holes.get(holePosition), holeRadius = holeDiameter / 2;
 
-            float length = Math.max(holePositions.get(i) - holes.get(holePositions.get(i)) / 2 - (holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2), 0);
+            if (i == 0) {
+                v1 = new Vector2(0, 0);
+                length = Math.max(holePosition - holeRadius, 0);
+            } else {
+                float previousHolePosition = holePositions.get(i - 1);
+                float previousHoleDiameter = holes.get(previousHolePosition), previousHoleRadius = previousHoleDiameter / 2;
+
+                v1 = new Vector2((float)((previousHolePosition + previousHoleRadius) * Math.cos(angle)),
+                        (float)((previousHolePosition + previousHoleRadius) * Math.sin(angle)));
+                length = Math.max((holePosition - holeRadius) - (previousHolePosition + previousHoleRadius), 0);
+            }
 
             if (length > 0) {
                 EdgeShape shape = new EdgeShape();
-                shape.set(v1, Geometry.travelVector(v1, angle, length));
-                lines.add(new DrawLine(v1.cpy().add(body.getPosition()), Geometry.travelVector(v1, angle, length).add(body.getPosition())));
+                shape.set(v1, Geometry.projectVector(v1, angle, length));
                 body.createFixture(shape, 0);
+                v1.add(body.getPosition());
+                lines.add(new DrawLine(v1, Geometry.projectVector(v1, angle, length)));
             }
 
             // if this is the last hole in the wall, draw the wall segment after it too.
             if (i == holePositions.size() - 1) {
-
                 // v2 describes the wall segment after this wall.
-                v2 = new MyVector2((float)((holePositions.get(i) + holes.get(holePositions.get(i)) / 2) * Math.cos(p1.angle() * Math.PI / 180)),
-                        (float)((holePositions.get(i) + holes.get(holePositions.get(i)) / 2) * Math.sin(p1.angle() * Math.PI / 180)),
-                        Math.max(p1.len() - (holePositions.get(i) + holes.get(holePositions.get(i)) / 2), 0),
-                        p1.angle());
+                v2 = new Vector2((float)((holePosition + holeDiameter) * Math.cos(angle)),
+                        (float)((holePosition + holeDiameter) * Math.sin(angle)));
+                length = Math.max(p1.dst(p2) - (holePosition + holeDiameter), 0);
 
-                if (v2.len() > 0) {
+                if (length > 0) {
                     EdgeShape shape2 = new EdgeShape();
-                    shape2.set(v2, v2.end());
+                    shape2.set(v2, Geometry.projectVector(v2, angle, length));
                     body.createFixture(shape2, 0);
-                    lines.add(new DrawLine(v2.cpy().add(body.getPosition()), v2.end().cpy().add(body.getPosition())));
-                    lines.get(lines.size() - 1).setColor(Color.ORANGE);
+                    v2.add(body.getPosition());
+                    lines.add(new DrawLine(v2, Geometry.projectVector(v2, angle, length)));
                 }
             }
         }

@@ -67,7 +67,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         double w2p1a = p1aa - Math.PI / 2;
         double w2p2a = p2aa - Math.PI / 2;
 
-        double cornerRadius = radius * Math.sqrt(2);
+        double cornerRadius = Math.sqrt(radius*radius+radius*radius);
         Vector2 w1p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w1p1a)), (float)(cornerRadius * Math.sin(w1p1a)))); // starting point of the wall
         Vector2 w1p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w1p2a)), (float)(cornerRadius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
         Vector2 w2p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w2p1a)), (float)(cornerRadius * Math.sin(w2p1a))));

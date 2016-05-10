@@ -52,7 +52,7 @@ public class Geometry {
         return Math.atan2(dy, dx);
     }
 
-    public static Vector2 travelVector(Vector2 v, double angle, float length) {
+    public static Vector2 projectVector(Vector2 v, double angle, float length) {
         return v.cpy().add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
     }
 }
