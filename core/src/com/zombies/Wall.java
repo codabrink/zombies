@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.interfaces.Collideable;
 import com.interfaces.Drawable;
 import com.interfaces.Loadable;
+import com.util.Geometry;
 import com.util.MyVector2;
 
 public class Wall implements Collideable, Loadable, Drawable {
@@ -86,10 +87,7 @@ public class Wall implements Collideable, Loadable, Drawable {
             consolidatedHoles = new HashMap<Float, Float>();
             holePositions = new ArrayList<Float>(holes.keySet());
             Collections.sort(holePositions);
-            float nextHoleEndPoint;
-            float nextHoleStartPoint;
-            float thisHoleEndPoint;
-            float thisHoleStartPoint;
+            float nextHoleEndPoint, nextHoleStartPoint, thisHoleEndPoint, thisHoleStartPoint;
             boolean lastHoleConsolidated = false;
 
             for (int i = 0; i <= holePositions.size() - 2; i++) {
@@ -130,7 +128,8 @@ public class Wall implements Collideable, Loadable, Drawable {
 
         holePositions = new ArrayList<Float>(holes.keySet());
         Collections.sort(holePositions);
-        MyVector2 vo, v1, v2;
+        Vector2 v1;
+        MyVector2 vo, v2;
 
         for (int i=0;i<holePositions.size();i++) {
 
@@ -139,16 +138,15 @@ public class Wall implements Collideable, Loadable, Drawable {
             // v1 describes the wall segment before this hole.
             // the position of the end of the last hole (or the start of the wall if there isn't one),
             // the distance between the start of the last hole and the beginning of this one, the wall angle.
-            v1 = (i == 0 ? vo : new MyVector2((float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.cos(p1.angle() * Math.PI / 180)),
-                    (float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.sin(p1.angle() * Math.PI / 180)),
-                    Math.max(holePositions.get(i) - holes.get(holePositions.get(i)) / 2 - (holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2), 0),
-                    p1.angle()));
+            v1 = (i == 0 ? vo : new Vector2((float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.cos(p1.angle() * Math.PI / 180)),
+                    (float)((holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2) * Math.sin(p1.angle() * Math.PI / 180))));
 
-            if (v1.len() > 0) {
+            float length = Math.max(holePositions.get(i) - holes.get(holePositions.get(i)) / 2 - (holePositions.get(i-1) + holes.get(holePositions.get(i-1)) / 2), 0);
+
+            if (length > 0) {
                 EdgeShape shape = new EdgeShape();
-                shape.set(v1, v1.end());
-                lines.add(new DrawLine(v1.cpy().add(body.getPosition()), v1.end().cpy().add(body.getPosition())));
-                lines.get(lines.size()-1).setColor(Color.PURPLE);
+                shape.set(v1, Geometry.travelVector(v1, angle, length));
+                lines.add(new DrawLine(v1.cpy().add(body.getPosition()), Geometry.travelVector(v1, angle, length).add(body.getPosition())));
                 body.createFixture(shape, 0);
             }
 

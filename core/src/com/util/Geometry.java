@@ -51,4 +51,8 @@ public class Geometry {
         float dx = p2.x - p1.x, dy = p2.y - p1.y;
         return Math.atan2(dy, dx);
     }
+
+    public static Vector2 travelVector(Vector2 v, double angle, float length) {
+        return v.cpy().add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+    }
 }
