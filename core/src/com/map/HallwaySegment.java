@@ -34,6 +34,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         this.p1 = p1;
         this.p2 = p2;
         this.angle = Geometry.getAngleFromPoints(p1, p2);
+        this.nextSegmentAngle = this.angle;
         this.previousSegmentAngle = previousSegmentAngle;
         this.originWall = originWall;
         this.diameter = diameter;
@@ -67,11 +68,12 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         double w2p1a = p1aa - Math.PI / 2;
         double w2p2a = p2aa - Math.PI / 2;
 
-        double cornerRadius = Math.sqrt(radius*radius+radius*radius);
-        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w1p1a)), (float)(cornerRadius * Math.sin(w1p1a)))); // starting point of the wall
-        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w1p2a)), (float)(cornerRadius * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(cornerRadius * Math.cos(w2p1a)), (float)(cornerRadius * Math.sin(w2p1a))));
-        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(cornerRadius * Math.cos(w2p2a)), (float)(cornerRadius * Math.sin(w2p2a))));
+        float p1r = Math.abs(previousSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
+        float p2r = Math.abs(nextSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
+        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
+        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
+        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
 
         walls.add(new Wall(w1p1, w1p2));
         walls.add(new Wall(w2p1, w2p2));
