@@ -63,6 +63,10 @@ public class Wall implements Collideable, Loadable, Drawable {
         }
     }
 
+    public Double getAngle() { return angle; }
+    public Vector2 getStart() { return p1; }
+    public Vector2 getEnd() { return p2; }
+
     public Body getBody() {return body;}
 
     public void consolidateHoles() {

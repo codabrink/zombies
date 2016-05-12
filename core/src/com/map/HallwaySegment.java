@@ -24,19 +24,17 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public Vector2 p1, p2, position;
     public float diameter, radius, width, height;
     private char direction;
-    private Wall originWall;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Wall originWall, double previousSegmentAngle) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle) {
         this.p1 = p1;
         this.p2 = p2;
         this.angle = Geometry.getAngleFromPoints(p1, p2);
         this.nextSegmentAngle = this.angle;
         this.previousSegmentAngle = previousSegmentAngle;
-        this.originWall = originWall;
         this.diameter = diameter;
         radius = diameter / 2;
 
@@ -46,7 +44,6 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public void materialize() {
         calculateInfo(); // do this a second time
         createWalls();
-        removeWalls();
         registerDrawable();
         registerOverlappable();
     }
@@ -77,10 +74,6 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
 
         walls.add(new Wall(w1p1, w1p2));
         walls.add(new Wall(w2p1, w2p2));
-    }
-
-    private void removeWalls() {
-        this.originWall.createHole(p1, diameter);
     }
 
     private void calculateInfo() {

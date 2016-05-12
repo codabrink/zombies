@@ -17,6 +17,7 @@ public class Room implements Loadable, HasZone {
     private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
+    private ArrayList<Wall> walls = new ArrayList<Wall>();
     private Random random = new Random();
     private boolean alarmed = false;
     private float alpha = 0;
@@ -59,9 +60,10 @@ public class Room implements Loadable, HasZone {
     }
 
     public void load() {
-        for (Box b : boxes) {
+        for (Box b : boxes)
             b.load();
-        }
+        for (Wall w: walls)
+            w.load();
         loaded = true;
     }
 
@@ -69,6 +71,8 @@ public class Room implements Loadable, HasZone {
         for (Box b: boxes) {
             b.unload();
         }
+        for (Wall w: walls)
+            w.unload();
         loaded = false;
     }
 
@@ -86,9 +90,55 @@ public class Room implements Loadable, HasZone {
     }
 
     public void genOuterWalls() {
+        
+        // proposedPositions are sets of points where walls could be placed.
+        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
+
+        // propose positions for each box in the room.
         for (Box b: boxes) {
-            b.genOuterWalls();
+            proposedPositions.addAll(b.proposeWallPositions());
         }
+        
+        proposedPositions = consolidateWallPositions(proposedPositions);
+
+        for (ArrayList<Vector2> pstn: proposedPositions) {
+            walls.add(new Wall(pstn.get(0), pstn.get(1)));
+        }
+    }
+    
+    // consolidate the proposed walls into as few as possible.
+    public ArrayList<ArrayList<Vector2>> consolidateWallPositions(ArrayList<ArrayList<Vector2>> proposedPositions) {
+
+        ArrayList<ArrayList<Vector2>> iteratedPositions = new ArrayList<ArrayList<Vector2>>(proposedPositions);
+
+        for (ArrayList<Vector2> pstn1: iteratedPositions) {
+            for (ArrayList<Vector2> pstn2: iteratedPositions) {
+
+                // if the first wall's end meets the other wall's start and they have the same
+                // angle...
+                if (pstn1.get(1).equals(pstn2.get(0)) && Math.abs(pstn1.get(1).cpy().sub(pstn1.get(0)).angle() - (pstn2.get(1).cpy().sub(pstn2.get(0)).angle())) < 0.0001) {
+
+                    // System.out.println("Walls match up.");
+                    // System.out.println("pstn1: " + pstn1);
+                    // System.out.println("pstn2: " + pstn2);
+
+                    ArrayList<Vector2> points = new ArrayList<Vector2>();
+                    points.add(pstn1.get(0));
+                    points.add(pstn2.get(1));
+
+                    proposedPositions.add(points);
+
+                    proposedPositions.remove(pstn1);
+                    proposedPositions.remove(pstn2);
+
+                    // keep going until no more matched walls are found.
+                    proposedPositions = consolidateWallPositions(proposedPositions);
+                    return proposedPositions;
+                }
+            }
+        }
+
+        return proposedPositions;
     }
 
     public Unit findUnit(Body b) {
@@ -102,27 +152,15 @@ public class Room implements Loadable, HasZone {
     }
 
     public Wall findWall(Body b) {
-        for (Box box: boxes) {
-            for (Wall w: box.getWalls()) {
-                if (w != null && w.getBody().getPosition().x == b.getPosition().x && w.getBody().getPosition().y == b.getPosition().y) {
-                    return w;
-                }
+        for (Wall w: walls) {
+            if (w != null && w.getBody().getPosition().x == b.getPosition().x && w.getBody().getPosition().y == b.getPosition().y) {
+                return w;
             }
         }
         return null;
     }
 
-    public ArrayList<Wall> getWalls() {
-        ArrayList<Wall> roomWalls = new ArrayList<Wall>();
-
-        for (Box box: boxes) {
-            for (Wall wall: box.getWalls()) {
-                roomWalls.add(wall);
-            }
-        }
-
-        return roomWalls;
-    }
+    public ArrayList<Wall> getWalls() { return walls; }
 
     public ArrayList<Box> getBoxes() {
         return boxes;

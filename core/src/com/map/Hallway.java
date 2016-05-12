@@ -49,7 +49,6 @@ public class Hallway {
                 axes.add(new Vector2(b.getPosition().x, vertBoxRange(b, width)));
                 break;
         }
-        originWall = b.getWallsByDirection().get(direction);
         tryToMove(angle, angle);
     }
 
@@ -63,7 +62,7 @@ public class Hallway {
 
     private void tryToMove(double angle, double previousSegmentAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, originWall, previousSegmentAngle);
+        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
         if (o == null)
             o = Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);

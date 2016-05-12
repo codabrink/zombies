@@ -20,13 +20,11 @@ import com.powerups.ShotgunPickup;
 import com.util.Geometry;
 
 public class Box implements Drawable, Overlappable, Loadable, HasZone {
-    private ArrayList<Wall> walls = new ArrayList<Wall>();
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
-    private HashMap<Character, Wall> wallsByDirection = new HashMap<Character, Wall>();
     private Vector2 position;
     private int indexX, indexY;
     private Room room;
@@ -62,23 +60,37 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
             powerups.add(new HealthPickup(this));
     }
 
-    public void genOuterWalls() {
+    // detect where this box should have walls, but don't create them yet.
+    public ArrayList<ArrayList<Vector2>> proposeWallPositions() {
+
+        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
+
         if (adjBoxes.get('n') == null) {
-            walls.add(new Wall(position.cpy().add(0, height), position.cpy().add(width, height))); // top wall
-            wallsByDirection.put('n', walls.get(walls.size() - 1));
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            points.add(new Vector2(position.cpy().add(0, height)));
+            points.add(new Vector2(position.cpy().add(width, height)));
+            proposedPositions.add(points); // top wall
         }
         if (adjBoxes.get('e') == null) {
-            walls.add(new Wall(position.cpy().add(width, 0), position.cpy().add(width, height))); // right wall
-            wallsByDirection.put('e', walls.get(walls.size() - 1));
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            points.add(new Vector2(position.cpy().add(width, 0)));
+            points.add(new Vector2(position.cpy().add(width, height)));
+            proposedPositions.add(points); // right wall
         }
         if (adjBoxes.get('s') == null) {
-            walls.add(new Wall(position.cpy(), position.cpy().add(width, 0))); // bottom wall
-            wallsByDirection.put('s', walls.get(walls.size() - 1));
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            points.add(new Vector2(position.cpy()));
+            points.add(new Vector2(position.cpy().add(width, 0)));
+            proposedPositions.add(points); // bottom wall
         }
         if (adjBoxes.get('w') == null) {
-            walls.add(new Wall(position.cpy(), position.cpy().add(0, height))); // left wall
-            wallsByDirection.put('w', walls.get(walls.size() - 1));
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            points.add(new Vector2(position.cpy()));
+            points.add(new Vector2(position.cpy().add(0, height)));
+            proposedPositions.add(points); // left wall
         }
+
+        return proposedPositions;
     }
 
     public float x() {return position.x;}
@@ -188,14 +200,6 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return zombies;
     }
 
-    public Wall getWall(int i) {
-        return walls.get(i);
-    }
-
-    public ArrayList<Wall> getWalls() { return walls; }
-
-    public HashMap<Character, Wall> getWallsByDirection() { return wallsByDirection; }
-
     public Vector2 randomPoint() {
         return position.cpy().add(random.nextFloat() * C.BOX_WIDTH, random.nextFloat() * C.BOX_HEIGHT);
     }
@@ -296,13 +300,11 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
 
     @Override
     public void load() {
-        for (Wall w: walls)
-            w.load();
+
     }
     @Override
     public void unload() {
-        for (Wall w: walls)
-            w.unload();
+
     }
     @Override
     public Zone getZone() {
