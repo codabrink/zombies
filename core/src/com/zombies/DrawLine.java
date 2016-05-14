@@ -50,6 +50,8 @@ public class DrawLine {
 
     public void buildMesh(ModelBuilder modelBuilder, Vector2 modelCenter) {
         float dx = p2.x - p1.x, dy = p2.y - p1.y;
+        dx = (float)(p1.dst(p2) * Math.cos(angle) / 2);
+        dy = (float)(p1.dst(p2) * Math.sin(angle) / 2);
         Assets.meshBuilder.begin(Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
         Assets.meshBuilder.box(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
         modelBuilder.part(Integer.toString(System.identityHashCode(this)),
