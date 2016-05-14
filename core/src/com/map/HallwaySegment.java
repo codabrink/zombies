@@ -100,7 +100,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     }
 
     private void registerDrawable() {
-        Zone.getZone(getCenter()).addDrawable(this, 0);
+        Zone.getZone(getCenter()).addDrawable(this);
     }
 
     private void registerOverlappable() {

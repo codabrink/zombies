@@ -5,15 +5,19 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
+import com.util.Assets;
 
-public class Room implements Loadable, HasZone {
+public class Room implements Loadable, HasZone, Drawable {
     private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
@@ -26,6 +30,10 @@ public class Room implements Loadable, HasZone {
     private int frame;
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
+    private Vector2 center;
+
+    private Model wallModel;
+    private ModelInstance wallModelInstance;
 
     public Room(Collection<Box> boxes) {
         view = GameView.gv;
@@ -33,10 +41,14 @@ public class Room implements Loadable, HasZone {
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
-            Zone.getZone(b.getPosition()).addDrawableNoCheck(b, 0);
+            Zone.getZone(b.getPosition()).addDrawableNoCheck(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
+
+        center = calculateMedian();
+        genOuterWalls();
+        Zone.getZone(center).addDrawableNoCheck(this);
     }
 
     // calculates the median position of all of the boxes
@@ -90,7 +102,6 @@ public class Room implements Loadable, HasZone {
     }
 
     public void genOuterWalls() {
-        
         // proposedPositions are sets of points where walls could be placed.
         ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
 
@@ -104,6 +115,8 @@ public class Room implements Loadable, HasZone {
         for (ArrayList<Vector2> pstn: proposedPositions) {
             walls.add(new Wall(pstn.get(0), pstn.get(1)));
         }
+
+        buildWallsModel();
     }
     
     // consolidate the proposed walls into as few as possible.
@@ -190,6 +203,16 @@ public class Room implements Loadable, HasZone {
         return null;
     }
 
+    private void buildWallsModel() {
+        Assets.modelBuilder.begin();
+        for (Wall w: walls) {
+            w.buildWallMesh(Assets.modelBuilder);
+        }
+        wallModel = Assets.modelBuilder.end();
+        wallModelInstance = new ModelInstance(wallModel);
+        wallModelInstance.transform.setTranslation(center.x, center.y, 0);
+    }
+
     public LinkedList<Unit> getAliveUnits() {
         LinkedList<Unit> units = new LinkedList<Unit>();
         for (Box b: boxes) {
@@ -210,5 +233,17 @@ public class Room implements Loadable, HasZone {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    @Override
+    public String className() {
+        return "Room";
+    }
+
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        modelBatch.begin(GameView.gv.getCamera());
+        modelBatch.render(wallModelInstance, GameView.gv.environment);
+        modelBatch.end();
     }
 }

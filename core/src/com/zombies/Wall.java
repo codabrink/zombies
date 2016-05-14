@@ -3,10 +3,13 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -14,11 +17,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.interfaces.Collideable;
-import com.interfaces.Drawable;
 import com.interfaces.Loadable;
 import com.util.Geometry;
 
-public class Wall implements Collideable, Loadable, Drawable {
+public class Wall implements Collideable, Loadable {
     private Vector2 p1, p2, center;
     private double angle;
     private Body body;
@@ -43,18 +45,13 @@ public class Wall implements Collideable, Loadable, Drawable {
         body.setUserData(new BodData("wall", this));
 
         lines.add(new DrawLine(p1, p2));
-        Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
+        //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
     }
 
     public void setColor(Color c) {
         for (DrawLine dl : lines) {
             dl.setColor(c);
         }
-    }
-
-    @Override
-    public String className() {
-        return null;
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
@@ -160,6 +157,11 @@ public class Wall implements Collideable, Loadable, Drawable {
                 }
             }
         }
+    }
+
+    public void buildWallMesh(ModelBuilder modelBuilder) {
+        for (DrawLine dl: lines)
+            dl.buildMesh(modelBuilder);
     }
 
     @Override

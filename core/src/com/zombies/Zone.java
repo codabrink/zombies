@@ -1,42 +1,43 @@
 package com.zombies;
 
 import com.HUD.DebugText;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.interfaces.Collideable;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.interfaces.Updateable;
-import com.map.*;
-
+import com.map.MapGen;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
-/**
- * Created by coda on 2/27/2016.
- */
-public class Zone implements Loadable {
+public class Zone {
     private Vector2 position;
-    private int frame, fsAdjCheck=0, layer;
+    private int updateFrame, drawFrame;
+    public int loadIndex; // Tracks on what frame the zone was loaded
     private static Random r;
-    public boolean loaded = false;
 
+    // Static Variables
+    public static HashMap<String, Zone> zones;
+    public static ArrayList<Zone> loadedZones;
+    public static Zone currentZone;
+    public static int globalLoadIndex = 0;
+    // Collections
     private ArrayList<Zone> adjZones = new ArrayList<Zone>();
-    private ArrayList objects = new ArrayList();
+    private ArrayList<Overlappable> overlappables = new ArrayList<Overlappable>();
+    private ArrayList<Updateable> updateables = new ArrayList<Updateable>();
     private ArrayList<Box> boxes = new ArrayList<Box>();
-    private ArrayList<DrawLine> borderLines = new ArrayList<DrawLine>();
     private ArrayList<Room> rooms = new ArrayList<Room>();
+    private ArrayList<Loadable> loadables = new ArrayList<Loadable>();
+    private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+    private ArrayList<Drawable> debugLines = new ArrayList<Drawable>();
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
 
     public int numRooms = 2; // number of rooms that are supposed to exist in the zone
-    public int roomGenFailureCount = 0; // number of rooms that failed to generate
+    public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap
 
     public Zone(float x, float y) {
         r = GameView.gv.random;
@@ -47,8 +48,8 @@ public class Zone implements Loadable {
         numRooms = r.nextInt(numRooms);
 
         if (C.ENABLE_DEBUG_LINES) {
-            addDrawableNoCheck(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)), 1);
-            addDrawableNoCheck(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)), 1);
+            debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
+            debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)));
         }
     }
 
@@ -56,32 +57,31 @@ public class Zone implements Loadable {
         MapGen.fillZone(this);
     }
 
-    public void draw(int frame, int limit, int layer) {
-        if (this.frame == frame && this.layer == layer)
+    public void draw(int frame, int limit) {
+        if (drawFrame == frame)
             return;
-        this.frame = frame;
-        this.layer = layer;
+        drawFrame = frame;
 
-        for (Drawable d: drawablesList.get(layer)) {
+        for (Drawable d: drawables)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-        }
+        for (Drawable d: debugLines)
+            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
 
         if (limit > 0)
             for (Zone z: adjZones) {
-                z.draw(frame, limit - 1, layer);
+                z.draw(frame, limit - 1);
             }
     }
 
     public void update(int frame, int limit) {
-        if (this.frame == frame)
+        if (updateFrame == frame)
             return;
-        this.frame = frame;
+        updateFrame = frame;
 
         MapGen.update(this); // generate the map
 
-        for (Object o: objects)
-            if (o instanceof Updateable)
-                ((Updateable) o).update();
+        for (Updateable u: updateables)
+            u.update();
 
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
 
@@ -106,46 +106,58 @@ public class Zone implements Loadable {
             if (z != this && adjZones.indexOf(z) == -1)
                 adjZones.add(z);
         }
-        fsAdjCheck = 0;
     }
 
-    @Override
-    public void load() {
-        for (Object o: objects)
-            if (o instanceof Loadable)
-                ((Loadable) o).load();
-        loaded = true;
+    public void load(int limit) {
+        if (loadIndex == Zone.globalLoadIndex)
+            return; // already loaded
+        loadIndex = Zone.globalLoadIndex;
+        Zone.loadedZones.add(this);
 
-        for (Zone z: adjZones)
-            if (!z.loaded)
-                z.load();
+        for (Loadable l: loadables)
+            l.load();
+
+        if (limit > 0)
+            for (Zone z: adjZones)
+                z.load(limit - 1);
     }
 
-    @Override
     public void unload() {
-        for (Object o: objects)
-            if (o instanceof Loadable)
-                ((Loadable) o).unload();
-        loaded = false;
-
-        for (Zone z: adjZones)
-            if (z.loaded)
-                z.unload();
+        for (Loadable l: loadables)
+            l.unload();
     }
 
     public static Zone getZone(float x, float y) {
         int indX = (int)Math.floor(x / C.ZONE_SIZE);
         int indY = (int)Math.floor(y / C.ZONE_SIZE);
 
-        Zone z = GameView.gv.zones.get("row"+indY+"column"+indX);
+        Zone z = zones.get("row"+indY+"column"+indX);
         if (z == null) {
             z = new Zone(indX * C.ZONE_SIZE, indY * C.ZONE_SIZE);
-            GameView.gv.zones.put("row"+indY+"column"+indX, z);
+            zones.put("row"+indY+"column"+indX, z);
         }
         return z;
     }
     public static Zone getZone(Vector2 v) {
         return getZone(v.x, v.y);
+    }
+    public static boolean setCurrentZone(Zone z) {
+        if (Zone.currentZone == z)
+            return false;
+
+        Zone.globalLoadIndex++;
+        Zone.currentZone = z;
+        z.load(C.DRAW_DISTANCE);
+
+        // unload dormant zones
+        for (Iterator<Zone> it = loadedZones.iterator(); it.hasNext();) {
+            Zone zz = it.next();
+            if (zz.loadIndex != Zone.globalLoadIndex) {
+                zz.unload();
+                it.remove();
+            }
+        }
+        return true;
     }
 
     public Box getBox(float x, float y) {
@@ -160,29 +172,39 @@ public class Zone implements Loadable {
     }
 
     public void addObject(HasZone o) {
+        // DON'T USE THIS METHOD TO ADD A DRAWABLE
+        // USE addDrawable(..,..) INSTEAD
         if (o.getZone() != null)
             o.getZone().removeObject(o);
         o.setZone(this);
-
-        objects.add(o);
 
         // KEEP RECORDS
         if (o instanceof Room)
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
+        if (o instanceof Overlappable)
+            addOverlappable((Overlappable) o);
+        if (o instanceof Loadable)
+            addLoadable((Loadable) o);
+        if (o instanceof Updateable)
+            addUpdateable((Updateable) o);
     }
-    public boolean removeObject(HasZone o) {
+    public void removeObject(HasZone o) {
         o.setZone(null);
 
-        // KEEP RECORDS
         if (o instanceof Room)
             removeRoom((Room) o);
         if (o instanceof Box)
             removeBox((Box) o);
-
-        drawablesList.remove(o);
-        return objects.remove(o);
+        if (o instanceof Overlappable)
+            removeOverlappable((Overlappable) o);
+        if (o instanceof Loadable)
+            removeLoadable((Loadable) o);
+        if (o instanceof Drawable)
+            removeDrawable((Drawable) o);
+        if (o instanceof Updateable)
+            removeUpdateable((Updateable) o);
     }
 
     public Vector2 getPosition() {
@@ -217,23 +239,40 @@ public class Zone implements Loadable {
     private void removeBox(Box b) {
         boxes.remove(b);
     }
-
-    public void addDrawable(Drawable d, int layer) {
-        ArrayList<Drawable> drawables = drawablesList.get(layer);
+    public void addDrawable(Drawable d) {
         if (drawables.indexOf(d) == -1)
             drawables.add(d);
     }
-    public void addDrawableNoCheck(Drawable d, int layer) {
-        ArrayList<Drawable> drawables = drawablesList.get(layer);
+    public void addDrawableNoCheck(Drawable d) {
         drawables.add(d);
+    }
+    private void removeDrawable(Drawable d) {
+        drawables.remove(d);
+    }
+    private void addOverlappable(Overlappable o) {
+        if (overlappables.indexOf(o) == -1)
+            overlappables.add(o);
+    }
+    private void removeOverlappable(Overlappable o) {
+        overlappables.remove(o);
+    }
+    private void addLoadable(Loadable l) {
+        if (loadables.indexOf(l) == -1)
+            loadables.add(l);
+    }
+    private void removeLoadable(Loadable l) {
+        loadables.remove(l);
+    }
+    private void addUpdateable(Updateable u) {
+        if (updateables.indexOf(u) == -1)
+            updateables.add(u);
+    }
+    private void removeUpdateable(Updateable u) {
+        updateables.remove(u);
     }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        for (Object obj: objects) {
-            if (!(obj instanceof Overlappable))
-                continue;
-            Overlappable o = (Overlappable) obj;
-
+        for (Overlappable o: overlappables) {
             if (o.overlaps(x, y, w, h)) {
                 if (ignore != null) {
                     if (ignore.indexOf(o) != -1)
