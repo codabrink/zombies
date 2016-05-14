@@ -159,9 +159,9 @@ public class Wall implements Collideable, Loadable {
         }
     }
 
-    public void buildWallMesh(ModelBuilder modelBuilder) {
+    public void buildWallMesh(ModelBuilder modelBuilder, Vector2 modelCenter) {
         for (DrawLine dl: lines)
-            dl.buildMesh(modelBuilder);
+            dl.buildMesh(modelBuilder, modelCenter);
     }
 
     @Override

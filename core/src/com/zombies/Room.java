@@ -206,7 +206,7 @@ public class Room implements Loadable, HasZone, Drawable {
     private void buildWallsModel() {
         Assets.modelBuilder.begin();
         for (Wall w: walls) {
-            w.buildWallMesh(Assets.modelBuilder);
+            w.buildWallMesh(Assets.modelBuilder, center);
         }
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);

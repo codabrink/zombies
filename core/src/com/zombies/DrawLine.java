@@ -48,14 +48,14 @@ public class DrawLine {
         instance.transform.rotate(Vector3.Z, (float)Math.toDegrees(angle));
 	}
 
-    public void buildMesh(ModelBuilder modelBuilder) {
+    public void buildMesh(ModelBuilder modelBuilder, Vector2 modelCenter) {
         float dx = p2.x - p1.x, dy = p2.y - p1.y;
         Assets.meshBuilder.begin(Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
         Assets.meshBuilder.box(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
         modelBuilder.part(Integer.toString(System.identityHashCode(this)),
                 Assets.meshBuilder.end(), Usage.Position | Usage.Normal,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)))
-                .mesh.transform(new Matrix4().translate(p1.x + dx, p1.y + dy, C.BOX_HEIGHT / 2)
+                .mesh.transform(new Matrix4().translate(p1.x + dx - modelCenter.x, p1.y + dy - modelCenter.y, C.BOX_HEIGHT / 2)
                 .rotate(Vector3.Z, (float)Math.toDegrees(angle)));
     }
 
