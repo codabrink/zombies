@@ -41,14 +41,14 @@ public class Room implements Loadable, HasZone, Drawable {
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
-            Zone.getZone(b.getPosition()).addDrawableNoCheck(b);
+            Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
 
         center = calculateMedian();
         genOuterWalls();
-        Zone.getZone(center).addDrawableNoCheck(this);
+        Zone.getZone(center).addObject(this);
     }
 
     // calculates the median position of all of the boxes

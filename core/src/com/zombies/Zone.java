@@ -172,8 +172,6 @@ public class Zone {
     }
 
     public void addObject(HasZone o) {
-        // DON'T USE THIS METHOD TO ADD A DRAWABLE
-        // USE addDrawable(..,..) INSTEAD
         if (o.getZone() != null)
             o.getZone().removeObject(o);
         o.setZone(this);
@@ -189,6 +187,8 @@ public class Zone {
             addLoadable((Loadable) o);
         if (o instanceof Updateable)
             addUpdateable((Updateable) o);
+        if (o instanceof Drawable)
+            addDrawable((Drawable) o);
     }
     public void removeObject(HasZone o) {
         o.setZone(null);
@@ -201,10 +201,10 @@ public class Zone {
             removeOverlappable((Overlappable) o);
         if (o instanceof Loadable)
             removeLoadable((Loadable) o);
-        if (o instanceof Drawable)
-            removeDrawable((Drawable) o);
         if (o instanceof Updateable)
             removeUpdateable((Updateable) o);
+        if (o instanceof Drawable)
+            removeDrawable((Drawable) o);
     }
 
     public Vector2 getPosition() {
@@ -239,11 +239,11 @@ public class Zone {
     private void removeBox(Box b) {
         boxes.remove(b);
     }
-    public void addDrawable(Drawable d) {
+    private void addDrawable(Drawable d) {
         if (drawables.indexOf(d) == -1)
             drawables.add(d);
     }
-    public void addDrawableNoCheck(Drawable d) {
+    private void addDrawableNoCheck(Drawable d) {
         drawables.add(d);
     }
     private void removeDrawable(Drawable d) {

@@ -44,8 +44,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public void materialize() {
         calculateInfo(); // do this a second time
         createWalls();
-        registerDrawable();
-        registerOverlappable();
+        Zone.getZone(getCenter()).addObject(this);
     }
 
     private void createWalls() {
@@ -97,14 +96,6 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
             direction = 'n';
         else if (p1.y > p2.y)
             direction = 's';
-    }
-
-    private void registerDrawable() {
-        Zone.getZone(getCenter()).addDrawable(this);
-    }
-
-    private void registerOverlappable() {
-        Zone.getZone(getCenter()).addObject(this);
     }
 
     public Vector2 getCenter() {
