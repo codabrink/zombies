@@ -3,14 +3,9 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -46,18 +41,6 @@ public class Wall implements Collideable, Loadable {
 
         lines.add(new DrawLine(p1, p2));
         //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
-    }
-
-    public void setColor(Color c) {
-        for (DrawLine dl : lines) {
-            dl.setColor(c);
-        }
-    }
-
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        for (DrawLine l: lines) {
-            l.draw(spriteBatch, shapeRenderer, modelBatch);
-        }
     }
 
     public Double getAngle() { return angle; }
@@ -159,9 +142,9 @@ public class Wall implements Collideable, Loadable {
         }
     }
 
-    public void buildWallMesh(ModelBuilder modelBuilder, Vector2 modelCenter) {
+    public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
         for (DrawLine dl: lines)
-            dl.buildMesh(modelBuilder, modelCenter);
+            dl.buildMesh(wallBuilder, modelCenter);
     }
 
     @Override

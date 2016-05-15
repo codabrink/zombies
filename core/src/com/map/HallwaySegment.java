@@ -114,9 +114,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer, modelBatch);
-        }
+        //TODO: draw like a room draws
     }
 
     @Override

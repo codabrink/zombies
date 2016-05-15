@@ -5,19 +5,27 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
+import com.interfaces.Wallable;
 import com.util.Assets;
 
-public class Room implements Loadable, HasZone, Drawable {
+public class Room implements Loadable, HasZone, Drawable, Wallable {
     private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
@@ -32,8 +40,8 @@ public class Room implements Loadable, HasZone, Drawable {
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
     private Vector2 center;
 
-    private Model wallModel;
-    private ModelInstance wallModelInstance;
+    private Model wallModel, floorModel;
+    private ModelInstance wallModelInstance, floorModelInstance;
 
     public Room(Collection<Box> boxes) {
         view = GameView.gv;
@@ -116,7 +124,7 @@ public class Room implements Loadable, HasZone, Drawable {
             walls.add(new Wall(pstn.get(0), pstn.get(1)));
         }
 
-        buildWallsModel();
+        buildWallModel();
     }
     
     // consolidate the proposed walls into as few as possible.
@@ -203,14 +211,27 @@ public class Room implements Loadable, HasZone, Drawable {
         return null;
     }
 
-    private void buildWallsModel() {
+    public void buildWallModel() {
         Assets.modelBuilder.begin();
+        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w: walls) {
-            w.buildWallMesh(Assets.modelBuilder, center);
+            w.buildWallMesh(wallBuilder, center);
         }
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
+    }
+
+    public void buildFloorModel() {
+        Assets.modelBuilder.begin();
+        for (Box b: boxes) {
+            b.buildFloorMesh(Assets.modelBuilder, center);
+        }
+        floorModel = Assets.modelBuilder.end();
+        floorModelInstance = new ModelInstance(floorModel);
+        floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
     public LinkedList<Unit> getAliveUnits() {

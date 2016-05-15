@@ -6,12 +6,12 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
-import com.interfaces.Drawable;
 import com.map.MapGen;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
@@ -19,7 +19,7 @@ import com.powerups.Powerup;
 import com.powerups.ShotgunPickup;
 import com.util.Geometry;
 
-public class Box implements Drawable, Overlappable, Loadable, HasZone {
+public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
@@ -40,7 +40,7 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
     public Box(float x, float y) {
         position = new Vector2(x, y);
         this.view = GameView.gv;
-        this.floor = new Floor(this);
+        //this.floor = new Floor(this);
     }
 
     public boolean insideBox(float x, float y) {
@@ -183,9 +183,8 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return new Vector2();
     }
 
-    @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        floor.draw(spriteBatch, shapeRenderer, modelBatch);
+        //floor.draw(spriteBatch, shapeRenderer, modelBatch);
     }
 
     public Room getRoom() {
@@ -236,6 +235,10 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return false;
     }
 
+
+    public void buildFloorMesh(ModelBuilder modelBuilder, Vector2 center) {
+
+    }
 
     // Box Map Location - used during room generation in MapGen.java
     public int[] getBMLocation() {
