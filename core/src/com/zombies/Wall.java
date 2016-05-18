@@ -116,7 +116,6 @@ public class Wall implements Collideable, Loadable {
                 EdgeShape shape = new EdgeShape();
                 shape.set(v1, v2);
                 lines.add(new DrawLine(p1.cpy().add(v1), p1.cpy().add(v2)));
-                lines.get(lines.size() - 1).setColor(Color.PURPLE);
                 body.createFixture(shape, 0);
             }
         }
