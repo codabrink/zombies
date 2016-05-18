@@ -209,10 +209,9 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public void buildFloorModel() {
         Assets.modelBuilder.begin();
-        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
         MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(TextureAttribute.createDiffuse(floorTexture)));
+                new Material(Assets.floor1Diffuse));
         for (Box b: boxes) {
             b.buildFloorMesh(floorBuilder, center);
         }

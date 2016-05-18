@@ -12,7 +12,7 @@ public class Assets {
     public static AssetManager a;
     public static ModelBuilder modelBuilder;
     public static MeshBuilder meshBuilder;
-    public static TextureAttribute wildGrassTextureDiffuse;
+    public static TextureAttribute wildGrassTextureDiffuse, floor1Diffuse;
 
     public Assets() {
         a = new AssetManager();
@@ -27,5 +27,11 @@ public class Assets {
         wildGrassTextureDiffuse = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
                 new TextureDescriptor<Texture>(rawWildGrass),
                 0, 0, 7f, 7f);                     // offsetU, offsetV, scaleU, scaleV
+
+        Texture floor1Texture = a.get("data/floor1.png", Texture.class);
+        floor1Texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        floor1Diffuse = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
+                new TextureDescriptor<Texture>(floor1Texture),
+                0, 0, 1, 1);
     }
 }

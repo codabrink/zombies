@@ -148,11 +148,10 @@ public class Hallway implements Drawable, HasZone, Modelable {
         for (Overlappable hs: hallwaySegments) {
             ((HallwaySegment)hs).buildWallMesh(builder, center);
         }
-        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
         builder.setUVRange(0, 0, 10, 10);
         builder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(TextureAttribute.createDiffuse(floorTexture)));
+                new Material(Assets.floor1Diffuse));
         for (Overlappable hs: hallwaySegments) {
             ((HallwaySegment)hs).buildFloorMesh(builder, center);
         }
