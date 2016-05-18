@@ -3,6 +3,7 @@ package com.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Drawable;
@@ -10,6 +11,7 @@ import com.interfaces.HasZone;
 import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.util.Geometry;
+import com.zombies.DrawLine;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
@@ -21,7 +23,7 @@ import java.util.LinkedList;
  */
 public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
-    public Vector2 p1, p2, position;
+    public Vector2 p1, p2, position, center;
     public float diameter, radius, width, height;
     private char direction;
     private Zone zone;
@@ -83,6 +85,8 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
             position = new Vector2(p2.x - radius, p2.y - radius);
         }
 
+        center = position.cpy().add(width / 2, height / 2);
+
         // calculate width and height
         width = Math.abs(p1.x - p2.x) + diameter;
         height = Math.abs(p1.y - p2.y) + diameter;
@@ -99,7 +103,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     }
 
     public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
+        return center;
     }
 
     public Vector2 getP1() {return p1;}
@@ -120,6 +124,11 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    }
+
+    public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
+        for (Wall wall: walls)
+            wall.buildWallMesh(wallBuilder, modelCenter);
     }
 
     @Override
