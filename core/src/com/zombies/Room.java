@@ -252,6 +252,5 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     @Override
     public void rebuildModel() {
         buildWallModel();
-        buildFloorModel();
     }
 }
