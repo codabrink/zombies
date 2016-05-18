@@ -26,6 +26,6 @@ public class Assets {
         rawWildGrass.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         wildGrassTextureDiffuse = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
                 new TextureDescriptor<Texture>(rawWildGrass),
-                0, 0, 5f, 5f);                     // offsetU, offsetV, scaleU, scaleV
+                0, 0, 7f, 7f);                     // offsetU, offsetV, scaleU, scaleV
     }
 }

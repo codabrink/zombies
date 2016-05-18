@@ -50,7 +50,7 @@ public class Grass implements Drawable, HasZone {
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         modelBatch.begin(GameView.gv.getCamera());;
-        modelBatch.render(modelInstance, GameView.environment);
+        modelBatch.render(modelInstance, GameView.outsideEnvironment);
         modelBatch.end();
     }
 
