@@ -33,7 +33,7 @@ public class GameView implements Screen {
     // STATIC VARIABLES
     public static FontGen fontGen;
     public static GameView gv;
-    public static Environment environment;
+    public static Environment environment, outsideEnvironment;
 
     private ArrayList<Zombie> activeZombies;
 
@@ -115,6 +115,9 @@ public class GameView implements Screen {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(player.pointLight);
+
+        outsideEnvironment = new Environment();
+        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
     }
 
     private void addSurvivors() {

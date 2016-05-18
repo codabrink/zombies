@@ -7,6 +7,7 @@ import com.interfaces.HasZone;
 import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
 import com.interfaces.Updateable;
+import com.map.Grass;
 import com.map.MapGen;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import java.util.Random;
 public class Zone {
     private Vector2 position;
     private int updateFrame, drawFrame;
-    public int loadIndex; // Tracks on what frame the zone was loaded
+    public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r;
 
     // Static Variables
@@ -51,6 +52,8 @@ public class Zone {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)));
         }
+
+        addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
     public void generate() {
