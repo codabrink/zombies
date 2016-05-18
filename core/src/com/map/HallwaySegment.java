@@ -22,7 +22,7 @@ import com.zombies.Wall;
 import com.zombies.Zone;
 import java.util.LinkedList;
 
-public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
+public class HallwaySegment implements Overlappable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
     public Vector2 p1, p2, position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
@@ -120,10 +120,6 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         return "HallwaySegment";
     }
 
-    @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        //TODO: draw like a room draws
-    }
 
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
