@@ -30,8 +30,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class GameView implements Screen {
+    // STATIC VARIABLES
     public static FontGen fontGen;
     public static GameView gv;
+    public static Environment environment;
 
     private ArrayList<Zombie> activeZombies;
 
@@ -42,7 +44,6 @@ public class GameView implements Screen {
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
     public ModelBatch modelBatch;
-    public Environment environment;
     private Assets assets = new Assets();
 
     protected Player player;
@@ -81,6 +82,8 @@ public class GameView implements Screen {
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     private void reset() {
@@ -214,7 +217,6 @@ public class GameView implements Screen {
 
         //lists
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
         // renderer.draw(view.getWorld());
@@ -235,7 +237,7 @@ public class GameView implements Screen {
             dd.draw(spriteBatch, shapeRenderer, modelBatch);
         }
         DebugText.render();
-        //debugRenderer.render(world, cam.combined);
+        debugRenderer.render(world, cam.combined);
     }
 
     protected void updateLoop() {

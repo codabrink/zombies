@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.util.FixedBoxShapeBuilder;
 
 public class DrawLine {
 	private Vector2 p1, p2;
@@ -18,19 +19,18 @@ public class DrawLine {
 	}
 
     public void buildMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
-        float dx = (float)(p1.dst(p2) * Math.cos(angle) / 2);
-        float dy = (float)(p1.dst(p2) * Math.sin(angle) / 2);
-
         BoundingBox bounds;
         Vector3 min, max;
 
-        min = new Vector3(p1.x + dx - modelCenter.x, p1.y + dy - modelCenter.y, 0);
-        max = min.cpy().add(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
+        min = new Vector3(0, 0, 0);
+        max = new Vector3(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
         bounds = new BoundingBox(min, max);
+
         Matrix4 mrot = new Matrix4();
+        mrot.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
         mrot.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mrot);
 
-        BoxShapeBuilder.build(wallBuilder, bounds);
+        FixedBoxShapeBuilder.build(wallBuilder, bounds);
     }
 }

@@ -55,6 +55,7 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
         }
 
         center = calculateMedian();
+        buildFloorModel();
         genOuterWalls();
         Zone.getZone(center).addObject(this);
     }
@@ -191,26 +192,6 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
         return alarmed;
     }
 
-    public boolean isEmpty() {
-        LinkedList<Unit> zList = new LinkedList<Unit>();
-        for (Box b: boxes) {
-            for (Unit u: b.getUnits()) {
-                zList.add(u);
-            }
-        }
-        if (zList.size() > 1) {
-            return false;
-        }
-        return true;
-    }
-
-    public Box getRandomBox() {
-        if (!boxes.isEmpty()) {
-            return boxes.get(random.nextInt(boxes.size()));
-        }
-        return null;
-    }
-
     public void buildWallModel() {
         Assets.modelBuilder.begin();
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
@@ -226,21 +207,17 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
 
     public void buildFloorModel() {
         Assets.modelBuilder.begin();
+        MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.GREEN)));
         for (Box b: boxes) {
-            b.buildFloorMesh(Assets.modelBuilder, center);
+            b.buildFloorMesh(floorBuilder, center);
         }
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);
         floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
-    public LinkedList<Unit> getAliveUnits() {
-        LinkedList<Unit> units = new LinkedList<Unit>();
-        for (Box b: boxes) {
-            units.addAll((Collection)b.getUnits());
-        }
-        return units;
-    }
 
     public ArrayList<Box> getOuterBoxes() {
         return outerBoxes;
@@ -264,7 +241,8 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         modelBatch.begin(GameView.gv.getCamera());
-        modelBatch.render(wallModelInstance, GameView.gv.environment);
+        modelBatch.render(floorModelInstance, GameView.environment);
+        modelBatch.render(wallModelInstance, GameView.environment);
         modelBatch.end();
     }
 }
