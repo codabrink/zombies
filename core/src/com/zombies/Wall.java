@@ -70,8 +70,10 @@ public class Wall implements Collideable, Loadable, Drawable {
     public Body getBody() {return body;}
 
     public void consolidateHoles() {
+        
         ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
         Collections.sort(holePositions);
+
         for (int i = 0; i < holePositions.size() - 1; i++) {
             Float holePosition, nextHolePosition, holeRadius, nextHoleRadius;
             holePosition = holePositions.get(i);
@@ -114,50 +116,26 @@ public class Wall implements Collideable, Loadable, Drawable {
         ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
 
         Collections.sort(holePositions);
+
+        // unit vector in the same direction as the wall.
+        Vector2 vo = p2.cpy().sub(p1).scl(1 / p2.cpy().sub(p1).len());
         Vector2 v1, v2;
-        float length;
 
-        for (int i = 0; i < holePositions.size(); i++) {
-            // v1 describes the wall segment before this hole.
-            // the position of the end of the last hole (or the start of the wall if there isn't one),
-            // the distance between the start of the last hole and the beginning of this one, the wall angle.
-            float holePosition = holePositions.get(i);
-            float holeDiameter = holes.get(holePosition), holeRadius = holeDiameter / 2;
+        for (int i = 0; i <= holePositions.size(); i++) {
 
-            if (i == 0) {
-                v1 = new Vector2(0, 0);
-                length = Math.max(holePosition - holeRadius, 0);
-            } else {
-                float previousHolePosition = holePositions.get(i - 1);
-                float previousHoleDiameter = holes.get(previousHolePosition), previousHoleRadius = previousHoleDiameter / 2;
+            // the start and end positions of this wall segment, relative to the wall position.
+            v1 = (i == 0 ? new Vector2(0, 0) : vo.cpy().scl(holePositions.get(i - 1) + holes.get(holePositions.get(i - 1)) / 2));
+            v2 = (i == holePositions.size() ? p2.cpy().sub(p1) : vo.cpy().scl(holePositions.get(i) - holes.get(holePositions.get(i)) / 2));
 
-                v1 = new Vector2((float)((previousHolePosition + previousHoleRadius) * Math.cos(angle)),
-                        (float)((previousHolePosition + previousHoleRadius) * Math.sin(angle)));
-                length = Math.max((holePosition - holeRadius) - (previousHolePosition + previousHoleRadius), 0);
-            }
-
-            if (length > 0) {
+            // create the segment only if it has nonzero length, and is in the same direction as
+            // the wall unit vector (second requirement is false if the last/first hole extends past
+            // the wall, in which case this seg is not needed).
+            if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
                 EdgeShape shape = new EdgeShape();
-                shape.set(v1, Geometry.projectVector(v1, angle, length));
+                shape.set(v1, v2);
+                lines.add(new DrawLine(p1.cpy().add(v1), p1.cpy().add(v2)));
+                lines.get(lines.size() - 1).setColor(Color.PURPLE);
                 body.createFixture(shape, 0);
-                v1.add(body.getPosition());
-                lines.add(new DrawLine(v1, Geometry.projectVector(v1, angle, length)));
-            }
-
-            // if this is the last hole in the wall, draw the wall segment after it too.
-            if (i == holePositions.size() - 1) {
-                // v2 describes the wall segment after this wall.
-                v2 = new Vector2((float)((holePosition + holeDiameter) * Math.cos(angle)),
-                        (float)((holePosition + holeDiameter) * Math.sin(angle)));
-                length = Math.max(p1.dst(p2) - (holePosition + holeDiameter), 0);
-
-                if (length > 0) {
-                    EdgeShape shape2 = new EdgeShape();
-                    shape2.set(v2, Geometry.projectVector(v2, angle, length));
-                    body.createFixture(shape2, 0);
-                    v2.add(body.getPosition());
-                    lines.add(new DrawLine(v2, Geometry.projectVector(v2, angle, length)));
-                }
             }
         }
     }
@@ -165,7 +143,7 @@ public class Wall implements Collideable, Loadable, Drawable {
     @Override
     public void handleCollision(Fixture f) {
         if (C.ENABLE_WALL_DESRUCTION) {
-            //createHole(f.getBody().getPosition(), 5f);
+            createHole(f.getBody().getPosition(), 5f);
         }
     }
 
