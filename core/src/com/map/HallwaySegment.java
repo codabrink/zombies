@@ -16,16 +16,12 @@ import com.interfaces.Modelable;
 import com.interfaces.Overlappable;
 import com.util.FixedBoxShapeBuilder;
 import com.util.Geometry;
-import com.zombies.DrawLine;
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
-
 import java.util.LinkedList;
 
-/**
- * Created by coda on 4/2/16.
- */
 public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
     public Vector2 p1, p2, position, center;
@@ -151,6 +147,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         mtrans.translate(position.x - modelCenter.x, position.y - modelCenter.y, 0);
         bounds.mul(mtrans);
 
+        builder.setUVRange(0, 0, height / C.BOX_SIZE, width / C.BOX_SIZE);
         FixedBoxShapeBuilder.build(builder, bounds);
     }
 

@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -45,7 +41,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     public boolean insideBox(float x, float y) {
-        return (x > position.x && x < position.x + C.BOX_WIDTH && y > position.y && y < position.y + C.BOX_HEIGHT);
+        return (x > position.x && x < position.x + C.BOX_SIZE && y > position.y && y < position.y + C.BOX_SIZE);
     }
 
     private void populateBox() {
@@ -171,11 +167,11 @@ public class Box implements Overlappable, Loadable, HasZone {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.BOX_WIDTH, 0);
+            return position.cpy().add(C.BOX_SIZE, 0);
         case 3:
-            return position.cpy().add(0, C.BOX_HEIGHT);
+            return position.cpy().add(0, C.BOX_SIZE);
         case 4:
-            return position.cpy().add(C.BOX_WIDTH, C.BOX_HEIGHT);
+            return position.cpy().add(C.BOX_SIZE, C.BOX_SIZE);
         }
         return new Vector2();
     }
@@ -193,7 +189,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.BOX_WIDTH, random.nextFloat() * C.BOX_HEIGHT);
+        return position.cpy().add(random.nextFloat() * C.BOX_SIZE, random.nextFloat() * C.BOX_SIZE);
     }
 
     public Unit randomZombie() {

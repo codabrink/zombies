@@ -1,15 +1,12 @@
 package com.map;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Box;
 import com.zombies.C;
-import com.zombies.DrawLine;
 import com.zombies.GameView;
 import com.zombies.Room;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -62,7 +59,7 @@ public class MapGen {
         HashMap<String, Box> boxMap = new HashMap<String, Box>();
         for (int i=0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = z.randomDiscreetPosition(20);
-            if (collides(z, boxPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
+            if (collides(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
                 Box b = new Box(boxPosition.x, boxPosition.y);
                 b.BMKey = "0,0";
                 boxMap.put("0,0", b);
@@ -112,7 +109,7 @@ public class MapGen {
                         newBMLocation[0]--;
                         break;
                 }
-                if (collides(z, proposedPosition, C.BOX_WIDTH, C.BOX_HEIGHT) == null) {
+                if (collides(z, proposedPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
                     Box bb = new Box(proposedPosition.x, proposedPosition.y);
                     bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
                     boxMap.put(bb.BMKey, bb);

@@ -6,9 +6,8 @@ public class C {
     public static boolean ENABLE_ACCEL = false;
     public static boolean ENABLE_WALL_DESRUCTION = true;
     public static boolean ENABLE_DEBUG_LINES = true;
-    public static float BOX_HEIGHT = 10 * scale;
+    public static float BOX_DEPTH = 7 * scale;
     public static float BOX_SIZE = 15 * scale;
-    public static float BOX_WIDTH = 15 * scale;
     public static int BULLET_DAMAGE_FACTOR = 2;
     public static float BULLET_RADIUS = 0.1f * scale;
     public static long CRATE_MPOS_DURATION = 500l;

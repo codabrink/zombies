@@ -1,7 +1,6 @@
 package com.zombies;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -23,7 +22,7 @@ public class DrawLine {
         Vector3 min, max;
 
         min = new Vector3(0, 0, 0);
-        max = new Vector3(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
+        max = new Vector3(p1.dst(p2), 0.1f, C.BOX_DEPTH);
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
