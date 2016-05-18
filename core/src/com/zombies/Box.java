@@ -224,19 +224,13 @@ public class Box implements Overlappable, Loadable, HasZone {
         return false;
     }
 
-    public void buildFloorMesh(MeshPartBuilder floorBuilder, Vector2 modelCenter) {
-        BoundingBox bounds;
-        Vector3 min, max;
-
-        min = new Vector3(0, 0, -0.1f);
-        max = new Vector3(width, height, 0);
-        bounds = new BoundingBox(min, max);
-
-        Matrix4 mtrans = new Matrix4();
-        mtrans.translate(position.x - modelCenter.x, position.y - modelCenter.y, 0);
-        bounds.mul(mtrans);
-
-        FixedBoxShapeBuilder.build(floorBuilder, bounds);
+    public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+        Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
+        builder.rect(relp.x, relp.y, 0,
+                relp.x + width, relp.y, 0,
+                relp.x + width, relp.y + height, 0,
+                relp.x, relp.y + height, 0,
+                1, 1, 1);
     }
 
     // Box Map Location - used during room generation in MapGen.java

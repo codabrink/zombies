@@ -132,19 +132,14 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        BoundingBox bounds;
-        Vector3 min, max;
+        Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
 
-        min = new Vector3(0, 0, -0.2f);
-        max = new Vector3(width, height, -0.1f);
-        bounds = new BoundingBox(min, max);
-
-        Matrix4 mtrans = new Matrix4();
-        mtrans.translate(position.x - modelCenter.x, position.y - modelCenter.y, 0);
-        bounds.mul(mtrans);
-
-        builder.setUVRange(0, 0, height / C.BOX_SIZE, width / C.BOX_SIZE);
-        FixedBoxShapeBuilder.build(builder, bounds);
+        builder.setUVRange(0, 0, width / C.BOX_SIZE, height / C.BOX_SIZE);
+        builder.rect(relp.x, relp.y, -0.09f,
+                relp.x + width, relp.y, -0.09f,
+                relp.x + width, relp.y + height, -0.09f,
+                relp.x, relp.y + height, -0.09f,
+                1, 1, 1);
     }
 
     @Override
