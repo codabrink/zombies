@@ -7,6 +7,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -22,10 +24,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
-import com.interfaces.Wallable;
+import com.interfaces.Modelable;
 import com.util.Assets;
 
-public class Room implements Loadable, HasZone, Drawable, Wallable {
+public class Room implements Loadable, HasZone, Drawable, Modelable {
     private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
@@ -122,7 +124,7 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
         proposedPositions = consolidateWallPositions(proposedPositions);
 
         for (ArrayList<Vector2> pstn: proposedPositions) {
-            walls.add(new Wall(pstn.get(0), pstn.get(1)));
+            walls.add(new Wall(pstn.get(0), pstn.get(1), this));
         }
 
         buildWallModel();
@@ -207,9 +209,10 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
 
     public void buildFloorModel() {
         Assets.modelBuilder.begin();
+        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
         MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.GREEN)));
+                new Material(TextureAttribute.createDiffuse(floorTexture)));
         for (Box b: boxes) {
             b.buildFloorMesh(floorBuilder, center);
         }
@@ -244,5 +247,11 @@ public class Room implements Loadable, HasZone, Drawable, Wallable {
         modelBatch.render(floorModelInstance, GameView.environment);
         modelBatch.render(wallModelInstance, GameView.environment);
         modelBatch.end();
+    }
+
+    @Override
+    public void rebuildModel() {
+        buildWallModel();
+        buildFloorModel();
     }
 }

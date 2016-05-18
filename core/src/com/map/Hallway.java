@@ -2,6 +2,7 @@ package com.map;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -9,11 +10,13 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
+import com.interfaces.Modelable;
 import com.interfaces.Overlappable;
 import com.util.Assets;
 import com.util.Geometry;
@@ -28,7 +31,7 @@ import java.util.Random;
 /**
  * Created by coda on 3/31/2016.
  */
-public class Hallway implements Drawable, HasZone {
+public class Hallway implements Drawable, HasZone, Modelable {
     public static int MAX_HALLWAY_SEGMENTS = 2;
 
     ArrayList<Vector2> axes = new ArrayList<Vector2>();
@@ -79,7 +82,7 @@ public class Hallway implements Drawable, HasZone {
 
     private void tryToMove(double angle, double previousSegmentAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle);
+        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle, this);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
         if (o == null)
             o = Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
@@ -145,9 +148,11 @@ public class Hallway implements Drawable, HasZone {
         for (Overlappable hs: hallwaySegments) {
             ((HallwaySegment)hs).buildWallMesh(builder, center);
         }
+        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
+        builder.setUVRange(0, 0, 10, 10);
         builder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.BLUE)));
+                new Material(TextureAttribute.createDiffuse(floorTexture)));
         for (Overlappable hs: hallwaySegments) {
             ((HallwaySegment)hs).buildFloorMesh(builder, center);
         }
@@ -188,5 +193,10 @@ public class Hallway implements Drawable, HasZone {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    @Override
+    public void rebuildModel() {
+        buildModel();
     }
 }

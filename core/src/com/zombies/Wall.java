@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.interfaces.Collideable;
 import com.interfaces.Loadable;
+import com.interfaces.Modelable;
 import com.util.Geometry;
 
 public class Wall implements Collideable, Loadable {
@@ -22,14 +22,16 @@ public class Wall implements Collideable, Loadable {
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private ArrayList<DrawLine> lines;
     private GameView view;
+    private Modelable modelable;
 
-    public Wall(Vector2 p1, Vector2 p2) {
+    public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
         this.p1 = p1;
         this.p2 = p2;
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         lines = new ArrayList<DrawLine>();
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        modelable = m;
 
         //set up physics
         EdgeShape shape = new EdgeShape();
@@ -140,6 +142,7 @@ public class Wall implements Collideable, Loadable {
                 }
             }
         }
+        modelable.rebuildModel();
     }
 
     public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {

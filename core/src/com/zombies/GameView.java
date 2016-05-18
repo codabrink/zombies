@@ -237,7 +237,7 @@ public class GameView implements Screen {
             dd.draw(spriteBatch, shapeRenderer, modelBatch);
         }
         DebugText.render();
-        debugRenderer.render(world, cam.combined);
+        //debugRenderer.render(world, cam.combined);
     }
 
     protected void updateLoop() {

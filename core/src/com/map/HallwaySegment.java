@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
+import com.interfaces.Modelable;
 import com.interfaces.Overlappable;
 import com.util.FixedBoxShapeBuilder;
 import com.util.Geometry;
@@ -34,9 +35,10 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
+    private Modelable modelable;
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle, Modelable m) {
         this.p1 = p1;
         this.p2 = p2;
         this.angle = Geometry.getAngleFromPoints(p1, p2);
@@ -44,6 +46,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         this.previousSegmentAngle = previousSegmentAngle;
         this.diameter = diameter;
         radius = diameter / 2;
+        modelable = m;
 
         calculateInfo();
     }
@@ -78,8 +81,8 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
         w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
 
-        walls.add(new Wall(w1p1, w1p2));
-        walls.add(new Wall(w2p1, w2p2));
+        walls.add(new Wall(w1p1, w1p2, modelable));
+        walls.add(new Wall(w2p1, w2p2, modelable));
     }
 
     private void calculateInfo() {

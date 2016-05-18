@@ -1,6 +1,7 @@
 package com.util;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
@@ -19,6 +20,7 @@ public class Assets {
         a = new AssetManager();
         modelBuilder = new ModelBuilder();
         meshBuilder = new MeshBuilder();
+        a.load("data/floor1.png", Texture.class);
         a.load("data/models/floor.g3dj", Model.class);
         a.finishLoading();
 
