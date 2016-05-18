@@ -135,8 +135,8 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         BoundingBox bounds;
         Vector3 min, max;
 
-        min = new Vector3(0, 0, -0.1f);
-        max = new Vector3(width, height, 0);
+        min = new Vector3(0, 0, -0.2f);
+        max = new Vector3(width, height, -0.1f);
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
