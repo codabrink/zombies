@@ -26,10 +26,10 @@ public class DrawLine {
         max = new Vector3(p1.dst(p2), 0.1f, C.BOX_HEIGHT);
         bounds = new BoundingBox(min, max);
 
-        Matrix4 mrot = new Matrix4();
-        mrot.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
-        mrot.rotate(Vector3.Z, (float)Math.toDegrees(angle));
-        bounds.mul(mrot);
+        Matrix4 mtrans = new Matrix4();
+        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
+        mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
+        bounds.mul(mtrans);
 
         FixedBoxShapeBuilder.build(wallBuilder, bounds);
     }

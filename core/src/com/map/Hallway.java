@@ -38,8 +38,8 @@ public class Hallway implements Drawable, HasZone {
     private Wall originWall;
     private float diameter;
     private double totalAngle = 0;
-    private Model wallModel;
-    private ModelInstance wallModelInstance;
+    private Model model, floorModel;
+    private ModelInstance modelInstance, floorModelInstance;
     private Vector2 center;
     private Zone zone;
 
@@ -133,21 +133,28 @@ public class Hallway implements Drawable, HasZone {
         }
         center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());
 
-        buildWallModel();
+        buildModel();
         Zone.getZone(center).addObject(this);
     }
 
-    public void buildWallModel() {
+    public void buildModel() {
         Assets.modelBuilder.begin();
-        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
+        MeshPartBuilder builder = Assets.modelBuilder.part("walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Overlappable hs: hallwaySegments) {
-            ((HallwaySegment)hs).buildWallMesh(wallBuilder, center);
+            ((HallwaySegment)hs).buildWallMesh(builder, center);
         }
-        wallModel = Assets.modelBuilder.end();
-        wallModelInstance = new ModelInstance(wallModel);
-        wallModelInstance.transform.setTranslation(center.x, center.y, 0);
+        builder = Assets.modelBuilder.part("floor",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.BLUE)));
+        for (Overlappable hs: hallwaySegments) {
+            ((HallwaySegment)hs).buildFloorMesh(builder, center);
+        }
+
+        model = Assets.modelBuilder.end();
+        modelInstance = new ModelInstance(model);
+        modelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
     private Zone originBoxZone() {
@@ -169,7 +176,7 @@ public class Hallway implements Drawable, HasZone {
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         modelBatch.begin(GameView.gv.getCamera());
-        modelBatch.render(wallModelInstance, GameView.environment);
+        modelBatch.render(modelInstance, GameView.environment);
         modelBatch.end();
     }
 
