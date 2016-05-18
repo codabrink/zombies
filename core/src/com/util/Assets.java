@@ -1,8 +1,10 @@
 package com.util;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -10,12 +12,15 @@ import com.zombies.C;
 
 public class Assets {
     public static AssetManager a;
-    public static ModelBuilder mb;
+    public static ModelBuilder modelBuilder;
+    public static MeshBuilder meshBuilder;
     public static float FLOOR_SCALE;
 
     public Assets() {
         a = new AssetManager();
-        mb = new ModelBuilder();
+        modelBuilder = new ModelBuilder();
+        meshBuilder = new MeshBuilder();
+        a.load("data/floor1.png", Texture.class);
         a.load("data/models/floor.g3dj", Model.class);
         a.finishLoading();
 

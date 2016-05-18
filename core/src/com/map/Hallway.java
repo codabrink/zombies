@@ -1,7 +1,24 @@
 package com.map;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.interfaces.Drawable;
+import com.interfaces.HasZone;
+import com.interfaces.Modelable;
 import com.interfaces.Overlappable;
+import com.util.Assets;
 import com.util.Geometry;
 import com.zombies.Box;
 import com.zombies.GameView;
@@ -14,7 +31,7 @@ import java.util.Random;
 /**
  * Created by coda on 3/31/2016.
  */
-public class Hallway {
+public class Hallway implements Drawable, HasZone, Modelable {
     public static int MAX_HALLWAY_SEGMENTS = 2;
 
     ArrayList<Vector2> axes = new ArrayList<Vector2>();
@@ -24,9 +41,12 @@ public class Hallway {
     private Wall originWall;
     private float diameter;
     private double totalAngle = 0;
+    private Model model, floorModel;
+    private ModelInstance modelInstance, floorModelInstance;
+    private Vector2 center;
+    private Zone zone;
 
     public Hallway(Box b, char direction, float width) {
-        long startTime = System.currentTimeMillis();
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
@@ -62,7 +82,7 @@ public class Hallway {
 
     private void tryToMove(double angle, double previousSegmentAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle);
+        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle, this);
         Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
         if (o == null)
             o = Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
@@ -108,9 +128,38 @@ public class Hallway {
     }
 
     private void materialize() {
+        center = new Vector2();
+
         for (Overlappable hs: hallwaySegments) {
+            center.add(((HallwaySegment)hs).getCenter());
             ((HallwaySegment)hs).materialize();
         }
+        center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());
+
+        buildModel();
+        Zone.getZone(center).addObject(this);
+    }
+
+    public void buildModel() {
+        Assets.modelBuilder.begin();
+        MeshPartBuilder builder = Assets.modelBuilder.part("walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+        for (Overlappable hs: hallwaySegments) {
+            ((HallwaySegment)hs).buildWallMesh(builder, center);
+        }
+        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
+        builder.setUVRange(0, 0, 10, 10);
+        builder = Assets.modelBuilder.part("floor",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(TextureAttribute.createDiffuse(floorTexture)));
+        for (Overlappable hs: hallwaySegments) {
+            ((HallwaySegment)hs).buildFloorMesh(builder, center);
+        }
+
+        model = Assets.modelBuilder.end();
+        modelInstance = new ModelInstance(model);
+        modelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
     private Zone originBoxZone() {
@@ -122,5 +171,32 @@ public class Hallway {
     }
     private float vertBoxRange(Box b, float width) {
         return b.getPosition().y + r.nextFloat() * (b.height - width) + width / 2;
+    }
+
+    @Override
+    public String className() {
+        return "Hallway";
+    }
+
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        modelBatch.begin(GameView.gv.getCamera());
+        modelBatch.render(modelInstance, GameView.environment);
+        modelBatch.end();
+    }
+
+    @Override
+    public Zone getZone() {
+        return zone;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+        zone = z;
+    }
+
+    @Override
+    public void rebuildModel() {
+        buildModel();
     }
 }

@@ -5,15 +5,29 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
-import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
+import com.interfaces.Modelable;
+import com.util.Assets;
 
-public class Room implements Loadable, HasZone {
+public class Room implements Loadable, HasZone, Drawable, Modelable {
     private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
@@ -26,6 +40,10 @@ public class Room implements Loadable, HasZone {
     private int frame;
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
+    private Vector2 center;
+
+    private Model wallModel, floorModel;
+    private ModelInstance wallModelInstance, floorModelInstance;
 
     public Room(Collection<Box> boxes) {
         view = GameView.gv;
@@ -33,10 +51,15 @@ public class Room implements Loadable, HasZone {
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
-            Zone.getZone(b.getPosition()).addDrawableNoCheck(b, 0);
+            Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
+
+        center = calculateMedian();
+        buildFloorModel();
+        genOuterWalls();
+        Zone.getZone(center).addObject(this);
     }
 
     // calculates the median position of all of the boxes
@@ -90,7 +113,6 @@ public class Room implements Loadable, HasZone {
     }
 
     public void genOuterWalls() {
-        
         // proposedPositions are sets of points where walls could be placed.
         ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
 
@@ -102,8 +124,10 @@ public class Room implements Loadable, HasZone {
         proposedPositions = consolidateWallPositions(proposedPositions);
 
         for (ArrayList<Vector2> pstn: proposedPositions) {
-            walls.add(new Wall(pstn.get(0), pstn.get(1)));
+            walls.add(new Wall(pstn.get(0), pstn.get(1), this));
         }
+
+        buildWallModel();
     }
     
     // consolidate the proposed walls into as few as possible.
@@ -170,33 +194,33 @@ public class Room implements Loadable, HasZone {
         return alarmed;
     }
 
-    public boolean isEmpty() {
-        LinkedList<Unit> zList = new LinkedList<Unit>();
-        for (Box b: boxes) {
-            for (Unit u: b.getUnits()) {
-                zList.add(u);
-            }
+    public void buildWallModel() {
+        Assets.modelBuilder.begin();
+        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+        for (Wall w: walls) {
+            w.buildWallMesh(wallBuilder, center);
         }
-        if (zList.size() > 1) {
-            return false;
-        }
-        return true;
+        wallModel = Assets.modelBuilder.end();
+        wallModelInstance = new ModelInstance(wallModel);
+        wallModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
-    public Box getRandomBox() {
-        if (!boxes.isEmpty()) {
-            return boxes.get(random.nextInt(boxes.size()));
+    public void buildFloorModel() {
+        Assets.modelBuilder.begin();
+        Texture floorTexture = Assets.a.get("data/floor1.png", Texture.class);
+        MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(TextureAttribute.createDiffuse(floorTexture)));
+        for (Box b: boxes) {
+            b.buildFloorMesh(floorBuilder, center);
         }
-        return null;
+        floorModel = Assets.modelBuilder.end();
+        floorModelInstance = new ModelInstance(floorModel);
+        floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
-    public LinkedList<Unit> getAliveUnits() {
-        LinkedList<Unit> units = new LinkedList<Unit>();
-        for (Box b: boxes) {
-            units.addAll((Collection)b.getUnits());
-        }
-        return units;
-    }
 
     public ArrayList<Box> getOuterBoxes() {
         return outerBoxes;
@@ -210,5 +234,24 @@ public class Room implements Loadable, HasZone {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    @Override
+    public String className() {
+        return "Room";
+    }
+
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        modelBatch.begin(GameView.gv.getCamera());
+        modelBatch.render(floorModelInstance, GameView.environment);
+        modelBatch.render(wallModelInstance, GameView.environment);
+        modelBatch.end();
+    }
+
+    @Override
+    public void rebuildModel() {
+        buildWallModel();
+        buildFloorModel();
     }
 }

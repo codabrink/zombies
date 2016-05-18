@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -31,10 +30,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class GameView implements Screen {
+    // STATIC VARIABLES
     public static FontGen fontGen;
     public static GameView gv;
-
-    public HashMap<String, Zone> zones;
+    public static Environment environment;
 
     private ArrayList<Zombie> activeZombies;
 
@@ -45,7 +44,6 @@ public class GameView implements Screen {
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
     public ModelBatch modelBatch;
-    public Environment environment;
     private Assets assets = new Assets();
 
     protected Player player;
@@ -62,7 +60,7 @@ public class GameView implements Screen {
     public MessageHandler mh;
     private HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
-    private int frame = 0;
+    public int frame = 0;
 
     public float scale = 1;
 
@@ -84,11 +82,14 @@ public class GameView implements Screen {
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     private void reset() {
         setGv(this);
-        zones = new HashMap<String, Zone>();
+        Zone.zones = new HashMap<String, Zone>();
+        Zone.loadedZones = new ArrayList<Zone>();
         activeZombies = new ArrayList<Zombie>();
         stats = new Stats();
 
@@ -216,7 +217,6 @@ public class GameView implements Screen {
 
         //lists
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         cam.update();
         // renderer.draw(view.getWorld());

@@ -311,9 +311,7 @@ public class Player extends Unit implements Collideable {
 
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 15, 300);
 
-        for (int i=0;i<=C.DRAW_LAYERS;i++) {
-            zone.draw(frame, 1, i);
-        }
+        zone.draw(frame, 1);
 
         this.handleHealth();
 
@@ -347,15 +345,8 @@ public class Player extends Unit implements Collideable {
 
     @Override
     protected void updateZone() {
-        Zone z;
-        z = Zone.getZone(body.getPosition());
-        if (zone != z) {
-            if (zone != null)
-                zone.unload();
-
-            z.load();
-        }
-        zone = z;
+        zone = Zone.getZone(body.getPosition());
+        Zone.setCurrentZone(zone);
     }
     public void removeSurvivor(Survivor s) {survivors.remove(s);}
     public void addSurvivor(Survivor s) {

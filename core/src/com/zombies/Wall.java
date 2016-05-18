@@ -4,35 +4,34 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.interfaces.Collideable;
-import com.interfaces.Drawable;
 import com.interfaces.Loadable;
+import com.interfaces.Modelable;
 import com.util.Geometry;
 
-public class Wall implements Collideable, Loadable, Drawable {
+public class Wall implements Collideable, Loadable {
     private Vector2 p1, p2, center;
     private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private ArrayList<DrawLine> lines;
     private GameView view;
+    private Modelable modelable;
 
-    public Wall(Vector2 p1, Vector2 p2) {
+    public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
         this.p1 = p1;
         this.p2 = p2;
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         lines = new ArrayList<DrawLine>();
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        modelable = m;
 
         //set up physics
         EdgeShape shape = new EdgeShape();
@@ -43,24 +42,7 @@ public class Wall implements Collideable, Loadable, Drawable {
         body.setUserData(new BodData("wall", this));
 
         lines.add(new DrawLine(p1, p2));
-        Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
-    }
-
-    public void setColor(Color c) {
-        for (DrawLine dl : lines) {
-            dl.setColor(c);
-        }
-    }
-
-    @Override
-    public String className() {
-        return null;
-    }
-
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        for (DrawLine l: lines) {
-            l.draw(spriteBatch, shapeRenderer, modelBatch);
-        }
+        //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
     }
 
     public Double getAngle() { return angle; }
@@ -138,6 +120,12 @@ public class Wall implements Collideable, Loadable, Drawable {
                 body.createFixture(shape, 0);
             }
         }
+        modelable.rebuildModel();
+    }
+
+    public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
+        for (DrawLine dl: lines)
+            dl.buildMesh(wallBuilder, modelCenter);
     }
 
     @Override

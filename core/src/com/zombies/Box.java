@@ -6,41 +6,42 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
 import com.interfaces.Overlappable;
-import com.interfaces.Drawable;
 import com.map.MapGen;
 import com.powerups.HealthPickup;
 import com.powerups.PistolPickup;
 import com.powerups.Powerup;
 import com.powerups.ShotgunPickup;
+import com.util.FixedBoxShapeBuilder;
 import com.util.Geometry;
 
-public class Box implements Drawable, Overlappable, Loadable, HasZone {
+public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
     private Vector2 position;
-    private int indexX, indexY;
     private Room room;
     private GameView view;
     private Random random = new Random();
-    private Floor floor;
     public float height = C.BOX_SIZE, width = C.BOX_SIZE;
     private Zone z;
 
     public String BMKey;
-    private int[] boxMapLocation;
 
     public Box(float x, float y) {
         position = new Vector2(x, y);
         this.view = GameView.gv;
-        this.floor = new Floor(this);
     }
 
     public boolean insideBox(float x, float y) {
@@ -161,10 +162,6 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         zombies.add(u);
     }
 
-    public void createDoor(char direction) {
-
-    }
-
     public Vector2 getPosition() {
         return position;
     }
@@ -181,11 +178,6 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
             return position.cpy().add(C.BOX_WIDTH, C.BOX_HEIGHT);
         }
         return new Vector2();
-    }
-
-    @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        floor.draw(spriteBatch, shapeRenderer, modelBatch);
     }
 
     public Room getRoom() {
@@ -236,6 +228,20 @@ public class Box implements Drawable, Overlappable, Loadable, HasZone {
         return false;
     }
 
+    public void buildFloorMesh(MeshPartBuilder floorBuilder, Vector2 modelCenter) {
+        BoundingBox bounds;
+        Vector3 min, max;
+
+        min = new Vector3(0, 0, -0.1f);
+        max = new Vector3(width, height, 0);
+        bounds = new BoundingBox(min, max);
+
+        Matrix4 mtrans = new Matrix4();
+        mtrans.translate(position.x - modelCenter.x, position.y - modelCenter.y, 0);
+        bounds.mul(mtrans);
+
+        FixedBoxShapeBuilder.build(floorBuilder, bounds);
+    }
 
     // Box Map Location - used during room generation in MapGen.java
     public int[] getBMLocation() {

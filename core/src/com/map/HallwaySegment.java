@@ -3,13 +3,20 @@ package com.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.interfaces.Drawable;
 import com.interfaces.HasZone;
 import com.interfaces.Loadable;
+import com.interfaces.Modelable;
 import com.interfaces.Overlappable;
+import com.util.FixedBoxShapeBuilder;
 import com.util.Geometry;
+import com.zombies.DrawLine;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
@@ -21,15 +28,17 @@ import java.util.LinkedList;
  */
 public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
-    public Vector2 p1, p2, position;
+    public Vector2 p1, p2, position, center;
+    private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius, width, height;
     private char direction;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
+    private Modelable modelable;
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle, Modelable m) {
         this.p1 = p1;
         this.p2 = p2;
         this.angle = Geometry.getAngleFromPoints(p1, p2);
@@ -37,6 +46,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         this.previousSegmentAngle = previousSegmentAngle;
         this.diameter = diameter;
         radius = diameter / 2;
+        modelable = m;
 
         calculateInfo();
     }
@@ -44,8 +54,7 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
     public void materialize() {
         calculateInfo(); // do this a second time
         createWalls();
-        registerDrawable();
-        registerOverlappable();
+        Zone.getZone(getCenter()).addObject(this);
     }
 
     private void createWalls() {
@@ -67,13 +76,13 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
 
         float p1r = Math.abs(previousSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
         float p2r = Math.abs(nextSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        Vector2 w1p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
-        Vector2 w1p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        Vector2 w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
-        Vector2 w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
+        w1p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
+        w1p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
+        w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
 
-        walls.add(new Wall(w1p1, w1p2));
-        walls.add(new Wall(w2p1, w2p2));
+        walls.add(new Wall(w1p1, w1p2, modelable));
+        walls.add(new Wall(w2p1, w2p2, modelable));
     }
 
     private void calculateInfo() {
@@ -83,6 +92,8 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
         } else {
             position = new Vector2(p2.x - radius, p2.y - radius);
         }
+
+        center = position.cpy().add(width / 2, height / 2);
 
         // calculate width and height
         width = Math.abs(p1.x - p2.x) + diameter;
@@ -99,16 +110,8 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
             direction = 's';
     }
 
-    private void registerDrawable() {
-        Zone.getZone(getCenter()).addDrawable(this, 0);
-    }
-
-    private void registerOverlappable() {
-        Zone.getZone(getCenter()).addObject(this);
-    }
-
     public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
+        return center;
     }
 
     public Vector2 getP1() {return p1;}
@@ -123,14 +126,32 @@ public class HallwaySegment implements Overlappable, Drawable, Loadable, HasZone
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        for (Wall w: walls) {
-            w.draw(spriteBatch, shapeRenderer, modelBatch);
-        }
+        //TODO: draw like a room draws
     }
 
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    }
+
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+        for (Wall wall: walls)
+            wall.buildWallMesh(builder, modelCenter);
+    }
+
+    public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+        BoundingBox bounds;
+        Vector3 min, max;
+
+        min = new Vector3(0, 0, -0.1f);
+        max = new Vector3(width, height, 0);
+        bounds = new BoundingBox(min, max);
+
+        Matrix4 mtrans = new Matrix4();
+        mtrans.translate(position.x - modelCenter.x, position.y - modelCenter.y, 0);
+        bounds.mul(mtrans);
+
+        FixedBoxShapeBuilder.build(builder, bounds);
     }
 
     @Override

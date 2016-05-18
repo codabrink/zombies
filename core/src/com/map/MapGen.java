@@ -126,7 +126,6 @@ public class MapGen {
         }
 
         Room room = new Room(boxMap.values());
-        room.genOuterWalls();
         genHallway(room);
         return room;
     }
