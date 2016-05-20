@@ -32,10 +32,10 @@ public class Grass implements Drawable, HasZone {
         MeshPartBuilder builder = Assets.modelBuilder.part("grass",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(Assets.wildGrassTextureDiffuse));
-        builder.rect(0, 0, -0.1f,
-                width, 0, -0.1f,
-                width, height, -0.1f,
-                0, height, -0.1f,
+        builder.rect(0, 0, -0.2f,
+                width, 0, -0.2f,
+                width, height, -0.2f,
+                0, height, -0.2f,
                 1, 1, 1);
         model = Assets.modelBuilder.end();
         modelInstance = new ModelInstance(model);

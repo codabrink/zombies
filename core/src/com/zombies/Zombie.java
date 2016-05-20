@@ -12,22 +12,16 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.interfaces.Collideable;
-import com.interfaces.HasZone;
-import com.interfaces.Loadable;
+import com.interfaces.Drawable;
 
-public class Zombie extends Unit {
+public class Zombie extends Unit implements Drawable {
     private long lastAttack = System.currentTimeMillis();
-    private Player player;
     private Random random = new Random();
 
     public Zombie(GameView view, Box box, Vector2 position) {
         super();
-        this.box = box;
-        player = view.getPlayer();
 
         storedBodData = new BodData("zombie", this);
-
         speed = C.ZOMBIE_SPEED;
         color = new Color(1, 0, 0, 1);
         health = C.ZOMBIE_HEALTH;
@@ -59,9 +53,7 @@ public class Zombie extends Unit {
         if (state == "dead") {
             unload();
             zone.removeObject(this);
-            box.removeUnit(this);
-            if (box != null)
-                box.removeUnit(this);
+
             view.stats.zombieKills ++;
             view.stats.score += C.SCORE_ZOMBIE_KILL;
         } else if (state == "dormant") {
@@ -85,7 +77,6 @@ public class Zombie extends Unit {
         if (body != null)
             return;
 
-
         view.addActiveZombie(this);
     }
 
@@ -104,10 +95,12 @@ public class Zombie extends Unit {
     }
 
     @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        if (body == null) return;
-        if (box != null && box.getRoom() != view.getPlayer().getRoom()) return;
+    public String className() {
+        return "Zombie";
+    }
 
+    @Override
+    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);
         shapeRenderer.rect(body.getPosition().x - 0.5f, body.getPosition().y - 0.5f, 1, 1);
@@ -172,25 +165,11 @@ public class Zombie extends Unit {
         updateBox();
     }
 
-    public void updateBox() {
-        box = zone.getBox(body.getPosition().x, body.getPosition().y);
-    }
-
-    public void updateZone() {
-        Zone z;
-        z = Zone.getZone(body.getPosition().x, body.getPosition().y);
-        z.addObject(this);
-    }
-
     @Override
     public void move() {
         body.applyForce(mPos.sub(body.getPosition()).setLength(C.ZOMBIE_AGILITY), new Vector2(), true);
         if (body.getLinearVelocity().len() > C.ZOMBIE_SPEED) { //Zombie is going too fast
             body.setLinearVelocity(body.getLinearVelocity().setLength(C.ZOMBIE_SPEED));
         }
-    }
-
-    public void setZone(Zone z) {
-        z.addObject(this);
     }
 }

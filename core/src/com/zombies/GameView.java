@@ -34,6 +34,7 @@ public class GameView implements Screen {
     public static FontGen fontGen;
     public static GameView gv;
     public static Environment environment, outsideEnvironment;
+    public static Player player;
 
     private ArrayList<Zombie> activeZombies;
 
@@ -46,7 +47,6 @@ public class GameView implements Screen {
     public ModelBatch modelBatch;
     private Assets assets = new Assets();
 
-    protected Player player;
     protected World world;
     protected Box grid[][];
 
