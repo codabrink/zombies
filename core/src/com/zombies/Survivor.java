@@ -12,8 +12,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.guns.Pistol;
-import com.interfaces.Collideable;
+import com.zombies.guns.Pistol;
+import com.zombies.interfaces.Collideable;
 
 public class Survivor extends Unit implements Collideable {
 
@@ -68,8 +68,6 @@ public class Survivor extends Unit implements Collideable {
     @Override
     protected void updateBox() {
         updateZone();
-        box = zone.getBox(body.getPosition());
-        box.addUnit(this);
     }
     @Override
     protected void updateZone() {
@@ -130,10 +128,6 @@ public class Survivor extends Unit implements Collideable {
         return false;
     }
 
-    public void pushPointOfInterest(Vector2 point) {
-        pointsOfInterest.push(point);
-    }
-
     @Override
     public void die(Unit u) {
         if (state == "dead") return;
@@ -145,10 +139,6 @@ public class Survivor extends Unit implements Collideable {
     public void hurt(float zombieStrength, Unit u) {
         if (health >= C.PLAYER_HEALTH) {
             beginAttacks = System.currentTimeMillis();
-        }
-        if (view.getPlayer().getRoom() != box.getRoom()) {
-            body.setAwake(false);
-            return;
         }
         health -= zombieStrength;
         if (health < 0) {
@@ -170,14 +160,6 @@ public class Survivor extends Unit implements Collideable {
         shapeRenderer.end();
     }
 
-    public Box getBox() {
-        return box;
-    }
-
-    public Room getRoom() {
-        return box.getRoom();
-    }
-
     public void handleCollision(Fixture f) {
         String type = ((BodData)f.getBody().getUserData()).getType();
         Object o = ((BodData)f.getBody().getUserData()).getObject();
@@ -185,41 +167,6 @@ public class Survivor extends Unit implements Collideable {
 
     public void handleShots() {
 
-        if (box.getRoom().isAlarmed()) {
-            if (target == null) {
-                if (playerInRoom()) {
-                    if (box.getUnits().size() > 0) {
-                        Unit u = box.randomZombie();
-                        if (u != view.getPlayer())
-                            target = u;
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    return;
-                }
-            }
-            else {
-                if (!playerInRoom() || target.isDead()) {
-                    target = null;
-                    return;
-                }
-                if (System.currentTimeMillis() > lastShot + fireRate) {
-                    if (true)
-                        return; //TODO fix fighting
-                    Vector2 shot = target.getBody().getPosition().sub(body.getPosition()).setLength(100);
-                    gun.shoot(shot);
-
-                    //Switched over to a gun system
-                    //bullets.add(new Bullet(view, this, GROUP, new Vector2(body.getPosition().x, body.getPosition().y), shot));
-
-                    lastShot = System.currentTimeMillis();
-                    view.stats.survivorShots ++;
-                }
-            }
-        }
     }
 
     public boolean isFound() {
@@ -227,9 +174,6 @@ public class Survivor extends Unit implements Collideable {
     }
 
     public boolean playerInRoom() {
-        if (box.getRoom() == view.getPlayer().getBox().getRoom()) {
-            return true;
-        }
         return false;
     }
 
@@ -246,7 +190,6 @@ public class Survivor extends Unit implements Collideable {
             AI();
         else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < C.SURVIVOR_WAKE_DIST) {
             setState("found");
-            box.removeUnit(this);
             view.getPlayer().addSurvivor(this);
             view.stats.survivorsFound ++;
             view.stats.score += C.SCORE_FIND_SURVIVOR;

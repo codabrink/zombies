@@ -1,14 +1,14 @@
 package com.zombies;
 
-import com.HUD.DebugText;
+import com.zombies.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
-import com.interfaces.Drawable;
-import com.interfaces.HasZone;
-import com.interfaces.Loadable;
-import com.interfaces.Overlappable;
-import com.interfaces.Updateable;
-import com.map.Grass;
-import com.map.MapGen;
+import com.zombies.interfaces.Drawable;
+import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.Overlappable;
+import com.zombies.interfaces.Updateable;
+import com.zombies.map.Grass;
+import com.zombies.map.MapGen;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

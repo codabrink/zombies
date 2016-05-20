@@ -10,10 +10,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.interfaces.Collideable;
-import com.interfaces.Loadable;
-import com.interfaces.Modelable;
-import com.util.Geometry;
+import com.zombies.interfaces.Collideable;
+import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.Modelable;
 
 public class Wall implements Collideable, Loadable {
     private Vector2 p1, p2, center;

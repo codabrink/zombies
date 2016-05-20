@@ -5,20 +5,16 @@ import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
-import com.interfaces.HasZone;
-import com.interfaces.Loadable;
-import com.interfaces.Overlappable;
-import com.map.MapGen;
-import com.powerups.HealthPickup;
-import com.powerups.PistolPickup;
-import com.powerups.Powerup;
-import com.powerups.ShotgunPickup;
-import com.util.FixedBoxShapeBuilder;
-import com.util.Geometry;
+import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.Overlappable;
+import com.zombies.map.MapGen;
+import com.zombies.powerups.HealthPickup;
+import com.zombies.powerups.PistolPickup;
+import com.zombies.powerups.Powerup;
+import com.zombies.powerups.ShotgunPickup;
+import com.zombies.util.Geometry;
 
 public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
@@ -119,26 +115,6 @@ public class Box implements Overlappable, Loadable, HasZone {
         survivors.add(s);
         return s;
     }
-
-    public void addUnit(Unit u) {
-        if (u.box != null)
-            u.box.removeUnit(u);
-        u.box = this;
-
-        if (u instanceof Zombie) {
-            Zombie z = (Zombie)u;
-            if (zombies.indexOf(z) == -1)
-                zombies.add(z);
-            return;
-        } else if (u instanceof Survivor) {
-            Survivor s = (Survivor)u;
-            if (survivors.indexOf(s) == -1)
-                survivors.add(s);
-            return;
-        }
-        throw new Error("Addition of class " + u.getClass() + " to box is not supported.");
-    }
-
 
     public boolean removeUnit(Unit u) {
         if (u instanceof Zombie)

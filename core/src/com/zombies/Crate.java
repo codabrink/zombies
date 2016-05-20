@@ -13,8 +13,9 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.zombies.interfaces.Collideable;
 
-public class Crate implements com.interfaces.Collideable {
+public class Crate implements Collideable {
 	
 	private Body body;
 	private PolygonShape shape;

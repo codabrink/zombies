@@ -1,7 +1,6 @@
 package com.zombies;
 
 import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.interfaces.Drawable;
+import com.zombies.interfaces.Drawable;
 
 public class Zombie extends Unit implements Drawable {
     private long lastAttack = System.currentTimeMillis();
@@ -92,11 +91,6 @@ public class Zombie extends Unit implements Drawable {
 
     public void attack(Unit u) {
         attack = u;
-    }
-
-    @Override
-    public String className() {
-        return "Zombie";
     }
 
     @Override

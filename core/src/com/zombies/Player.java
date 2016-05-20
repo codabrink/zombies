@@ -1,28 +1,22 @@
 package com.zombies;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.HUD.DebugText;
+import com.zombies.HUD.DebugText;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
-import com.guns.Pistol;
+import com.zombies.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.interfaces.Collideable;
-
-import box2dLight.DirectionalLight;
+import com.zombies.interfaces.Collideable;
 
 public class Player extends Unit implements Collideable {
 
@@ -126,20 +120,12 @@ public class Player extends Unit implements Collideable {
 
     public Body getBody() {return body;}
 
-    public Box getBox() {
-        return box;
-    }
-
     public Gun getGun() {
         return guns.get(gunIndex);
     }
 
     public float getHealthPercent() {
         return health / C.PLAYER_HEALTH;
-    }
-
-    public Room getRoom() {
-        return box.getRoom();
     }
 
     public ArrayList<Survivor> getSurvivors() {
@@ -180,10 +166,6 @@ public class Player extends Unit implements Collideable {
     public void hurt(float zombieStrength, Unit u) {
         if (health >= C.PLAYER_HEALTH) {
             beginAttacks = System.currentTimeMillis();
-        }
-        if (view.getPlayer().getRoom() != box.getRoom()) {
-            body.setAwake(false);
-            return;
         }
         health -= zombieStrength;
         view.stats.damageTaken += zombieStrength;
@@ -276,11 +258,6 @@ public class Player extends Unit implements Collideable {
         }
     }
 
-    @Override
-    public void setBox(Box b) {
-        box = b;
-    }
-
     public void setGun(Gun g) {
         gunIndex = guns.indexOf(g);
     }
@@ -337,10 +314,6 @@ public class Player extends Unit implements Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
             this.applyMove();
         }
-    }
-
-    protected void updateBox() {
-        setBox(zone.getBox(body.getPosition()));
     }
 
     @Override

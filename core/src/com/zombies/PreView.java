@@ -1,7 +1,6 @@
 package com.zombies;
 
-import com.HUD.FontGen;
-import com.badlogic.gdx.Game;
+import com.zombies.HUD.FontGen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;

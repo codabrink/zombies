@@ -2,30 +2,26 @@ package com.zombies;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.interfaces.Drawable;
-import com.interfaces.HasZone;
-import com.interfaces.Loadable;
-import com.interfaces.Modelable;
-import com.util.Assets;
+import com.zombies.interfaces.Drawable;
+import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.Modelable;
+import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
     private int size;
@@ -233,11 +229,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     @Override
     public void setZone(Zone z) {
         zone = z;
-    }
-
-    @Override
-    public String className() {
-        return "Room";
     }
 
     @Override

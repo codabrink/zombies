@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.interfaces.Drawable;
+import com.zombies.interfaces.Drawable;
 
 public class DebugLine implements Drawable {
 
@@ -19,11 +19,6 @@ public class DebugLine implements Drawable {
         this.view = GameView.gv;
         this.v1 = v1;
         this.v2 = v2;
-    }
-
-    @Override
-    public String className() {
-        return "DebugLine";
     }
 
     @Override

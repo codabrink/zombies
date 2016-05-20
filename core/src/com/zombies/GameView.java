@@ -1,6 +1,5 @@
 package com.zombies;
 
-import com.HUD.*;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -20,8 +19,9 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
-import com.data.Stats;
-import com.util.Assets;
+import com.zombies.data.Stats;
+import com.zombies.util.Assets;
+import com.zombies.interfaces.Collideable;
 
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.Random;
 
 public class GameView implements Screen {
     // STATIC VARIABLES
-    public static FontGen fontGen;
+    public static com.zombies.HUD.FontGen fontGen;
     public static GameView gv;
     public static Environment environment, outsideEnvironment;
     public static Player player;
@@ -58,7 +58,7 @@ public class GameView implements Screen {
     protected ThumbpadRight thumbpadRight;
     protected ShootButton shootButton;
     public MessageHandler mh;
-    private HUD hud;
+    private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     public int frame = 0;
 
@@ -74,7 +74,7 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView() {
-        fontGen = new FontGen();
+        fontGen = new com.zombies.HUD.FontGen();
 
         cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         cam.position.set(0, 0, 60);
@@ -93,7 +93,7 @@ public class GameView implements Screen {
         activeZombies = new ArrayList<Zombie>();
         stats = new Stats();
 
-        hud = new HUD();
+        hud = new com.zombies.HUD.HUD();
         world = new World(new Vector2(), true);
 
         // generate the initial zone
@@ -131,7 +131,7 @@ public class GameView implements Screen {
         return shootButton;
     }
 
-    public com.HUD.HUD getHUD() {
+    public com.zombies.HUD.HUD getHUD() {
         return hud;
     }
 
@@ -229,7 +229,7 @@ public class GameView implements Screen {
         player.update(frame);
         player.draw(spriteBatch, shapeRenderer, modelBatch);
 
-        DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
+        com.zombies.HUD.DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
 
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
@@ -239,7 +239,7 @@ public class GameView implements Screen {
         for (DebugDots dd: debugDots) {
             dd.draw(spriteBatch, shapeRenderer, modelBatch);
         }
-        DebugText.render();
+        com.zombies.HUD.DebugText.render();
         //debugRenderer.render(world, cam.combined);
     }
 
@@ -270,8 +270,8 @@ public class GameView implements Screen {
                 return;
             if ((BodData)f1.getBody().getUserData() == null || (BodData)f2.getBody().getUserData() == null)
                 return;
-            com.interfaces.Collideable c1 = (com.interfaces.Collideable)((BodData)f1.getBody().getUserData()).getObject();
-            com.interfaces.Collideable c2 = (com.interfaces.Collideable)((BodData)f2.getBody().getUserData()).getObject();
+            Collideable c1 = (Collideable)((BodData)f1.getBody().getUserData()).getObject();
+            Collideable c2 = (Collideable)((BodData)f2.getBody().getUserData()).getObject();
             c1.handleCollision(f2);
             c2.handleCollision(f1);
         }
