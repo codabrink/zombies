@@ -11,6 +11,7 @@ import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -26,14 +27,14 @@ public class Zone {
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
     // Collections
-    private ArrayList<Zone> adjZones = new ArrayList<Zone>();
-    private ArrayList<Overlappable> overlappables = new ArrayList<Overlappable>();
-    private ArrayList<Updateable> updateables = new ArrayList<Updateable>();
-    private ArrayList<Box> boxes = new ArrayList<Box>();
-    private ArrayList<Room> rooms = new ArrayList<Room>();
-    private ArrayList<Loadable> loadables = new ArrayList<Loadable>();
-    private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-    private ArrayList<Drawable> debugLines = new ArrayList<Drawable>();
+    private HashSet<Zone> adjZones = new HashSet<Zone>();
+    private HashSet<Overlappable> overlappables = new HashSet<Overlappable>();
+    private HashSet<Updateable> updateables = new HashSet<Updateable>();
+    private HashSet<Box> boxes = new HashSet<Box>();
+    private HashSet<Room> rooms = new HashSet<Room>();
+    private HashSet<Loadable> loadables = new HashSet<Loadable>();
+    private HashSet<Drawable> drawables = new HashSet<Drawable>();
+    private HashSet<Drawable> debugLines = new HashSet<Drawable>();
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
 
@@ -106,8 +107,7 @@ public class Zone {
 
         for (int i=0;i<zonePositions.length;i+=2) {
             Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
-            if (z != this && adjZones.indexOf(z) == -1)
-                adjZones.add(z);
+            adjZones.add(z);
         }
     }
 
@@ -213,25 +213,22 @@ public class Zone {
     public Vector2 getPosition() {
         return position;
     }
-    public ArrayList<Box> getBoxes() { return boxes; }
-    public ArrayList<Room> getRooms() { return rooms; }
-    public ArrayList<Zone> getAdjZones() { return adjZones; }
-    public ArrayList<Zone> getAdjZonesPlusSelf() {
-        ArrayList<Zone> allZones = (ArrayList<Zone>)adjZones.clone();
+    public HashSet<Box> getBoxes() { return boxes; }
+    public HashSet<Room> getRooms() { return rooms; }
+    public HashSet<Zone> getAdjZones() { return adjZones; }
+    public HashSet<Zone> getAdjZonesPlusSelf() {
+        HashSet<Zone> allZones = (HashSet<Zone>)adjZones.clone();
         allZones.add(this);
         return allZones;
     }
 
     private void addRoom(Room r) {
-        if (rooms.indexOf(r) == -1)
-            rooms.add(r);
-        for (Box b : r.getBoxes()) {
-            Zone.getZone(b.getCenter()).addObject(b);
-        }
+        rooms.add(r);
+        for (Box b : r.getBoxes())
+            addObject(b);
     }
     private void addBox(Box b) {
-        if (boxes.indexOf(b) == -1)
-            boxes.add(b);
+        boxes.add(b);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
@@ -243,8 +240,7 @@ public class Zone {
         boxes.remove(b);
     }
     private void addDrawable(Drawable d) {
-        if (drawables.indexOf(d) == -1)
-            drawables.add(d);
+        drawables.add(d);
     }
     private void addDrawableNoCheck(Drawable d) {
         drawables.add(d);
@@ -253,22 +249,19 @@ public class Zone {
         drawables.remove(d);
     }
     private void addOverlappable(Overlappable o) {
-        if (overlappables.indexOf(o) == -1)
-            overlappables.add(o);
+        overlappables.add(o);
     }
     private void removeOverlappable(Overlappable o) {
         overlappables.remove(o);
     }
     private void addLoadable(Loadable l) {
-        if (loadables.indexOf(l) == -1)
-            loadables.add(l);
+        loadables.add(l);
     }
     private void removeLoadable(Loadable l) {
         loadables.remove(l);
     }
     private void addUpdateable(Updateable u) {
-        if (updateables.indexOf(u) == -1)
-            updateables.add(u);
+        updateables.add(u);
     }
     private void removeUpdateable(Updateable u) {
         updateables.remove(u);
@@ -318,9 +311,12 @@ public class Zone {
     }
 
     public Box randomBox() {
-        if (boxes.size() > 0)
-            return boxes.get(r.nextInt(boxes.size()));
-        else
-            return null;
+        int ri = GameView.r.nextInt(boxes.size()), i = 0;
+        for (Box b: boxes) {
+            if (ri == i)
+                return b;
+            i++;
+        }
+        return null;
     }
 }

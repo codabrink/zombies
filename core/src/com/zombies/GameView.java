@@ -35,6 +35,7 @@ public class GameView implements Screen {
     public static GameView gv;
     public static Environment environment, outsideEnvironment;
     public static Player player;
+    public static Random r = new Random();
 
     private ArrayList<Zombie> activeZombies;
 
