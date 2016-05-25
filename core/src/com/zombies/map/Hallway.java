@@ -118,6 +118,16 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
         axes.add(hs.getP2());
     }
 
+    public ArrayList<HallwaySegment> getHallwaySegments() {
+        ArrayList<HallwaySegment> hss = new ArrayList<HallwaySegment>();
+
+        for (Overlappable hs: hallwaySegments) {
+            hss.add((HallwaySegment)hs);
+        }
+
+        return hss;
+    }
+
     private void materialize() {
         center = new Vector2();
 

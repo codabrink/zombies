@@ -102,11 +102,16 @@ public class Wall implements Collideable, Loadable {
         Vector2 vo = p2.cpy().sub(p1).scl(1 / p2.cpy().sub(p1).len());
         Vector2 v1, v2;
 
+        // System.out.println("vo: " + vo);
+
         for (int i = 0; i <= holePositions.size(); i++) {
 
             // the start and end positions of this wall segment, relative to the wall position.
             v1 = (i == 0 ? new Vector2(0, 0) : vo.cpy().scl(holePositions.get(i - 1) + holes.get(holePositions.get(i - 1)) / 2));
             v2 = (i == holePositions.size() ? p2.cpy().sub(p1) : vo.cpy().scl(holePositions.get(i) - holes.get(holePositions.get(i)) / 2));
+
+            // System.out.println("v1: " + v1);
+            // System.out.println("v2: " + v2);
 
             // create the segment only if it has nonzero length, and is in the same direction as
             // the wall unit vector (second requirement is false if the last/first hole extends past

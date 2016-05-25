@@ -7,6 +7,8 @@ import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
+import com.zombies.map.Hallway;
+import com.zombies.map.HallwaySegment;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
 import java.util.ArrayList;
@@ -27,11 +29,13 @@ public class Zone {
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
     // Collections
+
     private HashSet<Zone> adjZones = new HashSet<Zone>();
     private HashSet<Overlappable> overlappables = new HashSet<Overlappable>();
     private HashSet<Updateable> updateables = new HashSet<Updateable>();
     private HashSet<Box> boxes = new HashSet<Box>();
     private HashSet<Room> rooms = new HashSet<Room>();
+    private ArrayList<Hallway> hallways = new ArrayList<Hallway>();
     private HashSet<Loadable> loadables = new HashSet<Loadable>();
     private HashSet<Drawable> drawables = new HashSet<Drawable>();
     private HashSet<Drawable> debugLines = new HashSet<Drawable>();
@@ -163,6 +167,88 @@ public class Zone {
         return true;
     }
 
+    public static void createHole(Vector2 blastCenter, Float blastRadius) {
+        Zone startingZone = getZone(blastCenter);
+        // TODO: calculate which zones the blast area covers. account for all of them.
+        ArrayList<Zone> damageZones = new ArrayList<Zone>();
+        damageZones.add(startingZone);
+
+        ArrayList<Wall> wallsToCheck = new ArrayList<Wall>();
+
+        // TODO: sometimes a wall is in a zone, but belongs to a different zone and so does not explode.
+        // how can these walls be counted?
+        for (Zone z: damageZones) {
+            wallsToCheck.addAll(z.getWalls());
+        }
+
+        for (Wall w: wallsToCheck) {
+
+            // TODO: use a simple preliminary check here to see if the segment intersects the circle.
+            // the below calculations are for lines, and so might go through to completion for walls
+            // that aren't even close.
+
+            Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
+            Float d, a, b, c, square, xi1, yi1, xi2, yi2;
+
+            // a variation of the formula has to be used for vertical lines.
+            if (m == Float.POSITIVE_INFINITY || m == Float.NEGATIVE_INFINITY) {
+                d = w.getStart().x;
+                a = 1.0f;
+                b = -2 * blastCenter.y;
+                c = (float)Math.pow(blastCenter.x, 2) + (float)Math.pow(blastCenter.y, 2) - (float)Math.pow(blastRadius, 2) - 2 * blastCenter.x * d + (float)Math.pow(d, 2);
+
+                square = (float)Math.pow(b, 2) - 4 * a * c;
+
+                // this line misses or is tangent to the circle.
+                if (square <= 0.0f)
+                    continue;
+
+                xi1 = d;
+                yi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
+                xi2 = d;
+                yi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
+            } else {
+                d = w.getEnd().y - m * w.getEnd().x;
+                a = (float) Math.pow(m, 2) + 1;
+                b = 2 * (m * d - m * blastCenter.y - blastCenter.x);
+                c = (float) Math.pow(blastCenter.y, 2) - (float) Math.pow(blastRadius, 2) + (float) Math.pow(blastCenter.x, 2) - 2 * blastCenter.y * d + (float) Math.pow(d, 2);
+
+                square = (float)Math.pow(b, 2) - 4 * a * c;
+
+                if (square <= 0.0f)
+                    continue;
+
+                xi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
+                yi1 = m * xi1 + d;
+                xi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
+                yi2 = m * xi2 + d;
+            }
+
+            Vector2 i1 = new Vector2(xi1, yi1);
+            Vector2 i2 = new Vector2(xi2, yi2);
+
+            // if either intersection is beyond the wall, pull it back to the wall's endpoint so
+            // the hole will draw correctly.
+            if (i1.cpy().dst(w.getStart()) < i1.cpy().dst(w.getEnd())) {
+                if (w.getEnd().dst(i1) > w.getEnd().dst(w.getStart()))
+                    i1 = w.getStart();
+            } else {
+                if (w.getStart().dst(i1) > w.getStart().dst(w.getEnd()))
+                    i1 = w.getEnd();
+            }
+
+            if (i2.cpy().dst(w.getStart()) < i2.cpy().dst(w.getEnd())) {
+                if (w.getEnd().dst(i2) > w.getEnd().dst(w.getStart()))
+                    i2 = w.getStart();
+            } else {
+                if (w.getStart().dst(i2) > w.getStart().dst(w.getEnd()))
+                    i2 = w.getEnd();
+            }
+
+            w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
+        }
+    }
+
     public Box getBox(float x, float y) {
         for (Box b: boxes) {
             if (b.insideBox(x, y))
@@ -184,6 +270,8 @@ public class Zone {
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
+        if (o instanceof Hallway)
+            addHallway((Hallway) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -200,6 +288,8 @@ public class Zone {
             removeRoom((Room) o);
         if (o instanceof Box)
             removeBox((Box) o);
+        if (o instanceof Hallway)
+            removeHallway((Hallway) o);
         if (o instanceof Overlappable)
             removeOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -210,9 +300,7 @@ public class Zone {
             removeDrawable((Drawable) o);
     }
 
-    public Vector2 getPosition() {
-        return position;
-    }
+    public Vector2 getPosition() { return position; }
     public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Zone> getAdjZones() { return adjZones; }
@@ -227,6 +315,10 @@ public class Zone {
         for (Box b : r.getBoxes())
             addObject(b);
     }
+    private void addHallway(Hallway h) {
+        if (hallways.indexOf(h) == -1)
+            hallways.add(h);
+    }
     private void addBox(Box b) {
         boxes.add(b);
     }
@@ -238,6 +330,9 @@ public class Zone {
     }
     private void removeBox(Box b) {
         boxes.remove(b);
+    }
+    private void removeHallway(Hallway h) {
+        hallways.remove(h);
     }
     private void addDrawable(Drawable d) {
         drawables.add(d);
@@ -265,6 +360,19 @@ public class Zone {
     }
     private void removeUpdateable(Updateable u) {
         updateables.remove(u);
+    }
+
+    private ArrayList<Wall> getWalls() {
+        ArrayList<Wall> walls = new ArrayList<Wall>();
+
+        for (Room r: rooms)
+            walls.addAll(r.getWalls());
+
+        for (Hallway h: hallways)
+            for (HallwaySegment hs: h.getHallwaySegments())
+                walls.addAll(hs.getWalls());
+
+        return walls;
     }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {

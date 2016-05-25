@@ -11,6 +11,8 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
@@ -103,6 +105,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
     public Vector2 getP1() {return p1;}
     public Vector2 getP2() {return p2;}
+    public LinkedList<Wall> getWalls() { return walls; }
 
     public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
 

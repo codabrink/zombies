@@ -61,6 +61,7 @@ public class GameView implements Screen {
     public MessageHandler mh;
     private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
+    private ArrayList<DebugCircle> debugCircles = new ArrayList<DebugCircle>();
     public int frame = 0;
 
     public float scale = 1;
@@ -228,6 +229,11 @@ public class GameView implements Screen {
         handleKeys();
 
         player.update(frame);
+
+        for (DebugCircle dc: debugCircles)
+            dc.draw(spriteBatch, shapeRenderer, modelBatch);
+        for (DebugDots dd: debugDots)
+            dd.draw(spriteBatch, shapeRenderer, modelBatch);
         player.draw(spriteBatch, shapeRenderer, modelBatch);
 
         com.zombies.HUD.DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
@@ -237,9 +243,6 @@ public class GameView implements Screen {
         hud.render(HUDSpriteBatch);
         HUDSpriteBatch.end();
 
-        for (DebugDots dd: debugDots) {
-            dd.draw(spriteBatch, shapeRenderer, modelBatch);
-        }
         com.zombies.HUD.DebugText.render();
         //debugRenderer.render(world, cam.combined);
     }
@@ -340,6 +343,11 @@ public class GameView implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_SIZE, 0), player.getBody().getAngle());
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            Zone.createHole(player.getPosition().cpy(), 4.0f);
+            debugCircles.add(new DebugCircle(player.getPosition().cpy(), 4.0f));
         }
 
 
