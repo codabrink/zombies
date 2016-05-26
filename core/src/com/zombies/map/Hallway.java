@@ -23,11 +23,11 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zombies.interfaces.Modelable {
-    public static int MAX_HALLWAY_SEGMENTS = 2;
+    public static int MAX_HALLWAY_SEGMENTS = 1;
 
     ArrayList<Vector2> axes = new ArrayList<Vector2>();
     private Random r;
-    private ArrayList<Overlappable> hallwaySegments = new ArrayList<Overlappable>();
+    private ArrayList<HallwaySegment> hallwaySegments = new ArrayList<HallwaySegment>();
     private Box originBox;
     private Wall originWall;
     private float diameter;
@@ -73,8 +73,9 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
 
     private void tryToMove(double angle, double previousSegmentAngle) {
         Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle, this);
-        Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
+        HallwaySegment hs = new HallwaySegment(this, axes.get(axes.size() - 1), newAxis, diameter);
+        Overlappable o = Zone.getZone(hs.center).checkOverlap(hs.position, hs.width, hs.height, 1);
+
         if (o == null)
             o = com.zombies.util.Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
 
@@ -160,6 +161,10 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
     }
     private float vertBoxRange(Box b, float width) {
         return b.getPosition().y + r.nextFloat() * (b.height - width) + width / 2;
+    }
+
+    public ArrayList<HallwaySegment> getSegments() {
+        return hallwaySegments;
     }
 
     @Override

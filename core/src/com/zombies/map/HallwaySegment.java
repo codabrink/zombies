@@ -15,27 +15,28 @@ import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
     private static int DRAWABLE_LAYER = 1;
+
+    private Hallway hallway;
+
     public Vector2 p1, p2, position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius, width, height;
     private char direction;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
-    private com.zombies.interfaces.Modelable modelable;
+    private double angle; // change in angle from the last hallway segment
 
-    // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle, com.zombies.interfaces.Modelable m) {
+    public HallwaySegment(Hallway h, Vector2 p1, Vector2 p2, float diameter) {
+        hallway = h;
         this.p1 = p1;
         this.p2 = p2;
-        this.angle = Geometry.getAngleFromPoints(p1, p2);
-        this.nextSegmentAngle = this.angle;
-        this.previousSegmentAngle = previousSegmentAngle;
         this.diameter = diameter;
+
+        angle = Geometry.getAngleFromPoints(p1, p2);
         radius = diameter / 2;
-        modelable = m;
 
         calculateInfo();
+        Zone.getZone(center).addObject(this); // TODO: CLEANUP!!
     }
 
     public void materialize() {
@@ -45,8 +46,11 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     private void createWalls() {
-        GameView.gv.addDebugDots(p1, Color.GREEN);
-        GameView.gv.addDebugDots(p2, Color.RED);
+        // GameView.gv.addDebugDots(p1, Color.GREEN);
+        // GameView.gv.addDebugDots(p2, Color.RED);
+
+        double previousSegmentAngle = previousSegmentAngle(),
+                nextSegmentAngle = nextSegmentAngle();
 
         // p1aa = Point 1 Angle Average
         double p1aa = (previousSegmentAngle + angle) / 2,
@@ -68,8 +72,8 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
         w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
 
-        walls.add(new Wall(w1p1, w1p2, modelable));
-        walls.add(new Wall(w2p1, w2p2, modelable));
+        walls.add(new Wall(w1p1, w1p2, hallway));
+        walls.add(new Wall(w2p1, w2p2, hallway));
     }
 
     private void calculateInfo() {
@@ -104,11 +108,20 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     public Vector2 getP1() {return p1;}
     public Vector2 getP2() {return p2;}
 
-    public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
+    private double previousSegmentAngle() {
+        int i = hallway.getSegments().indexOf(this);
+        if (i > 0)
+            return hallway.getSegments().get(i - 1).angle;
+        else
+            return angle;
+    }
 
-    @Override
-    public String className() {
-        return "HallwaySegment";
+    private double nextSegmentAngle() {
+        int i = hallway.getSegments().indexOf(this);
+        if (i < hallway.getSegments().size())
+            return hallway.getSegments().get(i + 1).angle;
+        else
+            return angle;
     }
 
 

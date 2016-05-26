@@ -152,10 +152,6 @@ public class Box implements Overlappable, Loadable, HasZone {
         return new Vector2();
     }
 
-    public Room getRoom() {
-        return room;
-    }
-
     public ArrayList<Unit> getSurvivorList() {
         return survivors;
     }
@@ -180,9 +176,11 @@ public class Box implements Overlappable, Loadable, HasZone {
         return position.cpy().add(width / 2, height / 2);
     }
 
-    public Box setRoom(Room room) {
-        this.room = room;
-        return this;
+    public void setRoom(Room r) {
+        room = r;
+    }
+    public Room getRoom() {
+        return room;
     }
 
     public void setAdjBox(Character direction, Box box) {

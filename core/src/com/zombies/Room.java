@@ -24,16 +24,11 @@ import com.zombies.interfaces.Modelable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
-    private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private Random random = new Random();
     private boolean alarmed = false;
-    private float alpha = 0;
-    private GameView view;
-    private boolean loaded = false;
-    private int frame;
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
     private Vector2 center;
@@ -42,29 +37,27 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private ModelInstance wallModelInstance, floorModelInstance;
 
     public Room(Collection<Box> boxes) {
-        view = GameView.gv;
         this.boxes = new ArrayList<Box>(boxes);
-        Zone.getZone(calculateMedian()).addObject(this);
+        calculateCenter();
+        Zone.getZone(center).addObject(this);
 
         for (Box b: boxes) {
-            Zone.getZone(b.getPosition()).addObject(b);
+            b.setRoom(this);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
 
-        center = calculateMedian();
         buildFloorModel();
         genOuterWalls();
-        Zone.getZone(center).addObject(this);
     }
 
     // calculates the median position of all of the boxes
-    private Vector2 calculateMedian() {
-        Vector2 center = new Vector2(0, 0);
+    private void calculateCenter() {
+        center = new Vector2(0, 0);
         for (Box b: boxes) {
             center.add(b.getCenter());
         }
-        return new Vector2(center.x / boxes.size(), center.y / boxes.size());
+        center = new Vector2(center.x / boxes.size(), center.y / boxes.size());
     }
 
     public void doorsTo(Room room) {
@@ -83,7 +76,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
             b.load();
         for (Wall w: walls)
             w.load();
-        loaded = true;
     }
 
     public void unload() {
@@ -92,7 +84,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
         for (Wall w: walls)
             w.unload();
-        loaded = false;
     }
 
     public void alarm(Unit victim) {
@@ -191,6 +182,9 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     }
 
     public void buildWallModel() {
+        if (wallModel != null)
+            wallModel.dispose();
+
         Assets.modelBuilder.begin();
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,

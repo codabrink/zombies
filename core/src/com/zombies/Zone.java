@@ -142,7 +142,7 @@ public class Zone {
         return z;
     }
     public static Zone getZone(Vector2 v) {
-        return getZone(v.x, v.y);
+        return Zone.getZone(v.x, v.y);
     }
     public static boolean setCurrentZone(Zone z) {
         if (Zone.currentZone == z)
