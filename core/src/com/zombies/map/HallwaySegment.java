@@ -1,6 +1,5 @@
 package com.zombies.map;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.HasZone;
@@ -8,14 +7,13 @@ import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
+import com.zombies.util.OverlapResult;
+
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
-    private static int DRAWABLE_LAYER = 1;
-
     private Hallway hallway;
 
     public Vector2 p1, p2, position, center;
@@ -36,7 +34,6 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         radius = diameter / 2;
 
         calculateInfo();
-        Zone.getZone(center).addObject(this); // TODO: CLEANUP!!
     }
 
     public void materialize() {
@@ -46,9 +43,6 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     private void createWalls() {
-        // GameView.gv.addDebugDots(p1, Color.GREEN);
-        // GameView.gv.addDebugDots(p2, Color.RED);
-
         double previousSegmentAngle = previousSegmentAngle(),
                 nextSegmentAngle = nextSegmentAngle();
 
@@ -118,16 +112,15 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
     private double nextSegmentAngle() {
         int i = hallway.getSegments().indexOf(this);
-        if (i < hallway.getSegments().size())
+        if (i < hallway.getSegments().size() - 1)
             return hallway.getSegments().get(i + 1).angle;
         else
             return angle;
     }
 
-
     @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    public OverlapResult overlaps(float x, float y, float w, float h) {
+        return new OverlapResult(this, Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h));
     }
 
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {

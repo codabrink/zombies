@@ -12,18 +12,22 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.Box;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
+import com.zombies.util.Geometry;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
-public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zombies.interfaces.Modelable {
-    public static int MAX_HALLWAY_SEGMENTS = 1;
+public class Hallway implements Drawable, HasZone, Modelable {
+    private static final int FAILURE_COUNT_LIMIT = 10;
+    private static final int MAX_HALLWAY_SEGMENTS = 1;
 
     ArrayList<Vector2> axes = new ArrayList<Vector2>();
     private Random r;
@@ -36,67 +40,34 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
     private ModelInstance modelInstance, floorModelInstance;
     private Vector2 center;
     private Zone zone;
+    private int failureCount = 0;
 
-    public Hallway(Box b, char direction, float width) {
+    public Hallway(Box b, Vector2 start, double angle, float width) {
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
-        double angle = 0;
-        switch(direction) {
-            case 'n':
-                angle = Math.PI / 2;
-                axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y + b.height));
-                break;
-            case 'e':
-                angle = 0;
-                axes.add(new Vector2(b.getPosition().x + b.width, vertBoxRange(b, width)));
-                break;
-            case 's':
-                angle = Math.PI * 1.5;
-                axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y));
-                break;
-            case 'w':
-                angle = Math.PI;
-                axes.add(new Vector2(b.getPosition().x, vertBoxRange(b, width)));
-                break;
-        }
-        tryToMove(angle, angle);
+        axes.add(start);
+        move(angle);
     }
 
     private float hallwayLength() { return r.nextFloat() * 10 + 15; }
 
     private Vector2 calculateNewAxis(double angle) {
-        Vector2 a = axes.get(axes.size() - 1).cpy();
-        float length = hallwayLength();
-        return a.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+        return Geometry.projectVector(axes.get(axes.size()-1), angle, hallwayLength());
     }
 
-    private void tryToMove(double angle, double previousSegmentAngle) {
+    private void move(double angle) {
         Vector2 newAxis = calculateNewAxis(angle);
         HallwaySegment hs = new HallwaySegment(this, axes.get(axes.size() - 1), newAxis, diameter);
         Overlappable o = Zone.getZone(hs.center).checkOverlap(hs.position, hs.width, hs.height, 1);
 
-        if (o == null)
-            o = com.zombies.util.Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
-
         // I would love to use lambdas here to reduce redundancy, but that's not introduced until Java 8, so... yeah
         if (o != null) {
-            if (axes.size() > 1) { // is fist segment
-                if (o instanceof Box && o != originBox && !originBox.isAdjacent((Box)o)) { // is not an origin box or adjacent box
-                    Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging..
-                    hs.p2.set(ip);
-                    addHallwaySegment(hs);
-                    materialize();
-                } else { // collision is an origin box or adjacent box
-                    addHallwaySegment(hs);
-                }
-            } else { // is a second or more segment
-                Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging...
-                hs.p2.set(ip);
-                addHallwaySegment(hs);
-                materialize();
-            }
-         } else { // in the clear, just add the segment
+            Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging...
+            hs.p2.set(ip);
+            addHallwaySegment(hs);
+            materialize();
+        } else { // in the clear, just add the segment
             addHallwaySegment(hs);
         }
 
@@ -107,8 +78,7 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
                 case 1: nextDeltaAngle = 0; break;
                 case 2: nextDeltaAngle = Math.PI / 2; break;
             }
-            ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setNextSegmentAngle(angle + nextDeltaAngle);
-            tryToMove(angle + nextDeltaAngle, angle);
+            move(angle + nextDeltaAngle);
         } else {
             materialize();
         }
@@ -150,6 +120,13 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
         model = com.zombies.util.Assets.modelBuilder.end();
         modelInstance = new ModelInstance(model);
         modelInstance.transform.setTranslation(center.x, center.y, 0);
+    }
+
+    public Vector2 endPoint() {
+        return hallwaySegments.get(hallwaySegments.size() - 1).getP2();
+    }
+    public Vector2 startPoint() {
+        return hallwaySegments.get(0).getP1();
     }
 
     private Zone originBoxZone() {
