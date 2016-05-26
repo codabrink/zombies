@@ -12,33 +12,32 @@ import java.util.ArrayList;
 public class Geometry {
 
     public static OverlapResult.OverlapType rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
-        Array<Vector2> points = new Array<Vector2>(4);
-        points.add(new Vector2(x + w, y + h));
-        points.add(new Vector2(x, y + h));
-        points.add(new Vector2(x, y));
-        points.add(new Vector2(x + w, y));
+        int overlapIndex = 0;
 
-        for (Vector2 p: points) {
-            if (pointInRectangle(p, x2, y2, w2, h2))
-                points.removeValue(p, true);
-        }
+        // Numbers chosen to be able to add in any combination to create unique numbers
+        if (pointInRectangle(new Vector2(x + w, y + h), x2, y2, w2, h2))
+            overlapIndex += 5;
+        if (pointInRectangle(new Vector2(x, y + h), x2, y2, w2, h2))
+            overlapIndex += 6;
+        if (pointInRectangle(new Vector2(x, y), x2, y2, w2, h2))
+            overlapIndex += 7;
+        if (pointInRectangle(new Vector2(x + x, y), x2, y2, w2, h2))
+            overlapIndex += 9;
 
-        if (points.get(0) == null && points.get(1) == null && points.get(2) == null && points.get(3) == null)
-            return OverlapResult.OverlapType.FULL;
-        if (points.get(0) == null && points.get(1) == null)
-            return OverlapResult.OverlapType.HORIZ_TOP;
-        if (points.get(2) == null && points.get(2) == null)
-            return OverlapResult.OverlapType.HORIZ_BOTTOM;
-        if (points.get(0) == null && points.get(3) == null)
-            return OverlapResult.OverlapType.VERT_RIGHT;
-        if (points.get(1) == null && points.get(2) == null)
-            return OverlapResult.OverlapType.VERT_LEFT;
-
-        for (int i = 0; i < points.size; i ++)
-            if (points.get(i) == null)
+        switch (overlapIndex) {
+            case 5: case 6: case 7: case 9:
                 return OverlapResult.OverlapType.CORNER;
-
-        return OverlapResult.OverlapType.NONE;
+            case 11:
+                return OverlapResult.OverlapType.HORIZ_TOP;
+            case 16:
+                return OverlapResult.OverlapType.HORIZ_BOTTOM;
+            case 14:
+                return OverlapResult.OverlapType.VERT_RIGHT;
+            case 13:
+                return OverlapResult.OverlapType.VERT_LEFT;
+            default:
+                return OverlapResult.OverlapType.NONE;
+        }
 }
 
     private static boolean pointInRectangle(Vector2 point, float x, float y, float w, float h) {
