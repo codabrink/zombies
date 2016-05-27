@@ -167,25 +167,96 @@ public class Zone {
         return true;
     }
 
+    public Zone adjZoneByDirection(Integer direction) {
+        Zone z = null;
+
+        switch (direction) {
+            case 1:
+                z = Zone.getZone(this.position.cpy().add(0, C.ZONE_SIZE));
+                break;
+            case 2:
+                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE));
+                break;
+            case 3:
+                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, 0));
+                break;
+            case 4:
+                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, -C.ZONE_SIZE));
+                break;
+            case 5:
+                z = Zone.getZone(this.position.cpy().add(0, -C.ZONE_SIZE));
+                break;
+            case 6:
+                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, -C.ZONE_SIZE));
+                break;
+            case 7:
+                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, 0));
+                break;
+            case 8:
+                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, C.ZONE_SIZE));
+                break;
+            default:
+                break;
+        }
+
+        return z;
+    }
+
+    public Float pointToZoneDistance(Vector2 point) {
+        if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE && point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
+            return 0.0f;
+        } else if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE) {
+            return Math.min(point.dst(point.x, this.position.y), point.dst(point.x, this.position.y + C.ZONE_SIZE));
+        } else if (point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
+            return Math.min(point.dst(this.position.x, point.y), point.dst(this.position.x + C.ZONE_SIZE, point.y));
+        } else {
+            return Math.min(
+                Math.min(point.dst(this.position.x, this.position.y), point.dst(this.position.x + C.ZONE_SIZE, this.position.y)),
+                    Math.min(point.dst(this.position.x, this.position.y + C.ZONE_SIZE), point.dst(this.position.x + C.ZONE_SIZE, this.position.y + C.ZONE_SIZE))
+            );
+        }
+    }
+
+    public ArrayList<Zone> infringedAdjZones(Vector2 circleCenter, Float circleRadius, ArrayList<Zone> infringedZones) {
+        Zone zoneToCheck;
+
+        for (int i = 1; i < 9; i++) {
+            zoneToCheck = this.adjZoneByDirection(i);
+            if (zoneToCheck.pointToZoneDistance(circleCenter) < circleRadius) {
+                if (!infringedZones.contains(zoneToCheck)) {
+                    infringedZones.add(zoneToCheck);
+                    infringedZones = zoneToCheck.infringedAdjZones(circleCenter, circleRadius, infringedZones);
+                }
+            }
+        }
+
+        return infringedZones;
+    }
+
+    public static ArrayList<Zone> getOverlappedZones(Vector2 circleCenter, Float circleRadius) {
+        ArrayList<Zone> overlappedZones = new ArrayList<Zone>();
+        Zone originZone = getZone(circleCenter);
+
+        overlappedZones.add(originZone);
+        overlappedZones = originZone.infringedAdjZones(circleCenter, circleRadius, overlappedZones);
+
+        return overlappedZones;
+    }
+
     public static void createHole(Vector2 blastCenter, Float blastRadius) {
         Zone startingZone = getZone(blastCenter);
-        // TODO: calculate which zones the blast area covers. account for all of them.
-        ArrayList<Zone> damageZones = new ArrayList<Zone>();
-        damageZones.add(startingZone);
+        ArrayList<Zone> damageZones = Zone.getOverlappedZones(blastCenter, blastRadius);
+
+        System.out.println("Affected zones: " + damageZones.size());
 
         ArrayList<Wall> wallsToCheck = new ArrayList<Wall>();
 
         // TODO: sometimes a wall is in a zone, but belongs to a different zone and so does not explode.
         // how can these walls be counted?
-        for (Zone z: damageZones) {
+        for (Zone z: damageZones)
             wallsToCheck.addAll(z.getWalls());
-        }
 
         for (Wall w: wallsToCheck) {
-
-            // TODO: use a simple preliminary check here to see if the segment intersects the circle.
-            // the below calculations are for lines, and so might go through to completion for walls
-            // that aren't even close.
 
             Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
             Float d, a, b, c, square, xi1, yi1, xi2, yi2;
@@ -245,7 +316,11 @@ public class Zone {
                     i2 = w.getEnd();
             }
 
-            w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
+            // if both intersections are beyond one of the wall's endpoints, they both be set to the
+            // same endpoint by the code above. the segment is not actually being intersected. only
+            // create the hole if that is not the case.
+            if (!i1.equals(i2))
+                w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
         }
     }
 

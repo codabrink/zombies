@@ -51,7 +51,6 @@ public class Wall implements Collideable, Loadable {
     public Body getBody() {return body;}
 
     public void consolidateHoles() {
-        
         ArrayList<Float> holePositions = new ArrayList<Float>(holes.keySet());
         Collections.sort(holePositions);
 
