@@ -113,7 +113,7 @@ public class Geometry {
         if (region == 1 || region == 3)
             edgePoint.add(xFactor * (width / 2), (float)(yFactor * (width / 2) * tanTheta));
         else
-            edgePoint.add((float)(xFactor * (width / (2 * tanTheta))), yFactor * width / 2);
+            edgePoint.add((float)(xFactor * (height / (2 * tanTheta))), yFactor * (height / 2));
 
         return edgePoint;
     }

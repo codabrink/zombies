@@ -43,6 +43,9 @@ public class Hallway implements Drawable, HasZone, Modelable {
     private int failureCount = 0;
 
     public Hallway(Box b, Vector2 start, double angle, float width) {
+        System.out.println("Angle: "+angle);
+        System.out.println("Point: "+start.x+", "+start.y);
+
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
