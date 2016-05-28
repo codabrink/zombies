@@ -9,6 +9,8 @@ import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
+import com.zombies.util.OverlapResult;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -142,7 +144,7 @@ public class Zone {
         return z;
     }
     public static Zone getZone(Vector2 v) {
-        return getZone(v.x, v.y);
+        return Zone.getZone(v.x, v.y);
     }
     public static boolean setCurrentZone(Zone z) {
         if (Zone.currentZone == z)
@@ -269,7 +271,7 @@ public class Zone {
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h)) {
+            if (o.overlaps(x, y, w, h).overlapType != OverlapResult.OverlapType.NONE) {
                 if (ignore != null) {
                     if (ignore.indexOf(o) != -1)
                         continue;

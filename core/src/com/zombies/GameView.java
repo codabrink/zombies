@@ -78,7 +78,9 @@ public class GameView implements Screen {
         fontGen = new com.zombies.HUD.FontGen();
 
         cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(0, 0, 60);
+        cam.near = 0.1f;
+        cam.far = 300f;
+        cam.position.set(0, 0, 300);
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();

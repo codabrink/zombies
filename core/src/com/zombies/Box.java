@@ -9,12 +9,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Overlappable;
+import com.zombies.map.Hallway;
 import com.zombies.map.MapGen;
 import com.zombies.powerups.HealthPickup;
 import com.zombies.powerups.PistolPickup;
 import com.zombies.powerups.Powerup;
 import com.zombies.powerups.ShotgunPickup;
 import com.zombies.util.Geometry;
+import com.zombies.util.OverlapResult;
 
 public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Unit> zombies = new ArrayList<Unit>();
@@ -96,11 +98,24 @@ public class Box implements Overlappable, Loadable, HasZone {
     public ArrayList<Character> getOpenDirections() {
         ArrayList<Character> openDirections = new ArrayList<Character>();
         for (char c: MapGen.DIRECTIONS) {
-            if (adjBoxes.get(c) == null) {
+            if (adjBoxes.get(c) == null)
                 openDirections.add(openDirections.size(), c);
-            }
         }
         return openDirections;
+    }
+    public ArrayList<Double> getOpenAngles() {
+        ArrayList<Double> openAngles = new ArrayList<Double>();
+        for (char c: MapGen.DIRECTIONS) {
+            if (adjBoxes.get(c) == null) {
+                switch (c) {
+                    case 'n': openAngles.add(Math.PI / 2);   break;
+                    case 'e': openAngles.add(0d);            break;
+                    case 's': openAngles.add(Math.PI * 1.5); break;
+                    case 'w': openAngles.add(Math.PI);       break;
+                }
+            }
+        }
+        return openAngles;
     }
     public char getRandomOpenDirection() {
         ArrayList<Character> openDirections = getOpenDirections();
@@ -108,6 +123,16 @@ public class Box implements Overlappable, Loadable, HasZone {
             return openDirections.get(random.nextInt(openDirections.size()));
         else
             return ' ';
+    }
+
+    public Hallway generateRandomHallway() {
+        ArrayList<Double> openAngles = getOpenAngles();
+        if (openAngles.size() > 0) {
+            double angle = openAngles.get(random.nextInt(openAngles.size()));
+            return new Hallway(this, Geometry.edgeOfRectangle(getCenter(), width, height, angle), angle, 3);
+        } else {
+            return null;
+        }
     }
 
     public Survivor addSurvivor() {
@@ -152,10 +177,6 @@ public class Box implements Overlappable, Loadable, HasZone {
         return new Vector2();
     }
 
-    public Room getRoom() {
-        return room;
-    }
-
     public ArrayList<Unit> getSurvivorList() {
         return survivors;
     }
@@ -180,9 +201,11 @@ public class Box implements Overlappable, Loadable, HasZone {
         return position.cpy().add(width / 2, height / 2);
     }
 
-    public Box setRoom(Room room) {
-        this.room = room;
-        return this;
+    public void setRoom(Room r) {
+        room = r;
+    }
+    public Room getRoom() {
+        return room;
     }
 
     public void setAdjBox(Character direction, Box box) {
@@ -219,13 +242,8 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public String className() {
-        return "Box";
-    }
-
-    @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    public OverlapResult overlaps(float x, float y, float w, float h) {
+        return new OverlapResult(this, Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h));
     }
     @Override
     public float edge(char direction) {

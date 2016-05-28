@@ -1,5 +1,9 @@
 package com.zombies;
 
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -25,11 +29,17 @@ public class DrawLine {
         max = new Vector3(p1.dst(p2), 0.1f, C.BOX_DEPTH);
         bounds = new BoundingBox(min, max);
 
+        MeshBuilder builder = new MeshBuilder();
+        builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
+        FixedBoxShapeBuilder.build(builder, bounds);
+        Mesh mesh = builder.end();
+
         Matrix4 mtrans = new Matrix4();
         mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
-        bounds.mul(mtrans);
 
-        FixedBoxShapeBuilder.build(wallBuilder, bounds);
+        mesh.transform(mtrans);
+
+        wallBuilder.addMesh(mesh);
     }
 }

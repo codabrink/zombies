@@ -51,7 +51,7 @@ public class MapGen {
     }
 
     public static Hallway genHallway(Box b) {
-        return new Hallway(b, b.getRandomOpenDirection(), 4);
+        return b.generateRandomHallway();
     }
 
     private static Room genRoom(Zone z) {

@@ -1,6 +1,7 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.zombies.interfaces.Overlappable;
 
 import java.util.ArrayList;
@@ -10,16 +11,44 @@ import java.util.ArrayList;
  */
 public class Geometry {
 
-    public static boolean rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
-        boolean xOverlap = valueInRange(x, x2, x2 + w2) ||
-                valueInRange(x2, x, x + w);
-        boolean yOverlap = valueInRange(y, y2, y2 + h2) ||
-                valueInRange(y2, y, y + h);
-        return xOverlap && yOverlap;
+    public static OverlapResult.OverlapType rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
+        int overlapIndex = 0;
+
+        // Numbers chosen to be able to add in any combination to create unique numbers
+        if (pointInRectangle(new Vector2(x + w, y + h), x2, y2, w2, h2))
+            overlapIndex += 5;
+        if (pointInRectangle(new Vector2(x, y + h), x2, y2, w2, h2))
+            overlapIndex += 6;
+        if (pointInRectangle(new Vector2(x, y), x2, y2, w2, h2))
+            overlapIndex += 7;
+        if (pointInRectangle(new Vector2(x + x, y), x2, y2, w2, h2))
+            overlapIndex += 9;
+
+        switch (overlapIndex) {
+            case 5: case 6: case 7: case 9:
+                return OverlapResult.OverlapType.CORNER;
+            case 11:
+                return OverlapResult.OverlapType.HORIZ_TOP;
+            case 16:
+                return OverlapResult.OverlapType.HORIZ_BOTTOM;
+            case 14:
+                return OverlapResult.OverlapType.VERT_RIGHT;
+            case 13:
+                return OverlapResult.OverlapType.VERT_LEFT;
+            default:
+                return OverlapResult.OverlapType.NONE;
+        }
+}
+
+    private static boolean pointInRectangle(Vector2 point, float x, float y, float w, float h) {
+        return point.x > x &&
+                point.x < x + w &&
+                point.y > y &&
+                point.y < y + h;
     }
 
     private static boolean valueInRange(float value, float min, float max) {
-        return (value >= min) && (value <= max);
+        return value > min && value < max;
     }
 
     public static Vector2 intersectPoint(float l1p1x, float l1p1y, float l1p2x, float l1p2y, float l2p1x, float l2p1y, float l2p2x, float l2p2y) {
@@ -39,12 +68,54 @@ public class Geometry {
         return new Vector2((B2*C1 - B1*C2)/delta, (A1*C2 - A2*C1)/ delta);
     }
 
-    public static Overlappable checkOverlap(float x, float y, float w, float h, ArrayList<Overlappable> overlappables) {
+    public static OverlapResult checkOverlap(float x, float y, float w, float h, ArrayList<Overlappable> overlappables) {
         for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h))
-                return o;
+            OverlapResult or = o.overlaps(x, y, w, h);
+            if (or.overlapType != OverlapResult.OverlapType.NONE)
+                return or;
         }
-        return null;
+        return new OverlapResult(null, OverlapResult.OverlapType.NONE);
+    }
+
+    public static Vector2 edgeOfRectangle(Vector2 center, float width, float height, double theta) {
+        double twoPI = Math.PI * 2;
+        while (theta < -Math.PI)
+            theta += twoPI;
+        while (theta > Math.PI)
+            theta -= twoPI;
+
+        // ref: http://stackoverflow.com/questions/4061576/finding-points-on-a-rectangle-at-a-given-angle
+
+        double rectAtan = Math.atan2(height, width);
+        double tanTheta = Math.tan(theta);
+
+        int region;
+        if ((theta > -rectAtan) && (theta <= rectAtan))
+            region = 1;
+        else if ((theta > rectAtan) && theta <= (Math.PI - rectAtan))
+            region = 2;
+        else if ((theta > (Math.PI - rectAtan)) || (theta <= -(Math.PI - rectAtan)))
+            region = 3;
+        else
+            region = 4;
+
+        Vector2 edgePoint = center.cpy();
+        float xFactor = 1;
+        float yFactor = 1;
+
+        switch (region) {
+            case 1: yFactor = -1; break;
+            case 2: yFactor = -1; break;
+            case 3: xFactor = -1; break;
+            case 4: xFactor = -1; break;
+        }
+
+        if (region == 1 || region == 3)
+            edgePoint.add(xFactor * (width / 2), (float)(yFactor * (width / 2) * tanTheta));
+        else
+            edgePoint.add((float)(xFactor * (height / (2 * tanTheta))), yFactor * (height / 2));
+
+        return edgePoint;
     }
 
     public static double getAngleFromPoints(Vector2 p1, Vector2 p2) {
