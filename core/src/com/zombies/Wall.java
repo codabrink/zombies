@@ -42,6 +42,10 @@ public class Wall implements Collideable, Loadable {
 
         lines.add(new DrawLine(p1, p2));
         //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
+
+        for (Zone z: Zone.getOverlappedZonesLine(p1, p2)) {
+            z.addWall(this);
+        }
     }
 
     public Double getAngle() { return angle; }

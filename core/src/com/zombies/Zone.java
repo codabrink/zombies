@@ -36,6 +36,7 @@ public class Zone {
     private HashSet<Box> boxes = new HashSet<Box>();
     private HashSet<Room> rooms = new HashSet<Room>();
     private ArrayList<Hallway> hallways = new ArrayList<Hallway>();
+    private ArrayList<Wall> walls = new ArrayList<Wall>();
     private HashSet<Loadable> loadables = new HashSet<Loadable>();
     private HashSet<Drawable> drawables = new HashSet<Drawable>();
     private HashSet<Drawable> debugLines = new HashSet<Drawable>();
@@ -217,7 +218,7 @@ public class Zone {
         }
     }
 
-    public ArrayList<Zone> infringedAdjZones(Vector2 circleCenter, Float circleRadius, ArrayList<Zone> infringedZones) {
+    public ArrayList<Zone> infringedAdjZonesCircle(Vector2 circleCenter, Float circleRadius, ArrayList<Zone> infringedZones) {
         Zone zoneToCheck;
 
         for (int i = 1; i < 9; i++) {
@@ -225,7 +226,7 @@ public class Zone {
             if (zoneToCheck.pointToZoneDistance(circleCenter) < circleRadius) {
                 if (!infringedZones.contains(zoneToCheck)) {
                     infringedZones.add(zoneToCheck);
-                    infringedZones = zoneToCheck.infringedAdjZones(circleCenter, circleRadius, infringedZones);
+                    infringedZones = zoneToCheck.infringedAdjZonesCircle(circleCenter, circleRadius, infringedZones);
                 }
             }
         }
@@ -233,19 +234,85 @@ public class Zone {
         return infringedZones;
     }
 
-    public static ArrayList<Zone> getOverlappedZones(Vector2 circleCenter, Float circleRadius) {
+    public ArrayList<Zone> infringedAdjZonesLine(Vector2 lineStart, Vector2 lineEnd, ArrayList<Integer> searchDirections, ArrayList<Zone> infringedZones) {
+        Zone zoneToCheck;
+        
+        for (Integer sd: searchDirections) {
+            zoneToCheck = this.adjZoneByDirection(sd);
+            
+            if (!infringedZones.contains(zoneToCheck)) {
+                Float u = lineEnd.y - lineStart.y;
+                Float v = lineStart.x - lineEnd.x;
+                Float w = (lineEnd.x * lineStart.y) - (lineStart.x * lineEnd.y);
+
+                Float r1 = (u * zoneToCheck.position.x) + (v * zoneToCheck.position.y) + w;
+                Float r2 = (u * (zoneToCheck.position.x + C.ZONE_SIZE)) + (v * zoneToCheck.position.y) + w;
+                Float r3 = (u * zoneToCheck.position.x) + (v * (zoneToCheck.position.y + C.ZONE_SIZE)) + w;
+                Float r4 = (u * (zoneToCheck.position.x + C.ZONE_SIZE)) + (v * (zoneToCheck.position.y + C.ZONE_SIZE)) + w;
+
+                if (!((r1 > 0.0f && r2 > 0.0f && r3 > 0.0f && r4 > 0.0f) || (r1 < 0.0f && r2 < 0.0f && r3 < 0.0f && r4 < 0.0f))) {
+                    // this check only works because zones are aligned with the game world's
+                    // directional axes.
+                    if (!((lineStart.x < zoneToCheck.position.x && lineEnd.x < zoneToCheck.position.x) ||
+                            (lineStart.x > zoneToCheck.position.x + C.ZONE_SIZE && lineEnd.x > zoneToCheck.position.x + C.ZONE_SIZE) ||
+                            (lineStart.y < zoneToCheck.position.y && lineEnd.y < zoneToCheck.position.y) ||
+                            (lineStart.y > zoneToCheck.position.y + C.ZONE_SIZE && lineEnd.y > zoneToCheck.position.y + C.ZONE_SIZE))) {
+                        infringedZones.add(zoneToCheck);
+                        infringedZones = zoneToCheck.infringedAdjZonesLine(lineStart, lineEnd, searchDirections, infringedZones);
+                    }
+                }
+            }
+        }
+
+        System.out.println("Zones overlapped: " + infringedZones.size());
+
+        return infringedZones;
+    }
+
+    public static ArrayList<Zone> getOverlappedZonesCircle(Vector2 circleCenter, Float circleRadius) {
         ArrayList<Zone> overlappedZones = new ArrayList<Zone>();
         Zone originZone = getZone(circleCenter);
 
         overlappedZones.add(originZone);
-        overlappedZones = originZone.infringedAdjZones(circleCenter, circleRadius, overlappedZones);
+        overlappedZones = originZone.infringedAdjZonesCircle(circleCenter, circleRadius, overlappedZones);
+
+        return overlappedZones;
+    }
+
+    public static ArrayList<Zone> getOverlappedZonesLine(Vector2 lineStart, Vector2 lineEnd) {
+        ArrayList<Zone> overlappedZones = new ArrayList<Zone>();
+        Zone originZone = getZone(lineStart);
+        ArrayList<Integer> searchDirections = new ArrayList<Integer>();
+
+        Float xDist = lineEnd.x - lineStart.x;
+        Float yDist = lineEnd.y - lineStart.y;
+
+        if (yDist > 0.0f)
+            searchDirections.add(1);
+        if (xDist > 0.0f && yDist > 0.0f)
+            searchDirections.add(2);
+        if (xDist > 0.0f)
+            searchDirections.add(3);
+        if (xDist > 0.0f && yDist < 0.0f)
+            searchDirections.add(4);
+        if (yDist < 0.0f)
+            searchDirections.add(5);
+        if (xDist < 0.0f && yDist < 0.0f)
+            searchDirections.add(6);
+        if (xDist < 0.0f)
+            searchDirections.add(7);
+        if (xDist < 0.0f && yDist > 0.0f)
+            searchDirections.add(8);
+
+        overlappedZones.add(originZone);
+        overlappedZones = originZone.infringedAdjZonesLine(lineStart, lineEnd, searchDirections, overlappedZones);
 
         return overlappedZones;
     }
 
     public static void createHole(Vector2 blastCenter, Float blastRadius) {
         Zone startingZone = getZone(blastCenter);
-        ArrayList<Zone> damageZones = Zone.getOverlappedZones(blastCenter, blastRadius);
+        ArrayList<Zone> damageZones = Zone.getOverlappedZonesCircle(blastCenter, blastRadius);
 
         System.out.println("Affected zones: " + damageZones.size());
 
@@ -254,7 +321,7 @@ public class Zone {
         // TODO: sometimes a wall is in a zone, but belongs to a different zone and so does not explode.
         // how can these walls be counted?
         for (Zone z: damageZones)
-            wallsToCheck.addAll(z.getWalls());
+            wallsToCheck.addAll(z.walls);
 
         for (Wall w: wallsToCheck) {
 
@@ -437,17 +504,10 @@ public class Zone {
         updateables.remove(u);
     }
 
-    private ArrayList<Wall> getWalls() {
-        ArrayList<Wall> walls = new ArrayList<Wall>();
-
-        for (Room r: rooms)
-            walls.addAll(r.getWalls());
-
-        for (Hallway h: hallways)
-            for (HallwaySegment hs: h.getHallwaySegments())
-                walls.addAll(hs.getWalls());
-
-        return walls;
+    public ArrayList<Wall> getWalls() { return walls; }
+    public void addWall(Wall w) {
+        if (walls.indexOf(w) == -1)
+            walls.add(w);
     }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
