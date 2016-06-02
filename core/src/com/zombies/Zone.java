@@ -12,6 +12,7 @@ import com.zombies.map.HallwaySegment;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +29,8 @@ public class Zone {
     public static ArrayList<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
+    public static enum Directions { N, NE, E, SE, S, SW, W, NW };
+
     // Collections
 
     private HashSet<Zone> adjZones = new HashSet<Zone>();
@@ -49,7 +52,7 @@ public class Zone {
     public Zone(float x, float y) {
         r = GameView.gv.random;
         position = new Vector2(x, y);
-        for (int i=0;i<=C.DRAW_LAYERS;i++) {
+        for (int i = 0; i <= C.DRAW_LAYERS; i++) {
             drawablesList.add(new ArrayList<Drawable>());
         }
         numRooms = r.nextInt(numRooms);
@@ -168,32 +171,32 @@ public class Zone {
         return true;
     }
 
-    public Zone adjZoneByDirection(Integer direction) {
+    public Zone adjZoneByDirection(Directions direction) {
         Zone z = null;
 
         switch (direction) {
-            case 1:
+            case N:
                 z = Zone.getZone(this.position.cpy().add(0, C.ZONE_SIZE));
                 break;
-            case 2:
+            case NE:
                 z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE));
                 break;
-            case 3:
+            case E:
                 z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, 0));
                 break;
-            case 4:
+            case SE:
                 z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, -C.ZONE_SIZE));
                 break;
-            case 5:
+            case S:
                 z = Zone.getZone(this.position.cpy().add(0, -C.ZONE_SIZE));
                 break;
-            case 6:
+            case SW:
                 z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, -C.ZONE_SIZE));
                 break;
-            case 7:
+            case W:
                 z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, 0));
                 break;
-            case 8:
+            case NW:
                 z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, C.ZONE_SIZE));
                 break;
             default:
@@ -221,8 +224,8 @@ public class Zone {
     public ArrayList<Zone> infringedAdjZonesCircle(Vector2 circleCenter, Float circleRadius, ArrayList<Zone> infringedZones) {
         Zone zoneToCheck;
 
-        for (int i = 1; i < 9; i++) {
-            zoneToCheck = this.adjZoneByDirection(i);
+        for (Directions d: Directions.values()) {
+            zoneToCheck = this.adjZoneByDirection(d);
             if (zoneToCheck.pointToZoneDistance(circleCenter) < circleRadius) {
                 if (!infringedZones.contains(zoneToCheck)) {
                     infringedZones.add(zoneToCheck);
@@ -234,10 +237,10 @@ public class Zone {
         return infringedZones;
     }
 
-    public ArrayList<Zone> infringedAdjZonesLine(Vector2 lineStart, Vector2 lineEnd, ArrayList<Integer> searchDirections, ArrayList<Zone> infringedZones) {
+    public ArrayList<Zone> infringedAdjZonesLine(Vector2 lineStart, Vector2 lineEnd, EnumSet<Directions> searchDirections, ArrayList<Zone> infringedZones) {
         Zone zoneToCheck;
         
-        for (Integer sd: searchDirections) {
+        for (Directions sd: searchDirections) {
             zoneToCheck = this.adjZoneByDirection(sd);
             
             if (!infringedZones.contains(zoneToCheck)) {
@@ -282,27 +285,27 @@ public class Zone {
     public static ArrayList<Zone> getOverlappedZonesLine(Vector2 lineStart, Vector2 lineEnd) {
         ArrayList<Zone> overlappedZones = new ArrayList<Zone>();
         Zone originZone = getZone(lineStart);
-        ArrayList<Integer> searchDirections = new ArrayList<Integer>();
+        EnumSet<Directions> searchDirections = EnumSet.noneOf(Directions.class);
 
         Float xDist = lineEnd.x - lineStart.x;
         Float yDist = lineEnd.y - lineStart.y;
 
         if (yDist > 0.0f)
-            searchDirections.add(1);
+            searchDirections.add(Directions.N);
         if (xDist > 0.0f && yDist > 0.0f)
-            searchDirections.add(2);
+            searchDirections.add(Directions.NE);
         if (xDist > 0.0f)
-            searchDirections.add(3);
+            searchDirections.add(Directions.E);
         if (xDist > 0.0f && yDist < 0.0f)
-            searchDirections.add(4);
+            searchDirections.add(Directions.SE);
         if (yDist < 0.0f)
-            searchDirections.add(5);
+            searchDirections.add(Directions.S);
         if (xDist < 0.0f && yDist < 0.0f)
-            searchDirections.add(6);
+            searchDirections.add(Directions.SW);
         if (xDist < 0.0f)
-            searchDirections.add(7);
+            searchDirections.add(Directions.W);
         if (xDist < 0.0f && yDist > 0.0f)
-            searchDirections.add(8);
+            searchDirections.add(Directions.NW);
 
         overlappedZones.add(originZone);
         overlappedZones = originZone.infringedAdjZonesLine(lineStart, lineEnd, searchDirections, overlappedZones);
