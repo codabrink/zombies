@@ -8,7 +8,6 @@ import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Hallway;
-import com.zombies.map.HallwaySegment;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
 import java.util.ArrayList;
@@ -38,8 +37,8 @@ public class Zone {
     private HashSet<Updateable> updateables = new HashSet<Updateable>();
     private HashSet<Box> boxes = new HashSet<Box>();
     private HashSet<Room> rooms = new HashSet<Room>();
-    private ArrayList<Hallway> hallways = new ArrayList<Hallway>();
-    private ArrayList<Wall> walls = new ArrayList<Wall>();
+    //private ArrayList<Hallway> hallways = new ArrayList<Hallway>();
+    private HashSet<Wall> walls = new HashSet<Wall>();
     private HashSet<Loadable> loadables = new HashSet<Loadable>();
     private HashSet<Drawable> drawables = new HashSet<Drawable>();
     private HashSet<Drawable> debugLines = new HashSet<Drawable>();
@@ -415,8 +414,6 @@ public class Zone {
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
-        if (o instanceof Hallway)
-            addHallway((Hallway) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -433,8 +430,6 @@ public class Zone {
             removeRoom((Room) o);
         if (o instanceof Box)
             removeBox((Box) o);
-        if (o instanceof Hallway)
-            removeHallway((Hallway) o);
         if (o instanceof Overlappable)
             removeOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -460,10 +455,6 @@ public class Zone {
         for (Box b : r.getBoxes())
             addObject(b);
     }
-    private void addHallway(Hallway h) {
-        if (hallways.indexOf(h) == -1)
-            hallways.add(h);
-    }
     private void addBox(Box b) {
         boxes.add(b);
     }
@@ -473,12 +464,7 @@ public class Zone {
             removeObject(b);
         }
     }
-    private void removeBox(Box b) {
-        boxes.remove(b);
-    }
-    private void removeHallway(Hallway h) {
-        hallways.remove(h);
-    }
+    private void removeBox(Box b) { boxes.remove(b); }
     private void addDrawable(Drawable d) {
         drawables.add(d);
     }
@@ -507,11 +493,8 @@ public class Zone {
         updateables.remove(u);
     }
 
-    public ArrayList<Wall> getWalls() { return walls; }
-    public void addWall(Wall w) {
-        if (walls.indexOf(w) == -1)
-            walls.add(w);
-    }
+    public HashSet<Wall> getWalls() { return walls; }
+    public void addWall(Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         for (Overlappable o: overlappables) {
