@@ -1,14 +1,10 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.zombies.interfaces.Overlappable;
 
 import java.util.ArrayList;
 
-/**
- * Created by coda on 4/2/16.
- */
 public class Geometry {
 
     public static OverlapResult.OverlapType rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
@@ -35,6 +31,8 @@ public class Geometry {
                 return OverlapResult.OverlapType.VERT_RIGHT;
             case 13:
                 return OverlapResult.OverlapType.VERT_LEFT;
+            case 27:
+                return OverlapResult.OverlapType.FULL;
             default:
                 return OverlapResult.OverlapType.NONE;
         }

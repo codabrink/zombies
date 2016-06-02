@@ -210,6 +210,19 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
+    public Box closestBox(Vector2 point) {
+        float closestDst = boxes.get(0).getPosition().dst(point);
+        Box closestBox = boxes.get(0);
+        
+        for (Box b: boxes) {
+            float dst = b.getPosition().dst(point);
+            if (dst < closestDst) {
+                closestDst = dst;
+                closestBox = b;
+            }
+        }
+        return closestBox;
+    }
 
     public ArrayList<Box> getOuterBoxes() {
         return outerBoxes;
