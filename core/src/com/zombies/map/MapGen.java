@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class MapGen {
 
-    public static char[] DIRECTIONS = {'n', 'e', 's', 'w'};
+    public static int[] DIRECTIONS = {0, 90, 180, 270};
 
     public static void update(Zone z) {
         // needs to be done during generation, not creation
@@ -82,7 +82,7 @@ public class MapGen {
                 } while (b.getAdjBoxes().size() == 4);
 
                 // find said open side (this can be improved)
-                char direction;
+                int direction;
                 do {
                     direction = DIRECTIONS[r.nextInt(4)];
                 } while (b.getAdjBox(direction) != null);
@@ -92,19 +92,19 @@ public class MapGen {
                 // rasterize that direction
                 Vector2 proposedPosition = new Vector2();
                 switch (direction) {
-                    case 'n': // top
+                    case 90: // top
                         proposedPosition = b.getPosition().cpy().add(0, b.height);
                         newBMLocation[1]++;
                         break;
-                    case 'e': // right
+                    case 0: // right
                         proposedPosition = b.getPosition().cpy().add(b.width, 0);
                         newBMLocation[0]++;
                         break;
-                    case 's': // bottom
+                    case 270: // bottom
                         proposedPosition = b.getPosition().cpy().sub(0, b.height);
                         newBMLocation[1]--;
                         break;
-                    case 'w': // left
+                    case 180: // left
                         proposedPosition = b.getPosition().cpy().sub(b.width, 0);
                         newBMLocation[0]--;
                         break;

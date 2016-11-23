@@ -52,7 +52,7 @@ public class HUD implements InputProcessor{
         if (keycode == 43) { // o
             Box b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
             String out = "";
-            for (char direction : MapGen.DIRECTIONS) {
+            for (int direction : MapGen.DIRECTIONS) {
                 if (b != null) {
                     Box bb = b.getAdjBox(direction);
                     out += "direction: " + direction + ": ";

@@ -137,33 +137,23 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public float edge(char direction) {
+    public float edge(int direction) {
         switch(direction) {
-            case 'n':
+            case 90:
                 return position.y + height;
-            case 'e':
+            case 0:
                 return position.x + width;
-            case 's':
+            case 270:
                 return position.y;
-            case 'w':
+            case 180:
                 return position.x;
         }
         return 0;
     }
 
     @Override
-    public float oppositeEdge(char direction) {
-        switch(direction) {
-            case 'n':
-                return edge('s');
-            case 'e':
-                return edge('w');
-            case 's':
-                return edge('n');
-            case 'w':
-                return edge('e');
-        }
-        return 0;
+    public float oppositeEdge(int direction) {
+        return edge((direction + 180) % 360);
     }
 
     @Override

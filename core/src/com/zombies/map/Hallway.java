@@ -37,29 +37,26 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
     private Vector2 center;
     private Zone zone;
 
-    public Hallway(Box b, char direction, float width) {
+    public Hallway(Box b, int direction, float width) {
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
         double angle = 0;
         switch(direction) {
-            case 'n':
-                angle = Math.PI / 2;
+            case 90:
                 axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y + b.height));
                 break;
-            case 'e':
-                angle = 0;
+            case 0:
                 axes.add(new Vector2(b.getPosition().x + b.width, vertBoxRange(b, width)));
                 break;
-            case 's':
-                angle = Math.PI * 1.5;
+            case 270:
                 axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y));
                 break;
-            case 'w':
-                angle = Math.PI;
+            case 180:
                 axes.add(new Vector2(b.getPosition().x, vertBoxRange(b, width)));
                 break;
         }
+        angle = Math.toRadians(direction);
         tryToMove(angle, angle);
     }
 
