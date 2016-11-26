@@ -19,7 +19,7 @@ public class Geometry {
     }
 
     private static boolean valueInRange(float value, float min, float max) {
-        return (value >= min) && (value <= max);
+        return (value > min) && (value < max);
     }
 
     public static Vector2 intersectPoint(float l1p1x, float l1p1y, float l1p2x, float l1p2y, float l2p1x, float l2p1y, float l2p2x, float l2p2y) {

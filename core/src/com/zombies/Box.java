@@ -212,9 +212,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     // Box Map Location - used during room generation in MapGen.java
     public int[] getBMLocation() {
         String[] stringLocations = BMKey.split(",");
-        int[] locations = new int[2];
-        locations[0] = Integer.parseInt(stringLocations[0]);
-        locations[1] = Integer.parseInt(stringLocations[1]);
+        int[] locations = {Integer.parseInt(stringLocations[0]), Integer.parseInt(stringLocations[1])};
         return locations;
     }
 

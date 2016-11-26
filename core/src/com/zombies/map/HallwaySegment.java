@@ -12,7 +12,6 @@ import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
@@ -20,7 +19,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     public Vector2 p1, p2, position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius, width, height;
-    private char direction;
+    private int direction;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
@@ -90,13 +89,13 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
         // calculate direction
         if (p1.x < p2.x)
-            direction = 'e';
+            direction = 0;
         else if (p1.x > p2.x)
-            direction = 'w';
+            direction = 180;
         else if (p1.y < p2.y)
-            direction = 'n';
+            direction = 90;
         else if (p1.y > p2.y)
-            direction = 's';
+            direction = 270;
     }
 
     public Vector2 getCenter() {

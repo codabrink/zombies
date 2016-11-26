@@ -442,6 +442,7 @@ public class Zone {
 
     public Vector2 getPosition() { return position; }
     public HashSet<Box> getBoxes() { return boxes; }
+    public HashSet<Overlappable> getOverlappables() { return overlappables; }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Zone> getAdjZones() { return adjZones; }
     public HashSet<Zone> getAdjZonesPlusSelf() {
@@ -533,7 +534,7 @@ public class Zone {
         return position.cpy().add(randomX, randomY);
     }
 
-    public Vector2 randomDiscreetPosition(int numIncrements) {
+    public Vector2 randomDiscretePosition(int numIncrements) {
         float randomX = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
         float randomY = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
         return position.cpy().add(randomX, randomY);
