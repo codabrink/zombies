@@ -170,38 +170,25 @@ public class Zone {
     }
 
     public Zone adjZoneByDirection(Directions direction) {
-        Zone z = null;
-
         switch (direction) {
             case N:
-                z = Zone.getZone(this.position.cpy().add(0, C.ZONE_SIZE));
-                break;
+                return Zone.getZone(position.x, position.y + C.ZONE_SIZE);
             case NE:
-                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE));
-                break;
+                return Zone.getZone(position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE);
             case E:
-                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, 0));
-                break;
+                return Zone.getZone(position.x + C.ZONE_SIZE, position.y);
             case SE:
-                z = Zone.getZone(this.position.cpy().add(C.ZONE_SIZE, -C.ZONE_SIZE));
-                break;
+                return Zone.getZone(position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE);
             case S:
-                z = Zone.getZone(this.position.cpy().add(0, -C.ZONE_SIZE));
-                break;
+                return Zone.getZone(position.x, position.y - C.ZONE_SIZE);
             case SW:
-                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, -C.ZONE_SIZE));
-                break;
+                return Zone.getZone(position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE);
             case W:
-                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, 0));
-                break;
+                return Zone.getZone(position.x - C.ZONE_SIZE, position.y);
             case NW:
-                z = Zone.getZone(this.position.cpy().add(-C.ZONE_SIZE, C.ZONE_SIZE));
-                break;
-            default:
-                break;
+                return Zone.getZone(position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE);
         }
-
-        return z;
+        return null;
     }
 
     public Float pointToZoneDistance(Vector2 point) {
@@ -250,7 +237,7 @@ public class Zone {
         float m = (end.y - start.y) / (end.x - end.y);
         float b = start.y - (m * start.x);
 
-        HashSet<Zone> zones = new HashSet<>();
+        HashSet<Zone> zones = new HashSet<>(); // HashSet gives uniqueness constraint for free
         float xStart = (float)(C.ZONE_SIZE * Math.floor(Math.min(start.x, end.x) / C.ZONE_SIZE));
         float xEnd   = (float)(C.ZONE_SIZE * Math.ceil(Math.max(start.x, end.x) / C.ZONE_SIZE));
         float yStart = (float)(C.ZONE_SIZE * Math.floor(Math.min(start.y, end.y) / C.ZONE_SIZE));
@@ -258,10 +245,13 @@ public class Zone {
 
         float halfZoneSize = C.ZONE_SIZE / 2;
 
+        // find all vertical intercepts of line on zone grid
         for (float x = xStart; x < xEnd; x = x + C.ZONE_SIZE) {
+            // add zones from both sides of line
             zones.add(getZone(x - halfZoneSize, m * x + b));
             zones.add(getZone(x + halfZoneSize, m * x + b));
         }
+        // find all horizontal intercepts of line on zone grid
         for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
             zones.add(getZone((y - b) / m, y - halfZoneSize));
             zones.add(getZone((y - b) / m, y + halfZoneSize));
