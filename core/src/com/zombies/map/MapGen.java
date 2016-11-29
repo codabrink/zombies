@@ -81,9 +81,6 @@ public class MapGen {
             Box b;
             do {
                 b = (Box)boxMapArray[r.nextInt(boxMapArray.length)];
-
-                if (C.DEBUG && b.getAdjBoxes().size() > 4)
-                    System.out.println("ERROR: box has >4 adj sides. - MapGen.java");
             } while (b.getAdjBoxes().size() == 4);
 
             // find open side (this can be improved)

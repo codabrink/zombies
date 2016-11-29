@@ -10,7 +10,6 @@ import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -102,16 +101,18 @@ public class Zone {
     }
 
     public void findAdjZones() {
-        float[] zonePositions = {position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-        position.x - C.ZONE_SIZE, position.y,
-        position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-        position.x, position.y + C.ZONE_SIZE,
-        position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-        position.x + C.ZONE_SIZE, position.y,
-        position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-        position.x, position.y - C.ZONE_SIZE};
+        float[] zonePositions = {
+                position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
+                position.x - C.ZONE_SIZE, position.y,
+                position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,
+                position.x, position.y + C.ZONE_SIZE,
+                position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE,
+                position.x + C.ZONE_SIZE, position.y,
+                position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE,
+                position.x, position.y - C.ZONE_SIZE
+        };
 
-        for (int i=0;i<zonePositions.length;i+=2) {
+        for (int i = 0; i < zonePositions.length; i += 2) {
             Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
             adjZones.add(z);
         }

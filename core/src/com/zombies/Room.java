@@ -33,7 +33,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private float alpha = 0;
     private GameView view;
     private boolean loaded = false;
-    private int frame;
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
     private Vector2 center;

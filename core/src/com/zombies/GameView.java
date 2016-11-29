@@ -85,7 +85,9 @@ public class GameView implements Screen {
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl20.glEnable(GL20.GL_BLEND);
+        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private void reset() {
@@ -142,7 +144,7 @@ public class GameView implements Screen {
     }
 
     public Game getGame() {
-        return Zombies.game;
+        return Zombies.instance;
     }
 
     public ThumbpadLeft getThumbpadLeft() {
@@ -240,7 +242,7 @@ public class GameView implements Screen {
 
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
-        hud.render(HUDSpriteBatch);
+        hud.render(HUDSpriteBatch, shapeRenderer, modelBatch);
         HUDSpriteBatch.end();
 
         com.zombies.HUD.DebugText.render();
@@ -366,7 +368,7 @@ public class GameView implements Screen {
     }
 
     public void end() {
-        Zombies.game.setScreen(new EndView(stats));
+        Zombies.instance.setScreen(new EndView(stats));
     }
 
     private void handleKeysAndroid() {

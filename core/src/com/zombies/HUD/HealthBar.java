@@ -1,13 +1,10 @@
-package com.zombies;
+package com.zombies.HUD;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.C;
+import com.zombies.GameView;
 
 public class HealthBar {
-
-	private C c;
-	private Player player;
-	private float x, width, height;
-	private boolean setUp = false;
 	private GameView view;
 	private ShapeRenderer shapeRenderer;
 

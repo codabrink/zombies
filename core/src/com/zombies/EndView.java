@@ -34,7 +34,7 @@ public class EndView implements Screen {
         for (int i=0; i<3; i++) {
             if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
                 System.gc();
-                Zombies.game.setScreen(new GameView());
+                Zombies.instance.setScreen(new GameView());
                 System.gc();
             }
         }
