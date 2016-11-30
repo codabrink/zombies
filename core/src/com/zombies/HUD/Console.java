@@ -3,8 +3,12 @@ package com.zombies.HUD;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Console {
     private GameView view;
@@ -12,6 +16,7 @@ public class Console {
     private SpriteBatch   spriteBatch;
     private int           fontSize = 18;
     private BitmapFont    font = FontGen.generateFont(fontSize, "serif-reg");
+    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)");
 
     public boolean enabled = false;
     private String  string  = "";
@@ -42,14 +47,22 @@ public class Console {
     }
 
     public boolean keyTyped(char c) {
-        if (Character.toString(c).matches("[a-zA-Z\\s]"))
+        if (Character.toString(c).matches("[a-zA-Z\\s/]"))
             string += c;
         return true;
     }
 
     private void submit() {
-        switch(string) {
+        Matcher m = commandPattern.matcher(string);
+        string = "";
 
+        if (!m.find())
+            return;
+
+        switch(m.group(1)) {
+            case "boxmap":
+                C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+                break;
         }
     }
 

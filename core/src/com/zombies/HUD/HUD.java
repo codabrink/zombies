@@ -2,11 +2,14 @@ package com.zombies.HUD;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.map.MapGen;
 import com.zombies.Box;
 import com.zombies.GameView;
@@ -25,6 +28,7 @@ public class HUD implements InputProcessor{
 
     public void update() {
         view.getThumbpadLeft().update();
+        handleKeys();
     }
 
 	public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
@@ -54,10 +58,32 @@ public class HUD implements InputProcessor{
         view.fontGen.killFont.draw(spriteBatch, String.valueOf(view.stats.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
 	}
 
+    private void handleKeys() {
+        if (console.enabled)
+            return;
+
+        float strength = 50 * C.SCALE;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            view.getPlayer().getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            view.getPlayer().getBody().applyForce(new Vector2(0, -strength), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            view.getPlayer().getBody().applyForce(new Vector2(-strength, 0), new Vector2(), true);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            view.getPlayer().getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
+        }
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         if (console.enabled)
             return console.keyDown(keycode);
+
+        System.out.println(keycode);
 
         Box b;
         switch(keycode) {

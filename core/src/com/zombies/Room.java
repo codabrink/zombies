@@ -236,6 +236,10 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         modelBatch.render(floorModelInstance, GameView.environment);
         modelBatch.render(wallModelInstance, GameView.environment);
         modelBatch.end();
+
+        if (C.DEBUG) {
+            
+        }
     }
 
     @Override

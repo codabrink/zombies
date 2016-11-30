@@ -319,20 +319,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 50 * C.scale;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            player.getBody().applyForce(new Vector2(0, -strength), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            player.getBody().applyForce(new Vector2(-strength, 0), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            player.getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
-        }
+        float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());

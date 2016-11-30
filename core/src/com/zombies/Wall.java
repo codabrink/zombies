@@ -141,7 +141,7 @@ public class Wall implements Collideable, Loadable {
 
     @Override
     public void handleCollision(Fixture f) {
-        if (C.ENABLE_WALL_DESRUCTION) {
+        if (C.ENABLE_WALL_DESTRUCTION) {
             //createHole(f.getBody().getPosition(), 5f);
         }
     }
