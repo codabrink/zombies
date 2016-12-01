@@ -26,6 +26,8 @@ public class Zone {
     public static ArrayList<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
+    private static Box zone;
+
     public static enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections

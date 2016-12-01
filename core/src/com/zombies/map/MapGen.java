@@ -123,14 +123,18 @@ public class MapGen {
                 break;
         }
 
-        Room room = new Room(boxMap.values());
+        Room room = new Room(boxMap);
         // genHallway(room);
         return room;
     }
 
+    private void addBox(HashMap<String, Box> boxMap) {
+
+    }
+
     private static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
-        int[] modifiers = {0, 1, 1, 0, 0, -1, -1, 0};
+        int[] modifiers = {1, 0, 0, 1, -1, 0, 0, -1};
         for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
             Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
             if (bb == null)

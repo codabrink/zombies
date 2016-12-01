@@ -2,6 +2,7 @@ package com.zombies;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -16,7 +17,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.zombies.interfaces.Drawable;
@@ -38,13 +38,15 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
     private Vector2 center;
+    private HashMap<String, Box> boxMap;
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public Room(Collection<Box> boxes) {
+    public Room( HashMap<String, Box> boxMap) {
         view = GameView.gv;
-        this.boxes = new ArrayList<Box>(boxes);
+        this.boxes = new ArrayList<Box>(boxMap.values());
+        this.boxMap = boxMap;
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
@@ -55,7 +57,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         center = calculateMedian();
         buildFloorModel();
-        genOuterWalls();
+        rasterizeWalls();
         Zone.getZone(center).addObject(this);
     }
 
@@ -109,7 +111,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
     }
 
-    public void genOuterWalls() {
+    public void rasterizeWalls() {
         // proposedPositions are sets of points where walls could be placed.
         ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
 
@@ -216,7 +218,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance = new ModelInstance(floorModel);
         floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
-
 
     public ArrayList<Box> getOuterBoxes() {
         return outerBoxes;

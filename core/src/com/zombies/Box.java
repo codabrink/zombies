@@ -191,7 +191,11 @@ public class Box implements Overlappable, Loadable, HasZone {
     public Box getAdjBox(int direction) {
         return adjBoxes.get(direction);
     }
-    public HashMap<Integer, Box> getAdjBoxes() {return adjBoxes;}
+    public HashMap<Integer, Box> getAdjBoxes() {
+        System.out.println(adjBoxes);
+        return adjBoxes;
+
+    }
     public boolean isAdjacent(Box b) {
         for (Box bb: adjBoxes.values()) {
             if (b == bb)

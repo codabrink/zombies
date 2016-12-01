@@ -3,9 +3,12 @@ package com.zombies.HUD;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.GameView;
+import com.zombies.Player;
 import com.zombies.Zombies;
+import com.zombies.Zone;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +65,10 @@ public class Console {
             case "boxmap":
                 C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
                 break;
+            case "addbox":
+                Player p = view.getPlayer();
+                Box b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+
             default:
                 return;
         }
