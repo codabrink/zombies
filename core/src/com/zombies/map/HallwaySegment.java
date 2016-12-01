@@ -12,7 +12,6 @@ import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
@@ -20,7 +19,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     public Vector2 p1, p2, position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius, width, height;
-    private char direction;
+    private int direction;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
@@ -90,13 +89,13 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
         // calculate direction
         if (p1.x < p2.x)
-            direction = 'e';
+            direction = 0;
         else if (p1.x > p2.x)
-            direction = 'w';
+            direction = 180;
         else if (p1.y < p2.y)
-            direction = 'n';
+            direction = 90;
         else if (p1.y > p2.y)
-            direction = 's';
+            direction = 270;
     }
 
     public Vector2 getCenter() {
@@ -137,33 +136,23 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public float edge(char direction) {
+    public float edge(int direction) {
         switch(direction) {
-            case 'n':
+            case 90:
                 return position.y + height;
-            case 'e':
+            case 0:
                 return position.x + width;
-            case 's':
+            case 270:
                 return position.y;
-            case 'w':
+            case 180:
                 return position.x;
         }
         return 0;
     }
 
     @Override
-    public float oppositeEdge(char direction) {
-        switch(direction) {
-            case 'n':
-                return edge('s');
-            case 'e':
-                return edge('w');
-            case 's':
-                return edge('n');
-            case 'w':
-                return edge('e');
-        }
-        return 0;
+    public float oppositeEdge(int direction) {
+        return edge((direction + 180) % 360);
     }
 
     @Override

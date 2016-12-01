@@ -2,10 +2,12 @@ package com.zombies;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -33,17 +35,18 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private float alpha = 0;
     private GameView view;
     private boolean loaded = false;
-    private int frame;
     private Zone zone;
     private ArrayList<Box> outerBoxes = new ArrayList<Box>();
     private Vector2 center;
+    private HashMap<String, Box> boxMap;
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public Room(Collection<Box> boxes) {
+    public Room( HashMap<String, Box> boxMap) {
         view = GameView.gv;
-        this.boxes = new ArrayList<Box>(boxes);
+        this.boxes = new ArrayList<Box>(boxMap.values());
+        this.boxMap = boxMap;
         Zone.getZone(calculateMedian()).addObject(this);
 
         for (Box b: boxes) {
@@ -54,7 +57,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         center = calculateMedian();
         buildFloorModel();
-        genOuterWalls();
+        rasterizeWalls();
         Zone.getZone(center).addObject(this);
     }
 
@@ -108,7 +111,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
     }
 
-    public void genOuterWalls() {
+    public void rasterizeWalls() {
         // proposedPositions are sets of points where walls could be placed.
         ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
 
@@ -216,7 +219,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
-
     public ArrayList<Box> getOuterBoxes() {
         return outerBoxes;
     }
@@ -237,6 +239,17 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         modelBatch.render(floorModelInstance, GameView.environment);
         modelBatch.render(wallModelInstance, GameView.environment);
         modelBatch.end();
+
+        if (C.DEBUG) {
+            BitmapFont f = Zombies.instance.fonts.get("sans-reg:18:white");
+            if (C.DEBUG_SHOW_BOXMAP) {
+                spriteBatch.begin();
+                for (Box b : boxes) {
+                    f.draw(spriteBatch, b.BMKey, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
+                }
+                spriteBatch.end();
+            }
+        }
     }
 
     @Override

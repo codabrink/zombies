@@ -21,7 +21,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
-    private HashMap<Character, Box> adjBoxes = new HashMap<Character, Box>();
+    private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
     private Vector2 position;
     private Room room;
     private GameView view;
@@ -58,25 +58,25 @@ public class Box implements Overlappable, Loadable, HasZone {
 
         ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
 
-        if (adjBoxes.get('n') == null) {
+        if (adjBoxes.get(90) == null) {
             ArrayList<Vector2> points = new ArrayList<Vector2>();
             points.add(new Vector2(position.cpy().add(0, height)));
             points.add(new Vector2(position.cpy().add(width, height)));
             proposedPositions.add(points); // top wall
         }
-        if (adjBoxes.get('e') == null) {
+        if (adjBoxes.get(0) == null) {
             ArrayList<Vector2> points = new ArrayList<Vector2>();
             points.add(new Vector2(position.cpy().add(width, 0)));
             points.add(new Vector2(position.cpy().add(width, height)));
             proposedPositions.add(points); // right wall
         }
-        if (adjBoxes.get('s') == null) {
+        if (adjBoxes.get(270) == null) {
             ArrayList<Vector2> points = new ArrayList<Vector2>();
             points.add(new Vector2(position.cpy()));
             points.add(new Vector2(position.cpy().add(width, 0)));
             proposedPositions.add(points); // bottom wall
         }
-        if (adjBoxes.get('w') == null) {
+        if (adjBoxes.get(180) == null) {
             ArrayList<Vector2> points = new ArrayList<Vector2>();
             points.add(new Vector2(position.cpy()));
             points.add(new Vector2(position.cpy().add(0, height)));
@@ -93,17 +93,17 @@ public class Box implements Overlappable, Loadable, HasZone {
         return powerups;
     }
 
-    public ArrayList<Character> getOpenDirections() {
-        ArrayList<Character> openDirections = new ArrayList<Character>();
-        for (char c: MapGen.DIRECTIONS) {
-            if (adjBoxes.get(c) == null) {
-                openDirections.add(openDirections.size(), c);
+    public ArrayList<Integer> getOpenDirections() {
+        ArrayList<Integer> openDirections = new ArrayList<Integer>();
+        for (int i: MapGen.DIRECTIONS) {
+            if (adjBoxes.get(i) == null) {
+                openDirections.add(openDirections.size(), i);
             }
         }
         return openDirections;
     }
-    public char getRandomOpenDirection() {
-        ArrayList<Character> openDirections = getOpenDirections();
+    public int getRandomOpenDirection() {
+        ArrayList<Integer> openDirections = getOpenDirections();
         if (openDirections.size() > 0)
             return openDirections.get(random.nextInt(openDirections.size()));
         else
@@ -185,13 +185,17 @@ public class Box implements Overlappable, Loadable, HasZone {
         return this;
     }
 
-    public void setAdjBox(Character direction, Box box) {
+    public void setAdjBox(int direction, Box box) {
         adjBoxes.put(direction, box);
     }
-    public Box getAdjBox(Character direction) {
+    public Box getAdjBox(int direction) {
         return adjBoxes.get(direction);
     }
-    public HashMap<Character, Box> getAdjBoxes() {return adjBoxes;}
+    public HashMap<Integer, Box> getAdjBoxes() {
+        System.out.println(adjBoxes);
+        return adjBoxes;
+
+    }
     public boolean isAdjacent(Box b) {
         for (Box bb: adjBoxes.values()) {
             if (b == bb)
@@ -212,9 +216,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     // Box Map Location - used during room generation in MapGen.java
     public int[] getBMLocation() {
         String[] stringLocations = BMKey.split(",");
-        int[] locations = new int[2];
-        locations[0] = Integer.parseInt(stringLocations[0]);
-        locations[1] = Integer.parseInt(stringLocations[1]);
+        int[] locations = {Integer.parseInt(stringLocations[0]), Integer.parseInt(stringLocations[1])};
         return locations;
     }
 
@@ -228,32 +230,22 @@ public class Box implements Overlappable, Loadable, HasZone {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
     }
     @Override
-    public float edge(char direction) {
+    public float edge(int direction) {
         switch(direction) {
-            case 'n':
+            case 90:
                 return position.y + height;
-            case 'e':
+            case 0:
                 return position.x + width;
-            case 's':
+            case 270:
                 return position.y;
-            case 'w':
+            case 180:
                 return position.x;
         }
         return 0;
     }
     @Override
-    public float oppositeEdge(char direction) {
-        switch(direction) {
-            case 'n':
-                return edge('s');
-            case 'e':
-                return edge('w');
-            case 's':
-                return edge('n');
-            case 'w':
-                return edge('e');
-        }
-        return 0;
+    public float oppositeEdge(int direction) {
+        return edge((direction + 180) % 360);
     }
 
     @Override

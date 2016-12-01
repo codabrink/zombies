@@ -16,7 +16,7 @@ public class PreView implements Screen {
 
     protected long startTime = System.currentTimeMillis();
     private int fontSize = 18;
-    protected BitmapFont font = FontGen.generateFont(fontSize, "serif-reg");
+    protected BitmapFont font = Zombies.fonts.get("serif-reg:" + fontSize + ":white");
     protected BitmapFont logoFont = FontGen.generateFont(36, "serif-reg", Color.RED);
     protected ArrayList<String> intro = new ArrayList<String>();
     protected float textStartHeight;
@@ -54,7 +54,7 @@ public class PreView implements Screen {
         for (int i=0; i<3; i++) {
             if (Gdx.input.isTouched(i) && System.currentTimeMillis() > startTime + 500l) {
                 System.gc();
-                Zombies.game.setScreen(new GameView());
+                Zombies.instance.setScreen(new GameView());
                 System.gc();
             }
         }

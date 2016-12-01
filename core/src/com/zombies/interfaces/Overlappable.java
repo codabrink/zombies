@@ -10,7 +10,7 @@ public interface Overlappable {
     // {x, y, w, h}
     public String className();
     public boolean overlaps(float x, float y, float w, float h);
-    public float edge(char direction);
-    public float oppositeEdge(char direction);
+    public float edge(int direction);
+    public float oppositeEdge(int direction);
     public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2);
 }

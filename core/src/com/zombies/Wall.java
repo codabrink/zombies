@@ -3,6 +3,8 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
@@ -43,8 +45,11 @@ public class Wall implements Collideable, Loadable {
         lines.add(new DrawLine(p1, p2));
         //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
 
-        for (Zone z: Zone.getOverlappedZonesLine(p1, p2)) {
-            z.addWall(this);
+        HashSet<Zone>  zones    = Zone.zonesOnLine(p1, p2);
+        Iterator<Zone> iterator = zones.iterator();
+
+        while (iterator.hasNext()) {
+            iterator.next().addWall(this);
         }
     }
 
@@ -136,7 +141,7 @@ public class Wall implements Collideable, Loadable {
 
     @Override
     public void handleCollision(Fixture f) {
-        if (C.ENABLE_WALL_DESRUCTION) {
+        if (C.ENABLE_WALL_DESTRUCTION) {
             //createHole(f.getBody().getPosition(), 5f);
         }
     }

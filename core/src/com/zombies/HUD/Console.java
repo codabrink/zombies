@@ -1,0 +1,96 @@
+package com.zombies.HUD;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.Box;
+import com.zombies.C;
+import com.zombies.GameView;
+import com.zombies.Player;
+import com.zombies.Zombies;
+import com.zombies.Zone;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Console {
+    private GameView view;
+    private ShapeRenderer shapeRenderer;
+    private SpriteBatch   spriteBatch;
+    private int           fontSize = 18;
+    private BitmapFont    font = FontGen.generateFont(fontSize, "serif-reg");
+    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)");
+
+    public boolean enabled = false;
+    private String  string  = "";
+
+    public Console() {
+        view = GameView.gv;
+        shapeRenderer = new ShapeRenderer();
+        spriteBatch   = new SpriteBatch();
+    }
+
+    public boolean keyDown(int keycode) {
+        switch(keycode) {
+            case 66: // enter
+                submit();
+                break;
+            case 67: // backspace
+                if (string != null && string.length() > 0) {
+                    string = string.substring(0, string.length()-1);
+                }
+                break;
+            case 68: // backtick (disable)
+                enabled = false;
+                break;
+        }
+
+        return true;
+    }
+
+    public boolean keyTyped(char c) {
+        if (Character.toString(c).matches("[a-zA-Z\\s/]"))
+            string += c;
+        return true;
+    }
+
+    private void submit() {
+        Matcher m = commandPattern.matcher(string);
+        string = "";
+
+        if (!m.find())
+            return;
+
+        switch(m.group(1)) {
+            case "boxmap":
+                C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+                break;
+            case "addbox":
+                Player p = view.getPlayer();
+                Box b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+
+            default:
+                return;
+        }
+
+        enabled = false;
+    }
+
+    public void draw() {
+        float padding = view.getWidth() * 0.1f;
+        BitmapFont font = Zombies.fonts.get("sans-reg:18:black");
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(200, 200, 200, 0.5f);
+        shapeRenderer.rect(padding, padding, view.getWidth() - padding * 2, 20);
+        shapeRenderer.end();
+
+        spriteBatch.begin();
+        font.draw(spriteBatch, string, padding + 5, padding + 20 - 4);
+        spriteBatch.end();
+    }
+
+    public boolean toggleEnabled() {
+        return enabled = !enabled;
+    }
+}

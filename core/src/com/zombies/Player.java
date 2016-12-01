@@ -3,7 +3,7 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.zombies.HUD.DebugText;
+import com.zombies.HUD.*;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -30,7 +30,7 @@ public class Player extends Unit implements Collideable {
     private float angle = 0;
     private long lastAngleSet = System.currentTimeMillis();
     private long angleLast = 1000l;
-    private HealthBar healthBar;
+    private com.zombies.HUD.HealthBar healthBar;
     public PointLight pointLight = new PointLight();
 
     private float radius, diameter;
@@ -40,7 +40,7 @@ public class Player extends Unit implements Collideable {
     public Player(Vector2 position) {
         super();
 
-        healthBar = new HealthBar();
+        healthBar = new com.zombies.HUD.HealthBar();
         radius = C.PLAYER_SIZE * 0.5f;
         diameter = C.PLAYER_SIZE;
 

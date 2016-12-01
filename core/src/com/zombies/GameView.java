@@ -41,7 +41,6 @@ public class GameView implements Screen {
 
     public Stats stats;
 
-    private PerspectiveCamera cam;
     private SpriteBatch HUDSpriteBatch;
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
@@ -78,14 +77,14 @@ public class GameView implements Screen {
     public GameView() {
         fontGen = new com.zombies.HUD.FontGen();
 
-        cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(0, 0, 60);
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
         debugRenderer = new Box2DDebugRenderer();
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl20.glEnable(GL20.GL_BLEND);
+        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private void reset() {
@@ -142,7 +141,7 @@ public class GameView implements Screen {
     }
 
     public Game getGame() {
-        return Zombies.game;
+        return Zombies.instance;
     }
 
     public ThumbpadLeft getThumbpadLeft() {
@@ -217,13 +216,12 @@ public class GameView implements Screen {
         handleContacts();
         camHandle.update(dt);
 
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        spriteBatch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(camHandle.cam.combined);
+        spriteBatch.setProjectionMatrix(camHandle.cam.combined);
 
         //lists
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        cam.update();
         // renderer.draw(view.getWorld());
         Gdx.gl.glFlush();
         handleKeys();
@@ -240,7 +238,7 @@ public class GameView implements Screen {
 
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
-        hud.render(HUDSpriteBatch);
+        hud.render(HUDSpriteBatch, shapeRenderer, modelBatch);
         HUDSpriteBatch.end();
 
         com.zombies.HUD.DebugText.render();
@@ -301,8 +299,7 @@ public class GameView implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        cam = new PerspectiveCamera(C.FOV, width, height);
-        System.out.println("resize");
+        camHandle.resize(width, height);
     }
 
     @Override
@@ -317,20 +314,7 @@ public class GameView implements Screen {
     }
 
     private void handleKeysDesktop() {
-        float strength = 50 * C.scale;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            player.getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            player.getBody().applyForce(new Vector2(0, -strength), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            player.getBody().applyForce(new Vector2(-strength, 0), new Vector2(), true);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            player.getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
-        }
+        float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());
@@ -366,7 +350,7 @@ public class GameView implements Screen {
     }
 
     public void end() {
-        Zombies.game.setScreen(new EndView(stats));
+        Zombies.instance.setScreen(new EndView(stats));
     }
 
     private void handleKeysAndroid() {
@@ -376,10 +360,7 @@ public class GameView implements Screen {
     }
 
     public PerspectiveCamera getCamera() {
-        return cam;
-    }
-    public void setCamera(PerspectiveCamera cam){
-        this.cam = cam;
+        return camHandle.cam;
     }
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
     public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}
