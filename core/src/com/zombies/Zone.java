@@ -45,7 +45,7 @@ public class Zone {
 
     private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
 
-    public int numRooms = 2; // number of rooms that are supposed to exist in the zone
+    public int numRooms = 6; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap
 
     public Zone(float x, float y) {
@@ -484,9 +484,9 @@ public class Zone {
         return position.cpy().add(randomX, randomY);
     }
 
-    public Vector2 randomDiscretePosition(int numIncrements) {
-        float randomX = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
-        float randomY = r.nextInt(numIncrements) * (C.ZONE_SIZE / numIncrements);
+    public Vector2 randomDiscretePosition(float interval) {
+        float randomX = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
+        float randomY = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
         return position.cpy().add(randomX, randomY);
     }
 
