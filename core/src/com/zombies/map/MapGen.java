@@ -60,7 +60,7 @@ public class MapGen {
         Random r = new Random();
         HashMap<String, Box> boxMap = new HashMap<>();
         for (int i=0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = z.randomDiscretePosition(20);
+            Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
             if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
                 Box b = new Box(boxPosition.x, boxPosition.y);
                 b.BMKey = "0,0";

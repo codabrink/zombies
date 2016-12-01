@@ -4,7 +4,7 @@ public class C {
     public static final float SCALE = 1f;
 
     //DEBUG
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
