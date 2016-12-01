@@ -2,20 +2,15 @@ package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Overlappable;
-
 import java.util.ArrayList;
 
-/**
- * Created by coda on 4/2/16.
- */
 public class Geometry {
-
     public static boolean rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
-        boolean xOverlap = valueInRange(x, x2, x2 + w2) ||
-                valueInRange(x2, x, x + w);
-        boolean yOverlap = valueInRange(y, y2, y2 + h2) ||
-                valueInRange(y2, y, y + h);
-        return xOverlap && yOverlap;
+        if (x >= x2 + w2 || x2 >= x + w)
+            return false;
+        if (y >= y2 + h2 || y2 >= y + h)
+            return false;
+        return true;
     }
 
     private static boolean valueInRange(float value, float min, float max) {
