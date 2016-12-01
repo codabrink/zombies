@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.zombies.interfaces.Drawable;
@@ -238,7 +240,14 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         modelBatch.end();
 
         if (C.DEBUG) {
-            
+            BitmapFont f = Zombies.instance.fonts.get("sans-reg:18:white");
+            if (C.DEBUG_SHOW_BOXMAP) {
+                spriteBatch.begin();
+                for (Box b : boxes) {
+                    f.draw(spriteBatch, b.BMKey, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
+                }
+                spriteBatch.end();
+            }
         }
     }
 

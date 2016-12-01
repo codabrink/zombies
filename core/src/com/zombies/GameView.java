@@ -41,7 +41,6 @@ public class GameView implements Screen {
 
     public Stats stats;
 
-    private PerspectiveCamera cam;
     private SpriteBatch HUDSpriteBatch;
     public SpriteBatch spriteBatch;
     public ShapeRenderer shapeRenderer;
@@ -78,8 +77,6 @@ public class GameView implements Screen {
     public GameView() {
         fontGen = new com.zombies.HUD.FontGen();
 
-        cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(0, 0, 60);
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
@@ -219,13 +216,12 @@ public class GameView implements Screen {
         handleContacts();
         camHandle.update(dt);
 
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        spriteBatch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(camHandle.cam.combined);
+        spriteBatch.setProjectionMatrix(camHandle.cam.combined);
 
         //lists
         world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        cam.update();
         // renderer.draw(view.getWorld());
         Gdx.gl.glFlush();
         handleKeys();
@@ -303,8 +299,7 @@ public class GameView implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        cam = new PerspectiveCamera(C.FOV, width, height);
-        System.out.println("resize");
+        camHandle.resize(width, height);
     }
 
     @Override
@@ -365,10 +360,7 @@ public class GameView implements Screen {
     }
 
     public PerspectiveCamera getCamera() {
-        return cam;
-    }
-    public void setCamera(PerspectiveCamera cam){
-        this.cam = cam;
+        return camHandle.cam;
     }
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
     public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}

@@ -83,8 +83,6 @@ public class HUD implements InputProcessor{
         if (console.enabled)
             return console.keyDown(keycode);
 
-        System.out.println(keycode);
-
         Box b;
         switch(keycode) {
             case 43: // o

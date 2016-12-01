@@ -42,7 +42,6 @@ public class Console {
                 break;
         }
 
-        // System.out.println(keycode);
         return true;
     }
 
@@ -63,7 +62,11 @@ public class Console {
             case "boxmap":
                 C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
                 break;
+            default:
+                return;
         }
+
+        enabled = false;
     }
 
     public void draw() {
