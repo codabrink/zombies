@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class MapGen {
 
-    public static int[] DIRECTIONS = {0, 90, 180, 270};
+    public static final int[] DIRECTIONS = {0, 90, 180, 270};
 
     public static void update(Zone z) {
         fillZone(z);
@@ -57,10 +57,19 @@ public class MapGen {
                     Box bb = Zone.getZone(x, y).getBox(x, y);
 
                     if (bb != null && bb.getRoom() != b.getRoom())
-                        System.out.println("Found box of another room");
+                        connectBoxes(b, bb);
                 }
             }
         }
+    }
+
+    public static void connectBoxes(Box b, Box bb) {
+        float dx = Math.abs(bb.getCenter().x - b.getCenter().x);
+        float dy = Math.abs(bb.getCenter().y - b.getCenter().y);
+        double theta = Math.toDegrees(Math.atan2(dy, dx));
+
+        theta = Math.round(theta / 90) * 90;
+        new Hallway(b, (int)theta, 3f);
     }
 
     public static Room genRoom(Zone z) {

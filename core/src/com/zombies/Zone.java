@@ -28,7 +28,7 @@ public class Zone {
     public static int globalLoadIndex = 0;
     private static Box zone;
 
-    public static enum Directions { N, NE, E, SE, S, SW, W, NW };
+    public enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections
 
@@ -262,8 +262,6 @@ public class Zone {
         Zone startingZone = getZone(blastCenter);
         ArrayList<Zone> damageZones = Zone.getOverlappedZonesCircle(blastCenter, blastRadius);
 
-        System.out.println("Affected zones: " + damageZones.size());
-
         ArrayList<Wall> wallsToCheck = new ArrayList<Wall>();
 
         // TODO: sometimes a wall is in a zone, but belongs to a different zone and so does not explode.
@@ -472,6 +470,39 @@ public class Zone {
     }
     public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         return checkOverlap(v.x, v.y, w, h, limit, ignore);
+    }
+
+    private Vector2 center() {
+        return new Vector2(position.x + C.ZONE_SIZE / 2, position.y + C.ZONE_SIZE / 2);
+    }
+
+    private HashSet<Zone> adjZones(int limit) {
+        HashSet<Zone> zones = new HashSet<>();
+        Vector2 center = center();
+        float variance = C.ZONE_SIZE * limit;
+
+        for (float x = center.x - variance; x <= center.x + variance; x += C.ZONE_SIZE)
+            for (float y = center.y - variance; y <= center.y + variance; y += C.ZONE_SIZE)
+                zones.add(Zone.getZone(x, y));
+        return zones;
+    }
+
+    public ArrayList<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
+        ArrayList<Overlappable> overlapped = new ArrayList<>();
+        HashSet<Zone> zones = adjZones(limit);
+        Iterator<Zone> iterator = zones.iterator();
+        while (iterator.hasNext())
+            iterator.next().getOverlappablesAtPoint(x, y, overlapped);
+
+        return overlapped;
+    }
+    private ArrayList<Overlappable> getOverlappablesAtPoint(float x, float y, ArrayList<Overlappable> overlapped) {
+        for (Overlappable o : overlappables) {
+            if (o.contains(x, y))
+                overlapped.add(o);
+        }
+
+        return overlapped;
     }
 
     public Vector2 randomPosition() {

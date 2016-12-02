@@ -119,6 +119,11 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
     }
 
+    @Override
+    public boolean contains(float x, float y) {
+        return Geometry.rectContains(x, y, position, width, height);
+    }
+
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         for (Wall wall: walls)
             wall.buildWallMesh(builder, modelCenter);

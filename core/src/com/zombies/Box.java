@@ -239,23 +239,20 @@ public class Box implements Overlappable, Loadable, HasZone {
         }
         return 0;
     }
+
     @Override
     public float oppositeEdge(int direction) {
         return edge((direction + 180) % 360);
     }
 
     @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        // left line
-        Vector2 ip = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // top line
-            ip = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // right line
-            ip = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // bottom line
-            ip = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
+    public boolean contains(float x, float y) {
+        return Geometry.rectContains(x, y, position, width, height);
+    }
 
-        return ip;
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        return Geometry.edgeIntersection(p1, p2, position, width, height);
     }
 
     @Override
