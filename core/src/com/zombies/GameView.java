@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.data.Stats;
+import com.zombies.map.MapGen;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 
@@ -99,7 +100,7 @@ public class GameView implements Screen {
 
         // generate the initial zone
         Zone z = Zone.getZone(0f, 0f);
-        z.generate();
+        MapGen.fillZone(z);
         Box initialBox = z.randomBox();
 
         player = new Player(initialBox.randomPoint());

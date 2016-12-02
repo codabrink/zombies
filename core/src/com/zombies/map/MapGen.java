@@ -16,18 +16,7 @@ public class MapGen {
     public static int[] DIRECTIONS = {0, 90, 180, 270};
 
     public static void update(Zone z) {
-        // needs to be done during generation, not creation
-        if (z.getAdjZones().size() < 8)
-            z.findAdjZones();
-
-        // can the zone generate a room?
-        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z);
-            if (room != null)
-                z.addObject(room);
-            else
-                z.roomGenFailureCount++;
-        }
+        fillZone(z);
     }
 
     public static void fillZone(Zone z) {
@@ -37,14 +26,14 @@ public class MapGen {
         if (z.getAdjZones().size() < 8)
             z.findAdjZones();
 
-        for (int i=0;i<=0;i++) {
+        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
             Room room = genRoom(z);
-            if (room != null) {
-                z.addObject(room);
-                connectRoom(room);
-            } else {
-                break;
+            if (room == null) {
+                z.roomGenFailureCount++;
+                return;
             }
+            z.addObject(room);
+            connectRoom(room);
         }
     }
 

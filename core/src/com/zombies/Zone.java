@@ -64,10 +64,6 @@ public class Zone {
         addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
-    public void generate() {
-        MapGen.fillZone(this);
-    }
-
     public void draw(int frame, int limit) {
         if (drawFrame == frame)
             return;
