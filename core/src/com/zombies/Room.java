@@ -45,11 +45,11 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public Room( HashMap<String, Box> boxMap) {
         view = GameView.gv;
-        this.boxes = new ArrayList<Box>(boxMap.values());
         this.boxMap = boxMap;
-        Zone.getZone(calculateMedian()).addObject(this);
+        this.boxes = new ArrayList<>(boxMap.values());
 
         for (Box b: boxes) {
+            b.setRoom(this);
             Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
@@ -58,7 +58,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         center = calculateMedian();
         buildFloorModel();
         rasterizeWalls();
-        Zone.getZone(center).addObject(this);
     }
 
     // calculates the median position of all of the boxes

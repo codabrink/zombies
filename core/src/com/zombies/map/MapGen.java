@@ -39,10 +39,12 @@ public class MapGen {
 
         for (int i=0;i<=0;i++) {
             Room room = genRoom(z);
-            if (room != null)
+            if (room != null) {
                 z.addObject(room);
-            else
+                connectRoom(room);
+            } else {
                 break;
+            }
         }
     }
 
@@ -56,7 +58,23 @@ public class MapGen {
         return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
 
-    private static Room genRoom(Zone z) {
+    public static void connectRoom(Room r) {
+        for (Box b : r.getOuterBoxes()) {
+            for (int i : DIRECTIONS) {
+                if (b.getAdjBox(i) == null) {
+                    double rad = Math.toRadians(i);
+                    float x = (float)(b.getPosition().x + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.cos(rad));
+                    float y = (float)(b.getPosition().y + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.sin(rad));
+                    Box bb = Zone.getZone(x, y).getBox(x, y);
+
+                    if (bb != null && bb.getRoom() != b.getRoom())
+                        System.out.println("Found box of another room");
+                }
+            }
+        }
+    }
+
+    public static Room genRoom(Zone z) {
         Random r = new Random();
         HashMap<String, Box> boxMap = new HashMap<>();
         for (int i=0; i <= 5; i++) { // try 5 times

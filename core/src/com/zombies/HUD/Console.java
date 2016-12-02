@@ -9,6 +9,7 @@ import com.zombies.GameView;
 import com.zombies.Player;
 import com.zombies.Zombies;
 import com.zombies.Zone;
+import com.zombies.map.MapGen;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +43,7 @@ public class Console {
                 break;
             case 68: // backtick (disable)
                 enabled = false;
+                string = "";
                 break;
         }
 
@@ -61,14 +63,21 @@ public class Console {
         if (!m.find())
             return;
 
+        Player p;
+        Box b;
+
         switch(m.group(1)) {
             case "boxmap":
                 C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
                 break;
             case "addbox":
-                Player p = view.getPlayer();
-                Box b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
-
+                p = view.getPlayer();
+                b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+                break;
+            case "connectRoom":
+                p = view.getPlayer();
+                b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+                MapGen.connectRoom(b.getRoom());
             default:
                 return;
         }
