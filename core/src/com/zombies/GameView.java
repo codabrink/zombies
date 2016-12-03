@@ -76,8 +76,6 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView() {
-        fontGen = new com.zombies.HUD.FontGen();
-
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();

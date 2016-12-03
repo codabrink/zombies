@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.badlogic.gdx.Gdx;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
