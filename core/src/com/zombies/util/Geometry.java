@@ -26,10 +26,7 @@ public class Geometry {
     public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Overlappable o) {
         Vector2 position;
 
-        float dx = o.getCenter().x - lp1.x;
-        float dy = o.getCenter().y - lp1.y;
-
-        double theta = Math.atan2(dy, dx);
+        double theta = angle(o.getCenter(), lp1);
         double cTheta = Math.atan2(o.height / 2, o.width / 2); // corner theta
 
         if (Math.abs(theta) < Math.abs(cTheta)) // right wall
@@ -61,12 +58,11 @@ public class Geometry {
         float B2 = l2p2x - l2p1x;
         float C2 = A2 * l2p1x + B2 * l2p1y;
 
-        float delta = A1*B2 - A2*B1;
-        if (delta == 0) {
+        float delta = A1 * B2 - A2 * B1;
+        if (delta == 0)
             return null; // lines are parallel
-        }
 
-        return new Vector2((B2*C1 - B1*C2)/delta, (A1*C2 - A2*C1)/ delta);
+        return new Vector2((B2 * C1 - B1 * C2) / delta, (A1 * C2 - A2 * C1) / delta);
     }
 
     public static Overlappable checkOverlap(float x, float y, float w, float h, ArrayList<Overlappable> overlappables) {
@@ -77,9 +73,8 @@ public class Geometry {
         return null;
     }
 
-    public static double getAngleFromPoints(Vector2 p1, Vector2 p2) {
-        float dx = p2.x - p1.x, dy = p2.y - p1.y;
-        return Math.atan2(dy, dx);
+    public static double angle(Vector2 p1, Vector2 p2) {
+        return Math.atan2(p2.y - p1.y, p2.x - p1.x);
     }
 
     public static Vector2 projectVector(Vector2 v, double angle, float length) {

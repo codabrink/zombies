@@ -21,6 +21,8 @@ public class Zombies extends Game {
         fonts.put("serif-reg:18:white", FontGen.generateFont(18, "serif-reg"));
         fonts.put("sans-reg:18:white",  FontGen.generateFont(18, "sans-reg"));
         fonts.put("sans-reg:18:black",  FontGen.generateFont(18, "sans-reg", Color.BLACK));
+        fonts.put("sans-reg:24:white",  FontGen.generateFont(24, "sans-reg"));
+        fonts.put("square:48:red",      FontGen.generateFont(48, "square", Color.RED));
     }
 
     @Override

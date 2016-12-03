@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.Box;
 import com.zombies.GameView;
@@ -23,7 +24,7 @@ import com.zombies.Zone;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zombies.interfaces.Modelable {
+public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modelable {
     public static int MAX_HALLWAY_SEGMENTS = 2;
 
     ArrayList<HallwayAxis> axes = new ArrayList<>();
@@ -84,21 +85,19 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
         materialize();
     }
 
-    public ArrayList<HallwaySegment> getHallwaySegments() {
-        ArrayList<HallwaySegment> hss = new ArrayList<HallwaySegment>();
-
-        for (Overlappable hs: hallwaySegments) {
-            hss.add((HallwaySegment)hs);
-        }
-
-        return hss;
-    }
-
     private void materialize() {
         center = new Vector2();
 
+        for (int i = 0; i < axes.size() - 1; i++) {
+            hallwaySegments.add(new HallwaySegment(
+                    axes.get(i).point,
+                    axes.get(i + 1).point,
+                    diameter,
+                    this));
+        }
+
         for (Overlappable hs: hallwaySegments) {
-            center.add(((HallwaySegment)hs).getCenter());
+            center.add(hs.getCenter());
             ((HallwaySegment)hs).materialize();
         }
         center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());

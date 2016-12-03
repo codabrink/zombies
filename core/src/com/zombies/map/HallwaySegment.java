@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
@@ -12,6 +13,7 @@ import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
@@ -26,17 +28,23 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     private com.zombies.interfaces.Modelable modelable;
 
     // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, double previousSegmentAngle, com.zombies.interfaces.Modelable m) {
+    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Modelable m) {
         this.p1 = p1;
         this.p2 = p2;
-        this.angle = Geometry.getAngleFromPoints(p1, p2);
+        this.angle = Geometry.angle(p1, p2);
         this.nextSegmentAngle = this.angle;
-        this.previousSegmentAngle = previousSegmentAngle;
         this.diameter = diameter;
         radius = diameter / 2;
         modelable = m;
 
         calculateInfo();
+    }
+
+    private void setCorners() {
+        corners.add(new Vector2(position.x + width, position.y + height));
+        corners.add(new Vector2(position.x, position.y + height));
+        corners.add(new Vector2(position.x, position.y));
+        corners.add(new Vector2(position.x + width, position.y));
     }
 
     public void materialize() {
@@ -108,22 +116,6 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
     public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
 
-    @Override
-    public String className() {
-        return "HallwaySegment";
-    }
-
-
-    @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
-    }
-
-    @Override
-    public boolean contains(float x, float y) {
-        return Geometry.rectContains(x, y, position, width, height);
-    }
-
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         for (Wall wall: walls)
             wall.buildWallMesh(builder, modelCenter);
@@ -141,18 +133,28 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     @Override
+    public String className() { return "HallwaySegment"; }
+    @Override
+    public ArrayList<Vector2> getCorners() { return corners; }
+    @Override
+    public boolean overlaps(float x, float y, float w, float h) {
+        return Geometry.rectOverlap(x, y, w, h, position.x, position.y, width, height);
+    }
+    @Override
+    public boolean contains(float x, float y) { return Geometry.rectContains(x, y, position, width, height); }
+    @Override
     public float edge(int direction) {
         switch(direction) {
-            case 90:
-                return position.y + height;
             case 0:
                 return position.x + width;
-            case 270:
-                return position.y;
+            case 90:
+                return position.y + height;
             case 180:
                 return position.x;
+            case 270:
+                return position.y;
         }
-        return 0;
+        throw new  IllegalArgumentException();
     }
 
     @Override
@@ -161,36 +163,22 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        // left line
-        Vector2 i = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (i == null) // top line
-            i = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (i == null) // right line
-            i = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
-        if (i == null) // bottom line
-            i = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
-
-        return i;
-    }
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
 
     @Override
     public void load() {
         for (Wall w: walls)
             w.load();
     }
-
     @Override
     public void unload() {
         for (Wall w: walls)
             w.unload();
     }
-
     @Override
     public Zone getZone() {
         return zone;
     }
-
     @Override
     public void setZone(Zone z) {
         zone = z;

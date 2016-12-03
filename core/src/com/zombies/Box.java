@@ -17,7 +17,6 @@ import com.zombies.powerups.ShotgunPickup;
 import com.zombies.util.Geometry;
 
 public class Box implements Overlappable, Loadable, HasZone {
-    private ArrayList<Vector2> corners = new ArrayList<>();
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
