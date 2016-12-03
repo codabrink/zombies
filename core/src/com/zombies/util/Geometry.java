@@ -23,20 +23,26 @@ public class Geometry {
     }
 
     // get intersection point of a line and a box
-    public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Vector2 p, float w, float h) {
+    public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Overlappable o) {
         Vector2 position;
 
-        // right wall
-        if ((position = intersectPoint(lp1, lp2, p.cpy().add(w, 0), p.cpy().add(w, h))) != null)
-            return position;
-        // top wall
-        if ((position = intersectPoint(lp1, lp2, p.cpy().add(0, h), p.cpy().add(w, h))) != null)
-            return position;
-        // left wall
-        if ((position = intersectPoint(lp1, lp2, p, p.cpy().add(0, h))) != null)
-            return position;
-        // bottom wall
-        if ((position = intersectPoint(lp1, lp2, p, p.cpy().add(w, 0))) != null)
+        float dx = o.getCenter().x - lp1.x;
+        float dy = o.getCenter().y - lp1.y;
+
+        double theta = Math.atan2(dy, dx);
+        double cTheta = Math.atan2(o.height / 2, o.width / 2); // corner theta
+
+        if (Math.abs(theta) < Math.abs(cTheta)) // right wall
+            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(3))) != null)
+                return position;
+        if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) // top wall
+            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(1))) != null)
+                return position;
+        if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) // bottom wall
+            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(2), o.getCorners().get(3))) != null)
+                return position;
+        // otherwise, assume left wall
+        if ((position = intersectPoint(lp1, lp2, o.getCorners().get(1), o.getCorners().get(2))) != null)
             return position;
 
         return null;

@@ -17,7 +17,8 @@ import com.zombies.powerups.ShotgunPickup;
 import com.zombies.util.Geometry;
 
 public class Box implements Overlappable, Loadable, HasZone {
-    private ArrayList<Unit> zombies = new ArrayList<Unit>();
+    private ArrayList<Vector2> corners = new ArrayList<>();
+    private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
@@ -33,7 +34,15 @@ public class Box implements Overlappable, Loadable, HasZone {
 
     public Box(float x, float y) {
         position = new Vector2(x, y);
+        setCorners();
         this.view = GameView.gv;
+    }
+
+    private void setCorners() {
+        corners.add(new Vector2(position.x + width, position.y + height));
+        corners.add(new Vector2(position.x, position.y + height));
+        corners.add(new Vector2(position.x, position.y));
+        corners.add(new Vector2(position.x + width, position.y));
     }
 
     public boolean insideBox(float x, float y) {
@@ -176,10 +185,6 @@ public class Box implements Overlappable, Loadable, HasZone {
         return u;
     }
 
-    public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
-    }
-
     public Box setRoom(Room room) {
         this.room = room;
         return this;
@@ -217,9 +222,17 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     @Override
+    public Vector2 getCenter() {
+        return position.cpy().add(width / 2, height / 2);
+    }
+
+    @Override
     public String className() {
         return "Box";
     }
+
+    @Override
+    public ArrayList<Vector2> getCorners() { return corners; }
 
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
@@ -252,7 +265,7 @@ public class Box implements Overlappable, Loadable, HasZone {
 
     @Override
     public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        return Geometry.edgeIntersection(p1, p2, position, width, height);
+        return Geometry.edgeIntersection(p1, p2, this);
     }
 
     @Override
