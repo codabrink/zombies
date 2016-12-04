@@ -6,6 +6,8 @@ public class C {
     //DEBUG
     public static final boolean DEBUG = true;
 
+    public static final float HALLWAY_WIDTH = 3f * SCALE;
+
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = true;

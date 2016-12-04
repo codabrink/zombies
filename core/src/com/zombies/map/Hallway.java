@@ -102,8 +102,9 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
 
         for (int i = 0; i < axes.size() - 1; i++) {
             hallwaySegments.add(new HallwaySegment(
-                    axes.get(i).point,
-                    axes.get(i + 1).point,
+                    axes.get(Math.max(i - 1, 0)),
+                    axes.get(i),
+                    axes.get(Math.min(i + 1, axes.size() - 1)),
                     diameter,
                     this));
         }

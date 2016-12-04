@@ -38,7 +38,7 @@ public class Grass implements com.zombies.interfaces.Drawable, HasZone {
                 1, 1, 1);
         model = Assets.modelBuilder.end();
         modelInstance = new ModelInstance(model);
-        modelInstance.transform.setTranslation(position.x, position.y, 0);
+        modelInstance.transform.setTranslation(position.x, position.y, -1);
     }
 
     @Override

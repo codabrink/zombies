@@ -50,7 +50,6 @@ public class GameView implements Screen {
     private Assets assets = new Assets();
 
     protected World world;
-    protected Box grid[][];
 
     public Random random = new Random();
     protected CameraHandle camHandle;
@@ -63,8 +62,6 @@ public class GameView implements Screen {
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private ArrayList<DebugCircle> debugCircles = new ArrayList<DebugCircle>();
     public int frame = 0;
-
-    public float scale = 1;
 
     private Box2DDebugRenderer debugRenderer;
     private Matrix4 debugMatrix;
@@ -118,13 +115,6 @@ public class GameView implements Screen {
         outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
     }
 
-    private void addSurvivors() {
-        if (!C.POPULATE_SURVIVORS) return;
-        for (int i=1;i<=10;i++) {
-            randomBox().addSurvivor();
-        }
-    }
-
     public HUD getHUD() {
         return hud;
     }
@@ -142,21 +132,8 @@ public class GameView implements Screen {
     }
     public ThumbpadRight getThumbpadRight() { return thumbpadRight;}
 
-
-    public Box randomBox(){
-        return grid[random.nextInt(C.GRID_WIDTH)+1][random.nextInt(C.GRID_HEIGHT)+1];
-    }
-
-    public int getLightingCount() {
-        return lightingCount;
-    }
-
     public Meshes getMeshes() {
         return meshes;
-    }
-
-    public Box[][] getGrid() {
-        return grid;
     }
 
     public int getWidth() {
@@ -165,25 +142,6 @@ public class GameView implements Screen {
 
     public int getHeight() {
         return Gdx.graphics.getHeight();
-    }
-
-    public void addPostZombie(PostponedZombie z) {
-        postZombie.add(z);
-    }
-
-    public void addDyingZombie(DyingZombie z) {
-        dyingZombie.add(z);
-    }
-
-    protected void clearDumps() {
-        for (PostponedZombie z: postZombieDump) {
-            postZombie.remove(z);
-        }
-        for (DyingZombie z: dyingZombieDump) {
-            dyingZombie.remove(z);
-        }
-        postZombieDump.clear();
-        dyingZombieDump.clear();
     }
 
     public void dumpPostZombie(PostponedZombie z) {

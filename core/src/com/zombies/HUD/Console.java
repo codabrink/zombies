@@ -7,6 +7,7 @@ import com.zombies.Box;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Player;
+import com.zombies.Room;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
@@ -78,14 +79,21 @@ public class Console {
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
+            case "genRoom":
+                Room r = MapGen.genRoom(view.getPlayer().getPosition());
+                Zone.getZone(view.getPlayer().getPosition()).addObject(r);
+                MapGen.connectRoom(r);
+                break;
             case "connectRoom":
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 MapGen.connectRoom(b.getRoom());
+                break;
             case "hallway":
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
-                new Hallway(b, Integer.parseInt(m.group(2)), 1);
+                new Hallway(b, Integer.parseInt(m.group(2)), 2 * C.SCALE);
+                break;
             default:
                 enabled = true;
                 return;

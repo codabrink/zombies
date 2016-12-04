@@ -69,21 +69,27 @@ public class MapGen {
         double theta = Math.toDegrees(Math.atan2(dy, dx));
 
         theta = Math.round(theta / 90) * 90;
-        new Hallway(b, (int)theta, 3f);
+        new Hallway(b, (int)theta, 2 * C.SCALE);
     }
 
     public static Room genRoom(Zone z) {
-        Random r = new Random();
-        HashMap<String, Box> boxMap = new HashMap<>();
-        for (int i=0; i <= 5; i++) { // try 5 times
+        for (int i = 0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
             if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
-                Box b = new Box(boxPosition.x, boxPosition.y);
-                b.BMKey = "0,0";
-                boxMap.put("0,0", b);
-                break;
+                return genRoom(boxPosition);
             }
         }
+        return null;
+    }
+
+    public static Room genRoom(Vector2 boxPosition) {
+        Zone z = Zone.getZone(boxPosition);
+        Random r = new Random();
+        HashMap<String, Box> boxMap = new HashMap<>();
+
+        Box b = new Box(boxPosition.x, boxPosition.y);
+        b.BMKey = "0,0";
+        boxMap.put("0,0", b);
 
         // if it failed to find an open position
         if (boxMap.size() == 0)
@@ -94,7 +100,6 @@ public class MapGen {
             Object[] boxMapArray = boxMap.values().toArray(); // so we can grab a random box
 
             // find a box with at least one open side
-            Box b;
             do {
                 b = (Box)boxMapArray[r.nextInt(boxMapArray.length)];
             } while (b.getAdjBoxes().size() == 4);

@@ -478,6 +478,7 @@ public class Zone {
     }
 
     public Vector2 randomDiscretePosition(float interval) {
+        interval = interval * C.SCALE;
         float randomX = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
         float randomY = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
         return position.cpy().add(randomX, randomY);

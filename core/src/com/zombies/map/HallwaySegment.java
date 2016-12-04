@@ -19,24 +19,21 @@ import java.util.LinkedList;
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
     private ArrayList<Vector2> corners = new ArrayList<>();
     private static int DRAWABLE_LAYER = 1;
-    public Vector2 p1, p2, position, center;
+    public Vector2 position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius, width, height;
-    private int direction;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private double angle, previousSegmentAngle, nextSegmentAngle = 0; // change in angle from the last hallway segment
+    private HallwayAxis pAxis, axis, nAxis;
     private com.zombies.interfaces.Modelable modelable;
 
-    // only handles modulus 90 degree angles
-    public HallwaySegment(Vector2 p1, Vector2 p2, float diameter, Modelable m) {
-        this.p1 = p1;
-        this.p2 = p2;
-        this.angle = Geometry.angle(p1, p2);
-        this.nextSegmentAngle = this.angle;
+    public HallwaySegment(HallwayAxis pAxis, HallwayAxis axis, HallwayAxis nAxis, float diameter, Modelable m) {
+        this.pAxis = pAxis;
+        this.axis  = axis;
+        this.nAxis = nAxis;
         this.diameter = diameter;
-        radius = diameter / 2;
-        modelable = m;
+        this.radius   = diameter / 2;
+        this.modelable = m;
 
         calculateInfo();
     }
@@ -56,12 +53,9 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     private void createWalls() {
-        GameView.gv.addDebugDots(p1, Color.GREEN);
-        GameView.gv.addDebugDots(p2, Color.RED);
-
         // p1aa = Point 1 Angle Average
-        double p1aa = (previousSegmentAngle + angle) / 2,
-                p2aa = (nextSegmentAngle + angle) / 2;
+        double p1aa = (pAxis.theta + axis.theta) / 2,
+                p2aa = (axis.theta + nAxis.theta) / 2;
 
         // Wall 1 is on the left
         // Wall 2 is on the right
@@ -72,51 +66,41 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         double w2p1a = p1aa - Math.PI / 2;
         double w2p2a = p2aa - Math.PI / 2;
 
-        float p1r = Math.abs(previousSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        float p2r = Math.abs(nextSegmentAngle - angle) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        w1p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
-        w1p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        w2p1 = new Vector2(p1.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
-        w2p2 = new Vector2(p2.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
+        float p1r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
+        float p2r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
+        w1p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
+        w1p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
+        w2p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
+        w2p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
 
         walls.add(new Wall(w1p1, w1p2, modelable));
         walls.add(new Wall(w2p1, w2p2, modelable));
+
+        if (C.DEBUG) {
+            GameView.gv.addDebugDots(axis.point, Color.GREEN);
+            GameView.gv.addDebugDots(nAxis.point, Color.RED);
+        }
     }
 
     private void calculateInfo() {
-        // calculate position
-        if (p1.x < p2.x || p1.y < p2.y) {
-            position = new Vector2(p1.x - radius, p1.y - radius);
-        } else {
-            position = new Vector2(p2.x - radius, p2.y - radius);
-        }
-
-        center = position.cpy().add(width / 2, height / 2);
+        position = new Vector2(
+                Math.min(axis.point.x, nAxis.point.x) - radius,
+                Math.min(axis.point.y, nAxis.point.y) - radius);
 
         // calculate width and height
-        width = Math.abs(p1.x - p2.x) + diameter;
-        height = Math.abs(p1.y - p2.y) + diameter;
+        width = Math.abs(axis.point.x - nAxis.point.x) + diameter;
+        height = Math.abs(axis.point.y - nAxis.point.y) + diameter;
 
-        // calculate direction
-        if (p1.x < p2.x)
-            direction = 0;
-        else if (p1.x > p2.x)
-            direction = 180;
-        else if (p1.y < p2.y)
-            direction = 90;
-        else if (p1.y > p2.y)
-            direction = 270;
+        center = position.cpy().add(width / 2, height / 2);
     }
 
     public Vector2 getCenter() {
         return center;
     }
 
-    public Vector2 getP1() {return p1;}
-    public Vector2 getP2() {return p2;}
+    public Vector2 getP1() {return axis.point;}
+    public Vector2 getP2() {return nAxis.point;}
     public LinkedList<Wall> getWalls() { return walls; }
-
-    public void setNextSegmentAngle(double nextSegmentAngle) {this.nextSegmentAngle = nextSegmentAngle;}
 
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         for (Wall wall: walls)
