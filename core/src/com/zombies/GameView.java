@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
+import com.zombies.HUD.HUD;
 import com.zombies.data.Stats;
 import com.zombies.map.MapGen;
 import com.zombies.util.Assets;
@@ -57,7 +58,6 @@ public class GameView implements Screen {
     protected int lightingCount = 0;
     protected ThumbpadLeft thumbpadLeft;
     protected ThumbpadRight thumbpadRight;
-    protected ShootButton shootButton;
     public MessageHandler mh;
     private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
@@ -104,7 +104,6 @@ public class GameView implements Screen {
         camHandle = new CameraHandle(this);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
-        shootButton = new ShootButton(this);
         mh = new MessageHandler(this);
         //meshes.main.play();
 
@@ -126,11 +125,7 @@ public class GameView implements Screen {
         }
     }
 
-    public ShootButton getShootButton() {
-        return shootButton;
-    }
-
-    public com.zombies.HUD.HUD getHUD() {
+    public HUD getHUD() {
         return hud;
     }
 
