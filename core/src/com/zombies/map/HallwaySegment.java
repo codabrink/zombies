@@ -50,6 +50,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
     public void materialize() {
         calculateInfo(); // do this a second time
+        setCorners();
         createWalls();
         Zone.getZone(getCenter()).addObject(this);
     }

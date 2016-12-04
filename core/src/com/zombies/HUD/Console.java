@@ -11,6 +11,7 @@ import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
 import com.zombies.map.MapGen;
+import com.zombies.util.U;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class Console {
     private SpriteBatch   spriteBatch;
     private int           fontSize = 18;
     private BitmapFont    font = FontGen.generateFont(fontSize, "serif-reg");
-    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)\\s+([a-zA-Z0-9]+)");
+    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)\\s*([a-zA-Z0-9]+)?");
 
     public boolean enabled = false;
     private String  string  = "";
@@ -73,7 +74,7 @@ public class Console {
             case "boxmap":
                 C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
                 break;
-            case "addbox":
+            case "inspectBox":
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;

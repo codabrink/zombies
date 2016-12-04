@@ -15,6 +15,7 @@ import com.zombies.powerups.PistolPickup;
 import com.zombies.powerups.Powerup;
 import com.zombies.powerups.ShotgunPickup;
 import com.zombies.util.Geometry;
+import com.zombies.util.U;
 
 public class Box implements Overlappable, Loadable, HasZone {
     private ArrayList<Vector2> corners = new ArrayList<>();
@@ -190,9 +191,7 @@ public class Box implements Overlappable, Loadable, HasZone {
         return this;
     }
 
-    public void setAdjBox(int direction, Box box) {
-        adjBoxes.put(direction, box);
-    }
+    public void setAdjBox(int direction, Box box) { adjBoxes.put(direction, box); }
     public Box getAdjBox(int direction) {
         return adjBoxes.get(direction);
     }

@@ -59,7 +59,7 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
         move(theta);
     }
 
-    private float hallwayLength() { return C.BOX_SIZE / 2; }
+    private float hallwayLength() { return C.BOX_SIZE - 0.001f; }
 
     private Vector2 calculateNewAxis(double angle) {
         Vector2 axis = axes.get(axes.size() - 1).point.cpy();
@@ -113,6 +113,9 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
             ((HallwaySegment)hs).materialize();
         }
         center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());
+
+        Zone.createHole(axes.get(0).point, diameter / 2);
+        Zone.createHole(axes.get(axes.size()-1).point, diameter / 2);
 
         buildModel();
         Zone.getZone(center).addObject(this);

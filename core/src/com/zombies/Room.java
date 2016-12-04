@@ -240,7 +240,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         modelBatch.end();
 
         if (C.DEBUG) {
-            BitmapFont f = Zombies.instance.fonts.get("sans-reg:18:white");
+            BitmapFont f = Zombies.getFont("sans-reg:8:white");
             if (C.DEBUG_SHOW_BOXMAP) {
                 spriteBatch.begin();
                 for (Box b : boxes) {

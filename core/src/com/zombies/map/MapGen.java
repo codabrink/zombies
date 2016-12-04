@@ -33,7 +33,7 @@ public class MapGen {
                 return;
             }
             z.addObject(room);
-            //connectRoom(room);
+            connectRoom(room);
         }
     }
 
@@ -151,7 +151,7 @@ public class MapGen {
     private static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
         int[] modifiers = {1, 0, 0, 1, -1, 0, 0, -1};
-        for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
+        for (int i = 0; i <= modifiers.length - 1; i += 2) {
             Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
             if (bb == null)
                 continue;

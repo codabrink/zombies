@@ -205,32 +205,6 @@ public class Zone {
         }
     }
 
-    public ArrayList<Zone> infringedAdjZonesCircle(Vector2 circleCenter, Float circleRadius, ArrayList<Zone> infringedZones) {
-        Zone zoneToCheck;
-
-        for (Directions d: Directions.values()) {
-            zoneToCheck = this.adjZoneByDirection(d);
-            if (zoneToCheck.pointToZoneDistance(circleCenter) < circleRadius) {
-                if (!infringedZones.contains(zoneToCheck)) {
-                    infringedZones.add(zoneToCheck);
-                    infringedZones = zoneToCheck.infringedAdjZonesCircle(circleCenter, circleRadius, infringedZones);
-                }
-            }
-        }
-
-        return infringedZones;
-    }
-
-    public static ArrayList<Zone> getOverlappedZonesCircle(Vector2 circleCenter, Float circleRadius) {
-        ArrayList<Zone> overlappedZones = new ArrayList<Zone>();
-        Zone originZone = getZone(circleCenter);
-
-        overlappedZones.add(originZone);
-        overlappedZones = originZone.infringedAdjZonesCircle(circleCenter, circleRadius, overlappedZones);
-
-        return overlappedZones;
-    }
-
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
         // slope intercept form (y = mx + b)
         float m = (end.y - start.y) / (end.x - end.y);
@@ -258,87 +232,80 @@ public class Zone {
         return zones;
     }
 
-    public static void createHole(Vector2 blastCenter, Float blastRadius) {
-        Zone startingZone = getZone(blastCenter);
-        ArrayList<Zone> damageZones = Zone.getOverlappedZonesCircle(blastCenter, blastRadius);
+    public static void createHole(Vector2 center, Float radius) {
+        HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
 
-        ArrayList<Wall> wallsToCheck = new ArrayList<Wall>();
+        for (Zone z : zones) {
+            for (Wall w : z.getWalls()) {
+                Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
+                Float d, a, b, c, square, xi1, yi1, xi2, yi2;
 
-        // TODO: sometimes a wall is in a zone, but belongs to a different zone and so does not explode.
-        // how can these walls be counted?
-        for (Zone z: damageZones)
-            wallsToCheck.addAll(z.walls);
+                // a variation of the formula has to be used for vertical lines.
+                if (m == Float.POSITIVE_INFINITY || m == Float.NEGATIVE_INFINITY) {
+                    d = w.getStart().x;
+                    a = 1.0f;
+                    b = -2 * center.y;
+                    c = (float) Math.pow(center.x, 2) + (float) Math.pow(center.y, 2) - (float) Math.pow(radius, 2) - 2 * center.x * d + (float) Math.pow(d, 2);
 
-        for (Wall w: wallsToCheck) {
+                    square = (float) Math.pow(b, 2) - 4 * a * c;
 
-            Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
-            Float d, a, b, c, square, xi1, yi1, xi2, yi2;
+                    // this line misses or is tangent to the circle.
+                    if (square <= 0.0f)
+                        continue;
 
-            // a variation of the formula has to be used for vertical lines.
-            if (m == Float.POSITIVE_INFINITY || m == Float.NEGATIVE_INFINITY) {
-                d = w.getStart().x;
-                a = 1.0f;
-                b = -2 * blastCenter.y;
-                c = (float)Math.pow(blastCenter.x, 2) + (float)Math.pow(blastCenter.y, 2) - (float)Math.pow(blastRadius, 2) - 2 * blastCenter.x * d + (float)Math.pow(d, 2);
+                    xi1 = d;
+                    yi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
+                    xi2 = d;
+                    yi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
+                } else {
+                    d = w.getEnd().y - m * w.getEnd().x;
+                    a = (float) Math.pow(m, 2) + 1;
+                    b = 2 * (m * d - m * center.y - center.x);
+                    c = (float) Math.pow(center.y, 2) - (float) Math.pow(radius, 2) + (float) Math.pow(center.x, 2) - 2 * center.y * d + (float) Math.pow(d, 2);
 
-                square = (float)Math.pow(b, 2) - 4 * a * c;
+                    square = (float) Math.pow(b, 2) - 4 * a * c;
 
-                // this line misses or is tangent to the circle.
-                if (square <= 0.0f)
-                    continue;
+                    if (square <= 0.0f)
+                        continue;
 
-                xi1 = d;
-                yi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
-                xi2 = d;
-                yi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
-            } else {
-                d = w.getEnd().y - m * w.getEnd().x;
-                a = (float) Math.pow(m, 2) + 1;
-                b = 2 * (m * d - m * blastCenter.y - blastCenter.x);
-                c = (float) Math.pow(blastCenter.y, 2) - (float) Math.pow(blastRadius, 2) + (float) Math.pow(blastCenter.x, 2) - 2 * blastCenter.y * d + (float) Math.pow(d, 2);
+                    xi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
+                    yi1 = m * xi1 + d;
+                    xi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
+                    yi2 = m * xi2 + d;
+                }
 
-                square = (float)Math.pow(b, 2) - 4 * a * c;
+                Vector2 i1 = new Vector2(xi1, yi1);
+                Vector2 i2 = new Vector2(xi2, yi2);
 
-                if (square <= 0.0f)
-                    continue;
+                // if either intersection is beyond the wall, pull it back to the wall's endpoint so
+                // the hole will draw correctly.
+                if (i1.cpy().dst(w.getStart()) < i1.cpy().dst(w.getEnd())) {
+                    if (w.getEnd().dst(i1) > w.getEnd().dst(w.getStart()))
+                        i1 = w.getStart();
+                } else {
+                    if (w.getStart().dst(i1) > w.getStart().dst(w.getEnd()))
+                        i1 = w.getEnd();
+                }
 
-                xi1 = (-b + (float) Math.pow(square, 0.5)) / (2 * a);
-                yi1 = m * xi1 + d;
-                xi2 = (-b - (float) Math.pow(square, 0.5)) / (2 * a);
-                yi2 = m * xi2 + d;
+                if (i2.cpy().dst(w.getStart()) < i2.cpy().dst(w.getEnd())) {
+                    if (w.getEnd().dst(i2) > w.getEnd().dst(w.getStart()))
+                        i2 = w.getStart();
+                } else {
+                    if (w.getStart().dst(i2) > w.getStart().dst(w.getEnd()))
+                        i2 = w.getEnd();
+                }
+
+                // if both intersections are beyond one of the wall's endpoints, they both be set to the
+                // same endpoint by the code above. the segment is not actually being intersected. only
+                // create the hole if that is not the case.
+                if (!i1.equals(i2))
+                    w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
             }
-
-            Vector2 i1 = new Vector2(xi1, yi1);
-            Vector2 i2 = new Vector2(xi2, yi2);
-
-            // if either intersection is beyond the wall, pull it back to the wall's endpoint so
-            // the hole will draw correctly.
-            if (i1.cpy().dst(w.getStart()) < i1.cpy().dst(w.getEnd())) {
-                if (w.getEnd().dst(i1) > w.getEnd().dst(w.getStart()))
-                    i1 = w.getStart();
-            } else {
-                if (w.getStart().dst(i1) > w.getStart().dst(w.getEnd()))
-                    i1 = w.getEnd();
-            }
-
-            if (i2.cpy().dst(w.getStart()) < i2.cpy().dst(w.getEnd())) {
-                if (w.getEnd().dst(i2) > w.getEnd().dst(w.getStart()))
-                    i2 = w.getStart();
-            } else {
-                if (w.getStart().dst(i2) > w.getStart().dst(w.getEnd()))
-                    i2 = w.getEnd();
-            }
-
-            // if both intersections are beyond one of the wall's endpoints, they both be set to the
-            // same endpoint by the code above. the segment is not actually being intersected. only
-            // create the hole if that is not the case.
-            if (!i1.equals(i2))
-                w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
         }
     }
 
     public Box getBox(float x, float y) {
-        HashSet<Zone> zones = adjZones(1);
+        HashSet<Zone> zones = getAdjZones(1);
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
             for (Box b: iterator.next().getBoxes())
@@ -478,7 +445,7 @@ public class Zone {
         return new Vector2(position.x + C.ZONE_SIZE / 2, position.y + C.ZONE_SIZE / 2);
     }
 
-    private HashSet<Zone> adjZones(int limit) {
+    private HashSet<Zone> getAdjZones(int limit) {
         HashSet<Zone> zones = new HashSet<>();
         Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
@@ -491,7 +458,7 @@ public class Zone {
 
     public HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
         HashSet<Overlappable> overlapped = new HashSet<>();
-        HashSet<Zone> zones = adjZones(limit);
+        HashSet<Zone> zones = getAdjZones(limit);
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
             iterator.next().getOverlappablesAtPoint(x, y, overlapped);

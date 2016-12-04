@@ -3,7 +3,7 @@ package com.zombies.util;
 import com.zombies.C;
 
 public class U {
-    public static void p(String s) {
+    public static void p(Object s) {
         if (!C.DEBUG) return;
 
         System.out.println(getCallerClassName() + ": " + s);
