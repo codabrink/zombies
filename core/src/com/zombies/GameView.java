@@ -97,11 +97,10 @@ public class GameView implements Screen {
         world = new World(new Vector2(), true);
 
         // generate the initial zone
-        Zone z = Zone.getZone(0f, 0f);
-        MapGen.fillZone(z);
-        Box initialBox = z.randomBox();
+        Zone zone = Zone.getZone(0f, 0f);
+        MapGen.fillZone(zone);
 
-        player = new Player(initialBox.randomPoint());
+        player = new Player(zone.suggestedStartPoint());
         camHandle = new CameraHandle(this);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);

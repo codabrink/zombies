@@ -487,21 +487,18 @@ public class Zone {
         return zones;
     }
 
-    public ArrayList<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
-        ArrayList<Overlappable> overlapped = new ArrayList<>();
+    public HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
+        HashSet<Overlappable> overlapped = new HashSet<>();
         HashSet<Zone> zones = adjZones(limit);
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
             iterator.next().getOverlappablesAtPoint(x, y, overlapped);
-
         return overlapped;
     }
-    private ArrayList<Overlappable> getOverlappablesAtPoint(float x, float y, ArrayList<Overlappable> overlapped) {
-        for (Overlappable o : overlappables) {
+    private HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, HashSet<Overlappable> overlapped) {
+        for (Overlappable o : overlappables)
             if (o.contains(x, y))
                 overlapped.add(o);
-        }
-
         return overlapped;
     }
 
@@ -518,6 +515,8 @@ public class Zone {
     }
 
     public Box randomBox() {
+        if (boxes.size() == 0) return null;
+
         int ri = GameView.r.nextInt(boxes.size()), i = 0;
         for (Box b: boxes) {
             if (ri == i)
@@ -525,5 +524,12 @@ public class Zone {
             i++;
         }
         return null;
+    }
+
+    public Vector2 suggestedStartPoint() {
+        if (boxes.size() == 0)
+            return randomPosition();
+
+        return randomBox().randomPoint();
     }
 }

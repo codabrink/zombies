@@ -22,6 +22,8 @@ import com.zombies.Wall;
 import com.zombies.Zone;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 
 public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modelable {
@@ -70,9 +72,10 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
                 (float)(lastAxis.point.x + hallwayLength() * Math.cos(theta)),
                 (float)(lastAxis.point.y + hallwayLength() * Math.sin(theta)));
 
-        ArrayList<Overlappable> overlappables = Zone.getZone(newPoint).getOverlappablesAtPoint(newPoint.x, newPoint.y, 1);
-        for (Overlappable o : overlappables) {
-            Vector2 p = o.intersectPointOfLine(lastAxis.point, newPoint);
+        HashSet<Overlappable> overlappables = Zone.getZone(newPoint).getOverlappablesAtPoint(newPoint.x, newPoint.y, 1);
+        Iterator<Overlappable> iterator = overlappables.iterator();
+        while (iterator.hasNext()) {
+            Vector2 p = iterator.next().intersectPointOfLine(lastAxis.point, newPoint);
             if (p != null)
                 newPoint = p;
         }
