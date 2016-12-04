@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zombies.C;
 import com.zombies.GameView;
+import com.zombies.Zombies;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class DebugText {
         spriteBatch.begin();
         int i = 1;
         for (Map.Entry<String, String> e : m.entrySet()) {
-            view.fontGen.font24.draw(spriteBatch, e.getValue(), 0, view.getHeight() - i * 20 * Gdx.graphics.getDensity());
+            Zombies.getFont("sans-reg:18:white").draw(spriteBatch, e.getValue(), 0, view.getHeight() - i * 20 * Gdx.graphics.getDensity());
             i++;
         }
         spriteBatch.end();

@@ -12,20 +12,25 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.interfaces.HasZone;
+import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.Overlappable;
 import com.zombies.Box;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
+import com.zombies.util.U;
+
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 
-public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zombies.interfaces.Modelable {
+public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modelable {
     public static int MAX_HALLWAY_SEGMENTS = 2;
 
-    ArrayList<Vector2> axes = new ArrayList<Vector2>();
+    ArrayList<HallwayAxis> axes = new ArrayList<>();
     private Random r;
     private ArrayList<Overlappable> hallwaySegments = new ArrayList<Overlappable>();
     private Box originBox;
@@ -41,98 +46,77 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, com.zo
         r = GameView.gv.random;
         originBox = b;
         diameter = width;
-        double angle = 0;
-        switch(direction) {
-            case 90:
-                axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y + b.height));
-                break;
-            case 0:
-                axes.add(new Vector2(b.getPosition().x + b.width, vertBoxRange(b, width)));
-                break;
-            case 270:
-                axes.add(new Vector2(horizBoxRange(b, width), b.getPosition().y));
-                break;
-            case 180:
-                axes.add(new Vector2(b.getPosition().x, vertBoxRange(b, width)));
-                break;
-        }
-        angle = Math.toRadians(direction);
-        tryToMove(angle, angle);
+
+        double theta = Math.toRadians(direction);
+
+        axes.add(
+                new HallwayAxis(
+                        theta,
+                        new Vector2(
+                                (float)(b.getCenter().x + C.BOX_SIZE / 2 * Math.cos(theta)),
+                                (float)(b.getCenter().y + C.BOX_SIZE / 2 * Math.sin(theta)))));
+
+        move(theta);
     }
 
-    private float hallwayLength() { return r.nextFloat() * 10 + 15; }
+    private float hallwayLength() { return C.BOX_SIZE - 0.001f; }
 
     private Vector2 calculateNewAxis(double angle) {
-        Vector2 a = axes.get(axes.size() - 1).cpy();
+        Vector2 axis = axes.get(axes.size() - 1).point.cpy();
         float length = hallwayLength();
-        return a.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+        return axis.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
     }
 
-    private void tryToMove(double angle, double previousSegmentAngle) {
-        Vector2 newAxis = calculateNewAxis(angle);
-        HallwaySegment hs = new HallwaySegment(axes.get(axes.size()-1), newAxis, diameter, previousSegmentAngle, this);
-        Overlappable o = originBoxZone().checkOverlap(hs.position, hs.width, hs.height, 1, new ArrayList<Overlappable>(Arrays.asList(originBox)));
-        if (o == null)
-            o = com.zombies.util.Geometry.checkOverlap(hs.position.x, hs.position.y, hs.width, hs.height, hallwaySegments);
+    private void move(double theta) {
+        U.p("theta: " + theta);
+        HallwayAxis lastAxis = axes.get(axes.size() - 1);
+        Vector2 newPoint = new Vector2(
+                (float)(lastAxis.point.x + hallwayLength() * Math.cos(theta)),
+                (float)(lastAxis.point.y + hallwayLength() * Math.sin(theta)));
 
-        // I would love to use lambdas here to reduce redundancy, but that's not introduced until Java 8, so... yeah
-        if (o != null) {
-            if (axes.size() > 1) { // is fist segment
-                if (o instanceof Box && o != originBox && !originBox.isAdjacent((Box)o)) { // is not an origin box or adjacent box
-                    Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging..
-                    hs.p2.set(ip);
-                    addHallwaySegment(hs);
-                    materialize();
-                } else { // collision is an origin box or adjacent box
-                    addHallwaySegment(hs);
-                }
-            } else { // is a second or more segment
-                Vector2 ip = o.intersectPointOfLine(hs.p1, hs.p2); // set to a variable for debugging...
-                hs.p2.set(ip);
-                addHallwaySegment(hs);
-                materialize();
+        HashSet<Overlappable> overlappables = Zone.getZone(newPoint).getOverlappablesAtPoint(newPoint.x, newPoint.y, 1);
+        Iterator<Overlappable> iterator = overlappables.iterator();
+        U.p("overlappables.size: " + overlappables.size());
+        U.p("Original newPoint: " + newPoint);
+        Overlappable next;
+        while (iterator.hasNext()) {
+            next = iterator.next();
+            if (next == originBox) U.p("Origin box is in overlappables :(");
+            Vector2 p = next.intersectPointOfLine(lastAxis.point, newPoint);
+            if (p != null) {
+                newPoint = p;
+                U.p("         newPoint: " + newPoint);
             }
-         } else { // in the clear, just add the segment
-            addHallwaySegment(hs);
         }
 
-        if (hallwaySegments.size() - 1 < MAX_HALLWAY_SEGMENTS) {
-            double nextDeltaAngle = 0;
-            switch (r.nextInt(2)) {
-                case 0: nextDeltaAngle = -Math.PI / 2; break;
-                case 1: nextDeltaAngle = 0; break;
-                case 2: nextDeltaAngle = Math.PI / 2; break;
-            }
-            ((HallwaySegment)hallwaySegments.get(hallwaySegments.size() - 1)).setNextSegmentAngle(angle + nextDeltaAngle);
-            tryToMove(angle + nextDeltaAngle, angle);
-        } else {
-            materialize();
-        }
-    }
+        axes.add(
+                new HallwayAxis(
+                        theta,
+                        newPoint));
 
-    private void addHallwaySegment(HallwaySegment hs) {
-        hallwaySegments.add(hs);
-        axes.add(hs.getP2());
-    }
-
-    public ArrayList<HallwaySegment> getHallwaySegments() {
-        ArrayList<HallwaySegment> hss = new ArrayList<HallwaySegment>();
-
-        for (Overlappable hs: hallwaySegments) {
-            hss.add((HallwaySegment)hs);
-        }
-
-        return hss;
+        materialize();
     }
 
     private void materialize() {
         center = new Vector2();
 
+        for (int i = 0; i < axes.size() - 1; i++) {
+            hallwaySegments.add(new HallwaySegment(
+                    axes.get(Math.max(i - 1, 0)),
+                    axes.get(i),
+                    axes.get(Math.min(i + 1, axes.size() - 1)),
+                    diameter,
+                    this));
+        }
+
         for (Overlappable hs: hallwaySegments) {
-            center.add(((HallwaySegment)hs).getCenter());
+            center.add(hs.getCenter());
             ((HallwaySegment)hs).materialize();
         }
         center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());
+
+        Zone.createHole(axes.get(0).point, diameter / 2);
+        Zone.createHole(axes.get(axes.size()-1).point, diameter / 2);
 
         buildModel();
         Zone.getZone(center).addObject(this);

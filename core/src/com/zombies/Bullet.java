@@ -22,7 +22,7 @@ public class Bullet {
     private Vector2 direction;
     private String[] stoppingObjects = {"zombie", "crate", "wall"};
 	private GameView view;
-	private float speed = 3f;
+	private float speed = 15f;
     private RayCastCallback callback;
     private Gun gun;
     private float shotSpread = 10f;
@@ -45,8 +45,7 @@ public class Bullet {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData) fixture.getBody().getUserData());
                 if (bodData.getType() == "wall") {
-                    System.out.println("Creating a hole");
-                    ((Wall)bodData.getObject()).createHole(point, 2);
+                    ((Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
                 }
 
 
@@ -63,16 +62,16 @@ public class Bullet {
 
     public ArrayList<Unit> unitsInBulletRange() {
         ArrayList<Unit> units = new ArrayList<Unit>();
-        Vector2 p1 = position.cpy().add(direction);
-        Vector2 p2 = position.cpy().add(direction.cpy().setLength(30));
-        view.getWorld().rayCast(callback, p1, p2);
+        Vector2 p1 = position.cpy().add(direction.cpy());
+        Vector2 p2 = position.cpy().add(direction.cpy().setLength(30 * C.SCALE));
+        view.getWorld().rayCast(callback, p2, p1);
 
         ArrayList<Vector2> hitBoxCorners = new ArrayList<Vector2>();
-        Vector2 behindPlayer = position.cpy().sub(direction.cpy().setLength(-C.PLAYER_SIZE * 6));
-        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(C.PLAYER_SIZE * 6)));
-        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(30 + C.PLAYER_SIZE * 2)));
-        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(30 + C.PLAYER_SIZE * 2)));
-        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(C.PLAYER_SIZE * 6)));
+        Vector2 behindPlayer = position.cpy().sub(direction.cpy().setLength(-C.PLAYER_SIZE * 6 * C.SCALE));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(C.PLAYER_SIZE * 6 * C.SCALE)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(-shotSpread).setLength(30 * C.SCALE + C.PLAYER_SIZE * 2)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(30 * C.SCALE + C.PLAYER_SIZE * 2)));
+        hitBoxCorners.add(behindPlayer.cpy().add(direction.cpy().rotate(shotSpread).setLength(C.PLAYER_SIZE * 6 * C.SCALE)));
 
         if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(0), hitBoxCorners.get(1));
         if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(2), hitBoxCorners.get(3));

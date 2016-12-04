@@ -1,10 +1,12 @@
 package com.zombies;
 
 public class C {
-    public static final float SCALE = 1f;
+    public static final float SCALE = 6f;
 
     //DEBUG
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
+
+    public static final float HALLWAY_WIDTH = 3f * SCALE;
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;

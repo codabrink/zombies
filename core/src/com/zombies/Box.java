@@ -15,9 +15,11 @@ import com.zombies.powerups.PistolPickup;
 import com.zombies.powerups.Powerup;
 import com.zombies.powerups.ShotgunPickup;
 import com.zombies.util.Geometry;
+import com.zombies.util.U;
 
 public class Box implements Overlappable, Loadable, HasZone {
-    private ArrayList<Unit> zombies = new ArrayList<Unit>();
+    private ArrayList<Vector2> corners = new ArrayList<>();
+    private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
@@ -33,7 +35,15 @@ public class Box implements Overlappable, Loadable, HasZone {
 
     public Box(float x, float y) {
         position = new Vector2(x, y);
+        setCorners();
         this.view = GameView.gv;
+    }
+
+    private void setCorners() {
+        corners.add(new Vector2(position.x + width, position.y + height));
+        corners.add(new Vector2(position.x, position.y + height));
+        corners.add(new Vector2(position.x, position.y));
+        corners.add(new Vector2(position.x + width, position.y));
     }
 
     public boolean insideBox(float x, float y) {
@@ -176,26 +186,16 @@ public class Box implements Overlappable, Loadable, HasZone {
         return u;
     }
 
-    public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
-    }
-
     public Box setRoom(Room room) {
         this.room = room;
         return this;
     }
 
-    public void setAdjBox(int direction, Box box) {
-        adjBoxes.put(direction, box);
-    }
+    public void setAdjBox(int direction, Box box) { adjBoxes.put(direction, box); }
     public Box getAdjBox(int direction) {
         return adjBoxes.get(direction);
     }
-    public HashMap<Integer, Box> getAdjBoxes() {
-        System.out.println(adjBoxes);
-        return adjBoxes;
-
-    }
+    public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
     public boolean isAdjacent(Box b) {
         for (Box bb: adjBoxes.values()) {
             if (b == bb)
@@ -221,9 +221,17 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     @Override
+    public Vector2 getCenter() {
+        return position.cpy().add(width / 2, height / 2);
+    }
+
+    @Override
     public String className() {
         return "Box";
     }
+
+    @Override
+    public ArrayList<Vector2> getCorners() { return corners; }
 
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
@@ -243,25 +251,26 @@ public class Box implements Overlappable, Loadable, HasZone {
         }
         return 0;
     }
+
     @Override
     public float oppositeEdge(int direction) {
         return edge((direction + 180) % 360);
     }
 
     @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        // left line
-        Vector2 ip = Geometry.intersectPoint(position.x, position.y, position.x, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // top line
-            ip = Geometry.intersectPoint(position.x, position.y + height, position.x + width, position.y + height, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // right line
-            ip = Geometry.intersectPoint(position.x + width, position.y + height, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
-        if (ip == null) // bottom line
-            ip = Geometry.intersectPoint(position.x, position.y, position.x + width, position.y, p1.x, p1.y, p2.x, p2.y);
-
-        return ip;
+    public boolean contains(float x, float y) {
+        return Geometry.rectContains(x, y, position, width, height);
     }
 
+    @Override
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
+        return Geometry.edgeIntersection(p1, p2, this);
+    }
+
+    @Override
+    public float getWidth() { return width; }
+    @Override
+    public float getHeight() { return height; }
     @Override
     public void load() {
 

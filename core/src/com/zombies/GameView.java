@@ -19,7 +19,9 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
+import com.zombies.HUD.HUD;
 import com.zombies.data.Stats;
+import com.zombies.map.MapGen;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 
@@ -48,7 +50,6 @@ public class GameView implements Screen {
     private Assets assets = new Assets();
 
     protected World world;
-    protected Box grid[][];
 
     public Random random = new Random();
     protected CameraHandle camHandle;
@@ -56,14 +57,11 @@ public class GameView implements Screen {
     protected int lightingCount = 0;
     protected ThumbpadLeft thumbpadLeft;
     protected ThumbpadRight thumbpadRight;
-    protected ShootButton shootButton;
     public MessageHandler mh;
     private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private ArrayList<DebugCircle> debugCircles = new ArrayList<DebugCircle>();
     public int frame = 0;
-
-    public float scale = 1;
 
     private Box2DDebugRenderer debugRenderer;
     private Matrix4 debugMatrix;
@@ -75,8 +73,6 @@ public class GameView implements Screen {
     LinkedList<DyingZombie> dyingZombieDump = new LinkedList<DyingZombie>();
 
     public GameView() {
-        fontGen = new com.zombies.HUD.FontGen();
-
         shapeRenderer = new ShapeRenderer();
         HUDSpriteBatch = new SpriteBatch();
         spriteBatch = new SpriteBatch();
@@ -98,15 +94,13 @@ public class GameView implements Screen {
         world = new World(new Vector2(), true);
 
         // generate the initial zone
-        Zone z = Zone.getZone(0f, 0f);
-        z.generate();
-        Box initialBox = z.randomBox();
+        Zone zone = Zone.getZone(0f, 0f);
+        MapGen.fillZone(zone);
 
-        player = new Player(initialBox.randomPoint());
+        player = new Player(zone.suggestedStartPoint());
         camHandle = new CameraHandle(this);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
-        shootButton = new ShootButton(this);
         mh = new MessageHandler(this);
         //meshes.main.play();
 
@@ -121,18 +115,7 @@ public class GameView implements Screen {
         outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
     }
 
-    private void addSurvivors() {
-        if (!C.POPULATE_SURVIVORS) return;
-        for (int i=1;i<=10;i++) {
-            randomBox().addSurvivor();
-        }
-    }
-
-    public ShootButton getShootButton() {
-        return shootButton;
-    }
-
-    public com.zombies.HUD.HUD getHUD() {
+    public HUD getHUD() {
         return hud;
     }
 
@@ -149,21 +132,8 @@ public class GameView implements Screen {
     }
     public ThumbpadRight getThumbpadRight() { return thumbpadRight;}
 
-
-    public Box randomBox(){
-        return grid[random.nextInt(C.GRID_WIDTH)+1][random.nextInt(C.GRID_HEIGHT)+1];
-    }
-
-    public int getLightingCount() {
-        return lightingCount;
-    }
-
     public Meshes getMeshes() {
         return meshes;
-    }
-
-    public Box[][] getGrid() {
-        return grid;
     }
 
     public int getWidth() {
@@ -172,25 +142,6 @@ public class GameView implements Screen {
 
     public int getHeight() {
         return Gdx.graphics.getHeight();
-    }
-
-    public void addPostZombie(PostponedZombie z) {
-        postZombie.add(z);
-    }
-
-    public void addDyingZombie(DyingZombie z) {
-        dyingZombie.add(z);
-    }
-
-    protected void clearDumps() {
-        for (PostponedZombie z: postZombieDump) {
-            postZombie.remove(z);
-        }
-        for (DyingZombie z: dyingZombieDump) {
-            dyingZombie.remove(z);
-        }
-        postZombieDump.clear();
-        dyingZombieDump.clear();
     }
 
     public void dumpPostZombie(PostponedZombie z) {

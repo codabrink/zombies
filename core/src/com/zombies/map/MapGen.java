@@ -13,21 +13,10 @@ import java.util.Random;
 
 public class MapGen {
 
-    public static int[] DIRECTIONS = {0, 90, 180, 270};
+    public static final int[] DIRECTIONS = {0, 90, 180, 270};
 
     public static void update(Zone z) {
-        // needs to be done during generation, not creation
-        if (z.getAdjZones().size() < 8)
-            z.findAdjZones();
-
-        // can the zone generate a room?
-        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z);
-            if (room != null)
-                z.addObject(room);
-            else
-                z.roomGenFailureCount++;
-        }
+        fillZone(z);
     }
 
     public static void fillZone(Zone z) {
@@ -37,12 +26,14 @@ public class MapGen {
         if (z.getAdjZones().size() < 8)
             z.findAdjZones();
 
-        for (int i=0;i<=0;i++) {
+        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
             Room room = genRoom(z);
-            if (room != null)
-                z.addObject(room);
-            else
-                break;
+            if (room == null) {
+                z.roomGenFailureCount++;
+                return;
+            }
+            z.addObject(room);
+            connectRoom(room);
         }
     }
 
@@ -56,18 +47,49 @@ public class MapGen {
         return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
 
-    private static Room genRoom(Zone z) {
-        Random r = new Random();
-        HashMap<String, Box> boxMap = new HashMap<>();
-        for (int i=0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
-            if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
-                Box b = new Box(boxPosition.x, boxPosition.y);
-                b.BMKey = "0,0";
-                boxMap.put("0,0", b);
-                break;
+    public static void connectRoom(Room r) {
+        for (Box b : r.getOuterBoxes()) {
+            for (int i : DIRECTIONS) {
+                if (b.getAdjBox(i) == null) {
+                    double rad = Math.toRadians(i);
+                    float x = (float)(b.getPosition().x + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.cos(rad));
+                    float y = (float)(b.getPosition().y + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.sin(rad));
+                    Box bb = Zone.getZone(x, y).getBox(x, y);
+
+                    if (bb != null && bb.getRoom() != b.getRoom())
+                        connectBoxes(b, bb);
+                }
             }
         }
+    }
+
+    public static void connectBoxes(Box b, Box bb) {
+        float dx = Math.abs(bb.getCenter().x - b.getCenter().x);
+        float dy = Math.abs(bb.getCenter().y - b.getCenter().y);
+        double theta = Math.toDegrees(Math.atan2(dy, dx));
+
+        theta = Math.round(theta / 90) * 90;
+        new Hallway(b, (int)theta, 2 * C.SCALE);
+    }
+
+    public static Room genRoom(Zone z) {
+        for (int i = 0; i <= 5; i++) { // try 5 times
+            Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
+            if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
+                return genRoom(boxPosition);
+            }
+        }
+        return null;
+    }
+
+    public static Room genRoom(Vector2 boxPosition) {
+        Zone z = Zone.getZone(boxPosition);
+        Random r = new Random();
+        HashMap<String, Box> boxMap = new HashMap<>();
+
+        Box b = new Box(boxPosition.x, boxPosition.y);
+        b.BMKey = "0,0";
+        boxMap.put("0,0", b);
 
         // if it failed to find an open position
         if (boxMap.size() == 0)
@@ -78,7 +100,6 @@ public class MapGen {
             Object[] boxMapArray = boxMap.values().toArray(); // so we can grab a random box
 
             // find a box with at least one open side
-            Box b;
             do {
                 b = (Box)boxMapArray[r.nextInt(boxMapArray.length)];
             } while (b.getAdjBoxes().size() == 4);
@@ -135,7 +156,7 @@ public class MapGen {
     private static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
         int[] modifiers = {1, 0, 0, 1, -1, 0, 0, -1};
-        for (int i = 0; i <= modifiers.length - 1; i = i + 2) {
+        for (int i = 0; i <= modifiers.length - 1; i += 2) {
             Box bb = boxMap.get((BMLocation[0]+modifiers[i])+","+(BMLocation[1]+modifiers[i+1]));
             if (bb == null)
                 continue;

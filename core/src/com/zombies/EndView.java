@@ -23,8 +23,8 @@ public class EndView implements Screen {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         spriteBatch.begin();
-        FontGen.font24.draw(spriteBatch, "Zombie Kills: " + String.valueOf(stats.zombieKills), 100, getHeight() / 2 + 10);
-        FontGen.font24.draw(spriteBatch, "Touch screen to play again.", 100, getHeight() / 2 - 10);
+        Zombies.getFont("sans-reg:24:white").draw(spriteBatch, "Zombie Kills: " + String.valueOf(stats.zombieKills), 100, getHeight() / 2 + 10);
+        Zombies.getFont("sans-reg:24:white").draw(spriteBatch, "Touch screen to play again.", 100, getHeight() / 2 - 10);
         spriteBatch.end();
         Gdx.gl.glFlush();
         handleKeys();

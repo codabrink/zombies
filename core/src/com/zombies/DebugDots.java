@@ -13,7 +13,7 @@ public class DebugDots {
     private GameView view;
     Vector2 p1;
     Vector2 p2;
-    private float radius = 0.5f;
+    private float radius = 0.5f * C.SCALE;
     private Color color;
 
     public DebugDots(Vector2 p1) {

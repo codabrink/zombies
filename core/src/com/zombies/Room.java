@@ -45,11 +45,11 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public Room( HashMap<String, Box> boxMap) {
         view = GameView.gv;
-        this.boxes = new ArrayList<Box>(boxMap.values());
         this.boxMap = boxMap;
-        Zone.getZone(calculateMedian()).addObject(this);
+        this.boxes = new ArrayList<>(boxMap.values());
 
         for (Box b: boxes) {
+            b.setRoom(this);
             Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
@@ -58,7 +58,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         center = calculateMedian();
         buildFloorModel();
         rasterizeWalls();
-        Zone.getZone(center).addObject(this);
     }
 
     // calculates the median position of all of the boxes
@@ -216,7 +215,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);
-        floorModelInstance.transform.setTranslation(center.x, center.y, 0);
+        floorModelInstance.transform.setTranslation(center.x, center.y, 1);
     }
 
     public ArrayList<Box> getOuterBoxes() {
@@ -241,7 +240,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         modelBatch.end();
 
         if (C.DEBUG) {
-            BitmapFont f = Zombies.instance.fonts.get("sans-reg:18:white");
+            BitmapFont f = Zombies.getFont("sans-reg:8:white");
             if (C.DEBUG_SHOW_BOXMAP) {
                 spriteBatch.begin();
                 for (Box b : boxes) {

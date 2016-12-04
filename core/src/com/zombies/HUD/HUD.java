@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.Zombies;
 import com.zombies.map.MapGen;
 import com.zombies.Box;
 import com.zombies.GameView;
@@ -55,14 +56,14 @@ public class HUD implements InputProcessor{
     }
 
     private void drawZombiesKilled(SpriteBatch spriteBatch) {
-        view.fontGen.killFont.draw(spriteBatch, String.valueOf(view.stats.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
+        Zombies.getFont("square:48:red").draw(spriteBatch, String.valueOf(view.stats.zombieKills), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 10);
 	}
 
     private void handleKeys() {
         if (console.enabled)
             return;
 
-        float strength = 50 * C.SCALE;
+        float strength = 2000 * C.SCALE;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             view.getPlayer().getBody().applyForce(new Vector2(0, strength), new Vector2(), true);
