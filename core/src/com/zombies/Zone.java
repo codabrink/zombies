@@ -33,17 +33,17 @@ public class Zone {
     // Collections
 
     private HashSet<Zone> adjZones = new HashSet<Zone>();
-    private HashSet<Overlappable> overlappables = new HashSet<Overlappable>();
-    private HashSet<Updateable> updateables = new HashSet<Updateable>();
-    private HashSet<Box> boxes = new HashSet<Box>();
-    private HashSet<Room> rooms = new HashSet<Room>();
-    //private ArrayList<Hallway> hallways = new ArrayList<Hallway>();
-    private HashSet<Wall> walls = new HashSet<Wall>();
-    private HashSet<Loadable> loadables = new HashSet<Loadable>();
-    private HashSet<Drawable> drawables = new HashSet<Drawable>();
-    private HashSet<Drawable> debugLines = new HashSet<Drawable>();
+    private HashSet<Overlappable> overlappables = new HashSet<>();
+    private HashSet<Updateable> updateables = new HashSet<>();
+    private HashSet<Box> boxes = new HashSet<>();
+    private HashSet<Room> rooms = new HashSet<>();
+    //private ArrayList<Hallway> hallways = new ArrayList<>();
+    private HashSet<Wall> walls = new HashSet<>();
+    private HashSet<Loadable> loadables = new HashSet<>();
+    private HashSet<Drawable> drawables = new HashSet<>();
+    private HashSet<Drawable> debugLines = new HashSet<>();
 
-    private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<ArrayList<Drawable>>();
+    private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<>();
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap

@@ -25,12 +25,9 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL20;
-
-import static org.mockito.Mockito.mock;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.zombies.Zombies;
 
 public class GdxTestRunner extends BlockJUnit4ClassRunner implements ApplicationListener {
 
@@ -38,11 +35,10 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 
 	public GdxTestRunner(Class<?> klass) throws InitializationError {
 		super(klass);
-		HeadlessApplicationConfiguration conf = new HeadlessApplicationConfiguration();
+        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
-		new HeadlessApplication(this, conf);
-		Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
+        //new LwjglApplication(new Zombies(), config);
+        new LwjglApplication(this, config);
 	}
 
 	@Override

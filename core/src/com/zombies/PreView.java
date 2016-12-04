@@ -1,9 +1,7 @@
 package com.zombies;
 
-import com.zombies.HUD.FontGen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,8 +14,8 @@ public class PreView implements Screen {
 
     protected long startTime = System.currentTimeMillis();
     private int fontSize = 18;
-    protected BitmapFont font = Zombies.fonts.get("serif-reg:" + fontSize + ":white");
-    protected BitmapFont logoFont = FontGen.generateFont(36, "serif-reg", Color.RED);
+    protected BitmapFont font = Zombies.getFont("serif-reg:" + fontSize + ":white");
+    protected BitmapFont logoFont = Zombies.getFont("serif-reg:36:red");
     protected ArrayList<String> intro = new ArrayList<String>();
     protected float textStartHeight;
 
