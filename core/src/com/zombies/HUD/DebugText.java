@@ -20,7 +20,7 @@ public class DebugText {
         spriteBatch.begin();
         int i = 1;
         for (Map.Entry<String, String> e : m.entrySet()) {
-            Zombies.fonts.get("sans-reg:24:white").draw(spriteBatch, e.getValue(), 0, view.getHeight() - i * 20 * Gdx.graphics.getDensity());
+            Zombies.getFont("sans-reg:18:white").draw(spriteBatch, e.getValue(), 0, view.getHeight() - i * 20 * Gdx.graphics.getDensity());
             i++;
         }
         spriteBatch.end();

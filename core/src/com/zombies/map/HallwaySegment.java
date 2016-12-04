@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment implements Overlappable, Loadable, HasZone {
+    private ArrayList<Vector2> corners = new ArrayList<>();
     private static int DRAWABLE_LAYER = 1;
     public Vector2 p1, p2, position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
@@ -164,6 +165,16 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
 
     @Override
     public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
+
+    @Override
+    public float getWidth() {
+        return width;
+    }
+
+    @Override
+    public float getHeight() {
+        return height;
+    }
 
     @Override
     public void load() {

@@ -27,17 +27,26 @@ public class Geometry {
         Vector2 position;
 
         double theta = angle(o.getCenter(), lp1);
-        double cTheta = Math.atan2(o.height / 2, o.width / 2); // corner theta
+        double cTheta = Math.atan2(o.getHeight() / 2, o.getWidth() / 2); // corner theta
 
-        if (Math.abs(theta) < Math.abs(cTheta)) // right wall
+        U.p("theta: " + theta + ", cTheta: " + cTheta);
+
+        if (Math.abs(theta) < Math.abs(cTheta)) { // right wall
+            U.p("Intersecting right wall");
             if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(3))) != null)
                 return position;
-        if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) // top wall
+        }
+        if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) { // top wall
+            U.p("Intersecting top wall");
             if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(1))) != null)
                 return position;
-        if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) // bottom wall
+        }
+        if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) { // bottom wall
+            U.p("Intersecting bottom wall");
             if ((position = intersectPoint(lp1, lp2, o.getCorners().get(2), o.getCorners().get(3))) != null)
                 return position;
+        }
+        U.p("Default: Intersecting left wall");
         // otherwise, assume left wall
         if ((position = intersectPoint(lp1, lp2, o.getCorners().get(1), o.getCorners().get(2))) != null)
             return position;
@@ -46,7 +55,24 @@ public class Geometry {
     }
 
     public static Vector2 intersectPoint(Vector2 l1p1, Vector2 l1p2, Vector2 l2p1, Vector2 l2p2) {
-        return intersectPoint(l1p1.x, l1p1.y, l1p2.x, l1p2.y, l2p1.x, l2p1.y, l2p2.x, l2p2.y);
+        return intersection(line(l1p1, l1p2), line(l2p1, l2p2));
+    }
+
+    private static float[] line(Vector2 p1, Vector2 p2) {
+        float A = p1.y - p2.y;
+        float B = p2.x - p1.x;
+        float C = p1.x * p2.y - p2.x * p1.y;
+        return new float[] {A, B, -C};
+    }
+
+    public static Vector2 intersection(float[] l1, float[] l2) {
+        float d = l1[0] * l2[1] - l1[1] * l2[0];
+        float dx = l1[2] * l2[1] - l1[1] * l2[2];
+        float dy = l1[0] * l2[2] - l1[2] * l2[0];
+        if (d != 0)
+            return new Vector2(dx / d, dy / d);
+        else
+            return null;
     }
 
     public static Vector2 intersectPoint(float l1p1x, float l1p1y, float l1p2x, float l1p2y, float l2p1x, float l2p1y, float l2p2x, float l2p2y) {

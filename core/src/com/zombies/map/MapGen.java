@@ -33,7 +33,7 @@ public class MapGen {
                 return;
             }
             z.addObject(room);
-            connectRoom(room);
+            //connectRoom(room);
         }
     }
 

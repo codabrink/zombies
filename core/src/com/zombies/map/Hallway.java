@@ -20,6 +20,7 @@ import com.zombies.Box;
 import com.zombies.GameView;
 import com.zombies.Wall;
 import com.zombies.Zone;
+import com.zombies.util.U;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,6 +68,7 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
     }
 
     private void move(double theta) {
+        U.p("theta: " + theta);
         HallwayAxis lastAxis = axes.get(axes.size() - 1);
         Vector2 newPoint = new Vector2(
                 (float)(lastAxis.point.x + hallwayLength() * Math.cos(theta)),
@@ -74,10 +76,17 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
 
         HashSet<Overlappable> overlappables = Zone.getZone(newPoint).getOverlappablesAtPoint(newPoint.x, newPoint.y, 1);
         Iterator<Overlappable> iterator = overlappables.iterator();
+        U.p("overlappables.size: " + overlappables.size());
+        U.p("Original newPoint: " + newPoint);
+        Overlappable next;
         while (iterator.hasNext()) {
-            Vector2 p = iterator.next().intersectPointOfLine(lastAxis.point, newPoint);
-            if (p != null)
+            next = iterator.next();
+            if (next == originBox) U.p("Origin box is in overlappables :(");
+            Vector2 p = next.intersectPointOfLine(lastAxis.point, newPoint);
+            if (p != null) {
                 newPoint = p;
+                U.p("         newPoint: " + newPoint);
+            }
         }
 
         axes.add(

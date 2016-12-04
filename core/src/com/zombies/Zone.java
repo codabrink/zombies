@@ -338,10 +338,12 @@ public class Zone {
     }
 
     public Box getBox(float x, float y) {
-        for (Box b: boxes) {
-            if (b.insideBox(x, y))
-                return b;
-        }
+        HashSet<Zone> zones = adjZones(1);
+        Iterator<Zone> iterator = zones.iterator();
+        while (iterator.hasNext())
+            for (Box b: iterator.next().getBoxes())
+                if (b.insideBox(x, y))
+                    return b;
         return null;
     }
     public Box getBox(Vector2 v) {

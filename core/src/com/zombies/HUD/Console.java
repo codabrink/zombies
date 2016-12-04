@@ -9,6 +9,7 @@ import com.zombies.GameView;
 import com.zombies.Player;
 import com.zombies.Zombies;
 import com.zombies.Zone;
+import com.zombies.map.Hallway;
 import com.zombies.map.MapGen;
 
 import java.util.regex.Matcher;
@@ -20,7 +21,7 @@ public class Console {
     private SpriteBatch   spriteBatch;
     private int           fontSize = 18;
     private BitmapFont    font = FontGen.generateFont(fontSize, "serif-reg");
-    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)");
+    final Pattern commandPattern =  Pattern.compile("/([a-zA-Z]+)\\s+([a-zA-Z0-9]+)");
 
     public boolean enabled = false;
     private String  string  = "";
@@ -51,7 +52,7 @@ public class Console {
     }
 
     public boolean keyTyped(char c) {
-        if (Character.toString(c).matches("[a-zA-Z\\s/]"))
+        if (Character.toString(c).matches("[a-zA-Z0-9\\s/]"))
             string += c;
         return true;
     }
@@ -66,6 +67,8 @@ public class Console {
         Player p;
         Box b;
 
+        enabled = false;
+
         switch(m.group(1)) {
             case "boxmap":
                 C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
@@ -78,16 +81,19 @@ public class Console {
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 MapGen.connectRoom(b.getRoom());
+            case "hallway":
+                p = view.getPlayer();
+                b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+                new Hallway(b, Integer.parseInt(m.group(2)), 1);
             default:
+                enabled = true;
                 return;
         }
-
-        enabled = false;
     }
 
     public void draw() {
         float padding = view.getWidth() * 0.1f;
-        BitmapFont font = Zombies.fonts.get("sans-reg:18:black");
+        BitmapFont font = Zombies.getFont("sans-reg:16:black");
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(200, 200, 200, 0.5f);
@@ -95,7 +101,7 @@ public class Console {
         shapeRenderer.end();
 
         spriteBatch.begin();
-        font.draw(spriteBatch, string, padding + 5, padding + 20 - 4);
+        font.draw(spriteBatch, string + '|', padding + 5, padding + 20 - 4);
         spriteBatch.end();
     }
 
