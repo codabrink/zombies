@@ -1,7 +1,7 @@
 package com.zombies;
 
 public class C {
-    public static final float SCALE = 1f;
+    public static final float SCALE = 6f;
 
     //DEBUG
     public static final boolean DEBUG = true;

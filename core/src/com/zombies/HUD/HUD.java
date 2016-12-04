@@ -63,7 +63,7 @@ public class HUD implements InputProcessor{
         if (console.enabled)
             return;
 
-        float strength = 50 * C.SCALE;
+        float strength = 2000 * C.SCALE;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             view.getPlayer().getBody().applyForce(new Vector2(0, strength), new Vector2(), true);

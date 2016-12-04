@@ -215,7 +215,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);
-        floorModelInstance.transform.setTranslation(center.x, center.y, 0);
+        floorModelInstance.transform.setTranslation(center.x, center.y, 1);
     }
 
     public ArrayList<Box> getOuterBoxes() {
