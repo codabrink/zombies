@@ -16,6 +16,7 @@
 
 package de.tomgrill.gdxtesting;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.runner.notification.RunNotifier;
@@ -37,7 +38,7 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
         //new LwjglApplication(new Zombies(), config);
-        new LwjglApplication(this, config);
+		new LwjglApplication(this, config);
 	}
 
 	@Override
