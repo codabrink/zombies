@@ -4,7 +4,7 @@ public class C {
     public static final float SCALE = 6f;
 
     //DEBUG
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static final float HALLWAY_WIDTH = 3f * SCALE;
 
@@ -58,6 +58,7 @@ public class C {
     public static final float FOV = 60;
 
     public static boolean DEBUG_SHOW_BOXMAP = false;
+    public static boolean DEBUG_SHOW_ADJBOXCOUNT = false;
 
     public static final boolean POPULATE_ZOMBIES = true;
     public static final boolean POPULATE_SURVIVORS = true;

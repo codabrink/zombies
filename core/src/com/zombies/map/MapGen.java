@@ -7,6 +7,7 @@ import com.zombies.GameView;
 import com.zombies.Room;
 import com.zombies.Zone;
 import com.zombies.interfaces.Overlappable;
+import com.zombies.util.Geometry;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -37,12 +38,6 @@ public class MapGen {
         }
     }
 
-    public static Hallway genHallway(Room r) {
-        Random rnd = GameView.gv.random;
-        Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
-        return genHallway(b);
-    }
-
     public static Hallway genHallway(Box b) {
         return new Hallway(b, b.getRandomOpenDirection(), 4);
     }
@@ -52,9 +47,8 @@ public class MapGen {
             for (int i : DIRECTIONS) {
                 if (b.getAdjBox(i) == null) {
                     double rad = Math.toRadians(i);
-                    float x = (float)(b.getPosition().x + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.cos(rad));
-                    float y = (float)(b.getPosition().y + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.sin(rad));
-                    Box bb = Zone.getZone(x, y).getBox(x, y);
+                    Vector2 p = Geometry.projectVector(b.getCenter(), rad, C.BOX_SIZE);
+                    Box bb = Zone.getZone(p).getBox(p);
 
                     if (bb != null && bb.getRoom() != b.getRoom())
                         connectBoxes(b, bb);
@@ -74,7 +68,7 @@ public class MapGen {
 
     public static Room genRoom(Zone z) {
         for (int i = 0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
+            Vector2 boxPosition = z.randomPosition();
             if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
                 return genRoom(boxPosition);
             }

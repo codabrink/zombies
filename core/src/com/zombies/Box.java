@@ -46,50 +46,33 @@ public class Box implements Overlappable, Loadable, HasZone {
         corners.add(new Vector2(position.x + width, position.y));
     }
 
-    public boolean insideBox(float x, float y) {
-        return (x > position.x && x < position.x + C.BOX_SIZE && y > position.y && y < position.y + C.BOX_SIZE);
-    }
-
-    private void populateBox() {
-        if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE)
-            crates.add(new Crate(view, this.randomPoint()));
-        if (C.ENABLE_SURVIVORS && random.nextFloat() < C.SURVIVOR_CHANCE)
-            survivors.add(new Survivor(this.randomPoint()));
-        if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE)
-            powerups.add(new ShotgunPickup(this));
-        if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE)
-            powerups.add(new PistolPickup(this));
-        if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE)
-            powerups.add(new HealthPickup(this));
-    }
-
     // detect where this box should have walls, but don't create them yet.
-    public ArrayList<ArrayList<Vector2>> proposeWallPositions() {
+    public ArrayList<Vector2[]> proposeWallPositions() {
+        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
-        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
-
+        Vector2[] points;
         if (adjBoxes.get(90) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy().add(0, height)));
-            points.add(new Vector2(position.cpy().add(width, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy().add(0, height));
+            points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // top wall
         }
         if (adjBoxes.get(0) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy().add(width, 0)));
-            points.add(new Vector2(position.cpy().add(width, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy().add(width, 0));
+            points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // right wall
         }
         if (adjBoxes.get(270) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy()));
-            points.add(new Vector2(position.cpy().add(width, 0)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy());
+            points[1] = new Vector2(position.cpy().add(width, 0));
             proposedPositions.add(points); // bottom wall
         }
         if (adjBoxes.get(180) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy()));
-            points.add(new Vector2(position.cpy().add(0, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy());
+            points[1] = new Vector2(position.cpy().add(0, height));
             proposedPositions.add(points); // left wall
         }
 

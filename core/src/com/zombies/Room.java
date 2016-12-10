@@ -3,6 +3,7 @@ package com.zombies;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -36,7 +37,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private GameView view;
     private boolean loaded = false;
     private Zone zone;
-    private ArrayList<Box> outerBoxes = new ArrayList<Box>();
+    private HashSet<Box> outerBoxes = new HashSet<>();
     private Vector2 center;
     private HashMap<String, Box> boxMap;
 
@@ -67,13 +68,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
             center.add(b.getCenter());
         }
         return new Vector2(center.x / boxes.size(), center.y / boxes.size());
-    }
-
-    public void doorsTo(Room room) {
-        if (!adjRooms.contains(room)) {
-            //TODO further path finding to that room
-            return;
-        }
     }
 
     public void currentRoom() {
@@ -112,7 +106,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public void rasterizeWalls() {
         // proposedPositions are sets of points where walls could be placed.
-        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
+        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
         // propose positions for each box in the room.
         for (Box b: boxes) {
@@ -121,32 +115,27 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         
         proposedPositions = consolidateWallPositions(proposedPositions);
 
-        for (ArrayList<Vector2> pstn: proposedPositions) {
-            walls.add(new Wall(pstn.get(0), pstn.get(1), this));
+        for (Vector2[] pstn: proposedPositions) {
+            walls.add(new Wall(pstn[0], pstn[1], this));
         }
 
         buildWallModel();
     }
     
     // consolidate the proposed walls into as few as possible.
-    public ArrayList<ArrayList<Vector2>> consolidateWallPositions(ArrayList<ArrayList<Vector2>> proposedPositions) {
+    public ArrayList<Vector2[]> consolidateWallPositions(ArrayList<Vector2[]> proposedPositions) {
 
-        ArrayList<ArrayList<Vector2>> iteratedPositions = new ArrayList<ArrayList<Vector2>>(proposedPositions);
+        ArrayList<Vector2[]> iteratedPositions = new ArrayList<>(proposedPositions);
 
-        for (ArrayList<Vector2> pstn1: iteratedPositions) {
-            for (ArrayList<Vector2> pstn2: iteratedPositions) {
+        for (Vector2[] pstn1: iteratedPositions) {
+            for (Vector2[] pstn2: iteratedPositions) {
 
                 // if the first wall's end meets the other wall's start and they have the same
                 // angle...
-                if (pstn1.get(1).equals(pstn2.get(0)) && Math.abs(pstn1.get(1).cpy().sub(pstn1.get(0)).angle() - (pstn2.get(1).cpy().sub(pstn2.get(0)).angle())) < 0.0001) {
-
-                    // System.out.println("Walls match up.");
-                    // System.out.println("pstn1: " + pstn1);
-                    // System.out.println("pstn2: " + pstn2);
-
-                    ArrayList<Vector2> points = new ArrayList<Vector2>();
-                    points.add(pstn1.get(0));
-                    points.add(pstn2.get(1));
+                if (pstn1[1].equals(pstn2[0]) && Math.abs(pstn1[1].cpy().sub(pstn1[0]).angle() - (pstn2[1].cpy().sub(pstn2[0]).angle())) < 0.0001) {
+                    Vector2[] points = new Vector2[2];
+                    points[0] = pstn1[0];
+                    points[1] = pstn2[1];
 
                     proposedPositions.add(points);
 
@@ -218,7 +207,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance.transform.setTranslation(center.x, center.y, 1);
     }
 
-    public ArrayList<Box> getOuterBoxes() {
+    public HashSet<Box> getOuterBoxes() {
         return outerBoxes;
     }
 
@@ -241,13 +230,17 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         if (C.DEBUG) {
             BitmapFont f = Zombies.getFont("sans-reg:8:white");
-            if (C.DEBUG_SHOW_BOXMAP) {
-                spriteBatch.begin();
-                for (Box b : boxes) {
-                    f.draw(spriteBatch, b.BMKey, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
-                }
-                spriteBatch.end();
+            String s = "";
+
+            spriteBatch.begin();
+            for (Box b : boxes) {
+                if (C.DEBUG_SHOW_BOXMAP)
+                    s = b.BMKey;
+                if (C.DEBUG_SHOW_ADJBOXCOUNT)
+                    s = b.getAdjBoxes().size() + "";
+                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
             }
+            spriteBatch.end();
         }
     }
 

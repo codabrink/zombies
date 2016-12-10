@@ -9,6 +9,8 @@ import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.MapGen;
+import com.zombies.util.U;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -309,7 +311,7 @@ public class Zone {
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
             for (Box b: iterator.next().getBoxes())
-                if (b.insideBox(x, y))
+                if (b.contains(x, y))
                     return b;
         return null;
     }

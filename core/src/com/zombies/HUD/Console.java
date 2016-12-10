@@ -72,8 +72,12 @@ public class Console {
         enabled = false;
 
         switch(m.group(1)) {
-            case "boxmap":
-                C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+            case "box":
+                U.p(m.group(2));
+                if (m.group(2) == "bm")
+                    C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+                else if (m.group(2) == "adj")
+                    C.DEBUG_SHOW_ADJBOXCOUNT = !C.DEBUG_SHOW_ADJBOXCOUNT;
                 break;
             case "inspectBox":
                 p = view.getPlayer();
