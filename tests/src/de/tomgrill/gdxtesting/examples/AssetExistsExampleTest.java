@@ -21,10 +21,14 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.MapGen;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 import de.tomgrill.gdxtesting.GdxTestRunner;
 
@@ -32,13 +36,38 @@ import de.tomgrill.gdxtesting.GdxTestRunner;
 public class AssetExistsExampleTest {
 
 	@Test
-	public void badlogicLogoFileExists() {
+	public void getAdjZone() {
 		Zombies instance = new Zombies();
 		instance.setScreen(new GameView());
 
-		Zone z = Zone.getZone(0f, 0f);
-		MapGen.genRoom(z);
+		Zone zone = Zone.getZone(0f, 0f);
+		MapGen.genRoom(zone);
 
-		assertTrue(z.getRooms().size() > 0);
-	}
+        // assert a room is generating
+		assertTrue(zone.getRooms().size() > 0);
+
+        // assert getAdjZones works
+        HashSet<Zone> adjZones = zone.getAdjZones(1);
+        HashMap<String, Zone> adjZonesMap = new HashMap<String, Zone>();
+        assertTrue(adjZones.size() == 9);
+
+        for (Zone z : adjZones) {
+            int x = (int)(z.getPosition().x / C.ZONE_SIZE);
+            int y = (int)(z.getPosition().y / C.ZONE_SIZE);
+            adjZonesMap.put(x+","+y, z);
+        }
+
+        assertTrue(adjZonesMap.get("-1,-1") != null);
+        assertTrue(adjZonesMap.get("0,-1") != null);
+        assertTrue(adjZonesMap.get("1,-1") != null);
+        assertTrue(adjZonesMap.get("-1,0") != null);
+        assertTrue(adjZonesMap.get("0,0") != null);
+        assertTrue(adjZonesMap.get("1,0") != null);
+        assertTrue(adjZonesMap.get("-1,1") != null);
+        assertTrue(adjZonesMap.get("0,1") != null);
+        assertTrue(adjZonesMap.get("1,1") != null);
+
+        adjZones = zone.getAdjZones(2);
+        assertTrue(adjZones.size() == 25);
+    }
 }

@@ -447,7 +447,7 @@ public class Zone {
         return new Vector2(position.x + C.ZONE_SIZE / 2, position.y + C.ZONE_SIZE / 2);
     }
 
-    private HashSet<Zone> getAdjZones(int limit) {
+    public HashSet<Zone> getAdjZones(int limit) {
         HashSet<Zone> zones = new HashSet<>();
         Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
