@@ -1,35 +1,38 @@
-package com.zombies;
+package com.zombies.map.room;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.C;
+import com.zombies.Crate;
+import com.zombies.GameView;
+import com.zombies.Survivor;
+import com.zombies.Unit;
+import com.zombies.Zombie;
+import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.IOverlappable;
 import com.zombies.map.MapGen;
-import com.zombies.powerups.HealthPickup;
-import com.zombies.powerups.PistolPickup;
+import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
-import com.zombies.powerups.ShotgunPickup;
-import com.zombies.util.Geometry;
-import com.zombies.util.U;
 
-public class Box implements Overlappable, Loadable, HasZone {
-    private ArrayList<Vector2> corners = new ArrayList<>();
+public class Box extends Overlappable implements IOverlappable {
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
-    private Vector2 position;
     private Room room;
     private GameView view;
     private Random random = new Random();
     public float height = C.BOX_SIZE, width = C.BOX_SIZE;
     private Zone z;
+
+    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     public String BMKey;
 
@@ -204,56 +207,11 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
-    }
-
-    @Override
     public String className() {
         return "Box";
     }
 
-    @Override
-    public ArrayList<Vector2> getCorners() { return corners; }
 
-    @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
-    }
-    @Override
-    public float edge(int direction) {
-        switch(direction) {
-            case 90:
-                return position.y + height;
-            case 0:
-                return position.x + width;
-            case 270:
-                return position.y;
-            case 180:
-                return position.x;
-        }
-        return 0;
-    }
-
-    @Override
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
-    }
-
-    @Override
-    public boolean contains(float x, float y) {
-        return Geometry.rectContains(x, y, position, width, height);
-    }
-
-    @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        return Geometry.edgeIntersection(p1, p2, this);
-    }
-
-    @Override
-    public float getWidth() { return width; }
-    @Override
-    public float getHeight() { return height; }
     @Override
     public void load() {
 

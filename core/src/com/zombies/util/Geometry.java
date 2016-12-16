@@ -1,7 +1,8 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.IOverlappable;
 import java.util.ArrayList;
 
 public class Geometry {

@@ -13,34 +13,36 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.Overlappable;
-import com.zombies.Box;
 import com.zombies.GameView;
-import com.zombies.Wall;
 import com.zombies.Zone;
-import com.zombies.util.U;
+import com.zombies.map.room.Box;
+import com.zombies.map.data.join.JoinOverlappableOverlappable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Random;
 
-public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modelable {
+public class Hallway implements Drawable, HasZone, Modelable {
     public static int MAX_HALLWAY_SEGMENTS = 2;
 
     ArrayList<HallwayAxis> axes = new ArrayList<>();
     private Random r;
-    private ArrayList<Overlappable> hallwaySegments = new ArrayList<Overlappable>();
+    private ArrayList<Overlappable> hallwaySegments = new ArrayList<>();
+
     private Box originBox;
-    private Wall originWall;
+    private Overlappable endOverlappable;
+
     private float diameter;
-    private double totalAngle = 0;
-    private Model model, floorModel;
-    private ModelInstance modelInstance, floorModelInstance;
+    private Model model;
+    private ModelInstance modelInstance;
     private Vector2 center;
     private Zone zone;
+
+    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     public Hallway(Box b, int direction, float width) {
         r = GameView.gv.random;
@@ -55,7 +57,6 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
                         new Vector2(
                                 (float)(b.getCenter().x + C.BOX_SIZE / 2 * Math.cos(theta)),
                                 (float)(b.getCenter().y + C.BOX_SIZE / 2 * Math.sin(theta)))));
-
         move(theta);
     }
 
@@ -68,24 +69,17 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
     }
 
     private void move(double theta) {
-        U.p("theta: " + theta);
         HallwayAxis lastAxis = axes.get(axes.size() - 1);
         Vector2 newPoint = new Vector2(
                 (float)(lastAxis.point.x + hallwayLength() * Math.cos(theta)),
                 (float)(lastAxis.point.y + hallwayLength() * Math.sin(theta)));
 
-        HashSet<Overlappable> overlappables = Zone.getZone(newPoint).getOverlappablesAtPoint(newPoint.x, newPoint.y, 1);
-        Iterator<Overlappable> iterator = overlappables.iterator();
-        U.p("overlappables.size: " + overlappables.size());
-        U.p("Original newPoint: " + newPoint);
-        Overlappable next;
-        while (iterator.hasNext()) {
-            next = iterator.next();
-            if (next == originBox) U.p("Origin box is in overlappables :(");
-            Vector2 p = next.intersectPointOfLine(lastAxis.point, newPoint);
+        HashSet<Overlappable> overlappables = Zone.getZone(newPoint).checkOverlap(newPoint.x, newPoint.y, 1);
+        for (Overlappable o : overlappables) {
+            Vector2 p = o.intersectPointOfLine(lastAxis.point, newPoint);
             if (p != null) {
                 newPoint = p;
-                U.p("         newPoint: " + newPoint);
+                endOverlappable = o;
             }
         }
 
@@ -100,6 +94,8 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
     private void materialize() {
         center = new Vector2();
 
+
+
         for (int i = 0; i < axes.size() - 1; i++) {
             hallwaySegments.add(new HallwaySegment(
                     axes.get(Math.max(i - 1, 0)),
@@ -108,6 +104,8 @@ public class Hallway implements com.zombies.interfaces.Drawable, HasZone, Modela
                     diameter,
                     this));
         }
+
+        new JoinOverlappableOverlappable(axes.get(0).point, (Overlappable)originBox, (Overlappable)hallwaySegments.get(0));
 
         for (Overlappable hs: hallwaySegments) {
             center.add(hs.getCenter());

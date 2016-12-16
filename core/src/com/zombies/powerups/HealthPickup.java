@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
-import com.zombies.Box;
+import com.zombies.map.room.Box;
 import com.zombies.C;
 import com.zombies.Unit;
 

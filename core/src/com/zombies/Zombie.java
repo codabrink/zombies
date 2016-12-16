@@ -17,7 +17,7 @@ public class Zombie extends Unit implements Drawable {
     private long lastAttack = System.currentTimeMillis();
     private Random random = new Random();
 
-    public Zombie(GameView view, Box box, Vector2 position) {
+    public Zombie(GameView view, com.zombies.map.room.Box box, Vector2 position) {
         super();
 
         storedBodData = new BodData("zombie", this);

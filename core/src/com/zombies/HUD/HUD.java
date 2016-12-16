@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zombies;
 import com.zombies.map.MapGen;
-import com.zombies.Box;
+import com.zombies.map.room.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
 

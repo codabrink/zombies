@@ -1,7 +1,6 @@
-package com.zombies;
+package com.zombies.map.room;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -20,10 +19,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.zombies.C;
+import com.zombies.GameView;
+import com.zombies.Unit;
+import com.zombies.Wall;
+import com.zombies.Zombies;
+import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
+import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
@@ -43,6 +49,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
+
+    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     public Room( HashMap<String, Box> boxMap) {
         view = GameView.gv;

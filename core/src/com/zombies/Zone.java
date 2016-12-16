@@ -1,15 +1,15 @@
 package com.zombies;
 
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.map.Grass;
-import com.zombies.map.MapGen;
-import com.zombies.util.U;
+import com.zombies.map.*;
+import com.zombies.map.room.Box;
+import com.zombies.map.room.Room;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class Zone {
     private HashSet<Overlappable> overlappables = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
-    private HashSet<Room> rooms = new HashSet<>();
+    private HashSet<com.zombies.map.room.Room> rooms = new HashSet<>();
     //private ArrayList<Hallway> hallways = new ArrayList<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
@@ -361,11 +361,6 @@ public class Zone {
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Zone> getAdjZones() { return adjZones; }
-    public HashSet<Zone> getAdjZonesPlusSelf() {
-        HashSet<Zone> allZones = (HashSet<Zone>)adjZones.clone();
-        allZones.add(this);
-        return allZones;
-    }
 
     private void addRoom(Room r) {
         rooms.add(r);
@@ -414,22 +409,14 @@ public class Zone {
     public void addWall(Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h)) {
-                if (ignore != null) {
-                    if (ignore.indexOf(o) != -1)
+        HashSet<Zone> zones = getAdjZones(1);
+        for (Zone z : zones) {
+            for (Overlappable o : z.getOverlappables()) {
+                if (o.overlaps(x, y, w, h)) {
+                    if (ignore != null && ignore.indexOf(o) != -1)
                         continue;
                     return o;
-                } else {
-                    return o;
                 }
-            }
-        }
-        if (limit > 0) {
-            for (Zone z : adjZones) {
-                Overlappable o = checkOverlap(x, y, w, h, limit - 1, ignore);
-                if (o != null)
-                    return o;
             }
         }
         return null;
@@ -459,15 +446,16 @@ public class Zone {
         return zones;
     }
 
-    public HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
+    public HashSet<Overlappable> checkOverlap(float x, float y, int limit) {
         HashSet<Overlappable> overlapped = new HashSet<>();
         HashSet<Zone> zones = getAdjZones(limit);
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
-            iterator.next().getOverlappablesAtPoint(x, y, overlapped);
+            iterator.next().checkOverlap(x, y, overlapped);
         return overlapped;
     }
-    private HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, HashSet<Overlappable> overlapped) {
+    public HashSet<Overlappable> checkOverlap(Vector2 point, int limit) { return checkOverlap(point.x, point.y, limit);}
+    private HashSet<Overlappable> checkOverlap(float x, float y, HashSet<Overlappable> overlapped) {
         for (Overlappable o : overlappables)
             if (o.contains(x, y))
                 overlapped.add(o);

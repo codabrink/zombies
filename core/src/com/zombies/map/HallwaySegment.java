@@ -3,10 +3,9 @@ package com.zombies.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Loadable;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.interfaces.IOverlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.GameView;
@@ -16,12 +15,11 @@ import com.zombies.Zone;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class HallwaySegment implements Overlappable, Loadable, HasZone {
+public class HallwaySegment extends Overlappable implements IOverlappable {
     private ArrayList<Vector2> corners = new ArrayList<>();
-    private static int DRAWABLE_LAYER = 1;
     public Vector2 position, center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
-    public float diameter, radius, width, height;
+    public float diameter, radius;
     private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private HallwayAxis pAxis, axis, nAxis;
@@ -92,10 +90,6 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         height = Math.abs(axis.point.y - nAxis.point.y) + diameter;
 
         center = position.cpy().add(width / 2, height / 2);
-    }
-
-    public Vector2 getCenter() {
-        return center;
     }
 
     public Vector2 getP1() {return axis.point;}
