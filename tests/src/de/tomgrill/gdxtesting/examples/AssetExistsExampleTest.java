@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2015 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package de.tomgrill.gdxtesting.examples;
 
 import static org.junit.Assert.assertTrue;
@@ -21,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
@@ -51,21 +34,18 @@ public class AssetExistsExampleTest {
         HashMap<String, Zone> adjZonesMap = new HashMap<String, Zone>();
         assertTrue(adjZones.size() == 9);
 
-        for (Zone z : adjZones) {
-            int x = (int)(z.getPosition().x / C.ZONE_SIZE);
-            int y = (int)(z.getPosition().y / C.ZONE_SIZE);
-            adjZonesMap.put(x+","+y, z);
-        }
+        for (Zone z : adjZones)
+            adjZonesMap.put(z.getKey(), z);
 
         assertTrue(adjZonesMap.get("-1,-1") != null);
-        assertTrue(adjZonesMap.get("0,-1") != null);
-        assertTrue(adjZonesMap.get("1,-1") != null);
-        assertTrue(adjZonesMap.get("-1,0") != null);
-        assertTrue(adjZonesMap.get("0,0") != null);
-        assertTrue(adjZonesMap.get("1,0") != null);
-        assertTrue(adjZonesMap.get("-1,1") != null);
-        assertTrue(adjZonesMap.get("0,1") != null);
-        assertTrue(adjZonesMap.get("1,1") != null);
+        assertTrue(adjZonesMap.get("0,-1")  != null);
+        assertTrue(adjZonesMap.get("1,-1")  != null);
+        assertTrue(adjZonesMap.get("-1,0")  != null);
+        assertTrue(adjZonesMap.get("0,0")   != null);
+        assertTrue(adjZonesMap.get("1,0")   != null);
+        assertTrue(adjZonesMap.get("-1,1")  != null);
+        assertTrue(adjZonesMap.get("0,1")   != null);
+        assertTrue(adjZonesMap.get("1,1")   != null);
 
         adjZones = zone.getAdjZones(2);
         assertTrue(adjZones.size() == 25);

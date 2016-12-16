@@ -355,6 +355,7 @@ public class Zone {
             removeDrawable((Drawable) o);
     }
 
+    public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
     public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }

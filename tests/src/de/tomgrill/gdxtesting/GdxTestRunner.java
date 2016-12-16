@@ -37,7 +37,6 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 		super(klass);
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
-        //new LwjglApplication(new Zombies(), config);
 		new LwjglApplication(this, config);
 	}
 
