@@ -33,19 +33,15 @@ public class Zone {
     public enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections
-
     private HashSet<Zone> adjZones = new HashSet<Zone>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
     private HashSet<com.zombies.map.room.Room> rooms = new HashSet<>();
-    //private ArrayList<Hallway> hallways = new ArrayList<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
-
-    private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<>();
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
     public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap
@@ -53,9 +49,6 @@ public class Zone {
     public Zone(float x, float y) {
         r = GameView.gv.random;
         position = new Vector2(x, y);
-        for (int i = 0; i <= C.DRAW_LAYERS; i++) {
-            drawablesList.add(new ArrayList<Drawable>());
-        }
         numRooms = r.nextInt(numRooms);
 
         if (C.ENABLE_DEBUG_LINES) {
@@ -95,6 +88,8 @@ public class Zone {
         DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
 
         if (limit > 0)
+            if (adjZones.size() < 8)
+                findAdjZones();  
             for (Zone z: adjZones) {
                 z.update(frame, limit - 1);
             }
