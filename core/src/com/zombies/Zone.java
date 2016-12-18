@@ -37,7 +37,7 @@ public class Zone {
     private HashSet<Overlappable> overlappables = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
-    private HashSet<com.zombies.map.room.Room> rooms = new HashSet<>();
+    private HashSet<Room> rooms = new HashSet<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
@@ -89,10 +89,9 @@ public class Zone {
 
         if (limit > 0)
             if (adjZones.size() < 8)
-                findAdjZones();  
-            for (Zone z: adjZones) {
+                findAdjZones();
+            for (Zone z: adjZones)
                 z.update(frame, limit - 1);
-            }
     }
 
     public void findAdjZones() {
@@ -302,10 +301,8 @@ public class Zone {
     }
 
     public Box getBox(float x, float y) {
-        HashSet<Zone> zones = getAdjZones(1);
-        Iterator<Zone> iterator = zones.iterator();
-        while (iterator.hasNext())
-            for (Box b: iterator.next().getBoxes())
+        for (Zone z : getAdjZones(1))
+            for (Box b : z.getBoxes())
                 if (b.contains(x, y))
                     return b;
         return null;
@@ -480,12 +477,5 @@ public class Zone {
             i++;
         }
         return null;
-    }
-
-    public Vector2 suggestedStartPoint() {
-        if (boxes.size() == 0)
-            return randomPosition();
-
-        return randomBox().randomPoint();
     }
 }

@@ -2,7 +2,9 @@ package com.zombies.map;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.data.Data;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Room;
 import com.zombies.map.thread.RunnableRoomGen;
@@ -21,6 +23,9 @@ public class MapGen {
     private static long lastGenTimestamp;
 
     public static void update(Zone z) {
+        if (Data.currentRoom != null && Data.currentRoom.joinOverlappableOverlappables.size() < 3) {
+
+        }
         if (!roomGen.isAlive()) {
 
             //roomGen.start();

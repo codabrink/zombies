@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.data.Data;
 import com.zombies.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -283,37 +284,35 @@ public class Player extends Unit implements Collideable {
         updateBox();
         updateZone();
         zone.update(frame, 1);
-
         DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
-
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 150, 40000);
-
         zone.draw(frame, 1);
-
         this.handleHealth();
-
-        for (Gun g: guns) {
+        for (Gun g: guns)
             g.update();
-        }
-
         for (Survivor s: survivors) {
             s.update(frame);
 
             if (s.getState() == "dead")
                 survivors.remove(s);
         }
-
         survivorKill.clear();
-
-        for (Bullet b: bullets) {
+        for (Bullet b: bullets)
             b.update();
-        }
-
         capSpeed();
-
-        if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
+
+        if (frame % 100 == 0) {
+            updateInfo();
         }
+    }
+
+    private void updateInfo() {
+        Data.currentZone = Zone.getZone(body.getPosition());
+        Data.currentBox  = Data.currentZone.getBox(body.getPosition());
+        //if (Data.currentBox != null)
+            Data.currentRoom = Data.currentBox.getRoom();
     }
 
     @Override

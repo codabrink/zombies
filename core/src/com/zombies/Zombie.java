@@ -12,12 +12,13 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.interfaces.Drawable;
+import com.zombies.map.room.Box;
 
 public class Zombie extends Unit implements Drawable {
     private long lastAttack = System.currentTimeMillis();
     private Random random = new Random();
 
-    public Zombie(GameView view, com.zombies.map.room.Box box, Vector2 position) {
+    public Zombie(GameView view, Box box, Vector2 position) {
         super();
 
         storedBodData = new BodData("zombie", this);
