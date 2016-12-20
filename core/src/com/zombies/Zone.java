@@ -3,6 +3,8 @@ package com.zombies;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.data.Data;
+import com.zombies.exception.ShouldNotHappenException;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -33,7 +35,7 @@ public class Zone {
     public enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections
-    private HashSet<Zone> adjZones = new HashSet<Zone>();
+    private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
@@ -59,39 +61,29 @@ public class Zone {
         addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
-    public void draw(int frame, int limit) {
-        if (drawFrame == frame)
-            return;
-        drawFrame = frame;
 
-        for (Drawable d: drawables)
+    public void draw(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z : zones)
+            z.draw();
+    }
+    public void draw() {
+        for (Drawable d : drawables)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-        for (Drawable d: debugLines)
+        for (Drawable d : debugLines)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-
-        if (limit > 0)
-            for (Zone z: adjZones) {
-                z.draw(frame, limit - 1);
-            }
     }
 
-    public void update(int frame, int limit) {
-        if (updateFrame == frame)
-            return;
-        updateFrame = frame;
-
-        MapGen.update(this); // generate the map
-
-        for (Updateable u: updateables)
+    public void update(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z : zones)
+            z.update();
+    }
+    public void update() {
+        if (Data.currentZone == this)
+            MapGen.update(this); // generate the map
+        for (Updateable u : updateables)
             u.update();
-
-        DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
-
-        if (limit > 0)
-            if (adjZones.size() < 8)
-                findAdjZones();
-            for (Zone z: adjZones)
-                z.update(frame, limit - 1);
     }
 
     public void findAdjZones() {
@@ -108,11 +100,17 @@ public class Zone {
 
         for (int i = 0; i < zonePositions.length; i += 2) {
             Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
-            adjZones.add(z);
+            adjZones.get(1).add(z);
         }
     }
 
+
     public void load(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z: zones)
+            z.load();
+    }
+    public void load() {
         if (loadIndex == Zone.globalLoadIndex)
             return; // already loaded
         loadIndex = Zone.globalLoadIndex;
@@ -120,10 +118,6 @@ public class Zone {
 
         for (Loadable l: loadables)
             l.load();
-
-        if (limit > 0)
-            for (Zone z: adjZones)
-                z.load(limit - 1);
     }
 
     public void unload() {
@@ -352,7 +346,7 @@ public class Zone {
     public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
     public HashSet<Room> getRooms() { return rooms; }
-    public HashSet<Zone> getAdjZones() { return adjZones; }
+    public HashSet<Zone> getAdjZones() { return getAdjZones(1); }
 
     private void addRoom(Room r) {
         rooms.add(r);
@@ -428,13 +422,19 @@ public class Zone {
     }
 
     public HashSet<Zone> getAdjZones(int limit) {
-        HashSet<Zone> zones = new HashSet<>();
+        HashSet<Zone> zones = adjZones.get(limit);
+        if (zones != null)
+            return zones;
+
+        zones = new HashSet<>();
         Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
 
         for (float x = center.x - variance; x <= center.x + variance; x += C.ZONE_SIZE)
             for (float y = center.y - variance; y <= center.y + variance; y += C.ZONE_SIZE)
                 zones.add(Zone.getZone(x, y));
+
+        adjZones.put(limit, zones);
         return zones;
     }
 
