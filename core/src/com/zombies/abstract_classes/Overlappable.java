@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
-    protected float width, height;
+    public float width, height;
     protected Vector2 position;
     protected ArrayList<Vector2> corners = new ArrayList<>();
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();

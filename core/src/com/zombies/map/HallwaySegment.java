@@ -17,7 +17,7 @@ import java.util.LinkedList;
 
 public class HallwaySegment extends Overlappable implements IOverlappable {
     private ArrayList<Vector2> corners = new ArrayList<>();
-    public Vector2 position, center;
+    public Vector2 center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius;
     private Zone zone;

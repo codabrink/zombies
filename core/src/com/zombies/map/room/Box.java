@@ -29,7 +29,6 @@ public class Box extends Overlappable implements IOverlappable {
     private Room room;
     private GameView view;
     private Random random = new Random();
-    public float height = C.BOX_SIZE, width = C.BOX_SIZE;
     private Zone z;
 
     public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
@@ -37,7 +36,9 @@ public class Box extends Overlappable implements IOverlappable {
     public String BMKey;
 
     public Box(float x, float y) {
-        position = new Vector2(x, y);
+        this.height = C.BOX_SIZE;
+        this.width  = C.BOX_SIZE;
+        this.position = new Vector2(x, y);
         setCorners();
         this.view = GameView.gv;
     }

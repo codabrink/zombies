@@ -158,43 +158,6 @@ public class Zone {
         return true;
     }
 
-    public Zone adjZoneByDirection(Directions direction) {
-        switch (direction) {
-            case N:
-                return Zone.getZone(position.x, position.y + C.ZONE_SIZE);
-            case NE:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE);
-            case E:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y);
-            case SE:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE);
-            case S:
-                return Zone.getZone(position.x, position.y - C.ZONE_SIZE);
-            case SW:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE);
-            case W:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y);
-            case NW:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE);
-        }
-        return null;
-    }
-
-    public Float pointToZoneDistance(Vector2 point) {
-        if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE && point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
-            return 0.0f;
-        } else if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE) {
-            return Math.min(point.dst(point.x, this.position.y), point.dst(point.x, this.position.y + C.ZONE_SIZE));
-        } else if (point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
-            return Math.min(point.dst(this.position.x, point.y), point.dst(this.position.x + C.ZONE_SIZE, point.y));
-        } else {
-            return Math.min(
-                Math.min(point.dst(this.position.x, this.position.y), point.dst(this.position.x + C.ZONE_SIZE, this.position.y)),
-                    Math.min(point.dst(this.position.x, this.position.y + C.ZONE_SIZE), point.dst(this.position.x + C.ZONE_SIZE, this.position.y + C.ZONE_SIZE))
-            );
-        }
-    }
-
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
         // slope intercept form (y = mx + b)
         float m = (end.y - start.y) / (end.x - end.y);
