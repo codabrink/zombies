@@ -39,23 +39,6 @@ public class MapGen {
         return initialRoom;
     }
 
-    public static void fillZone(Zone z) {
-
-        // needs to be done during generation, not creation
-        if (z.getAdjZones().size() < 8)
-            z.findAdjZones();
-
-        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z);
-            if (room == null) {
-                z.roomGenFailureCount++;
-                return;
-            }
-            z.addObject(room);
-            // connectRoom(room);
-        }
-    }
-
     public static Hallway genHallway(Box b) {
         return new Hallway(b, b.getRandomOpenDirection(), 4);
     }

@@ -86,25 +86,6 @@ public class Zone {
             u.update();
     }
 
-    public void findAdjZones() {
-        float[] zonePositions = {
-                position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-                position.x - C.ZONE_SIZE, position.y,
-                position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-                position.x, position.y + C.ZONE_SIZE,
-                position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-                position.x + C.ZONE_SIZE, position.y,
-                position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-                position.x, position.y - C.ZONE_SIZE
-        };
-
-        for (int i = 0; i < zonePositions.length; i += 2) {
-            Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
-            adjZones.get(1).add(z);
-        }
-    }
-
-
     public void load(int limit) {
         HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z: zones)
