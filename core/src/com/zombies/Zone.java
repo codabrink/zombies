@@ -1,10 +1,8 @@
 package com.zombies;
 
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.HUD.DebugText;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.Data;
-import com.zombies.exception.ShouldNotHappenException;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -21,7 +19,6 @@ import java.util.Random;
 
 public class Zone {
     private Vector2 position;
-    private int updateFrame, drawFrame;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r;
 
@@ -30,9 +27,6 @@ public class Zone {
     public static ArrayList<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
-    private static Box zone;
-
-    public enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections
     private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
@@ -46,7 +40,6 @@ public class Zone {
     private HashSet<Drawable> debugLines = new HashSet<>();
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
-    public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap
 
     public Zone(float x, float y) {
         r = GameView.gv.random;
@@ -290,7 +283,6 @@ public class Zone {
     public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
     public HashSet<Room> getRooms() { return rooms; }
-    public HashSet<Zone> getAdjZones() { return getAdjZones(1); }
 
     private void addRoom(Room r) {
         rooms.add(r);
@@ -308,9 +300,6 @@ public class Zone {
     }
     private void removeBox(Box b) { boxes.remove(b); }
     private void addDrawable(Drawable d) {
-        drawables.add(d);
-    }
-    private void addDrawableNoCheck(Drawable d) {
         drawables.add(d);
     }
     private void removeDrawable(Drawable d) {
@@ -351,14 +340,8 @@ public class Zone {
         }
         return null;
     }
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit) {
-        return checkOverlap(x, y, w, h, limit, null);
-    }
     public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
         return checkOverlap(v.x, v.y, w, h, limit, null);
-    }
-    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
 
     private Vector2 center() {
@@ -402,24 +385,5 @@ public class Zone {
         float randomX = r.nextFloat() * C.ZONE_SIZE;
         float randomY = r.nextFloat() * C.ZONE_SIZE;
         return position.cpy().add(randomX, randomY);
-    }
-
-    public Vector2 randomDiscretePosition(float interval) {
-        interval = interval * C.SCALE;
-        float randomX = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
-        float randomY = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
-        return position.cpy().add(randomX, randomY);
-    }
-
-    public Box randomBox() {
-        if (boxes.size() == 0) return null;
-
-        int ri = GameView.r.nextInt(boxes.size()), i = 0;
-        for (Box b: boxes) {
-            if (ri == i)
-                return b;
-            i++;
-        }
-        return null;
     }
 }
