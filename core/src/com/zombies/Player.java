@@ -303,16 +303,17 @@ public class Player extends Unit implements Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
 
-        if (frame % 100 == 0) {
+        if (frame % 100 == 0)
             updateInfo();
-        }
     }
 
     private void updateInfo() {
         Data.currentZone = Zone.getZone(body.getPosition());
         Data.currentBox  = Data.currentZone.getBox(body.getPosition());
-        //if (Data.currentBox != null)
-        Data.currentRoom = Data.currentBox.getRoom();
+        if (Data.currentBox != null)
+            Data.currentRoom = Data.currentBox.getRoom();
+        else
+            Data.currentRoom = null;
     }
 
     @Override

@@ -59,7 +59,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         for (Box b: boxes) {
             b.setRoom(this);
-            Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
