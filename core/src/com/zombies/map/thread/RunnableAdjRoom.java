@@ -32,6 +32,6 @@ public class RunnableAdjRoom implements Runnable {
         startPos = Geometry.projectVector(startPos, Math.toRadians(direction), C.BOX_SIZE);
         startPos.sub(C.BOX_SIZE / 2, C.BOX_SIZE / 2);
 
-        Generator.addRoom(Generator.generateRoom(startPos));
+        Generator.zoneRoom(Generator.genRoom(startPos));
     }
 }

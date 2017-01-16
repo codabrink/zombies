@@ -7,6 +7,7 @@ import com.zombies.Zone;
 import com.zombies.data.Data;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Room;
+import com.zombies.map.thread.Generator;
 import com.zombies.map.thread.RunnableRoomGen;
 import com.zombies.util.Geometry;
 
@@ -20,28 +21,6 @@ public class MapGen {
     public static RunnableRoomGen runnableRoomGen = new RunnableRoomGen();
     public static Thread roomGen = new Thread(runnableRoomGen);
 
-    private static long lastGenTimestamp;
-
-    public static void update(Zone z) {
-        if (Data.currentRoom != null && Data.currentRoom.joinOverlappableOverlappables.size() < 3) {
-
-        }
-        if (!roomGen.isAlive()) {
-
-            //roomGen.start();
-        }
-    }
-
-    public static Room initialRoom() {
-        Room initialRoom = genRoom(new Vector2(-C.BOX_SIZE / 2, -C.BOX_SIZE / 2));
-        Zone.getZone(0, 0).addObject(initialRoom);
-        lastGenTimestamp = System.currentTimeMillis();
-        return initialRoom;
-    }
-
-    public static Hallway genHallway(Box b) {
-        return new Hallway(b, b.getRandomOpenDirection(), 4);
-    }
 
     public static void connectRoom(Room r) {
         for (Box b : r.getOuterBoxes()) {

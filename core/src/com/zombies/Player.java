@@ -1,6 +1,7 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.zombies.HUD.*;
@@ -18,9 +19,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.zombies.interfaces.Collideable;
+import com.zombies.map.thread.MapAdmin;
 
 public class Player extends Unit implements Collideable {
-
     private long beginAttacks = System.currentTimeMillis();
     private long lastAttack = System.currentTimeMillis();
     private long lastShot = System.currentTimeMillis();
@@ -72,6 +73,8 @@ public class Player extends Unit implements Collideable {
 
         updateZone();
         updateBox();
+
+        Data.players.add(this);
     }
 
     public float getHealth() {
@@ -314,6 +317,8 @@ public class Player extends Unit implements Collideable {
             Data.currentRoom = Data.currentBox.getRoom();
         else
             Data.currentRoom = null;
+
+        MapAdmin.update(this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.zombies.abstract_classes;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.IOverlappable;
 import com.zombies.interfaces.Loadable;
@@ -15,6 +16,7 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     protected Vector2 position;
     protected ArrayList<Vector2> corners = new ArrayList<>();
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
+    protected Zone z;
 
     public ArrayList<Vector2> getCorners() { return corners; }
     public Vector2 getCenter() {
@@ -51,5 +53,11 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
             if (j.o1 == this || j.o2 == this)
                 return;
         joinOverlappableOverlappables.add(joo);
+    }
+    public Zone getZone() {
+        return z;
+    }
+    public void setZone(Zone z) {
+        this.z = z;
     }
 }

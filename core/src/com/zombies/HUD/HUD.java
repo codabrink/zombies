@@ -101,9 +101,11 @@ public class HUD implements InputProcessor{
                 }
                 break;
             case 36: // h - generate hallway in current box
+                // TODO: deprecated
+
                 b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
                 if (b != null)
-                    MapGen.genHallway(b);
+
                 break;
             case 68: // ` - toggle console
                 console.toggleEnabled();

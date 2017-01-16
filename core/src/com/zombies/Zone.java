@@ -2,7 +2,6 @@ package com.zombies;
 
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.data.Data;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -73,8 +72,6 @@ public class Zone {
             z.update();
     }
     public void update() {
-        if (Data.currentZone == this)
-            MapGen.update(this); // generate the map
         for (Updateable u : updateables)
             u.update();
     }
@@ -242,7 +239,7 @@ public class Zone {
         return getBox(v.x, v.y);
     }
 
-    public void addObject(HasZone o) {
+    public Zone addObject(HasZone o) {
         if (o.getZone() != null)
             o.getZone().removeObject(o);
         o.setZone(this);
@@ -260,8 +257,10 @@ public class Zone {
             addUpdateable((Updateable) o);
         if (o instanceof Drawable)
             addDrawable((Drawable) o);
+
+        return this;
     }
-    public void removeObject(HasZone o) {
+    public Zone removeObject(HasZone o) {
         o.setZone(null);
 
         if (o instanceof Room)
@@ -276,6 +275,8 @@ public class Zone {
             removeUpdateable((Updateable) o);
         if (o instanceof Drawable)
             removeDrawable((Drawable) o);
+
+        return this;
     }
 
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
@@ -286,8 +287,6 @@ public class Zone {
 
     private void addRoom(Room r) {
         rooms.add(r);
-        for (Box b : r.getBoxes())
-            addObject(b);
     }
     private void addBox(Box b) {
         boxes.add(b);

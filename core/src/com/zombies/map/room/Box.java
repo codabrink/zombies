@@ -20,7 +20,7 @@ import com.zombies.map.MapGen;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
 
-public class Box extends Overlappable implements IOverlappable {
+public class Box extends Overlappable {
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
@@ -29,7 +29,6 @@ public class Box extends Overlappable implements IOverlappable {
     private Room room;
     private GameView view;
     private Random random = new Random();
-    private Zone z;
 
     public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
@@ -220,13 +219,5 @@ public class Box extends Overlappable implements IOverlappable {
     @Override
     public void unload() {
 
-    }
-    @Override
-    public Zone getZone() {
-        return z;
-    }
-    @Override
-    public void setZone(Zone z) {
-        this.z = z;
     }
 }
