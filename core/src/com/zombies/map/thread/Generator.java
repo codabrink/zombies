@@ -60,7 +60,7 @@ public class Generator {
                     newBMLocation[1]--;
                     break;
             }
-            if (z.checkOverlap(proposedPosition, C.BOX_SIZE, C.BOX_SIZE, 1) == null) {
+            if (z.checkOverlap(proposedPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
                 Box bb = new Box(proposedPosition.x, proposedPosition.y);
                 bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
                 boxMap.put(bb.BMKey, bb);

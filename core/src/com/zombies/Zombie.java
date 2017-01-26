@@ -49,23 +49,23 @@ public class Zombie extends Unit implements Drawable {
         updateZone();
     }
 
-    public void setState(String state) {
-        if (state == "dead") {
+    public void setState(State state) {
+        if (state == State.DEAD) {
             unload();
             zone.removeObject(this);
 
             view.stats.zombieKills ++;
             view.stats.score += C.SCORE_ZOMBIE_KILL;
-        } else if (state == "dormant") {
+        } else if (state == State.DORMANT) {
             unload();
-        } else if (state == "loaded") {
+        } else if (state == State.LOADED) {
             load();
-        } else if (state == "active") {
+        } else if (state == State.ACTIVE) {
             load();
         }
     }
 
-    public void die(Unit u) { setState("dead"); }
+    public void die(Unit u) { setState(State.DEAD); }
 
     @Override
     public void unload() {
@@ -121,16 +121,16 @@ public class Zombie extends Unit implements Drawable {
     @Override
     public void update(int frame) {
         super.update(frame);
-        if (state == "dormant") {
+        if (state == State.DORMANT) {
             if (body.getPosition().dst(GameView.gv.getPlayer().getBody().getPosition()) < 50)
-                setState("active");
+                state = State.ACTIVE;
             else
                 return;
         }
 
         if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) > 60) {
             System.out.println("going to sleep");
-            setState("dormant");
+            setState(State.DORMANT);
             return;
         }
 

@@ -13,9 +13,7 @@ import com.zombies.GameView;
 import com.zombies.Survivor;
 import com.zombies.Unit;
 import com.zombies.Zombie;
-import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IOverlappable;
 import com.zombies.map.MapGen;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
@@ -34,9 +32,12 @@ public class Box extends Overlappable {
 
     public String BMKey;
 
+    public Box(Vector2 p) {
+        this(p.x, p.y);
+    }
     public Box(float x, float y) {
-        this.height = C.BOX_SIZE;
-        this.width  = C.BOX_SIZE;
+        this.height = C.BOX_DIAMETER;
+        this.width  = C.BOX_DIAMETER;
         this.position = new Vector2(x, y);
         setCorners();
         this.view = GameView.gv;
@@ -139,11 +140,11 @@ public class Box extends Overlappable {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.BOX_SIZE, 0);
+            return position.cpy().add(C.BOX_DIAMETER, 0);
         case 3:
-            return position.cpy().add(0, C.BOX_SIZE);
+            return position.cpy().add(0, C.BOX_DIAMETER);
         case 4:
-            return position.cpy().add(C.BOX_SIZE, C.BOX_SIZE);
+            return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
         }
         return new Vector2();
     }
@@ -161,7 +162,7 @@ public class Box extends Overlappable {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.BOX_SIZE, random.nextFloat() * C.BOX_SIZE);
+        return position.cpy().add(random.nextFloat() * C.BOX_DIAMETER, random.nextFloat() * C.BOX_DIAMETER);
     }
 
     public Unit randomZombie() {

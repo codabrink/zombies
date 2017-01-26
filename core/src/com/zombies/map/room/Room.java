@@ -52,7 +52,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
-    public Room( HashMap<String, Box> boxMap) {
+    public Room(HashMap<String, Box> boxMap) {
         view = GameView.gv;
         this.boxMap = boxMap;
         this.boxes = new ArrayList<>(boxMap.values());
@@ -220,12 +220,14 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     @Override
     public Zone getZone() {
+
         return zone;
     }
 
     @Override
     public void setZone(Zone z) {
-        zone = z;
+        if (Zone.getZone(this.center) == z)
+            zone = z;
     }
 
     @Override
@@ -245,7 +247,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
                     s = b.BMKey;
                 if (C.DEBUG_SHOW_ADJBOXCOUNT)
                     s = b.getAdjBoxes().size() + "";
-                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
+                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_DIAMETER / 2, b.getPosition().y + C.BOX_DIAMETER / 2);
             }
             spriteBatch.end();
         }

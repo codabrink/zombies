@@ -2,12 +2,9 @@ package com.zombies.map;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
-import com.zombies.data.Data;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Room;
-import com.zombies.map.thread.Generator;
 import com.zombies.map.thread.RunnableRoomGen;
 import com.zombies.util.Geometry;
 
@@ -27,7 +24,7 @@ public class MapGen {
             for (int i : DIRECTIONS) {
                 if (b.getAdjBox(i) == null) {
                     double rad = Math.toRadians(i);
-                    Vector2 p = Geometry.projectVector(b.getCenter(), rad, C.BOX_SIZE);
+                    Vector2 p = Geometry.projectVector(b.getCenter(), rad, C.BOX_DIAMETER);
                     Box bb;
                     Zone zone = Zone.getZone(p);
                     HashSet<Zone> zones = zone.getAdjZones(1);
@@ -55,7 +52,7 @@ public class MapGen {
     public static Room genRoom(Zone z) {
         for (int i = 0; i <= 5; i++) { // try 5 times
             Vector2 boxPosition = z.randomPosition();
-            if (z.checkOverlap(boxPosition, C.BOX_SIZE, C.BOX_SIZE, 1) == null) {
+            if (z.checkOverlap(boxPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
                 return genRoom(boxPosition);
             }
         }
@@ -113,7 +110,7 @@ public class MapGen {
                     break;
             }
 
-            if (z.checkOverlap(proposedPosition, C.BOX_SIZE, C.BOX_SIZE, 1) == null) {
+            if (z.checkOverlap(proposedPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
                 Box bb = new Box(proposedPosition.x, proposedPosition.y);
                 bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
                 boxMap.put(bb.BMKey, bb);

@@ -296,7 +296,7 @@ public class Player extends Unit implements Collideable {
         for (Survivor s: survivors) {
             s.update(frame);
 
-            if (s.getState() == "dead")
+            if (s.getState() == State.DEAD)
                 survivors.remove(s);
         }
         survivorKill.clear();

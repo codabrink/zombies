@@ -14,11 +14,12 @@ import java.util.HashSet;
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     public float width, height;
     protected Vector2 position;
-    protected ArrayList<Vector2> corners = new ArrayList<>();
+    protected Vector2[] corners = new Vector2[4];
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
+
     protected Zone z;
 
-    public ArrayList<Vector2> getCorners() { return corners; }
+    public Vector2[] getCorners() { return corners; }
     public Vector2 getCenter() {
         return position.cpy().add(width / 2, height / 2);
     }
@@ -54,10 +55,10 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
                 return;
         joinOverlappableOverlappables.add(joo);
     }
-    public Zone getZone() {
-        return z;
-    }
+
+    @Override
     public void setZone(Zone z) {
-        this.z = z;
+        if (Zone.getZone(getCenter()) == z)
+            this.z = z;
     }
 }

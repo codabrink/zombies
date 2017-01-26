@@ -30,9 +30,14 @@ public class Zone {
     // Collections
     private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
+    private HashSet<Overlappable> overlappableNiblings = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
+    private HashSet<Box> boxNiblings = new HashSet<>();
+
     private HashSet<Room> rooms = new HashSet<>();
+    private HashSet<Room> niblingRooms = new HashSet<>();
+
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
@@ -251,6 +256,11 @@ public class Zone {
             addBox((Box) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
+
+        // ABOVE TYPES HAVE NIBLINGS
+        if (o.getZone() != this)
+            return this;
+
         if (o instanceof Loadable)
             addLoadable((Loadable) o);
         if (o instanceof Updateable)
@@ -289,26 +299,36 @@ public class Zone {
         rooms.add(r);
     }
     private void addBox(Box b) {
-        boxes.add(b);
+        if (b.getZone() == this)
+            boxes.add(b);
+        else
+            boxNiblings.add(b);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
-        for (Box b : r.getBoxes()) {
+        niblingRooms.remove(r);
+        for (Box b : r.getBoxes())
             removeObject(b);
-        }
     }
-    private void removeBox(Box b) { boxes.remove(b); }
+    private void removeBox(Box b) {
+        boxes.remove(b);
+        boxNiblings.remove(b);
+    }
+
+    private void addOverlappable(Overlappable o) {
+        if (o.getZone() == this)
+            overlappables.add(o);
+        else
+            overlappableNiblings.add(o);
+    }
+    private void removeOverlappable(Overlappable o) {
+        overlappables.remove(o);
+    }
     private void addDrawable(Drawable d) {
         drawables.add(d);
     }
     private void removeDrawable(Drawable d) {
         drawables.remove(d);
-    }
-    private void addOverlappable(Overlappable o) {
-        overlappables.add(o);
-    }
-    private void removeOverlappable(Overlappable o) {
-        overlappables.remove(o);
     }
     private void addLoadable(Loadable l) {
         loadables.add(l);

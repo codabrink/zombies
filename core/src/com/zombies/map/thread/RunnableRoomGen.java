@@ -27,5 +27,4 @@ public class RunnableRoomGen implements Runnable {
     public Room getRoom() {
         return room;
     }
-
 }

@@ -21,7 +21,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
 import com.zombies.data.Stats;
-import com.zombies.map.room.Room;
 import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
@@ -95,7 +94,7 @@ public class GameView implements Screen {
         world = new World(new Vector2(), true);
 
         // generate the initial zone
-        Generator.genRoomAndZone(new Vector2(-C.BOX_SIZE / 2, -C.BOX_SIZE / 2));
+        Generator.genRoomAndZone(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2));
         player = new Player(new Vector2(0, 0));
 
         camHandle = new CameraHandle(this);
@@ -268,16 +267,16 @@ public class GameView implements Screen {
         float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_DIAMETER), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_DIAMETER, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_DIAMETER), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_DIAMETER, 0), player.getBody().getAngle());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {

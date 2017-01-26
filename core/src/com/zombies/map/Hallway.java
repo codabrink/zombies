@@ -55,12 +55,12 @@ public class Hallway implements Drawable, HasZone, Modelable {
                 new HallwayAxis(
                         theta,
                         new Vector2(
-                                (float)(b.getCenter().x + C.BOX_SIZE / 2 * Math.cos(theta)),
-                                (float)(b.getCenter().y + C.BOX_SIZE / 2 * Math.sin(theta)))));
+                                (float)(b.getCenter().x + C.BOX_DIAMETER / 2 * Math.cos(theta)),
+                                (float)(b.getCenter().y + C.BOX_DIAMETER / 2 * Math.sin(theta)))));
         move(theta);
     }
 
-    private float hallwayLength() { return C.BOX_SIZE - 0.001f; }
+    private float hallwayLength() { return C.BOX_DIAMETER - 0.001f; }
 
     private Vector2 calculateNewAxis(double angle) {
         Vector2 axis = axes.get(axes.size() - 1).point.cpy();

@@ -104,7 +104,7 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
 
-        builder.setUVRange(0, 0, width / C.BOX_SIZE, height / C.BOX_SIZE);
+        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
         builder.rect(relp.x, relp.y, -0.1f,
                 relp.x + width, relp.y, -0.1f,
                 relp.x + width, relp.y + height, -0.1f,
