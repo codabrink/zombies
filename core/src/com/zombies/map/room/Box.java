@@ -44,10 +44,10 @@ public class Box extends Overlappable {
     }
 
     private void setCorners() {
-        corners.add(new Vector2(position.x + width, position.y + height));
-        corners.add(new Vector2(position.x, position.y + height));
-        corners.add(new Vector2(position.x, position.y));
-        corners.add(new Vector2(position.x + width, position.y));
+        corners[0] = new Vector2(position.x + width, position.y + height);
+        corners[1] = new Vector2(position.x, position.y + height);
+        corners[2] = new Vector2(position.x, position.y);
+        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     // detect where this box should have walls, but don't create them yet.

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment extends Overlappable implements IOverlappable {
-    private ArrayList<Vector2> corners = new ArrayList<>();
+    private Vector2[] corners = new Vector2[4];
     public Vector2 center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius;
@@ -37,10 +37,10 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     }
 
     private void setCorners() {
-        corners.add(new Vector2(position.x + width, position.y + height));
-        corners.add(new Vector2(position.x, position.y + height));
-        corners.add(new Vector2(position.x, position.y));
-        corners.add(new Vector2(position.x + width, position.y));
+        corners[0] = new Vector2(position.x + width, position.y + height);
+        corners[1] = new Vector2(position.x, position.y + height);
+        corners[2] = new Vector2(position.x, position.y);
+        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     public void materialize() {
@@ -115,7 +115,7 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     @Override
     public String className() { return "HallwaySegment"; }
     @Override
-    public ArrayList<Vector2> getCorners() { return corners; }
+    public Vector2[] getCorners() { return corners; }
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(x, y, w, h, position.x, position.y, width, height);

@@ -61,4 +61,9 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
         if (Zone.getZone(getCenter()) == z)
             this.z = z;
     }
+
+    @Override
+    public Zone getZone() {
+        return z;
+    }
 }
