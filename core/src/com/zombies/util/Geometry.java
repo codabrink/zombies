@@ -1,7 +1,8 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.IOverlappable;
 import java.util.ArrayList;
 
 public class Geometry {
@@ -33,22 +34,22 @@ public class Geometry {
 
         if (Math.abs(theta) < Math.abs(cTheta)) { // right wall
             U.p("Intersecting right wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(3))) != null)
+            if ((position = intersectPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[3])) != null)
                 return position;
         }
         if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) { // top wall
             U.p("Intersecting top wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(0), o.getCorners().get(1))) != null)
+            if ((position = intersectPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[1])) != null)
                 return position;
         }
         if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) { // bottom wall
             U.p("Intersecting bottom wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners().get(2), o.getCorners().get(3))) != null)
+            if ((position = intersectPoint(lp1, lp2, o.getCorners()[2], o.getCorners()[3])) != null)
                 return position;
         }
         U.p("Default: Intersecting left wall");
         // otherwise, assume left wall
-        if ((position = intersectPoint(lp1, lp2, o.getCorners().get(1), o.getCorners().get(2))) != null)
+        if ((position = intersectPoint(lp1, lp2, o.getCorners()[1], o.getCorners()[2])) != null)
             return position;
 
         return null;

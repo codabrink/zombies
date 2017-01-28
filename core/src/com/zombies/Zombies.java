@@ -7,9 +7,12 @@ import com.zombies.HUD.FontGen;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
+
 public class Zombies extends Game {
     public static Zombies instance;
     public static HashMap<String, BitmapFont> fonts = new HashMap<>();
+    public static HashSet<Thread> threads = new HashSet<>();
 
     @Override
     public void create() {

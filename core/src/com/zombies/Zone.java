@@ -1,14 +1,16 @@
 package com.zombies;
 
-import com.zombies.HUD.DebugText;
+import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Overlappable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.map.Grass;
-import com.zombies.map.MapGen;
+import com.zombies.map.*;
+import com.zombies.map.room.Box;
+import com.zombies.map.room.Room;
+import com.zombies.util.U;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +19,6 @@ import java.util.Random;
 
 public class Zone {
     private Vector2 position;
-    private int updateFrame, drawFrame;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r;
 
@@ -26,34 +27,23 @@ public class Zone {
     public static ArrayList<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
-    private static Box zone;
-
-    public enum Directions { N, NE, E, SE, S, SW, W, NW };
 
     // Collections
-
-    private HashSet<Zone> adjZones = new HashSet<Zone>();
+    private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
     private HashSet<Room> rooms = new HashSet<>();
-    //private ArrayList<Hallway> hallways = new ArrayList<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
 
-    private ArrayList<ArrayList<Drawable>> drawablesList = new ArrayList<>();
-
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
-    public int roomGenFailureCount = 0; // number of rooms that failed to generate due to overlap
 
     public Zone(float x, float y) {
         r = GameView.gv.random;
         position = new Vector2(x, y);
-        for (int i = 0; i <= C.DRAW_LAYERS; i++) {
-            drawablesList.add(new ArrayList<Drawable>());
-        }
         numRooms = r.nextInt(numRooms);
 
         if (C.ENABLE_DEBUG_LINES) {
@@ -64,59 +54,37 @@ public class Zone {
         addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
-    public void draw(int frame, int limit) {
-        if (drawFrame == frame)
-            return;
-        drawFrame = frame;
 
-        for (Drawable d: drawables)
+    public void draw(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z : zones)
+            z.draw();
+    }
+    public void draw() {
+        for (Drawable d : drawables)
+            if (d.getZone() == this)
+                d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
+        for (Drawable d : debugLines)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-        for (Drawable d: debugLines)
-            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-
-        if (limit > 0)
-            for (Zone z: adjZones) {
-                z.draw(frame, limit - 1);
-            }
     }
 
-    public void update(int frame, int limit) {
-        if (updateFrame == frame)
-            return;
-        updateFrame = frame;
-
-        MapGen.update(this); // generate the map
-
-        for (Updateable u: updateables)
-            u.update();
-
-        DebugText.addMessage("rooms", "Rooms in zone: " + rooms.size());
-
-        if (limit > 0)
-            for (Zone z: adjZones) {
-                z.update(frame, limit - 1);
-            }
+    public void update(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z : zones)
+            z.update();
     }
-
-    public void findAdjZones() {
-        float[] zonePositions = {
-                position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-                position.x - C.ZONE_SIZE, position.y,
-                position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-                position.x, position.y + C.ZONE_SIZE,
-                position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE,
-                position.x + C.ZONE_SIZE, position.y,
-                position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE,
-                position.x, position.y - C.ZONE_SIZE
-        };
-
-        for (int i = 0; i < zonePositions.length; i += 2) {
-            Zone z = Zone.getZone(zonePositions[i], zonePositions[i+1]);
-            adjZones.add(z);
-        }
+    public void update() {
+        for (Updateable u : updateables)
+            if (u.getZone() == this)
+                u.update();
     }
 
     public void load(int limit) {
+        HashSet<Zone> zones = getAdjZones(limit);
+        for (Zone z: zones)
+            z.load();
+    }
+    public void load() {
         if (loadIndex == Zone.globalLoadIndex)
             return; // already loaded
         loadIndex = Zone.globalLoadIndex;
@@ -124,10 +92,6 @@ public class Zone {
 
         for (Loadable l: loadables)
             l.load();
-
-        if (limit > 0)
-            for (Zone z: adjZones)
-                z.load(limit - 1);
     }
 
     public void unload() {
@@ -166,43 +130,6 @@ public class Zone {
             }
         }
         return true;
-    }
-
-    public Zone adjZoneByDirection(Directions direction) {
-        switch (direction) {
-            case N:
-                return Zone.getZone(position.x, position.y + C.ZONE_SIZE);
-            case NE:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y + C.ZONE_SIZE);
-            case E:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y);
-            case SE:
-                return Zone.getZone(position.x + C.ZONE_SIZE, position.y - C.ZONE_SIZE);
-            case S:
-                return Zone.getZone(position.x, position.y - C.ZONE_SIZE);
-            case SW:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y - C.ZONE_SIZE);
-            case W:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y);
-            case NW:
-                return Zone.getZone(position.x - C.ZONE_SIZE, position.y + C.ZONE_SIZE);
-        }
-        return null;
-    }
-
-    public Float pointToZoneDistance(Vector2 point) {
-        if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE && point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
-            return 0.0f;
-        } else if (point.x > this.position.x && point.x < this.position.x + C.ZONE_SIZE) {
-            return Math.min(point.dst(point.x, this.position.y), point.dst(point.x, this.position.y + C.ZONE_SIZE));
-        } else if (point.y > this.position.y && point.y < this.position.y + C.ZONE_SIZE) {
-            return Math.min(point.dst(this.position.x, point.y), point.dst(this.position.x + C.ZONE_SIZE, point.y));
-        } else {
-            return Math.min(
-                Math.min(point.dst(this.position.x, this.position.y), point.dst(this.position.x + C.ZONE_SIZE, this.position.y)),
-                    Math.min(point.dst(this.position.x, this.position.y + C.ZONE_SIZE), point.dst(this.position.x + C.ZONE_SIZE, this.position.y + C.ZONE_SIZE))
-            );
-        }
     }
 
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
@@ -305,11 +232,9 @@ public class Zone {
     }
 
     public Box getBox(float x, float y) {
-        HashSet<Zone> zones = getAdjZones(1);
-        Iterator<Zone> iterator = zones.iterator();
-        while (iterator.hasNext())
-            for (Box b: iterator.next().getBoxes())
-                if (b.insideBox(x, y))
+        for (Zone z : getAdjZones(1))
+            for (Box b : z.getBoxes())
+                if (b.contains(x, y))
                     return b;
         return null;
     }
@@ -317,9 +242,7 @@ public class Zone {
         return getBox(v.x, v.y);
     }
 
-    public void addObject(HasZone o) {
-        if (o.getZone() != null)
-            o.getZone().removeObject(o);
+    public Zone addObject(HasZone o) {
         o.setZone(this);
 
         // KEEP RECORDS
@@ -329,14 +252,23 @@ public class Zone {
             addBox((Box) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
+
+        if (o.getZone() == null && o instanceof Room)
+            U.p("krap!");
+
+        if (o.getZone() != this)
+            return this;
+
         if (o instanceof Loadable)
             addLoadable((Loadable) o);
         if (o instanceof Updateable)
             addUpdateable((Updateable) o);
         if (o instanceof Drawable)
             addDrawable((Drawable) o);
+
+        return this;
     }
-    public void removeObject(HasZone o) {
+    public Zone removeObject(HasZone o) {
         o.setZone(null);
 
         if (o instanceof Room)
@@ -351,48 +283,40 @@ public class Zone {
             removeUpdateable((Updateable) o);
         if (o instanceof Drawable)
             removeDrawable((Drawable) o);
+
+        return this;
     }
 
+    public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
     public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
     public HashSet<Room> getRooms() { return rooms; }
-    public HashSet<Zone> getAdjZones() { return adjZones; }
-    public HashSet<Zone> getAdjZonesPlusSelf() {
-        HashSet<Zone> allZones = (HashSet<Zone>)adjZones.clone();
-        allZones.add(this);
-        return allZones;
-    }
 
     private void addRoom(Room r) {
         rooms.add(r);
-        for (Box b : r.getBoxes())
-            addObject(b);
     }
     private void addBox(Box b) {
         boxes.add(b);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
-        for (Box b : r.getBoxes()) {
+        for (Box b : r.getBoxes())
             removeObject(b);
-        }
     }
-    private void removeBox(Box b) { boxes.remove(b); }
-    private void addDrawable(Drawable d) {
-        drawables.add(d);
+    private void removeBox(Box b) {
+        boxes.remove(b);
     }
-    private void addDrawableNoCheck(Drawable d) {
-        drawables.add(d);
-    }
-    private void removeDrawable(Drawable d) {
-        drawables.remove(d);
-    }
+
     private void addOverlappable(Overlappable o) {
         overlappables.add(o);
     }
     private void removeOverlappable(Overlappable o) {
         overlappables.remove(o);
+    }
+    private void addDrawable(Drawable d) { drawables.add(d); }
+    private void removeDrawable(Drawable d) {
+        drawables.remove(d);
     }
     private void addLoadable(Loadable l) {
         loadables.add(l);
@@ -411,60 +335,53 @@ public class Zone {
     public void addWall(Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h)) {
-                if (ignore != null) {
-                    if (ignore.indexOf(o) != -1)
+        HashSet<Zone> zones = getAdjZones(1);
+        for (Zone z : zones) {
+            for (Overlappable o : z.getOverlappables()) {
+                if (o.overlaps(x, y, w, h)) {
+                    if (ignore != null && ignore.indexOf(o) != -1)
                         continue;
-                    return o;
-                } else {
                     return o;
                 }
             }
         }
-        if (limit > 0) {
-            for (Zone z : adjZones) {
-                Overlappable o = checkOverlap(x, y, w, h, limit - 1, ignore);
-                if (o != null)
-                    return o;
-            }
-        }
         return null;
-    }
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit) {
-        return checkOverlap(x, y, w, h, limit, null);
     }
     public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
         return checkOverlap(v.x, v.y, w, h, limit, null);
-    }
-    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
 
     private Vector2 center() {
         return new Vector2(position.x + C.ZONE_SIZE / 2, position.y + C.ZONE_SIZE / 2);
     }
 
-    private HashSet<Zone> getAdjZones(int limit) {
-        HashSet<Zone> zones = new HashSet<>();
+    public HashSet<Zone> getAdjZones(int limit) {
+        HashSet<Zone> zones = adjZones.get(limit);
+        if (zones != null)
+            return zones;
+
+        zones = new HashSet<>();
         Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
 
         for (float x = center.x - variance; x <= center.x + variance; x += C.ZONE_SIZE)
             for (float y = center.y - variance; y <= center.y + variance; y += C.ZONE_SIZE)
                 zones.add(Zone.getZone(x, y));
+
+        adjZones.put(limit, zones);
         return zones;
     }
 
-    public HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, int limit) {
+    public HashSet<Overlappable> checkOverlap(float x, float y, int limit) {
         HashSet<Overlappable> overlapped = new HashSet<>();
         HashSet<Zone> zones = getAdjZones(limit);
         Iterator<Zone> iterator = zones.iterator();
         while (iterator.hasNext())
-            iterator.next().getOverlappablesAtPoint(x, y, overlapped);
+            iterator.next().checkOverlap(x, y, overlapped);
         return overlapped;
     }
-    private HashSet<Overlappable> getOverlappablesAtPoint(float x, float y, HashSet<Overlappable> overlapped) {
+    public HashSet<Overlappable> checkOverlap(Vector2 point, int limit) { return checkOverlap(point.x, point.y, limit);}
+    private HashSet<Overlappable> checkOverlap(float x, float y, HashSet<Overlappable> overlapped) {
         for (Overlappable o : overlappables)
             if (o.contains(x, y))
                 overlapped.add(o);
@@ -475,31 +392,5 @@ public class Zone {
         float randomX = r.nextFloat() * C.ZONE_SIZE;
         float randomY = r.nextFloat() * C.ZONE_SIZE;
         return position.cpy().add(randomX, randomY);
-    }
-
-    public Vector2 randomDiscretePosition(float interval) {
-        interval = interval * C.SCALE;
-        float randomX = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
-        float randomY = r.nextInt((int)Math.floor(C.ZONE_SIZE / interval)) * (C.ZONE_SIZE / interval);
-        return position.cpy().add(randomX, randomY);
-    }
-
-    public Box randomBox() {
-        if (boxes.size() == 0) return null;
-
-        int ri = GameView.r.nextInt(boxes.size()), i = 0;
-        for (Box b: boxes) {
-            if (ri == i)
-                return b;
-            i++;
-        }
-        return null;
-    }
-
-    public Vector2 suggestedStartPoint() {
-        if (boxes.size() == 0)
-            return randomPosition();
-
-        return randomBox().randomPoint();
     }
 }

@@ -21,7 +21,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
 import com.zombies.data.Stats;
-import com.zombies.map.MapGen;
+import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 
@@ -38,8 +38,6 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
-
-    private ArrayList<Zombie> activeZombies;
 
     public Stats stats;
 
@@ -84,20 +82,20 @@ public class GameView implements Screen {
     }
 
     private void reset() {
-        setGv(this);
+        gv = this;
+        System.gc();
+
         Zone.zones = new HashMap<String, Zone>();
         Zone.loadedZones = new ArrayList<Zone>();
-        activeZombies = new ArrayList<Zombie>();
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();
         world = new World(new Vector2(), true);
 
         // generate the initial zone
-        Zone zone = Zone.getZone(0f, 0f);
-        MapGen.fillZone(zone);
+        Generator.genRoom(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2));
+        player = new Player(new Vector2(0, 0));
 
-        player = new Player(zone.suggestedStartPoint());
         camHandle = new CameraHandle(this);
         thumbpadLeft = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
@@ -185,8 +183,6 @@ public class GameView implements Screen {
             dd.draw(spriteBatch, shapeRenderer, modelBatch);
         player.draw(spriteBatch, shapeRenderer, modelBatch);
 
-        com.zombies.HUD.DebugText.addMessage("activezombies", "Active Zombies: " + activeZombies.size());
-
         HUDSpriteBatch.begin();
         HUDSpriteBatch.enableBlending();
         hud.render(HUDSpriteBatch, shapeRenderer, modelBatch);
@@ -231,22 +227,13 @@ public class GameView implements Screen {
     }
 
     @Override
-    public void dispose() {
-        // TODO Auto-generated method stub
-
-    }
+    public void dispose() {}
 
     @Override
-    public void hide() {
-        // TODO Auto-generated method stub
-
-    }
+    public void hide() {}
 
     @Override
-    public void pause() {
-        // TODO Auto-generated method stub
-
-    }
+    public void pause() {}
 
     @Override
     public void resize(int width, int height) {
@@ -254,10 +241,7 @@ public class GameView implements Screen {
     }
 
     @Override
-    public void resume() {
-        // TODO Auto-generated method stub
-
-    }
+    public void resume() {}
 
     @Override
     public void show() {
@@ -268,16 +252,16 @@ public class GameView implements Screen {
         float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_DIAMETER), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_DIAMETER, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_DIAMETER), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_DIAMETER, 0), player.getBody().getAngle());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -316,15 +300,6 @@ public class GameView implements Screen {
     public ShapeRenderer getShapeRenderer() {return shapeRenderer;}
     public SpriteBatch getHUDSpriteBatch() {return HUDSpriteBatch;}
     public SpriteBatch getSpriteBatch() {return spriteBatch;}
-    public void addActiveZombie(Zombie z) {
-        if (activeZombies.indexOf(z) == -1)
-            activeZombies.add(z);
-    }
-    public boolean removeActiveZombie(Zombie z) {
-        return activeZombies.remove(z);
-    }
-    public ArrayList<Zombie> getActiveZombies() {return activeZombies;}
-    private static void setGv(GameView view) {gv = view;}
 
     public void addDebugDots(Vector2 p1, Vector2 p2) {
         debugDots.add(new DebugDots(p1));

@@ -76,11 +76,6 @@ public class Bullet {
         if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(0), hitBoxCorners.get(1));
         if (C.DEBUG) view.addDebugDots(hitBoxCorners.get(2), hitBoxCorners.get(3));
 
-        for (Unit u: view.getActiveZombies()) {
-            if (pointInTrapezoid(u.getPosition(), hitBoxCorners)) {
-                units.add(u);
-            }
-        }
         return units;
     }
 

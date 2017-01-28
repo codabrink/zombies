@@ -1,95 +1,83 @@
-package com.zombies;
+package com.zombies.map.room;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.C;
+import com.zombies.Crate;
+import com.zombies.GameView;
+import com.zombies.Survivor;
+import com.zombies.Unit;
+import com.zombies.Zombie;
+import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.map.MapGen;
-import com.zombies.powerups.HealthPickup;
-import com.zombies.powerups.PistolPickup;
+import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
-import com.zombies.powerups.ShotgunPickup;
-import com.zombies.util.Geometry;
-import com.zombies.util.U;
 
-public class Box implements Overlappable, Loadable, HasZone {
-    private ArrayList<Vector2> corners = new ArrayList<>();
+public class Box extends Overlappable {
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
-    private Vector2 position;
     private Room room;
     private GameView view;
     private Random random = new Random();
-    public float height = C.BOX_SIZE, width = C.BOX_SIZE;
-    private Zone z;
+
+    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     public String BMKey;
 
+    public Box(Vector2 p) {
+        this(p.x, p.y);
+    }
     public Box(float x, float y) {
+        height = C.BOX_DIAMETER;
+        width  = C.BOX_DIAMETER;
         position = new Vector2(x, y);
         setCorners();
-        this.view = GameView.gv;
+        view = GameView.gv;
     }
 
     private void setCorners() {
-        corners.add(new Vector2(position.x + width, position.y + height));
-        corners.add(new Vector2(position.x, position.y + height));
-        corners.add(new Vector2(position.x, position.y));
-        corners.add(new Vector2(position.x + width, position.y));
-    }
-
-    public boolean insideBox(float x, float y) {
-        return (x > position.x && x < position.x + C.BOX_SIZE && y > position.y && y < position.y + C.BOX_SIZE);
-    }
-
-    private void populateBox() {
-        if (C.ENABLE_CRATES && random.nextFloat() < C.CRATE_CHANCE)
-            crates.add(new Crate(view, this.randomPoint()));
-        if (C.ENABLE_SURVIVORS && random.nextFloat() < C.SURVIVOR_CHANCE)
-            survivors.add(new Survivor(this.randomPoint()));
-        if (C.ENABLE_SHOTGUN && random.nextFloat() < C.SHOTGUN_CHANCE)
-            powerups.add(new ShotgunPickup(this));
-        if (C.ENABLE_PISTOL && random.nextFloat() < C.PISTOL_CHANCE)
-            powerups.add(new PistolPickup(this));
-        if (C.ENABLE_HEALTH && random.nextFloat() < C.HEALTH_CHANCE)
-            powerups.add(new HealthPickup(this));
+        corners[0] = new Vector2(position.x + width, position.y + height);
+        corners[1] = new Vector2(position.x, position.y + height);
+        corners[2] = new Vector2(position.x, position.y);
+        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     // detect where this box should have walls, but don't create them yet.
-    public ArrayList<ArrayList<Vector2>> proposeWallPositions() {
+    public ArrayList<Vector2[]> proposeWallPositions() {
+        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
-        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
-
+        Vector2[] points;
         if (adjBoxes.get(90) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy().add(0, height)));
-            points.add(new Vector2(position.cpy().add(width, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy().add(0, height));
+            points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // top wall
         }
         if (adjBoxes.get(0) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy().add(width, 0)));
-            points.add(new Vector2(position.cpy().add(width, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy().add(width, 0));
+            points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // right wall
         }
         if (adjBoxes.get(270) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy()));
-            points.add(new Vector2(position.cpy().add(width, 0)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy());
+            points[1] = new Vector2(position.cpy().add(width, 0));
             proposedPositions.add(points); // bottom wall
         }
         if (adjBoxes.get(180) == null) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            points.add(new Vector2(position.cpy()));
-            points.add(new Vector2(position.cpy().add(0, height)));
+            points = new Vector2[2];
+            points[0] = new Vector2(position.cpy());
+            points[1] = new Vector2(position.cpy().add(0, height));
             proposedPositions.add(points); // left wall
         }
 
@@ -153,11 +141,11 @@ public class Box implements Overlappable, Loadable, HasZone {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.BOX_SIZE, 0);
+            return position.cpy().add(C.BOX_DIAMETER, 0);
         case 3:
-            return position.cpy().add(0, C.BOX_SIZE);
+            return position.cpy().add(0, C.BOX_DIAMETER);
         case 4:
-            return position.cpy().add(C.BOX_SIZE, C.BOX_SIZE);
+            return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
         }
         return new Vector2();
     }
@@ -175,7 +163,7 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.BOX_SIZE, random.nextFloat() * C.BOX_SIZE);
+        return position.cpy().add(random.nextFloat() * C.BOX_DIAMETER, random.nextFloat() * C.BOX_DIAMETER);
     }
 
     public Unit randomZombie() {
@@ -188,6 +176,7 @@ public class Box implements Overlappable, Loadable, HasZone {
 
     public Box setRoom(Room room) {
         this.room = room;
+        this.zone = room.getZone();
         return this;
     }
 
@@ -221,8 +210,8 @@ public class Box implements Overlappable, Loadable, HasZone {
     }
 
     @Override
-    public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
+    public void setZone(Zone z) {
+        // Zone is set in setRoom
     }
 
     @Override
@@ -230,47 +219,7 @@ public class Box implements Overlappable, Loadable, HasZone {
         return "Box";
     }
 
-    @Override
-    public ArrayList<Vector2> getCorners() { return corners; }
 
-    @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
-    }
-    @Override
-    public float edge(int direction) {
-        switch(direction) {
-            case 90:
-                return position.y + height;
-            case 0:
-                return position.x + width;
-            case 270:
-                return position.y;
-            case 180:
-                return position.x;
-        }
-        return 0;
-    }
-
-    @Override
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
-    }
-
-    @Override
-    public boolean contains(float x, float y) {
-        return Geometry.rectContains(x, y, position, width, height);
-    }
-
-    @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) {
-        return Geometry.edgeIntersection(p1, p2, this);
-    }
-
-    @Override
-    public float getWidth() { return width; }
-    @Override
-    public float getHeight() { return height; }
     @Override
     public void load() {
 
@@ -278,13 +227,5 @@ public class Box implements Overlappable, Loadable, HasZone {
     @Override
     public void unload() {
 
-    }
-    @Override
-    public Zone getZone() {
-        return z;
-    }
-    @Override
-    public void setZone(Zone z) {
-        this.z = z;
     }
 }

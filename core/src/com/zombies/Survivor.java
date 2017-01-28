@@ -130,7 +130,7 @@ public class Survivor extends Unit implements Collideable {
 
     @Override
     public void die(Unit u) {
-        if (state == "dead") return;
+        if (state == State.DEAD) return;
         view.getPlayer().removeSurvivor(this);
         view.stats.survivorsLost ++;
     }
@@ -149,7 +149,7 @@ public class Survivor extends Unit implements Collideable {
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        if (state == "dead") {
+        if (state == State.DEAD) {
             return;
         }
         gun.draw(spriteBatch, shapeRenderer, modelBatch);
@@ -184,12 +184,12 @@ public class Survivor extends Unit implements Collideable {
     @Override
     public void update(int frame) {
         super.update(frame);
-        if (state == "dead")
+        if (state == State.DEAD)
             return;
-        if (state == "found")
+        if (state == State.FOUND)
             AI();
         else if (body.getPosition().dst(view.getPlayer().getBody().getPosition()) < C.SURVIVOR_WAKE_DIST) {
-            setState("found");
+            state = State.FOUND;
             view.getPlayer().addSurvivor(this);
             view.stats.survivorsFound ++;
             view.stats.score += C.SCORE_FIND_SURVIVOR;

@@ -3,15 +3,17 @@ package com.zombies.HUD;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zombies.Box;
+import com.zombies.data.Data;
+import com.zombies.map.room.Box;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Player;
-import com.zombies.Room;
+import com.zombies.map.room.Room;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
 import com.zombies.map.MapGen;
+import com.zombies.map.thread.Generator;
 import com.zombies.util.U;
 
 import java.util.regex.Matcher;
@@ -72,15 +74,19 @@ public class Console {
         enabled = false;
 
         switch(m.group(1)) {
-            case "boxmap":
-                C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+            case "box":
+                U.p(m.group(2));
+                if (m.group(2) == "bm")
+                    C.DEBUG_SHOW_BOXMAP = !C.DEBUG_SHOW_BOXMAP;
+                else if (m.group(2) == "adj")
+                    C.DEBUG_SHOW_ADJBOXCOUNT = !C.DEBUG_SHOW_ADJBOXCOUNT;
                 break;
             case "inspectBox":
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
             case "genRoom":
-                Room r = MapGen.genRoom(view.getPlayer().getPosition());
+                Room r = Generator.genRoom(Data.players.get(0).getPosition());
                 Zone.getZone(view.getPlayer().getPosition()).addObject(r);
                 MapGen.connectRoom(r);
                 break;
@@ -94,6 +100,9 @@ public class Console {
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 new Hallway(b, Integer.parseInt(m.group(2)), 2 * C.SCALE);
                 break;
+            case "debug":
+                Zone zone = Data.currentZone;
+                System.out.println("Break on this line");
             default:
                 enabled = true;
                 return;

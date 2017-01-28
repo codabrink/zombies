@@ -1,11 +1,12 @@
 package com.zombies;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.map.room.Box;
 
 public class PostponedZombie {
 
 	private long createdAt = System.currentTimeMillis();
-	private Box b;
+	private com.zombies.map.room.Box b;
 	private Vector2 position;
 	private Vector2 velocity;
 	private long post;

@@ -13,12 +13,14 @@ public class DebugCircle implements Drawable {
     private GameView view;
     private Vector2 p1;
     private Float r;
+    private Zone z;
 
     public DebugCircle(Vector2 p1, Float r) {
         this.color = Color.ORANGE;
         this.view = GameView.gv;
         this.p1 = p1;
         this.r = r;
+        this.z = Zone.getZone(p1);
     }
 
     @Override
@@ -31,5 +33,15 @@ public class DebugCircle implements Drawable {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    @Override
+    public Zone getZone() {
+        return z;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+
     }
 }

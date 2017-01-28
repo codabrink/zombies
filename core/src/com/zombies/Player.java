@@ -1,6 +1,7 @@
 package com.zombies;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.zombies.HUD.*;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.data.Data;
 import com.zombies.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,9 +19,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.zombies.interfaces.Collideable;
+import com.zombies.map.thread.MapAdmin;
 
 public class Player extends Unit implements Collideable {
-
     private long beginAttacks = System.currentTimeMillis();
     private long lastAttack = System.currentTimeMillis();
     private long lastShot = System.currentTimeMillis();
@@ -71,6 +73,8 @@ public class Player extends Unit implements Collideable {
 
         updateZone();
         updateBox();
+
+        Data.players.add(this);
     }
 
     public float getHealth() {
@@ -282,38 +286,39 @@ public class Player extends Unit implements Collideable {
     public void update(int frame) {
         updateBox();
         updateZone();
-        zone.update(frame, 1);
-
+        zone.update(1);
         DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
-
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 150, 40000);
-
-        zone.draw(frame, 1);
-
+        zone.draw(1);
         this.handleHealth();
-
-        for (Gun g: guns) {
+        for (Gun g: guns)
             g.update();
-        }
-
         for (Survivor s: survivors) {
             s.update(frame);
 
-            if (s.getState() == "dead")
+            if (s.getState() == State.DEAD)
                 survivors.remove(s);
         }
-
         survivorKill.clear();
-
-        for (Bullet b: bullets) {
+        for (Bullet b: bullets)
             b.update();
-        }
-
         capSpeed();
-
-        if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
+        if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
-        }
+
+        if (frame % 100 == 0)
+            updateInfo();
+    }
+
+    private void updateInfo() {
+        Data.currentZone = Zone.getZone(body.getPosition());
+        Data.currentBox  = Data.currentZone.getBox(body.getPosition());
+        if (Data.currentBox != null)
+            Data.currentRoom = Data.currentBox.getRoom();
+        else
+            Data.currentRoom = null;
+
+        MapAdmin.update(this);
     }
 
     @Override

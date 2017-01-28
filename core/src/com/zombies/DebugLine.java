@@ -13,12 +13,14 @@ public class DebugLine implements Drawable {
     private GameView view;
     private Vector2 v1;
     private Vector2 v2;
+    private Zone z;
 
     public DebugLine(Vector2 v1, Vector2 v2) {
         this.color = Color.WHITE;
         this.view = GameView.gv;
         this.v1 = v1;
         this.v2 = v2;
+        this.z = null;
     }
 
     @Override
@@ -31,5 +33,15 @@ public class DebugLine implements Drawable {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    @Override
+    public Zone getZone() {
+        return z;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+
     }
 }

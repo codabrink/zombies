@@ -3,10 +3,9 @@ package com.zombies.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Loadable;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.interfaces.IOverlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.GameView;
@@ -16,13 +15,11 @@ import com.zombies.Zone;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class HallwaySegment implements Overlappable, Loadable, HasZone {
-    private ArrayList<Vector2> corners = new ArrayList<>();
-    private static int DRAWABLE_LAYER = 1;
-    public Vector2 position, center;
+public class HallwaySegment extends Overlappable implements IOverlappable {
+    private Vector2[] corners = new Vector2[4];
+    public Vector2 center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
-    public float diameter, radius, width, height;
-    private Zone zone;
+    public float diameter, radius;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private HallwayAxis pAxis, axis, nAxis;
     private com.zombies.interfaces.Modelable modelable;
@@ -39,10 +36,10 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     }
 
     private void setCorners() {
-        corners.add(new Vector2(position.x + width, position.y + height));
-        corners.add(new Vector2(position.x, position.y + height));
-        corners.add(new Vector2(position.x, position.y));
-        corners.add(new Vector2(position.x + width, position.y));
+        corners[0] = new Vector2(position.x + width, position.y + height);
+        corners[1] = new Vector2(position.x, position.y + height);
+        corners[2] = new Vector2(position.x, position.y);
+        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     public void materialize() {
@@ -94,10 +91,6 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
         center = position.cpy().add(width / 2, height / 2);
     }
 
-    public Vector2 getCenter() {
-        return center;
-    }
-
     public Vector2 getP1() {return axis.point;}
     public Vector2 getP2() {return nAxis.point;}
     public LinkedList<Wall> getWalls() { return walls; }
@@ -110,7 +103,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
 
-        builder.setUVRange(0, 0, width / C.BOX_SIZE, height / C.BOX_SIZE);
+        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
         builder.rect(relp.x, relp.y, -0.1f,
                 relp.x + width, relp.y, -0.1f,
                 relp.x + width, relp.y + height, -0.1f,
@@ -121,7 +114,7 @@ public class HallwaySegment implements Overlappable, Loadable, HasZone {
     @Override
     public String className() { return "HallwaySegment"; }
     @Override
-    public ArrayList<Vector2> getCorners() { return corners; }
+    public Vector2[] getCorners() { return corners; }
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(x, y, w, h, position.x, position.y, width, height);

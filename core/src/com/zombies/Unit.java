@@ -36,7 +36,11 @@ public class Unit implements Collideable, Loadable, HasZone {
     protected float speed;
     protected GameView view;
     protected Color color;
-    protected String state = "dormant"; // dormant -> loaded -> active
+    protected State state = State.ACTIVE;
+
+    public enum State {
+        DORMANT, LOADED, ACTIVE, DEAD, FOUND
+    }
 
     protected int frame = 0;
 
@@ -76,10 +80,8 @@ public class Unit implements Collideable, Loadable, HasZone {
         }
     }
 
-    public void setState(String state) {}
-
     public void destroy() {
-        setState("dead");
+        state = State.DEAD;
         view.getWorld().destroyBody(body);
         shape.dispose();
         body.setUserData(null);
@@ -124,7 +126,7 @@ public class Unit implements Collideable, Loadable, HasZone {
 
     public void hurt(float zombieStrength, Unit u) {
         health -= zombieStrength;
-        if (health < 0 && state != "dead") {
+        if (health < 0 && state != State.DEAD) {
             u.victory();
             die(u);
         }
@@ -143,7 +145,7 @@ public class Unit implements Collideable, Loadable, HasZone {
     }
 
     public boolean isDead() {
-        return state == "dead";
+        return state == State.DEAD;
     }
 
     public boolean isVisionClear() {
@@ -205,7 +207,7 @@ public class Unit implements Collideable, Loadable, HasZone {
     public void victory() {}
     protected void updateZone() {}
     protected void updateBox() {}
-    public String getState() {return state;}
+    public State getState() {return state;}
     @Override
     public Zone getZone() {
         return zone;

@@ -1,63 +1,40 @@
 package com.zombies.map;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.Box;
 import com.zombies.C;
-import com.zombies.GameView;
-import com.zombies.Room;
 import com.zombies.Zone;
-import com.zombies.interfaces.Overlappable;
+import com.zombies.map.room.Box;
+import com.zombies.map.room.Room;
+import com.zombies.map.thread.RunnableRoomGen;
+import com.zombies.util.Geometry;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 public class MapGen {
-
     public static final int[] DIRECTIONS = {0, 90, 180, 270};
 
-    public static void update(Zone z) {
-        fillZone(z);
-    }
+    public static RunnableRoomGen runnableRoomGen = new RunnableRoomGen();
+    public static Thread roomGen = new Thread(runnableRoomGen);
 
-    public static void fillZone(Zone z) {
-        Random r = new Random();
-
-        // needs to be done during generation, not creation
-        if (z.getAdjZones().size() < 8)
-            z.findAdjZones();
-
-        if (z.getRooms().size() < z.numRooms && z.roomGenFailureCount < z.numRooms * 2) {
-            Room room = genRoom(z);
-            if (room == null) {
-                z.roomGenFailureCount++;
-                return;
-            }
-            z.addObject(room);
-            connectRoom(room);
-        }
-    }
-
-    public static Hallway genHallway(Room r) {
-        Random rnd = GameView.gv.random;
-        Box b = r.getOuterBoxes().get(rnd.nextInt(r.getOuterBoxes().size()));
-        return genHallway(b);
-    }
-
-    public static Hallway genHallway(Box b) {
-        return new Hallway(b, b.getRandomOpenDirection(), 4);
-    }
 
     public static void connectRoom(Room r) {
         for (Box b : r.getOuterBoxes()) {
             for (int i : DIRECTIONS) {
                 if (b.getAdjBox(i) == null) {
                     double rad = Math.toRadians(i);
-                    float x = (float)(b.getPosition().x + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.cos(rad));
-                    float y = (float)(b.getPosition().y + C.BOX_SIZE * 0.5 + C.BOX_SIZE * Math.sin(rad));
-                    Box bb = Zone.getZone(x, y).getBox(x, y);
+                    Vector2 p = Geometry.projectVector(b.getCenter(), rad, C.BOX_DIAMETER);
+                    Box bb;
+                    Zone zone = Zone.getZone(p);
+                    HashSet<Zone> zones = zone.getAdjZones(1);
 
-                    if (bb != null && bb.getRoom() != b.getRoom())
-                        connectBoxes(b, bb);
+                    for (Zone z : zones) {
+                        bb = z.getBox(p);
+
+                        if (bb != null && bb.getRoom() != b.getRoom())
+                            connectBoxes(b, bb);
+                    }
                 }
             }
         }
@@ -69,13 +46,13 @@ public class MapGen {
         double theta = Math.toDegrees(Math.atan2(dy, dx));
 
         theta = Math.round(theta / 90) * 90;
-        new Hallway(b, (int)theta, 2 * C.SCALE);
+        new Hallway(b, (int)theta, C.HALLWAY_WIDTH);
     }
 
     public static Room genRoom(Zone z) {
         for (int i = 0; i <= 5; i++) { // try 5 times
-            Vector2 boxPosition = z.randomDiscretePosition(C.BOX_SIZE);
-            if (collidesWith(z, boxPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
+            Vector2 boxPosition = z.randomPosition();
+            if (z.checkOverlap(boxPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
                 return genRoom(boxPosition);
             }
         }
@@ -132,7 +109,8 @@ public class MapGen {
                     newBMLocation[1]--;
                     break;
             }
-            if (collidesWith(z, proposedPosition, C.BOX_SIZE, C.BOX_SIZE) == null) {
+
+            if (z.checkOverlap(proposedPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
                 Box bb = new Box(proposedPosition.x, proposedPosition.y);
                 bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
                 boxMap.put(bb.BMKey, bb);
@@ -149,11 +127,7 @@ public class MapGen {
         return room;
     }
 
-    private void addBox(HashMap<String, Box> boxMap) {
-
-    }
-
-    private static void associate(Box b, HashMap<String, Box> boxMap) {
+    public static void associate(Box b, HashMap<String, Box> boxMap) {
         int[] BMLocation = b.getBMLocation();
         int[] modifiers = {1, 0, 0, 1, -1, 0, 0, -1};
         for (int i = 0; i <= modifiers.length - 1; i += 2) {
@@ -164,19 +138,5 @@ public class MapGen {
             b.setAdjBox(DIRECTIONS[i/2], bb);
             bb.setAdjBox(DIRECTIONS[(i/2 + 2) % 4], b);
         }
-    }
-
-    public static Overlappable collidesWith(Zone z, Vector2 p, float w, float h) {
-        for (Zone zone : z.getAdjZonesPlusSelf()) {
-            for (Overlappable o : zone.getOverlappables()) {
-                if (o.overlaps(p.x, p.y, w, h))
-                    return o;
-            }
-        }
-        return null;
-    }
-
-    private static boolean valueInRange(float value, float min, float max) {
-        return (value > min) && (value < max);
     }
 }

@@ -6,13 +6,14 @@ public class C {
     //DEBUG
     public static final boolean DEBUG = true;
 
-    public static final float HALLWAY_WIDTH = 3f * SCALE;
+    public static final float HALLWAY_WIDTH = 4f * SCALE;
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = true;
     public static final float BOX_DEPTH = 7 * SCALE;
-    public static final float BOX_SIZE = 15 * SCALE;
+    public static final float BOX_DIAMETER = 15 * SCALE;
+    public static final float BOX_RADIUS = BOX_DIAMETER / 2;
     public static final int BULLET_DAMAGE_FACTOR = 2;
     public static final float BULLET_RADIUS = 0.1f * SCALE;
     public static final long CRATE_MPOS_DURATION = 500l;
@@ -58,6 +59,7 @@ public class C {
     public static final float FOV = 60;
 
     public static boolean DEBUG_SHOW_BOXMAP = false;
+    public static boolean DEBUG_SHOW_ADJBOXCOUNT = false;
 
     public static final boolean POPULATE_ZOMBIES = true;
     public static final boolean POPULATE_SURVIVORS = true;

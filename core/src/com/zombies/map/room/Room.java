@@ -1,8 +1,8 @@
-package com.zombies;
+package com.zombies.map.room;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -19,14 +19,20 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.zombies.C;
+import com.zombies.GameView;
+import com.zombies.Unit;
+import com.zombies.Wall;
+import com.zombies.Zombies;
+import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
+import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
-    private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
@@ -36,44 +42,48 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private GameView view;
     private boolean loaded = false;
     private Zone zone;
-    private ArrayList<Box> outerBoxes = new ArrayList<Box>();
+    private HashSet<Box> outerBoxes = new HashSet<>();
     private Vector2 center;
     private HashMap<String, Box> boxMap;
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public Room( HashMap<String, Box> boxMap) {
-        view = GameView.gv;
+    public Room(HashMap<String, Box> boxMap) {
         this.boxMap = boxMap;
-        this.boxes = new ArrayList<>(boxMap.values());
+        view = GameView.gv;
+        boxes = new ArrayList<>(boxMap.values());
+
+        center = calculateMedian();
+        zone = Zone.getZone(center);
+        zone.addObject(this);
 
         for (Box b: boxes) {
             b.setRoom(this);
-            Zone.getZone(b.getPosition()).addObject(b);
             if (b.getAdjBoxes().size() < 4)
                 outerBoxes.add(b);
         }
 
-        center = calculateMedian();
         buildFloorModel();
         rasterizeWalls();
+        handleZoning();
+    }
+
+    private void handleZoning() {
+        HashSet<Zone> zones = new HashSet<>();
+        for (Box b : getBoxes())
+            for (Vector2 v : b.getCorners())
+                zones.add(Zone.getZone(v).addObject(b));
+        for (Zone z : zones)
+            z.addObject(this);
     }
 
     // calculates the median position of all of the boxes
     private Vector2 calculateMedian() {
         Vector2 center = new Vector2(0, 0);
-        for (Box b: boxes) {
+        for (Box b: boxes)
             center.add(b.getCenter());
-        }
         return new Vector2(center.x / boxes.size(), center.y / boxes.size());
-    }
-
-    public void doorsTo(Room room) {
-        if (!adjRooms.contains(room)) {
-            //TODO further path finding to that room
-            return;
-        }
     }
 
     public void currentRoom() {
@@ -112,7 +122,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public void rasterizeWalls() {
         // proposedPositions are sets of points where walls could be placed.
-        ArrayList<ArrayList<Vector2>> proposedPositions = new ArrayList<ArrayList<Vector2>>();
+        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
         // propose positions for each box in the room.
         for (Box b: boxes) {
@@ -121,32 +131,27 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         
         proposedPositions = consolidateWallPositions(proposedPositions);
 
-        for (ArrayList<Vector2> pstn: proposedPositions) {
-            walls.add(new Wall(pstn.get(0), pstn.get(1), this));
+        for (Vector2[] pstn: proposedPositions) {
+            walls.add(new Wall(pstn[0], pstn[1], this));
         }
 
         buildWallModel();
     }
     
     // consolidate the proposed walls into as few as possible.
-    public ArrayList<ArrayList<Vector2>> consolidateWallPositions(ArrayList<ArrayList<Vector2>> proposedPositions) {
+    public ArrayList<Vector2[]> consolidateWallPositions(ArrayList<Vector2[]> proposedPositions) {
 
-        ArrayList<ArrayList<Vector2>> iteratedPositions = new ArrayList<ArrayList<Vector2>>(proposedPositions);
+        ArrayList<Vector2[]> iteratedPositions = new ArrayList<>(proposedPositions);
 
-        for (ArrayList<Vector2> pstn1: iteratedPositions) {
-            for (ArrayList<Vector2> pstn2: iteratedPositions) {
+        for (Vector2[] pstn1: iteratedPositions) {
+            for (Vector2[] pstn2: iteratedPositions) {
 
                 // if the first wall's end meets the other wall's start and they have the same
                 // angle...
-                if (pstn1.get(1).equals(pstn2.get(0)) && Math.abs(pstn1.get(1).cpy().sub(pstn1.get(0)).angle() - (pstn2.get(1).cpy().sub(pstn2.get(0)).angle())) < 0.0001) {
-
-                    // System.out.println("Walls match up.");
-                    // System.out.println("pstn1: " + pstn1);
-                    // System.out.println("pstn2: " + pstn2);
-
-                    ArrayList<Vector2> points = new ArrayList<Vector2>();
-                    points.add(pstn1.get(0));
-                    points.add(pstn2.get(1));
+                if (pstn1[1].equals(pstn2[0]) && Math.abs(pstn1[1].cpy().sub(pstn1[0]).angle() - (pstn2[1].cpy().sub(pstn2[0]).angle())) < 0.0001) {
+                    Vector2[] points = new Vector2[2];
+                    points[0] = pstn1[0];
+                    points[1] = pstn2[1];
 
                     proposedPositions.add(points);
 
@@ -218,7 +223,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance.transform.setTranslation(center.x, center.y, 1);
     }
 
-    public ArrayList<Box> getOuterBoxes() {
+    public HashSet<Box> getOuterBoxes() {
         return outerBoxes;
     }
 
@@ -229,7 +234,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     @Override
     public void setZone(Zone z) {
-        zone = z;
+        // Zone is set in the constructor
     }
 
     @Override
@@ -241,13 +246,17 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         if (C.DEBUG) {
             BitmapFont f = Zombies.getFont("sans-reg:8:white");
-            if (C.DEBUG_SHOW_BOXMAP) {
-                spriteBatch.begin();
-                for (Box b : boxes) {
-                    f.draw(spriteBatch, b.BMKey, b.getPosition().x + C.BOX_SIZE / 2, b.getPosition().y + C.BOX_SIZE / 2);
-                }
-                spriteBatch.end();
+            String s = "";
+
+            spriteBatch.begin();
+            for (Box b : boxes) {
+                if (C.DEBUG_SHOW_BOXMAP)
+                    s = b.BMKey;
+                if (C.DEBUG_SHOW_ADJBOXCOUNT)
+                    s = b.getAdjBoxes().size() + "";
+                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_DIAMETER / 2, b.getPosition().y + C.BOX_DIAMETER / 2);
             }
+            spriteBatch.end();
         }
     }
 
