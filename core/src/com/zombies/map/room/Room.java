@@ -33,7 +33,6 @@ import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
-    private int size;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     private ArrayList<Room> adjRooms = new ArrayList<Room>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
@@ -50,12 +49,14 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
-
     public Room(HashMap<String, Box> boxMap) {
-        view = GameView.gv;
         this.boxMap = boxMap;
-        this.boxes = new ArrayList<>(boxMap.values());
+        view = GameView.gv;
+        boxes = new ArrayList<>(boxMap.values());
+
+        center = calculateMedian();
+        zone = Zone.getZone(center);
+        zone.addObject(this);
 
         for (Box b: boxes) {
             b.setRoom(this);
@@ -63,17 +64,25 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
                 outerBoxes.add(b);
         }
 
-        center = calculateMedian();
         buildFloorModel();
         rasterizeWalls();
+        handleZoning();
+    }
+
+    private void handleZoning() {
+        HashSet<Zone> zones = new HashSet<>();
+        for (Box b : getBoxes())
+            for (Vector2 v : b.getCorners())
+                zones.add(Zone.getZone(v).addObject(b));
+        for (Zone z : zones)
+            z.addObject(this);
     }
 
     // calculates the median position of all of the boxes
     private Vector2 calculateMedian() {
         Vector2 center = new Vector2(0, 0);
-        for (Box b: boxes) {
+        for (Box b: boxes)
             center.add(b.getCenter());
-        }
         return new Vector2(center.x / boxes.size(), center.y / boxes.size());
     }
 
@@ -220,14 +229,12 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     @Override
     public Zone getZone() {
-
         return zone;
     }
 
     @Override
     public void setZone(Zone z) {
-        if (Zone.getZone(this.center) == z)
-            zone = z;
+        // Zone is set in the constructor
     }
 
     @Override

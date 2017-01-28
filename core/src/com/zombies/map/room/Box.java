@@ -13,6 +13,7 @@ import com.zombies.GameView;
 import com.zombies.Survivor;
 import com.zombies.Unit;
 import com.zombies.Zombie;
+import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.map.MapGen;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
@@ -36,11 +37,11 @@ public class Box extends Overlappable {
         this(p.x, p.y);
     }
     public Box(float x, float y) {
-        this.height = C.BOX_DIAMETER;
-        this.width  = C.BOX_DIAMETER;
-        this.position = new Vector2(x, y);
+        height = C.BOX_DIAMETER;
+        width  = C.BOX_DIAMETER;
+        position = new Vector2(x, y);
         setCorners();
-        this.view = GameView.gv;
+        view = GameView.gv;
     }
 
     private void setCorners() {
@@ -175,6 +176,7 @@ public class Box extends Overlappable {
 
     public Box setRoom(Room room) {
         this.room = room;
+        this.zone = room.getZone();
         return this;
     }
 
@@ -205,6 +207,11 @@ public class Box extends Overlappable {
         String[] stringLocations = BMKey.split(",");
         int[] locations = {Integer.parseInt(stringLocations[0]), Integer.parseInt(stringLocations[1])};
         return locations;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+        // Zone is set in setRoom
     }
 
     @Override

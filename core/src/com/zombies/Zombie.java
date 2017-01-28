@@ -76,8 +76,6 @@ public class Zombie extends Unit implements Drawable {
     public void load() {
         if (body != null)
             return;
-
-        view.addActiveZombie(this);
     }
 
     private void attack() {

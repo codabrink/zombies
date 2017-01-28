@@ -20,7 +20,6 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     public Vector2 center;
     private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius;
-    private Zone zone;
     private LinkedList<Wall> walls = new LinkedList<Wall>();
     private HallwayAxis pAxis, axis, nAxis;
     private com.zombies.interfaces.Modelable modelable;

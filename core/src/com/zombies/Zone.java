@@ -9,6 +9,7 @@ import com.zombies.interfaces.Updateable;
 import com.zombies.map.*;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Room;
+import com.zombies.util.U;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +31,9 @@ public class Zone {
     // Collections
     private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
-    private HashSet<Overlappable> overlappableNiblings = new HashSet<>();
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
-    private HashSet<Box> boxNiblings = new HashSet<>();
-
     private HashSet<Room> rooms = new HashSet<>();
-    private HashSet<Room> niblingRooms = new HashSet<>();
-
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
@@ -66,7 +62,8 @@ public class Zone {
     }
     public void draw() {
         for (Drawable d : drawables)
-            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
+            if (d.getZone() == this)
+                d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
         for (Drawable d : debugLines)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
@@ -78,7 +75,8 @@ public class Zone {
     }
     public void update() {
         for (Updateable u : updateables)
-            u.update();
+            if (u.getZone() == this)
+                u.update();
     }
 
     public void load(int limit) {
@@ -245,8 +243,6 @@ public class Zone {
     }
 
     public Zone addObject(HasZone o) {
-        if (o.getZone() != null)
-            o.getZone().removeObject(o);
         o.setZone(this);
 
         // KEEP RECORDS
@@ -257,7 +253,9 @@ public class Zone {
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
 
-        // ABOVE TYPES HAVE NIBLINGS
+        if (o.getZone() == null && o instanceof Room)
+            U.p("krap!");
+
         if (o.getZone() != this)
             return this;
 
@@ -299,34 +297,24 @@ public class Zone {
         rooms.add(r);
     }
     private void addBox(Box b) {
-        if (b.getZone() == this)
-            boxes.add(b);
-        else
-            boxNiblings.add(b);
+        boxes.add(b);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
-        niblingRooms.remove(r);
         for (Box b : r.getBoxes())
             removeObject(b);
     }
     private void removeBox(Box b) {
         boxes.remove(b);
-        boxNiblings.remove(b);
     }
 
     private void addOverlappable(Overlappable o) {
-        if (o.getZone() == this)
-            overlappables.add(o);
-        else
-            overlappableNiblings.add(o);
+        overlappables.add(o);
     }
     private void removeOverlappable(Overlappable o) {
         overlappables.remove(o);
     }
-    private void addDrawable(Drawable d) {
-        drawables.add(d);
-    }
+    private void addDrawable(Drawable d) { drawables.add(d); }
     private void removeDrawable(Drawable d) {
         drawables.remove(d);
     }

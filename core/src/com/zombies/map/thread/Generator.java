@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class Generator {
-    public static Room genRoomAndZone(Vector2 startPos) { return zoneRoom(genRoom(startPos)); }
     public static Room genRoom(Vector2 startPos) {
         // startPos is the bottom left corner of the first box
         Zone z = Zone.getZone(startPos);
@@ -73,13 +72,5 @@ public class Generator {
         }
 
         return new Room(boxMap);
-    }
-    public static Room zoneRoom(Room r) {
-        HashSet<Zone> zones = new HashSet<>();
-        for (Box b : r.getBoxes())
-            zones.add(Zone.getZone(b.getPosition()).addObject(b));
-        for (Zone z : zones)
-            z.addObject(r);
-        return r;
     }
 }

@@ -100,6 +100,9 @@ public class Console {
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 new Hallway(b, Integer.parseInt(m.group(2)), 2 * C.SCALE);
                 break;
+            case "debug":
+                Zone zone = Data.currentZone;
+                System.out.println("Break on this line");
             default:
                 enabled = true;
                 return;

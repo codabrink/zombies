@@ -8,7 +8,6 @@ import com.zombies.interfaces.Loadable;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Geometry;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
@@ -17,7 +16,10 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     protected Vector2[] corners = new Vector2[4];
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
-    protected Zone z;
+    private Vector2 zonedPosition = null;
+    private long zonedTimestamp = 0l;
+
+    protected Zone zone;
 
     public Vector2[] getCorners() { return corners; }
     public Vector2 getCenter() {
@@ -58,12 +60,20 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
 
     @Override
     public void setZone(Zone z) {
-        if (Zone.getZone(getCenter()) == z)
-            this.z = z;
+        this.zone = Zone.getZone(getCenter());
+
+        if (zonedPosition == position || System.currentTimeMillis() < zonedTimestamp + 1000l)
+            return;
+
+        zonedPosition = position;
+        zonedTimestamp = System.currentTimeMillis();
+
+        for (Vector2 corner : corners)
+            Zone.getZone(corner).addObject(this);
     }
 
     @Override
     public Zone getZone() {
-        return z;
+        return zone;
     }
 }
