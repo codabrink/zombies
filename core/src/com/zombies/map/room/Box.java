@@ -15,9 +15,10 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.map.MapGen;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
+
+import static java.lang.Integer.parseInt;
 
 public class Box extends Overlappable {
     private ArrayList<Unit> zombies = new ArrayList<>();
@@ -25,23 +26,28 @@ public class Box extends Overlappable {
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
-    private Room room;
-    private GameView view;
     private Random random = new Random();
 
     public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
-    public String BMKey;
+    private Building building;
+    private Room room;
+    private String bmKey;
 
-    public Box(Vector2 p) {
-        this(p.x, p.y);
-    }
-    public Box(float x, float y) {
-        height = C.BOX_DIAMETER;
-        width  = C.BOX_DIAMETER;
-        position = new Vector2(x, y);
+    public Box(Building building, Room room, String bmKey) {
+        this.building = building;
+        this.room     = room;
+        this.bmKey    = bmKey;
+
+        building.boxMap.put(bmKey, this);
+        room.boxes.add(this);
+
+        position = building.positionOf(bmKey);
+        height   = C.BOX_DIAMETER;
+        width    = C.BOX_DIAMETER;
+
         setCorners();
-        view = GameView.gv;
+        building.associateBoxes();
     }
 
     private void setCorners() {
@@ -91,9 +97,18 @@ public class Box extends Overlappable {
         return powerups;
     }
 
+    public int[][] getOpenAdjBMAKeys() {
+        ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
+        int[][] adjBMAKeys = Building.getAdjBMKeys(getBMAKey());
+        for (int[] aKey : adjBMAKeys)
+            if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
+                openAdjBMAKeys.add(aKey);
+        return openAdjBMAKeys.toArray(new int[openAdjBMAKeys.size()][]);
+    }
+
     public ArrayList<Integer> getOpenDirections() {
         ArrayList<Integer> openDirections = new ArrayList<Integer>();
-        for (int i: MapGen.DIRECTIONS) {
+        for (int i: C.DIRECTIONS) {
             if (adjBoxes.get(i) == null) {
                 openDirections.add(openDirections.size(), i);
             }
@@ -124,7 +139,7 @@ public class Box extends Overlappable {
 
     public void addZombie() {
         if (C.POPULATE_ZOMBIES) {
-            zombies.add(new Zombie(view, this, this.randomPoint()));
+            zombies.add(new Zombie(GameView.gv, this, this.randomPoint()));
         }
     }
 
@@ -148,10 +163,6 @@ public class Box extends Overlappable {
             return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
         }
         return new Vector2();
-    }
-
-    public Room getRoom() {
-        return room;
     }
 
     public ArrayList<Unit> getSurvivorList() {
@@ -185,13 +196,9 @@ public class Box extends Overlappable {
         return adjBoxes.get(direction);
     }
     public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
-    public boolean isAdjacent(Box b) {
-        for (Box bb: adjBoxes.values()) {
-            if (b == bb)
-                return true;
-        }
-        return false;
-    }
+    public Building getBuilding() { return building; }
+    public Room getRoom() { return room; }
+    public String getBmKey() { return bmKey; }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
@@ -202,11 +209,9 @@ public class Box extends Overlappable {
                 1, 1, 1);
     }
 
-    // Box Map Location - used during room generation in MapGen.java
-    public int[] getBMLocation() {
-        String[] stringLocations = BMKey.split(",");
-        int[] locations = {Integer.parseInt(stringLocations[0]), Integer.parseInt(stringLocations[1])};
-        return locations;
+    public int[] getBMAKey() {
+        String[] sKeys = bmKey.split(",");
+        return new int[] {parseInt(sKeys[0]), parseInt(sKeys[1])};
     }
 
     @Override

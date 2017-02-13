@@ -37,6 +37,6 @@ class GenRoomOnPlayer implements Runnable {
         this.p = p;
     }
     public void run() {
-        Generator.genRoom(p.getPosition());
+        //asGenerator.genRoom(p.getPosition());
     }
 }

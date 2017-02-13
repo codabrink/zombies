@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zombies;
-import com.zombies.map.MapGen;
 import com.zombies.map.room.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
@@ -89,7 +88,7 @@ public class HUD implements InputProcessor{
             case 43: // o
                 b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
                 String out = "";
-                for (int direction : MapGen.DIRECTIONS) {
+                for (int direction : C.DIRECTIONS) {
                     if (b != null) {
                         Box bb = b.getAdjBox(direction);
                         out += "direction: " + direction + ": ";

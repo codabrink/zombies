@@ -5,7 +5,7 @@ public class C {
 
     //DEBUG
     public static final boolean DEBUG = true;
-
+    public static final int[] DIRECTIONS = {0, 90, 180, 270};
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
     public static final boolean ENABLE_ACCEL = false;

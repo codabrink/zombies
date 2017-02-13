@@ -21,6 +21,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
 import com.zombies.data.Stats;
+import com.zombies.map.room.*;
+import com.zombies.map.room.Building;
 import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
@@ -113,7 +115,7 @@ public class GameView implements Screen {
     }
 
     public void initialRoom() {
-        Generator.genRoom(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2));
+        Generator.genRoom(new Building(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2)), "0,0");
     }
 
     public HUD getHUD() {

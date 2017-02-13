@@ -1,7 +1,6 @@
 package com.zombies.map.room;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -29,31 +28,27 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
-    private ArrayList<Box> boxes = new ArrayList<Box>();
-    private ArrayList<Room> adjRooms = new ArrayList<Room>();
+    public  HashSet<Box> boxes = new HashSet<>();
+    private boolean finalized = false;
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private Random random = new Random();
     private boolean alarmed = false;
-    private float alpha = 0;
-    private boolean loaded = false;
     private Zone zone;
     private HashSet<Box> outerBoxes = new HashSet<>();
     private Vector2 center;
     private Building building;
-    private HashMap<String, Box> boxMap;
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
     public Room(Building building) {
         this.building = building;
-        boxMap = building.boxMap;
-        boxes = new ArrayList<>(boxMap.values());
+    }
 
+    public void finalize() {
         center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addObject(this);
@@ -67,6 +62,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         buildFloorModel();
         rasterizeWalls();
         handleZoning();
+
+        finalized = true;
     }
 
     private void handleZoning() {
@@ -95,7 +92,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
             b.load();
         for (Wall w: walls)
             w.load();
-        loaded = true;
     }
 
     public void unload() {
@@ -104,7 +100,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
         for (Wall w: walls)
             w.unload();
-        loaded = false;
     }
 
     public void alarm(Unit victim) {
@@ -188,7 +183,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     }
 
     public ArrayList<Wall> getWalls() { return walls; }
-    public ArrayList<Box> getBoxes() {
+    public HashSet<Box> getBoxes() {
         return boxes;
     }
     public Building getBuilding() { return building; }
@@ -247,7 +242,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
             spriteBatch.begin();
             for (Box b : boxes) {
                 if (C.DEBUG_SHOW_BOXMAP)
-                    s = b.BMKey;
+                    //s = b.getBMLocation();
                 if (C.DEBUG_SHOW_ADJBOXCOUNT)
                     s = b.getAdjBoxes().size() + "";
                 f.draw(spriteBatch, s, b.getPosition().x + C.BOX_DIAMETER / 2, b.getPosition().y + C.BOX_DIAMETER / 2);
