@@ -39,19 +39,19 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private Random random = new Random();
     private boolean alarmed = false;
     private float alpha = 0;
-    private GameView view;
     private boolean loaded = false;
     private Zone zone;
     private HashSet<Box> outerBoxes = new HashSet<>();
     private Vector2 center;
+    private Building building;
     private HashMap<String, Box> boxMap;
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public Room(HashMap<String, Box> boxMap) {
-        this.boxMap = boxMap;
-        view = GameView.gv;
+    public Room(Building building) {
+        this.building = building;
+        boxMap = building.boxMap;
         boxes = new ArrayList<>(boxMap.values());
 
         center = calculateMedian();
@@ -188,14 +188,10 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     }
 
     public ArrayList<Wall> getWalls() { return walls; }
-
     public ArrayList<Box> getBoxes() {
         return boxes;
     }
-
-    public boolean isAlarmed() {
-        return alarmed;
-    }
+    public Building getBuilding() { return building; }
 
     public void buildWallModel() {
         Assets.modelBuilder.begin();

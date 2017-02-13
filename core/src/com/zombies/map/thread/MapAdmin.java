@@ -12,7 +12,7 @@ public class MapAdmin {
     public static HashSet<Thread> threads = new HashSet<>();
 
     public static void update(Player p) {
-        if (p.getZone().getBoxes().size() < 3) {
+        if (true) { // p.getZone().getBoxes().size() < 3) {
             Room room = (Room)U.random(Data.currentZone.getRooms());
 
             if (room != null) {
@@ -21,8 +21,22 @@ public class MapAdmin {
                 threads.add(thread);
                 thread.run();
             } else {
-                System.out.println("MapAdmin: No room found");
+                System.out.println("MapAdmin: Cannot find room. Starting fresh.");
+                Runnable r = new GenRoomOnPlayer(p);
+                Thread thread = new Thread(r);
+                threads.add(thread);
+                thread.start();
             }
         }
+    }
+}
+
+class GenRoomOnPlayer implements Runnable {
+    private Player p;
+    public GenRoomOnPlayer(Player p) {
+        this.p = p;
+    }
+    public void run() {
+        Generator.genRoom(p.getPosition());
     }
 }
