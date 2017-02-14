@@ -26,12 +26,12 @@ public class Building {
             rooms.add(b.getRoom());
     }
     public Vector2 positionOf(String key) {
-        String[] parts = key.split(",");
-        return positionOf(parseInt(parts[0]), parseInt(parts[1]));
+        int[] bmaKey = parseBMKey(key);
+        return positionOf(bmaKey[0], bmaKey[1]);
     }
     public Vector2 positionOf(int x, int y) {
-        float vx = center.x - C.BOX_RADIUS - C.BOX_DIAMETER * x;
-        float vy = center.y - C.BOX_RADIUS - C.BOX_DIAMETER * x;
+        float vx = center.x - C.BOX_RADIUS + C.BOX_DIAMETER * x;
+        float vy = center.y - C.BOX_RADIUS + C.BOX_DIAMETER * y;
         return new Vector2(vx, vy);
     }
     public void associateBoxes() {
