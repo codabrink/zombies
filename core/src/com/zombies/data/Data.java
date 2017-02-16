@@ -17,4 +17,11 @@ public class Data {
     }
     public static ArrayList<Player> players = new ArrayList<>();
     public static Player player() { return players.get(0); }
+
+    public static void update() {
+        currentZone = Zone.getZone(player().getPosition());
+        currentBox  = currentZone.getBox(player().getPosition());
+        if (currentBox != null)
+            currentBox.getBuilding().update();
+    }
 }

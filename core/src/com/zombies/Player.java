@@ -311,11 +311,7 @@ public class Player extends Unit implements Collideable {
     }
 
     private void updateInfo() {
-        Data.currentZone = Zone.getZone(body.getPosition());
-        Data.currentBox  = Data.currentZone.getBox(body.getPosition());
-        if (Data.currentBox != null)
-            Data.currentBox.getBuilding().update();
-
+        Data.update();
         MapAdmin.update(this);
     }
 

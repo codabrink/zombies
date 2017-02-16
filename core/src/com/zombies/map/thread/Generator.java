@@ -23,12 +23,12 @@ public class Generator {
         if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) != null)
             return null;
 
-        Box b = new Box(building, room, bmKey);
+        Box b;
+        new Box(building, room, bmKey);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
         while (room.boxes.size() <= roomSize) {
-            Object[] boxMapArray = room.boxes.toArray();
-            int[][] openAdjBMAKeys;
+            b = (Box) U.random(room.getOuterBoxes());
 
             bmKey = (int[]) U.random(b.getOpenAdjKeys());
             if (bmKey == null)
