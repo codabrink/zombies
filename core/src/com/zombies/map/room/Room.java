@@ -63,6 +63,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         rasterizeWalls();
         handleZoning();
 
+        building.refresh();
+
         finalized = true;
     }
 

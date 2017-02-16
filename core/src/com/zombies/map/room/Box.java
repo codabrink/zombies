@@ -32,9 +32,9 @@ public class Box extends Overlappable {
 
     private Building building;
     private Room room;
-    private String bmKey;
+    private int[] bmKey;
 
-    public Box(Building building, Room room, String bmKey) {
+    public Box(Building building, Room room, int[] bmKey) {
         this.building = building;
         this.room     = room;
         this.bmKey    = bmKey;
@@ -99,7 +99,7 @@ public class Box extends Overlappable {
 
     public int[][] getOpenAdjBMAKeys() {
         ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
-        int[][] adjBMAKeys = Building.getAdjBMKeys(getBMAKey());
+        int[][] adjBMAKeys = Building.getAdjBMKeys(bmKey);
         for (int[] aKey : adjBMAKeys)
             if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
                 openAdjBMAKeys.add(aKey);
@@ -198,7 +198,7 @@ public class Box extends Overlappable {
     public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
-    public String getBmKey() { return bmKey; }
+    public int[] getBmKey() { return bmKey; }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
@@ -207,11 +207,6 @@ public class Box extends Overlappable {
                 relp.x + width, relp.y + height, 0,
                 relp.x, relp.y + height, 0,
                 1, 1, 1);
-    }
-
-    public int[] getBMAKey() {
-        String[] sKeys = bmKey.split(",");
-        return new int[] {parseInt(sKeys[0]), parseInt(sKeys[1])};
     }
 
     @Override

@@ -115,7 +115,7 @@ public class GameView implements Screen {
     }
 
     public void initialRoom() {
-        Generator.genRoom(new Building(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2)), "0,0");
+        Generator.genRoom(new Building(new Vector2(-C.BOX_DIAMETER / 2, -C.BOX_DIAMETER / 2)), new int[]{0, 0});
     }
 
     public HUD getHUD() {

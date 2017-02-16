@@ -86,7 +86,7 @@ public class Console {
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
             case "genRoom":
-                Generator.genRoom(new Building(Data.players.get(0).getPosition()), "0,0");
+                Generator.genRoom(new Building(Data.players.get(0).getPosition()), new int[]{0, 0});
                 break;
             case "hallway":
                 p = view.getPlayer();

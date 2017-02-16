@@ -13,19 +13,16 @@ import java.util.Random;
 import static java.lang.Integer.parseInt;
 
 public class Generator {
-    public static Room genRoom(Building building, String startBMKey) {
-        String[] sKeys = startBMKey.split(",");
-        int[] bmKeys   = { parseInt(sKeys[0]), parseInt(sKeys[1]) };
-
-        Vector2 startPos = building.positionOf(bmKeys[0], bmKeys[1]);
+    public static Room genRoom(Building building, int[] bmKey) {
+        Vector2 startPos = building.positionOf(bmKey);
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
-        HashMap<String, Box> boxMap = building.boxMap;
+        HashMap<int[], Box> boxMap = building.boxMap;
 
         Room room = new Room(building);
 
-        Box b = new Box(building, room, startBMKey);
-        boxMap.put(startBMKey, b);
+        Box b = new Box(building, room, bmKey);
+        boxMap.put(bmKey, b);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
         while (room.boxes.size() <= roomSize) {
@@ -37,10 +34,10 @@ public class Generator {
                 openAdjBMAKeys = b.getOpenAdjBMAKeys();
             } while (openAdjBMAKeys.length == 0);
 
-            int[] bmaKey = openAdjBMAKeys[r.nextInt(openAdjBMAKeys.length)];
+            bmKey = openAdjBMAKeys[r.nextInt(openAdjBMAKeys.length)];
 
-            if (z.checkOverlap(building.positionOf(bmaKey[0], bmaKey[1]), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
-                new Box(building, room, bmaKey[0]+","+bmaKey[1]);
+            if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
+                new Box(building, room, bmKey);
 
             loops++;
             if (loops > roomSize * 4) // catch infinite loops
@@ -48,6 +45,7 @@ public class Generator {
         }
 
         room.finalize();
+        System.out.println("generator - finalized a room");
         return room;
     }
 }

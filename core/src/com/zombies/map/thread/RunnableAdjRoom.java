@@ -26,7 +26,10 @@ public class RunnableAdjRoom implements Runnable {
         // get a random open direction
         ArrayList<Integer> openDirections = adjBox.getOpenDirections();
         int direction = openDirections.get((new Random()).nextInt(openDirections.size()));
-        int[] bmKeys = Building.directionToBMKey(adjBox.getBmKey(), direction);
-        Generator.genRoom(adjBox.getBuilding(), bmKeys[0]+","+bmKeys[1]);
+        int[] bmKey = Building.directionToBMKey(adjBox.getBmKey(), direction);
+
+        Vector2 position = adjBox.getBuilding().positionOf(bmKey);
+        if (adjBox.getZone().checkOverlap(position, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
+            Generator.genRoom(adjBox.getBuilding(), bmKey);
     }
 }
