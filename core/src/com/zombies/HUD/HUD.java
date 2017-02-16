@@ -85,20 +85,6 @@ public class HUD implements InputProcessor{
 
         Box b;
         switch(keycode) {
-            case 43: // o
-                b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
-                String out = "";
-                for (int direction : C.DIRECTIONS) {
-                    if (b != null) {
-                        Box bb = b.getAdjBox(direction);
-                        out += "direction: " + direction + ": ";
-                        if (bb == null)
-                            out += "NULL, ";
-                        else
-                            out += bb + ", ";
-                    }
-                }
-                break;
             case 36: // h - generate hallway in current box
                 // TODO: deprecated
 

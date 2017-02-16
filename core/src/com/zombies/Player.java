@@ -306,7 +306,7 @@ public class Player extends Unit implements Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
 
-        if (frame % 100 == 0)
+        if (frame % 10 == 0)
             updateInfo();
     }
 

@@ -34,8 +34,8 @@ public class Building {
             for (int i = 0; i < adjBMKeys.length; i++) {
                 int[] key = adjBMKeys[i];
                 Box bb = boxMap.get(key);
-                if (bb != null)
-                    b.setAdjBox(C.DIRECTIONS[i / 2], bb);
+                //if (bb != null)
+                    //b.setAdjBox(C.DIRECTIONS[i / 2], bb);
             }
         }
     }

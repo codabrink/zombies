@@ -22,7 +22,6 @@ public class Box extends Overlappable {
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
-    private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
     private HashMap<String, Box> boxMap;
     private Random random = new Random();
 
@@ -112,23 +111,6 @@ public class Box extends Overlappable {
         return openAdjBMAKeys.toArray(new int[openAdjBMAKeys.size()][]);
     }
 
-    public ArrayList<Integer> getOpenDirections() {
-        ArrayList<Integer> openDirections = new ArrayList<Integer>();
-        for (int i: C.DIRECTIONS) {
-            if (adjBoxes.get(i) == null) {
-                openDirections.add(openDirections.size(), i);
-            }
-        }
-        return openDirections;
-    }
-    public int getRandomOpenDirection() {
-        ArrayList<Integer> openDirections = getOpenDirections();
-        if (openDirections.size() > 0)
-            return openDirections.get(random.nextInt(openDirections.size()));
-        else
-            return ' ';
-    }
-
     public Survivor addSurvivor() {
         Survivor s = new Survivor(this.randomPoint());
         survivors.add(s);
@@ -197,14 +179,27 @@ public class Box extends Overlappable {
         return this;
     }
 
-    public void setAdjBox(int direction, Box box) { adjBoxes.put(direction, box); }
-    public Box getAdjBox(int direction) {
-        return adjBoxes.get(direction);
-    }
-    public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
+    public HashSet<Box> getAdjBoxes() {
+        HashSet<Box> adjBoxes = new HashSet<>();
+        Box b;
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            b = boxMap.get(k[0] + "," + k[1]);
+            if (b != null)
+                adjBoxes.add(b);
+        }
+        return adjBoxes;
+    }
+    public HashSet<int[]> getOpenAdjKeys() {
+        HashSet<int[]> adjKeys = new HashSet<>();
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            if (boxMap.get(k[0] + "," + k[1]) == null)
+                adjKeys.add(k);
+        }
+        return adjKeys;
+    }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
