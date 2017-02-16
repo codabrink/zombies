@@ -37,7 +37,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private Random random = new Random();
     private boolean alarmed = false;
     private Zone zone;
-    private HashSet<Box> outerBoxes = new HashSet<>();
     private Vector2 center;
     private Building building;
 
@@ -55,8 +54,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
         for (Box b: boxes) {
             b.setRoom(this);
-            if (b.getAdjBoxes().size() < 4)
-                outerBoxes.add(b);
         }
 
         building.associateBoxes();
@@ -219,6 +216,12 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     }
 
     public HashSet<Box> getOuterBoxes() {
+        HashSet<Box> outerBoxes = new HashSet<>();
+        // TODO: expensive
+        for (Box b : boxes) {
+            if (b.getOpenAdjKeys().size() > 0)
+                outerBoxes.add(b);
+        }
         return outerBoxes;
     }
 
