@@ -6,6 +6,7 @@ import com.zombies.Zone;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
+import com.zombies.util.U;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -19,6 +20,9 @@ public class Generator {
 
         Room room = new Room(building);
 
+        if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) != null)
+            return null;
+
         Box b = new Box(building, room, bmKey);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
@@ -26,12 +30,9 @@ public class Generator {
             Object[] boxMapArray = room.boxes.toArray();
             int[][] openAdjBMAKeys;
 
-            do {
-                b = (Box) boxMapArray[r.nextInt(boxMapArray.length)];
-                openAdjBMAKeys = b.getOpenAdjBMAKeys();
-            } while (openAdjBMAKeys.length == 0);
-
-            bmKey = openAdjBMAKeys[r.nextInt(openAdjBMAKeys.length)];
+            bmKey = (int[]) U.random(b.getOpenAdjKeys());
+            if (bmKey == null)
+                break;
 
             if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
                 new Box(building, room, bmKey);

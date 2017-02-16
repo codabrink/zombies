@@ -9,6 +9,8 @@ import java.util.HashSet;
 public class Building {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
 
+    public static HashSet<Room> unFinalizedRooms = new HashSet<>();
+
     public boolean threadLocked = false;
     private HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Box> boxMap = new HashMap<>();
@@ -16,6 +18,11 @@ public class Building {
 
     public Building(Vector2 center) {
         this.center = center;
+    }
+
+    public void update() {
+        for (Room r : unFinalizedRooms)
+            r.finalize();
     }
 
     public void refresh() {

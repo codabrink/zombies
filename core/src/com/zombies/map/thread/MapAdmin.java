@@ -3,6 +3,7 @@ package com.zombies.map.thread;
 import com.zombies.Player;
 import com.zombies.data.Data;
 import com.zombies.map.room.Box;
+import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
 import com.zombies.util.U;
 
@@ -12,8 +13,8 @@ public class MapAdmin {
     public static HashSet<Thread> threads = new HashSet<>();
 
     public static void update(Player p) {
-        if (true) { // p.getZone().getBoxes().size() < 3) {
-            Room room = (Room)U.random(Data.currentZone.getRooms());
+        if (p.getZone().getRooms().size() < 3) {
+            Room room = Data.currentRoom();
 
             if (room != null) {
                 Box box = (Box)U.random(room.getOuterBoxes());
@@ -25,7 +26,7 @@ public class MapAdmin {
                 Runnable r = new GenRoomOnPlayer(p);
                 Thread thread = new Thread(r);
                 threads.add(thread);
-                thread.start();
+                thread.run();
             }
         }
     }
@@ -37,6 +38,6 @@ class GenRoomOnPlayer implements Runnable {
         this.p = p;
     }
     public void run() {
-        //asGenerator.genRoom(p.getPosition());
+        Generator.genRoom(new Building(p.getPosition()), new int[]{0,0});
     }
 }

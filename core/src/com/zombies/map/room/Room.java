@@ -52,9 +52,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         zone = Zone.getZone(center);
         zone.addObject(this);
 
-        for (Box b: boxes) {
+        for (Box b: boxes)
             b.setRoom(this);
-        }
 
         building.associateBoxes();
 

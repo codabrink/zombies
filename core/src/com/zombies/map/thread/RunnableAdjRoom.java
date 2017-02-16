@@ -3,11 +3,7 @@ package com.zombies.map.thread;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.map.room.Box;
-import com.zombies.map.room.Building;
 import com.zombies.util.U;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 public class RunnableAdjRoom implements Runnable {
     private Box adjBox;
