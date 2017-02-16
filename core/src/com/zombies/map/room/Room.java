@@ -59,6 +59,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
                 outerBoxes.add(b);
         }
 
+        building.associateBoxes();
+
         buildFloorModel();
         rasterizeWalls();
         handleZoning();

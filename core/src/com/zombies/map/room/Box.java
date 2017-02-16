@@ -15,10 +15,7 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
-
-import static java.lang.Integer.parseInt;
 
 public class Box extends Overlappable {
     private ArrayList<Unit> zombies = new ArrayList<>();
@@ -26,20 +23,25 @@ public class Box extends Overlappable {
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
     private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
+    private HashMap<String, Box> boxMap;
     private Random random = new Random();
-
-    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     private Building building;
     private Room room;
-    private int[] bmKey;
+
+    private int[] key;
+    private String sKey;
 
     public Box(Building building, Room room, int[] bmKey) {
         this.building = building;
         this.room     = room;
-        this.bmKey    = bmKey;
 
-        building.boxMap.put(bmKey, this);
+        this.key      = bmKey;
+        this.sKey     = bmKey[0]+","+bmKey[1];
+
+        boxMap = building.boxMap;
+
+        building.putBoxMap(key, this);
         room.boxes.add(this);
 
         position = building.positionOf(bmKey);
@@ -47,7 +49,6 @@ public class Box extends Overlappable {
         width    = C.BOX_DIAMETER;
 
         setCorners();
-        building.associateBoxes();
     }
 
     private void setCorners() {
@@ -61,26 +62,31 @@ public class Box extends Overlappable {
     public ArrayList<Vector2[]> proposeWallPositions() {
         ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
+        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
+        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
+        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
+        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
+
         Vector2[] points;
-        if (adjBoxes.get(90) == null) {
+        if (n == null || n.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy().add(0, height));
             points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // top wall
         }
-        if (adjBoxes.get(0) == null) {
+        if (e == null || e.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy().add(width, 0));
             points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // right wall
         }
-        if (adjBoxes.get(270) == null) {
+        if (s == null || s.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy());
             points[1] = new Vector2(position.cpy().add(width, 0));
             proposedPositions.add(points); // bottom wall
         }
-        if (adjBoxes.get(180) == null) {
+        if (w == null || w.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy());
             points[1] = new Vector2(position.cpy().add(0, height));
@@ -99,7 +105,7 @@ public class Box extends Overlappable {
 
     public int[][] getOpenAdjBMAKeys() {
         ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
-        int[][] adjBMAKeys = Building.getAdjBMKeys(bmKey);
+        int[][] adjBMAKeys = Building.getAdjBMKeys(key);
         for (int[] aKey : adjBMAKeys)
             if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
                 openAdjBMAKeys.add(aKey);
@@ -198,7 +204,7 @@ public class Box extends Overlappable {
     public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
-    public int[] getBmKey() { return bmKey; }
+    public int[] getKey() { return key; }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);

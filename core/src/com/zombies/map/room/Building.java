@@ -6,14 +6,12 @@ import com.zombies.C;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static java.lang.Integer.parseInt;
-
 public class Building {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
 
     public boolean threadLocked = false;
     private HashSet<Room> rooms = new HashSet<>();
-    public HashMap<int[], Box> boxMap = new HashMap<>();
+    public HashMap<String, Box> boxMap = new HashMap<>();
     private Vector2 center;
 
     public Building(Vector2 center) {
@@ -32,14 +30,18 @@ public class Building {
     }
     public void associateBoxes() {
         for (Box b : boxMap.values()) {
-            int[][] adjBMKeys = getAdjBMKeys(b.getBmKey());
+            int[][] adjBMKeys = getAdjBMKeys(b.getKey());
             for (int i = 0; i < adjBMKeys.length; i++) {
                 int[] key = adjBMKeys[i];
-                Box bb = boxMap.get(key[0]+","+key[1]);
+                Box bb = boxMap.get(key);
                 if (bb != null)
                     b.setAdjBox(C.DIRECTIONS[i / 2], bb);
             }
         }
+    }
+
+    public void putBoxMap(int[] key, Box b) {
+        boxMap.put(key[0] + "," + key[1], b);
     }
 
     public static int[] directionToBMKey(int[] bmKey, int direction) {

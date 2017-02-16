@@ -10,19 +10,16 @@ import com.zombies.map.room.Room;
 import java.util.HashMap;
 import java.util.Random;
 
-import static java.lang.Integer.parseInt;
-
 public class Generator {
     public static Room genRoom(Building building, int[] bmKey) {
         Vector2 startPos = building.positionOf(bmKey);
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
-        HashMap<int[], Box> boxMap = building.boxMap;
+        HashMap<String, Box> boxMap = building.boxMap;
 
         Room room = new Room(building);
 
         Box b = new Box(building, room, bmKey);
-        boxMap.put(bmKey, b);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
         while (room.boxes.size() <= roomSize) {
