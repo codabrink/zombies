@@ -3,74 +3,51 @@ package com.zombies.map.thread;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.map.MapGen;
+import com.zombies.data.Data;
 import com.zombies.map.room.Box;
+import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
+import com.zombies.util.U;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
 
 public class Generator {
-    public static Room genRoom(Vector2 startPos) {
-        // startPos is the bottom left corner of the first box
+    public static Room genRoom(Building building, int[] bmKey) {
+        Vector2 startPos = building.positionOf(bmKey);
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
-        HashMap<String, Box> boxMap = new HashMap<>();
 
-        Box b = new Box(startPos.x, startPos.y);
-        b.BMKey = "0,0";
-        boxMap.put("0,0", b);
+        Room room = new Room(building);
+
+        if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) != null)
+            return null;
+
+        Box b;
+        new Box(building, room, bmKey);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
-        while (boxMap.size() <= roomSize) {
-            Object[] boxMapArray = boxMap.values().toArray(); // so we can grab a random box
+        while (room.boxes.size() <= roomSize) {
+            b = (Box) U.random(room.getOuterBoxes());
 
-            // find a box with at least one open side
-            do {
-                b = (Box) boxMapArray[r.nextInt(boxMapArray.length)];
-            } while (b.getAdjBoxes().size() == 4);
+            if (b == null)
+                break;
 
-            // find open side (this can be improved)
-            int direction;
-            do {
-                direction = MapGen.DIRECTIONS[r.nextInt(4)];
-            } while (b.getAdjBox(direction) != null);
+            bmKey = (int[]) U.random(b.getOpenAdjKeys());
+            if (bmKey == null)
+                break;
 
-            int[] newBMLocation = b.getBMLocation();
+            z = Zone.getZone(building.positionOf(bmKey));
 
-            // rasterize that direction
-            Vector2 proposedPosition = new Vector2();
-            switch (direction) {
-                case 0: // right
-                    proposedPosition = b.getPosition().cpy().add(b.width, 0);
-                    newBMLocation[0]++;
-                    break;
-                case 90: // top
-                    proposedPosition = b.getPosition().cpy().add(0, b.height);
-                    newBMLocation[1]++;
-                    break;
-                case 180: // left
-                    proposedPosition = b.getPosition().cpy().sub(b.width, 0);
-                    newBMLocation[0]--;
-                    break;
-                case 270: // bottom
-                    proposedPosition = b.getPosition().cpy().sub(0, b.height);
-                    newBMLocation[1]--;
-                    break;
-            }
-            if (z.checkOverlap(proposedPosition, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
-                Box bb = new Box(proposedPosition.x, proposedPosition.y);
-                bb.BMKey = newBMLocation[0] + "," + newBMLocation[1];
-                boxMap.put(bb.BMKey, bb);
-                MapGen.associate(bb, boxMap);
-            }
+            if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
+                new Box(building, room, bmKey);
 
             loops++;
             if (loops > roomSize * 4) // catch infinite loops
                 break;
         }
 
-        return new Room(boxMap);
+        room.finalize();
+        Data.update();
+        return room;
     }
 }

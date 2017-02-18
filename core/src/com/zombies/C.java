@@ -1,11 +1,11 @@
 package com.zombies;
 
 public class C {
-    public static final float SCALE = 6f;
+    public static final float SCALE = 1f;
 
     //DEBUG
     public static final boolean DEBUG = true;
-
+    public static final int[] DIRECTIONS = {0, 90, 180, 270};
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
     public static final boolean ENABLE_ACCEL = false;
@@ -27,8 +27,6 @@ public class C {
     public static final float HEALTH_CHANCE = 0.1f;
     public static final boolean ENABLE_HEALTH = true;
     public static final float CRATE_CHANCE = 0.4f;
-    public static final int GRID_HEIGHT = 12; //height of map boxes
-    public static final int GRID_WIDTH = 12; //width of map boxes
     public static final float GUNBOX_WIDTH = 0.15f;
     public static final float LINEAR_DAMPING = 2.5f;
     public static final float PLAYER_HEALTH = 100;

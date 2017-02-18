@@ -15,8 +15,6 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.map.MapGen;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.powerups.Powerup;
 
 public class Box extends Overlappable {
@@ -24,24 +22,32 @@ public class Box extends Overlappable {
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
-    private HashMap<Integer, Box> adjBoxes = new HashMap<Integer, Box>();
-    private Room room;
-    private GameView view;
+    private HashMap<String, Box> boxMap;
     private Random random = new Random();
 
-    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
+    private Building building;
+    private Room room;
 
-    public String BMKey;
+    private int[] key;
+    private String sKey;
 
-    public Box(Vector2 p) {
-        this(p.x, p.y);
-    }
-    public Box(float x, float y) {
-        height = C.BOX_DIAMETER;
-        width  = C.BOX_DIAMETER;
-        position = new Vector2(x, y);
+    public Box(Building building, Room room, int[] bmKey) {
+        this.building = building;
+        this.room     = room;
+
+        this.key      = bmKey;
+        this.sKey     = bmKey[0]+","+bmKey[1];
+
+        boxMap = building.boxMap;
+
+        building.putBoxMap(key, this);
+        room.boxes.add(this);
+
+        position = building.positionOf(bmKey);
+        height   = C.BOX_DIAMETER;
+        width    = C.BOX_DIAMETER;
+
         setCorners();
-        view = GameView.gv;
     }
 
     private void setCorners() {
@@ -55,26 +61,31 @@ public class Box extends Overlappable {
     public ArrayList<Vector2[]> proposeWallPositions() {
         ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
 
+        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
+        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
+        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
+        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
+
         Vector2[] points;
-        if (adjBoxes.get(90) == null) {
+        if (n == null || n.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy().add(0, height));
             points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // top wall
         }
-        if (adjBoxes.get(0) == null) {
+        if (e == null || e.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy().add(width, 0));
             points[1] = new Vector2(position.cpy().add(width, height));
             proposedPositions.add(points); // right wall
         }
-        if (adjBoxes.get(270) == null) {
+        if (s == null || s.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy());
             points[1] = new Vector2(position.cpy().add(width, 0));
             proposedPositions.add(points); // bottom wall
         }
-        if (adjBoxes.get(180) == null) {
+        if (w == null || w.getRoom() != room) {
             points = new Vector2[2];
             points[0] = new Vector2(position.cpy());
             points[1] = new Vector2(position.cpy().add(0, height));
@@ -91,21 +102,13 @@ public class Box extends Overlappable {
         return powerups;
     }
 
-    public ArrayList<Integer> getOpenDirections() {
-        ArrayList<Integer> openDirections = new ArrayList<Integer>();
-        for (int i: MapGen.DIRECTIONS) {
-            if (adjBoxes.get(i) == null) {
-                openDirections.add(openDirections.size(), i);
-            }
-        }
-        return openDirections;
-    }
-    public int getRandomOpenDirection() {
-        ArrayList<Integer> openDirections = getOpenDirections();
-        if (openDirections.size() > 0)
-            return openDirections.get(random.nextInt(openDirections.size()));
-        else
-            return ' ';
+    public int[][] getOpenAdjBMAKeys() {
+        ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
+        int[][] adjBMAKeys = Building.getAdjBMKeys(key);
+        for (int[] aKey : adjBMAKeys)
+            if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
+                openAdjBMAKeys.add(aKey);
+        return openAdjBMAKeys.toArray(new int[openAdjBMAKeys.size()][]);
     }
 
     public Survivor addSurvivor() {
@@ -124,7 +127,7 @@ public class Box extends Overlappable {
 
     public void addZombie() {
         if (C.POPULATE_ZOMBIES) {
-            zombies.add(new Zombie(view, this, this.randomPoint()));
+            zombies.add(new Zombie(GameView.gv, this, this.randomPoint()));
         }
     }
 
@@ -148,10 +151,6 @@ public class Box extends Overlappable {
             return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
         }
         return new Vector2();
-    }
-
-    public Room getRoom() {
-        return room;
     }
 
     public ArrayList<Unit> getSurvivorList() {
@@ -180,17 +179,26 @@ public class Box extends Overlappable {
         return this;
     }
 
-    public void setAdjBox(int direction, Box box) { adjBoxes.put(direction, box); }
-    public Box getAdjBox(int direction) {
-        return adjBoxes.get(direction);
-    }
-    public HashMap<Integer, Box> getAdjBoxes() { return adjBoxes; }
-    public boolean isAdjacent(Box b) {
-        for (Box bb: adjBoxes.values()) {
-            if (b == bb)
-                return true;
+    public Building getBuilding() { return building; }
+    public Room getRoom() { return room; }
+    public int[] getKey() { return key; }
+    public HashSet<Box> getAdjBoxes() {
+        HashSet<Box> adjBoxes = new HashSet<>();
+        Box b;
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            b = boxMap.get(k[0] + "," + k[1]);
+            if (b != null)
+                adjBoxes.add(b);
         }
-        return false;
+        return adjBoxes;
+    }
+    public HashSet<int[]> getOpenAdjKeys() {
+        HashSet<int[]> adjKeys = new HashSet<>();
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            if (boxMap.get(k[0] + "," + k[1]) == null)
+                adjKeys.add(k);
+        }
+        return adjKeys;
     }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
@@ -200,13 +208,6 @@ public class Box extends Overlappable {
                 relp.x + width, relp.y + height, 0,
                 relp.x, relp.y + height, 0,
                 1, 1, 1);
-    }
-
-    // Box Map Location - used during room generation in MapGen.java
-    public int[] getBMLocation() {
-        String[] stringLocations = BMKey.split(",");
-        int[] locations = {Integer.parseInt(stringLocations[0]), Integer.parseInt(stringLocations[1])};
-        return locations;
     }
 
     @Override

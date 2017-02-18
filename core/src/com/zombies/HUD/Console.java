@@ -8,11 +8,11 @@ import com.zombies.map.room.Box;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Player;
+import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
-import com.zombies.map.MapGen;
 import com.zombies.map.thread.Generator;
 import com.zombies.util.U;
 
@@ -86,14 +86,7 @@ public class Console {
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
             case "genRoom":
-                Room r = Generator.genRoom(Data.players.get(0).getPosition());
-                Zone.getZone(view.getPlayer().getPosition()).addObject(r);
-                MapGen.connectRoom(r);
-                break;
-            case "connectRoom":
-                p = view.getPlayer();
-                b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
-                MapGen.connectRoom(b.getRoom());
+                Generator.genRoom(new Building(Data.players.get(0).getPosition()), new int[]{0, 0});
                 break;
             case "hallway":
                 p = view.getPlayer();

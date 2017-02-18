@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zombies;
-import com.zombies.map.MapGen;
 import com.zombies.map.room.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
@@ -86,20 +85,6 @@ public class HUD implements InputProcessor{
 
         Box b;
         switch(keycode) {
-            case 43: // o
-                b = Zone.getZone(GameView.gv.getPlayer().getPosition()).getBox(GameView.gv.getPlayer().getPosition());
-                String out = "";
-                for (int direction : MapGen.DIRECTIONS) {
-                    if (b != null) {
-                        Box bb = b.getAdjBox(direction);
-                        out += "direction: " + direction + ": ";
-                        if (bb == null)
-                            out += "NULL, ";
-                        else
-                            out += bb + ", ";
-                    }
-                }
-                break;
             case 36: // h - generate hallway in current box
                 // TODO: deprecated
 

@@ -10,7 +10,18 @@ import java.util.ArrayList;
 public class Data {
     public static Zone currentZone;
     public static Box currentBox;
-    public static Room currentRoom;
+    public static Room currentRoom() {
+        if (currentBox != null)
+            return currentBox.getRoom();
+        return null;
+    }
     public static ArrayList<Player> players = new ArrayList<>();
     public static Player player() { return players.get(0); }
+
+    public static void update() {
+        currentZone = Zone.getZone(player().getPosition());
+        currentBox  = currentZone.getBox(player().getPosition());
+        if (currentBox != null)
+            currentBox.getBuilding().update();
+    }
 }
