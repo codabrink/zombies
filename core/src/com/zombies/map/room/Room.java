@@ -1,6 +1,7 @@
 package com.zombies.map.room;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -21,7 +22,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Unit;
-import com.zombies.Wall;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
@@ -38,7 +38,9 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
+
     private Building building;
+    private HashMap<String, ArrayList<Box[]>> doors = new HashMap<>();
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
@@ -193,9 +195,8 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w: walls) {
+        for (Wall w: walls)
             w.buildWallMesh(wallBuilder, center);
-        }
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);

@@ -7,8 +7,7 @@ import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.*;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Room;
+import com.zombies.map.room.*;
 import com.zombies.util.U;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class Zone {
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
     private HashSet<Room> rooms = new HashSet<>();
-    private HashSet<Wall> walls = new HashSet<>();
+    private HashSet<com.zombies.map.room.Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
@@ -163,7 +162,7 @@ public class Zone {
         HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
 
         for (Zone z : zones) {
-            for (Wall w : z.getWalls()) {
+            for (com.zombies.map.room.Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
                 Float d, a, b, c, square, xi1, yi1, xi2, yi2;
 
@@ -331,8 +330,8 @@ public class Zone {
         updateables.remove(u);
     }
 
-    public HashSet<Wall> getWalls() { return walls; }
-    public void addWall(Wall w) { walls.add(w); }
+    public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
+    public void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         HashSet<Zone> zones = getAdjZones(1);

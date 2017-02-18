@@ -1,4 +1,4 @@
-package com.zombies;
+package com.zombies.map.room;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.zombies.BodData;
+import com.zombies.C;
+import com.zombies.GameView;
+import com.zombies.Zone;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
@@ -21,7 +25,7 @@ public class Wall implements Collideable, Loadable {
     private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
-    private ArrayList<DrawLine> lines;
+    private ArrayList<WallSegment> segments;
     private GameView view;
     private Modelable modelable;
 
@@ -30,7 +34,7 @@ public class Wall implements Collideable, Loadable {
         this.p1 = p1;
         this.p2 = p2;
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-        lines = new ArrayList<DrawLine>();
+        segments = new ArrayList<WallSegment>();
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         modelable = m;
 
@@ -42,7 +46,7 @@ public class Wall implements Collideable, Loadable {
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
-        lines.add(new DrawLine(p1, p2));
+        segments.add(new WallSegment(p1, p2));
         //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
 
         HashSet<Zone>  zones    = Zone.zonesOnLine(p1, p2);
@@ -95,7 +99,7 @@ public class Wall implements Collideable, Loadable {
         body = view.getWorld().createBody(new BodyDef());
         body.setTransform(p1, body.getAngle());
         body.setUserData(new BodData("wall", this));
-        lines = new ArrayList<DrawLine>();
+        segments = new ArrayList<WallSegment>();
 
         // if holePosition is not on line, this function will
         // swing the vector2 onto the line using p1 as the axis
@@ -127,7 +131,7 @@ public class Wall implements Collideable, Loadable {
             if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
                 EdgeShape shape = new EdgeShape();
                 shape.set(v1, v2);
-                lines.add(new DrawLine(p1.cpy().add(v1), p1.cpy().add(v2)));
+                segments.add(new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2)));
                 body.createFixture(shape, 0);
             }
         }
@@ -135,8 +139,8 @@ public class Wall implements Collideable, Loadable {
     }
 
     public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
-        for (DrawLine dl: lines)
-            dl.buildMesh(wallBuilder, modelCenter);
+        for (WallSegment ws: segments)
+            ws.buildMesh(wallBuilder, modelCenter);
     }
 
     @Override
