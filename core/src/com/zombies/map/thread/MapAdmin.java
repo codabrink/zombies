@@ -13,11 +13,15 @@ public class MapAdmin {
     public static HashSet<Thread> threads = new HashSet<>();
 
     public static void update(Player p) {
-        if (p.getZone().getRooms().size() < 3) {
+        if (true) { //(p.getZone().getRooms().size() < 7) {
             Room room = Data.currentRoom();
 
             if (room != null) {
                 Box box = (Box)U.random(room.getOuterBoxes());
+
+                if (box == null)
+                    return;
+
                 Thread thread = new Thread(new RunnableAdjRoom(box));
                 threads.add(thread);
                 thread.run();
@@ -38,6 +42,6 @@ class GenRoomOnPlayer implements Runnable {
         this.p = p;
     }
     public void run() {
-        Generator.genRoom(new Building(p.getPosition()), new int[]{0, 0});
+        Generator.genRoom(new Building(p.getPosition().cpy()), new int[]{0, 0});
     }
 }

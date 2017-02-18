@@ -30,7 +30,7 @@ public class AssetExistsExampleTest {
         GameView.gv.reset();
 
         Zone zone = Zone.getZone(0, 0);
-        Room room = Generator.genRoom(new Building(new Vector2(300, 300)), "0,0");
+        Room room = Generator.genRoom(new Building(new Vector2(0, 0)), new int[]{0,0});
 
         // assert a room is generating
 		assertTrue(zone.getRooms().size() > 0);
@@ -74,11 +74,7 @@ public class AssetExistsExampleTest {
         Building building = new Building(new Vector2(0, 0));
         Room room = new Room(building);
 
-        Box b00  = new Box(building, room, "0,0");
-        Box b10  = new Box(building, room, "1,0");
-        Box bn10 = new Box(building, room, "-1,0");
-        Box b01  = new Box(building, room, "0,1");
-        Box b0n1 = new Box(building, room, "0,-1");
+        genCrossRoom(building, room);
 
         room.finalize();
 
@@ -110,5 +106,35 @@ public class AssetExistsExampleTest {
         assertTrue(z4.getBoxes().contains(building.boxMap.get("0,0")));
         assertTrue(z4.getBoxes().contains(building.boxMap.get("1,0")));
         assertTrue(z4.getBoxes().contains(building.boxMap.get("0,-1")));
+    }
+
+    @Test
+    public void testDisplacedRoomGen() {
+        GameView.gv.reset();
+
+        Building building = new Building(new Vector2(500, 500));
+        Room room = new Room(building);
+
+        genCrossRoom(building, room);
+        room.finalize();
+
+        room = Generator.genRoom(building, new int[]{-1,1});
+
+        Box newBox = building.boxMap.get("-1,1");
+
+        Vector2 expectedPosition = building.getCenter().cpy();
+        expectedPosition.sub(C.BOX_RADIUS, C.BOX_RADIUS);
+        expectedPosition.add(-C.BOX_DIAMETER, C.BOX_DIAMETER);
+
+        assertTrue(newBox.getPosition().x == expectedPosition.x);
+        assertTrue(newBox.getPosition().y == expectedPosition.y);
+    }
+
+    private void genCrossRoom(Building building, Room room) {
+        Box b00  = new Box(building, room, new int[]{0,0});
+        Box b10  = new Box(building, room, new int[]{1,0});
+        Box bn10 = new Box(building, room, new int[]{-1,0});
+        Box b01  = new Box(building, room, new int[]{0,1});
+        Box b0n1 = new Box(building, room, new int[]{0,-1});
     }
 }

@@ -31,8 +31,8 @@ public class Building {
     }
 
     public Vector2 positionOf(int[] key) {
-        float vx = center.x - C.BOX_RADIUS + C.BOX_DIAMETER * key[0];
-        float vy = center.y - C.BOX_RADIUS + C.BOX_DIAMETER * key[1];
+        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * key[0]);
+        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * key[1]);
         return new Vector2(vx, vy);
     }
     public void associateBoxes() {
@@ -75,5 +75,9 @@ public class Building {
             adjKeys[i / 2] = new int[] { key[0] + MODIFIERS[i], key[1] + MODIFIERS[i + 1] };
         }
         return adjKeys;
+    }
+
+    public Vector2 getCenter() {
+        return center;
     }
 }

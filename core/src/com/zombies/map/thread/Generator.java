@@ -3,12 +3,12 @@ package com.zombies.map.thread;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
+import com.zombies.data.Data;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
 import com.zombies.util.U;
 
-import java.util.HashMap;
 import java.util.Random;
 
 public class Generator {
@@ -16,7 +16,6 @@ public class Generator {
         Vector2 startPos = building.positionOf(bmKey);
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
-        HashMap<String, Box> boxMap = building.boxMap;
 
         Room room = new Room(building);
 
@@ -30,9 +29,14 @@ public class Generator {
         while (room.boxes.size() <= roomSize) {
             b = (Box) U.random(room.getOuterBoxes());
 
+            if (b == null)
+                break;
+
             bmKey = (int[]) U.random(b.getOpenAdjKeys());
             if (bmKey == null)
                 break;
+
+            z = Zone.getZone(building.positionOf(bmKey));
 
             if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null)
                 new Box(building, room, bmKey);
@@ -43,7 +47,7 @@ public class Generator {
         }
 
         room.finalize();
-        System.out.println("generator - finalized a room");
+        Data.update();
         return room;
     }
 }
