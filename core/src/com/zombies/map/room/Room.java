@@ -34,6 +34,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     public  HashSet<Box> boxes = new HashSet<>();
     private boolean finalized = false;
     private ArrayList<Wall> walls = new ArrayList<Wall>();
+    private HashSet<DoorContainer> doorContainers = new HashSet<>();
     private Random random = new Random();
     private boolean alarmed = false;
     private Zone zone;
@@ -197,6 +198,11 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w: walls)
             w.buildWallMesh(wallBuilder, center);
+        MeshPartBuilder frameBuilder = Assets.modelBuilder.part("DoorFrames",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.BROWN)));
+        for (DoorContainer dc : doorContainers)
+            dc.getDoorFrame().buildMesh(frameBuilder, center);
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
