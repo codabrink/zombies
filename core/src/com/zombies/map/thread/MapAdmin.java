@@ -26,7 +26,6 @@ public class MapAdmin {
                 threads.add(thread);
                 thread.run();
             } else {
-                System.out.println("MapAdmin: Cannot find room. Starting fresh.");
                 Runnable r = new GenRoomOnPlayer(p);
                 Thread thread = new Thread(r);
                 threads.add(thread);

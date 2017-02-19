@@ -3,6 +3,8 @@ package com.zombies.map.room;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -31,8 +33,12 @@ import com.zombies.interfaces.Modelable;
 import com.zombies.util.Assets;
 
 public class Room implements Loadable, HasZone, Drawable, Modelable {
+    public static int roomCount = 0;
+
+    private int id;
     public  HashSet<Box> boxes = new HashSet<>();
     private boolean finalized = false;
+    public boolean connected = false;
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private HashSet<DoorContainer> doorContainers = new HashSet<>();
     private Random random = new Random();
@@ -41,13 +47,15 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private Vector2 center;
 
     private Building building;
-    private HashMap<String, ArrayList<Box[]>> doors = new HashMap<>();
+    public HashMap<String, HashMap<String, Box[]>> doors = new HashMap<>();
 
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
     public Room(Building building) {
         this.building = building;
+        id = roomCount;
+        roomCount++;
     }
 
     public void finalize() {
@@ -225,6 +233,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         floorModelInstance.transform.setTranslation(center.x, center.y, 1);
     }
 
+    public int getId() { return id; }
     public HashSet<Box> getOuterBoxes() {
         HashSet<Box> outerBoxes = new HashSet<>();
         // TODO: expensive
@@ -271,5 +280,88 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     @Override
     public void rebuildModel() {
         buildWallModel();
+    }
+
+    public String giveKey(Room r) {
+        return Math.min(id, r.getId()) + "," + Math.max(id, r.getId());
+    }
+}
+
+class CalculateDoors implements Runnable {
+    private Room room;
+    public CalculateDoors(Room r) {
+        room = r;
+    }
+    public void run() {
+        HashSet<Room> adjRooms = new HashSet<>();
+        HashMap<String, HashMap<String, Box[]>> potentialConnections = new HashMap<>();
+        Random rand = new Random();
+
+        HashMap<String, Box[]> doorMap;
+        for (Box b1 : room.getBoxes()) {
+            for (Box b2 : b1.getAdjBoxes()) {
+                if (b2.getRoom() != room)
+                    adjRooms.add(b2.getRoom());
+
+                String roomKey = room.giveKey(b2.getRoom());
+                if (potentialConnections.get(roomKey) == null)
+                    potentialConnections.put(roomKey, new HashMap<String, Box[]>());
+
+                doorMap = potentialConnections.get(roomKey);
+                String boxKey = b1.giveKey(b2);
+                if (doorMap.get(boxKey) == null)
+                    doorMap.put(boxKey, new Box[]{b1, b2});
+            }
+        }
+
+        HashMap<String, Box[]> connectionList;
+        Box[] connection;
+        for (String roomsKey : potentialConnections.keySet()) {
+            connectionList = potentialConnections.get(roomsKey);
+
+            Iterator itr = connectionList.entrySet().iterator();
+            while (itr.hasNext()) {
+                Map.Entry pair = (Map.Entry)itr.next();
+                connection = (Box[])pair.getValue();
+                Room otherRoom = connection[0].getRoom() == room ? connection[1].getRoom() : connection[0].getRoom();
+                if (!otherRoom.connected && !itr.hasNext())
+                    connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
+                else if (rand.nextFloat() < 0.3f)
+                    connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
+            }
+        }
+    }
+
+    private void connectRooms(Box b1, Box b2, String roomKey, String boxKey) {
+        initRoomConnectionList(b1, b2, roomKey);
+
+        // do not generate door twice
+        if (checkDoorExistence(b1, roomKey, boxKey))
+            return;
+
+        // u stands for "un-generated"
+        b1.getRoom().doors.get(roomKey).put("u" + boxKey, new Box[]{b1, b2});
+        b2.getRoom().doors.get(roomKey).put("u" + boxKey, new Box[]{b2, b1});
+
+        if (b1.getRoom().connected == true)
+            b2.getRoom().connected = true;
+        if (b2.getRoom().connected == true)
+            b1.getRoom().connected = true;
+    }
+
+    // true - exists, false - doesn't exist
+    private boolean checkDoorExistence(Box b, String roomKey, String boxKey) {
+        if (b.getRoom().doors.get(roomKey).get("u" + boxKey) != null)
+            return true;
+        if (b.getRoom().doors.get(roomKey).get(boxKey) != null)
+            return true;
+        return false;
+    }
+
+    private void initRoomConnectionList(Box b1, Box b2, String roomKey) {
+        if (b1.getRoom().doors.get(roomKey) == null)
+            b1.getRoom().doors.put(roomKey, new HashMap<String, Box[]>());
+        if (b2.getRoom().doors.get(roomKey) == null)
+            b2.getRoom().doors.put(roomKey, new HashMap<String, Box[]>());
     }
 }

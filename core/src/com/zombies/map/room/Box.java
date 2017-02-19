@@ -18,6 +18,8 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.powerups.Powerup;
 
 public class Box extends Overlappable {
+    public static int numBoxes = 0;
+
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
@@ -28,10 +30,14 @@ public class Box extends Overlappable {
     private Building building;
     private Room room;
 
+    private int id;
     private int[] key;
     private String sKey;
 
     public Box(Building building, Room room, int[] bmKey) {
+        id = numBoxes;
+        numBoxes++;
+
         this.building = building;
         this.room     = room;
 
@@ -179,6 +185,7 @@ public class Box extends Overlappable {
         return this;
     }
 
+    public int getId() { return id; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
@@ -228,5 +235,9 @@ public class Box extends Overlappable {
     @Override
     public void unload() {
 
+    }
+
+    public String giveKey(Box b) {
+        return Math.min(id, b.getId()) + "," + Math.max(id, b.getId());
     }
 }
