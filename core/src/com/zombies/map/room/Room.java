@@ -30,9 +30,10 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
+import com.zombies.interfaces.Updateable;
 import com.zombies.util.Assets;
 
-public class Room implements Loadable, HasZone, Drawable, Modelable {
+public class Room implements Loadable, HasZone, Drawable, Modelable, Updateable {
     public static int roomCount = 0;
 
     private int id;
@@ -45,6 +46,7 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
+    private Thread doorCalcThread;
 
     private Building building;
     public HashMap<String, HashMap<String, Box[]>> doors = new HashMap<>();
@@ -73,6 +75,11 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         handleZoning();
 
         building.refresh();
+
+        // Calculate where doors should be in a separate thread
+        Runnable runnable     = new CalculateDoors(this);
+        doorCalcThread = new Thread(runnable);
+        doorCalcThread.start();
 
         finalized = true;
     }
@@ -244,6 +251,10 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         return outerBoxes;
     }
 
+    private void generateDoor(Map.Entry pair) {
+        System.out.println((String)pair.getKey());
+    }
+
     @Override
     public Zone getZone() {
         return zone;
@@ -284,6 +295,24 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
 
     public String giveKey(Room r) {
         return Math.min(id, r.getId()) + "," + Math.max(id, r.getId());
+    }
+
+    @Override
+    public void update() {
+        if (doorCalcThread != null && !doorCalcThread.isAlive()) {
+            for (HashMap<String, Box[]> roomConnections : doors.values()) {
+                Iterator itr = roomConnections.entrySet().iterator();
+                while (itr.hasNext()) {
+                    Map.Entry pair = (Map.Entry)itr.next();
+                    String key = (String)pair.getKey();
+                    if (key.charAt(0) != 'u')
+                        continue;
+
+                    generateDoor(pair);
+                }
+            }
+            doorCalcThread = null;
+        }
     }
 }
 

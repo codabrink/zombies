@@ -8,6 +8,6 @@ public class DesktopLauncher {
     public static boolean DESKTOP = true;
 
     public static void main (String[] arg) {
-        new LwjglApplication(new Zombies(), "Zombie Surge", 1900, 1024);
+        new LwjglApplication(new Zombies(), "Zombie Surge", 1500, 600);
     }
 }
