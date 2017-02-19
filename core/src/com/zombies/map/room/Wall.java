@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
@@ -25,17 +24,30 @@ public class Wall implements Collideable, Loadable {
     private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
-    private ArrayList<WallSegment> segments;
+
+    private ArrayList<WallPoint> points     = new ArrayList<>();
+    private ArrayList<WallSegment> segments = new ArrayList<>();
+
     private GameView view;
     private Modelable modelable;
 
     public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
+
+        HashSet<Zone> zonesOnLine = Zone.zonesOnLine(p1, p2);
+        // Do not duplicate walls.
+        for (Zone z : zonesOnLine)
+            for (Wall w : z.getWalls())
+                if (w.similar(p1, p2))
+                    return;
+
+        for (Zone z : zonesOnLine)
+            z.addWall(this);
+
         this.p1 = p1;
         this.p2 = p2;
-        center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-        segments = new ArrayList<WallSegment>();
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         modelable = m;
 
         //set up physics
@@ -46,11 +58,31 @@ public class Wall implements Collideable, Loadable {
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
-        segments.add(new WallSegment(p1, p2));
-        //Zone.getZone((p1.x + p2.x) / 2, (p1.y + p2.y) / 2).addDrawableNoCheck(this, 1);
+        points.add(new WallPoint(p1, 1));
+        points.add(new WallPoint(p2, 0));
 
-        for (Zone z : Zone.zonesOnLine(p1, p2))
-            z.addWall(this);
+        genSegmentsFromPoints();
+    }
+
+    private void genSegmentsFromPoints() {
+        segments = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            if (i == points.size() - 1)
+                break;
+
+            segments.add(new WallSegment(
+                    points.get(i).getPoint(),
+                    points.get(i + 1).getPoint(),
+                    points.get(i).getHeight()));
+        }
+    }
+
+    // Check if two lines are very close
+    public boolean similar(Vector2 p1, Vector2 p2) {
+        final float dstTolerance = 0.1f;
+        if (this.p1.dst(p1) < dstTolerance && this.p2.dst(p2) < dstTolerance)
+            return true;
+        return false;
     }
 
     public Double getAngle() { return angle; }
@@ -127,7 +159,7 @@ public class Wall implements Collideable, Loadable {
             if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
                 EdgeShape shape = new EdgeShape();
                 shape.set(v1, v2);
-                segments.add(new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2)));
+                segments.add(new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2), 1));
                 body.createFixture(shape, 0);
             }
         }

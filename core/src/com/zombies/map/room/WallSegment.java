@@ -11,19 +11,24 @@ import com.zombies.util.FixedBoxShapeBuilder;
 public class WallSegment {
 	private Vector2 p1, p2;
     private double angle;
+    private float height;
 
-	public WallSegment(Vector2 p1, Vector2 p2) {
+	public WallSegment(Vector2 p1, Vector2 p2, float height) {
         this.p1 = p1;
         this.p2 = p2;
+        this.height = height;
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 	}
 
     public void buildMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
+        if (height == 0)
+            return;
+
         BoundingBox bounds;
         Vector3 min, max;
 
-        min = new Vector3(0, 0, 0);
-        max = new Vector3(p1.dst(p2), 0.1f, C.BOX_DEPTH);
+        min = new Vector3(0, 0, (height < 0 ? C.BOX_DEPTH * Math.abs(height) : 0));
+        max = new Vector3(p1.dst(p2), 0.1f, (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH));
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
