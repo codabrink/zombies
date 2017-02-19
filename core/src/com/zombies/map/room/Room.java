@@ -130,6 +130,10 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         proposedPositions = consolidateWallPositions(proposedPositions);
 
         for (Vector2[] pstn: proposedPositions) {
+            for (Zone z : Zone.zonesOnLine(pstn[0], pstn[1]))
+                for (Wall w : z.getWalls())
+                    if (w.similar(pstn[0], pstn[1]))
+                        continue;
             walls.add(new Wall(pstn[0], pstn[1], this));
         }
 

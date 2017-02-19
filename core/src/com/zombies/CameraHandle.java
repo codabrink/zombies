@@ -8,7 +8,7 @@ public class CameraHandle {
     private Player player;
     public PerspectiveCamera cam;
 
-    private float zoom = 25 * C.SCALE;
+    private float zoom = 50 * C.SCALE;
 
     public CameraHandle(GameView view) {
         cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

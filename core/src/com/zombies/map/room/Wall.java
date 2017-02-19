@@ -36,13 +36,7 @@ public class Wall implements Collideable, Loadable {
 
         HashSet<Zone> zonesOnLine = Zone.zonesOnLine(p1, p2);
         // Do not duplicate walls.
-        for (Zone z : zonesOnLine)
-            for (Wall w : z.getWalls())
-                if (w.similar(p1, p2))
-                    return;
 
-        for (Zone z : zonesOnLine)
-            z.addWall(this);
 
         this.p1 = p1;
         this.p2 = p2;
@@ -62,6 +56,9 @@ public class Wall implements Collideable, Loadable {
         points.add(new WallPoint(p2, 0));
 
         genSegmentsFromPoints();
+
+        for (Zone z : Zone.zonesOnLine(p1, p2))
+            z.addWall(this);
     }
 
     private void genSegmentsFromPoints() {
