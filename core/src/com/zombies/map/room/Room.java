@@ -324,7 +324,7 @@ class CalculateDoors implements Runnable {
                 Map.Entry pair = (Map.Entry)itr.next();
                 connection = (Box[])pair.getValue();
                 Room otherRoom = connection[0].getRoom() == room ? connection[1].getRoom() : connection[0].getRoom();
-                if (!otherRoom.connected && !itr.hasNext())
+                if ((!room.connected || !otherRoom.connected) && !itr.hasNext())
                     connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
                 else if (rand.nextFloat() < 0.3f)
                     connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
