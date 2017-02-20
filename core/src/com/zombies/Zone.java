@@ -6,8 +6,9 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.map.*;
+import com.zombies.map.Grass;
 import com.zombies.map.room.*;
+import com.zombies.map.room.Building;
 import com.zombies.util.U;
 
 import java.util.ArrayList;
@@ -33,7 +34,8 @@ public class Zone {
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
     private HashSet<Room> rooms = new HashSet<>();
-    private HashSet<com.zombies.map.room.Wall> walls = new HashSet<>();
+    private HashSet<Building> buildings = new HashSet<>();
+    private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
@@ -160,6 +162,7 @@ public class Zone {
 
     public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
         Vector2 p1, p2;
+        HashSet<Wall> walls = new HashSet<>();
         for (Zone z : Zone.getZone(c).getAdjZones(1)) {
             for (Wall w : z.getWalls()) {
                 p1 = w.getStart();
@@ -168,13 +171,14 @@ public class Zone {
                 boolean intersects =
                         (Math.abs((p2.x - p1.x) * c.x + (p1.y - p2.y) * c.y + (p1.x - p2.x) * p1.y + (p2.y - p1.y) * p1.x)) /
                                 Math.sqrt(Math.pow((double)(p2.x - p1.x), 2) + Math.pow((double)(p1.y - p2.y), 2)) <= r;
+                if (intersects)
+                    walls.add(w);
             }
         }
+        return walls;
     }
 
     public static void createHole(Vector2 center, Float radius) {
-
-
         HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
         for (Zone z : zones) {
             for (Wall w : z.getWalls()) {
@@ -260,6 +264,8 @@ public class Zone {
         o.setZone(this);
 
         // KEEP RECORDS
+        if (o instanceof Building)
+            addBuilding((Building) o);
         if (o instanceof Room)
             addRoom((Room) o);
         if (o instanceof Box)
@@ -285,6 +291,8 @@ public class Zone {
     public Zone removeObject(HasZone o) {
         o.setZone(null);
 
+        if (o instanceof Building)
+            removeBuilding((Building) o);
         if (o instanceof Room)
             removeRoom((Room) o);
         if (o instanceof Box)
@@ -303,15 +311,23 @@ public class Zone {
 
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
-    public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
+    public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Room> getRooms() { return rooms; }
+    public HashSet<Building> getBuildings() { return buildings; }
 
+    private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {
         rooms.add(r);
     }
     private void addBox(Box b) {
         boxes.add(b);
+    }
+
+    private void removeBuilding(Building b) {
+        buildings.remove(b);
+        for (Room r : b.getRooms())
+            removeObject(r);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);

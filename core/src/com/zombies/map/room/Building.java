@@ -2,18 +2,26 @@ package com.zombies.map.room;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.Zone;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class Building {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
+    public enum DataState { BAD, PROCESSING, GOOD }
 
     public static HashSet<Room> unFinalizedRooms = new HashSet<>();
+
+    public DataState wallMapState = DataState.BAD;
 
     public boolean threadLocked = false;
     private HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Box> boxMap = new HashMap<>();
+    public HashMap<String, Wall> wallMap = new HashMap<>();
     private Vector2 center;
 
     public Building(Vector2 center) {
@@ -25,7 +33,8 @@ public class Building {
             r.finalize();
     }
 
-    public void refresh() {
+    public void refresh(Room room) { // room is the room that caused the refresh
+        wallMapState = DataState.BAD;
         for (Box b : boxMap.values())
             rooms.add(b.getRoom());
     }
@@ -80,4 +89,5 @@ public class Building {
     public Vector2 getCenter() {
         return center;
     }
+    public HashSet<Room> getRooms() { return rooms; }
 }

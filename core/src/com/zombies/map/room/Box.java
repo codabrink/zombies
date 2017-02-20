@@ -189,6 +189,7 @@ public class Box extends Overlappable {
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
+    public String getSKey() { return sKey; }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
         Box b;

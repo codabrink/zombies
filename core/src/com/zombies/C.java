@@ -8,6 +8,9 @@ public class C {
     public static final int[] DIRECTIONS = {0, 90, 180, 270};
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
+    public static final long THREAD_DELAY = 1000l;
+    public static final long THREAD_INTERVAL = 1000l;
+
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = false;
