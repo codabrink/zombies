@@ -264,6 +264,8 @@ public class Zone {
         o.setZone(this);
 
         // KEEP RECORDS
+        if (o instanceof Wall)
+            addWall((Wall) o);
         if (o instanceof Building)
             addBuilding((Building) o);
         if (o instanceof Room)
@@ -291,6 +293,8 @@ public class Zone {
     public Zone removeObject(HasZone o) {
         o.setZone(null);
 
+        if (o instanceof Wall)
+            removeWall((Wall) o);
         if (o instanceof Building)
             removeBuilding((Building) o);
         if (o instanceof Room)
@@ -324,6 +328,9 @@ public class Zone {
         boxes.add(b);
     }
 
+    private void removeWall(Wall w) {
+        walls.remove(w);
+    }
     private void removeBuilding(Building b) {
         buildings.remove(b);
         for (Room r : b.getRooms())
@@ -362,7 +369,7 @@ public class Zone {
     }
 
     public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
-    public void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
+    private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         HashSet<Zone> zones = getAdjZones(1);

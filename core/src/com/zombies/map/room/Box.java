@@ -15,6 +15,7 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Modelable;
 import com.zombies.powerups.Powerup;
 
 public class Box extends Overlappable {
@@ -61,6 +62,49 @@ public class Box extends Overlappable {
         corners[1] = new Vector2(position.x, position.y + height);
         corners[2] = new Vector2(position.x, position.y);
         corners[3] = new Vector2(position.x + width, position.y);
+    }
+
+    public void setWallMap(Modelable m) {
+        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
+        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
+        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
+        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
+
+        String wallKey;
+        if (n == null || n.getRoom() != room) {
+            wallKey = key[0]+','+(key[1]+1)+",h";
+            putWall(wallKey,
+                    position.cpy().add(0, height),
+                    position.cpy().add(width, height),
+                    m);
+        }
+        if (e == null || e.getRoom() != room) {
+            wallKey = (key[0]+1)+','+key[1]+",v";
+            putWall(wallKey,
+                    position.cpy().add(width, 0),
+                    position.cpy().add(width, height),
+                    m);
+        }
+        if (s == null || s.getRoom() != room) {
+            wallKey = sKey+",h";
+            putWall(wallKey,
+                    position.cpy(),
+                    position.cpy().add(width, 0),
+                    m);
+        }
+        if (w == null || w.getRoom() != room) {
+            wallKey = sKey+",v";
+            putWall(wallKey,
+                    position.cpy(),
+                    position.cpy().add(0, height),
+                    m);
+        }
+    }
+
+    private void putWall(String key, Vector2 p1, Vector2 p2, Modelable m) {
+        if (building.wallMap.get(key) != null)
+            building.wallMap.get(key).destroy();
+        building.wallMap.put(key, new WallWall(p1, p2, m));
     }
 
     // detect where this box should have walls, but don't create them yet.

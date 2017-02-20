@@ -16,20 +16,26 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.interfaces.Collideable;
+import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
 
-public class Wall implements Collideable, Loadable {
+public class Wall implements Collideable, Loadable, HasZone {
     private Vector2 p1, p2, center;
     private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
 
-    private ArrayList<WallPoint> points     = new ArrayList<>();
-    private ArrayList<WallSegment> segments = new ArrayList<>();
+    protected ArrayList<WallPoint>   points   = new ArrayList<>();
+    protected ArrayList<WallSegment> segments = new ArrayList<>();
 
     private GameView view;
     private Modelable modelable;
+
+    public Building building;
+    public boolean vertical;
+    private int[] key;
+    private String sKey;
 
     public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
@@ -40,16 +46,11 @@ public class Wall implements Collideable, Loadable {
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         modelable = m;
 
-        points.add(new WallPoint(p1, 1));
-        points.add(new WallPoint(p2, 0));
-
-        genSegmentsFromPoints();
-
         for (Zone z : Zone.zonesOnLine(p1, p2))
-            z.addWall(this);
+            z.addObject(this);
     }
 
-    private void genSegmentsFromPoints() {
+    protected void genSegmentsFromPoints() {
         if (body != null)
             view.getWorld().destroyBody(body);
 
@@ -166,6 +167,10 @@ public class Wall implements Collideable, Loadable {
             ws.buildMesh(wallBuilder, modelCenter);
     }
 
+    public void destroy() {
+        view.getWorld().destroyBody(body);
+    }
+
     @Override
     public void handleCollision(Fixture f) {
         if (C.ENABLE_WALL_DESTRUCTION) {
@@ -181,5 +186,15 @@ public class Wall implements Collideable, Loadable {
     @Override
     public void unload() {
         body.setActive(false);
+    }
+
+    @Override
+    public Zone getZone() {
+        return null;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+
     }
 }
