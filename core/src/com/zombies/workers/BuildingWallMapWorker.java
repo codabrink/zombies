@@ -30,6 +30,9 @@ public class BuildingWallMapWorker implements Runnable {
             return;
         running = true;
 
+        if (Data.currentBox != null)
+            if (Data.currentBox.getBuilding().wallMapState == Building.DataState.BAD)
+                buildWallMap(Data.currentBox.getBuilding());
         for (Zone z : Data.currentZone.getAdjZones(1))
             for (Building b : z.getBuildings())
                 if (b.wallMapState == Building.DataState.BAD)

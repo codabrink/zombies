@@ -9,7 +9,7 @@ public class C {
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
     public static final long THREAD_DELAY = 1000l;
-    public static final long THREAD_INTERVAL = 1000l;
+    public static final long THREAD_INTERVAL = 500l;
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;

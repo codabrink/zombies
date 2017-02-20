@@ -6,6 +6,6 @@ import com.zombies.Zombies;
 
 public class DesktopLauncher {
     public static void main (String[] arg) {
-        new LwjglApplication(new Zombies(), "Zombie Surge", 2500, 1000);
+        new LwjglApplication(new Zombies(), "Zombie Surge", 1500, 800);
     }
 }

@@ -3,6 +3,7 @@ package com.zombies.map.room;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
+import com.zombies.interfaces.HasZone;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Building {
+public class Building implements HasZone {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
+
     public enum DataState { BAD, PROCESSING, GOOD }
 
     public static HashSet<Room> unFinalizedRooms = new HashSet<>();
@@ -23,9 +25,11 @@ public class Building {
     public HashMap<String, Box> boxMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
     private Vector2 center;
+    private Zone zone;
 
     public Building(Vector2 center) {
         this.center = center;
+        Zone.getZone(center).addObject(this);
     }
 
     public void update() {
@@ -90,4 +94,14 @@ public class Building {
         return center;
     }
     public HashSet<Room> getRooms() { return rooms; }
+
+    @Override
+    public Zone getZone() {
+        return zone;
+    }
+
+    @Override
+    public void setZone(Zone z) {
+        zone = z;
+    }
 }

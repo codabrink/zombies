@@ -81,12 +81,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable, Updateable 
         finalized = true;
     }
 
-    public void calculateDoors() {
-        Runnable runnable     = new CalculateDoors(this);
-        doorCalcThread = new Thread(runnable);
-        doorCalcThread.start();
-    }
-
     private void handleZoning() {
         HashSet<Zone> zones = new HashSet<>();
         for (Box b : getBoxes())

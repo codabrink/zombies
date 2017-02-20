@@ -32,9 +32,14 @@ public class RoomDoorWorker implements Runnable {
             return;
         running = true;
 
-        for (Room r : roomList) {
-            if (r.getBuilding().wallMapState == Building.DataState.GOOD)
+        Room r;
+        Iterator itr = roomList.iterator();
+        while (itr.hasNext()) {
+            r = (Room)itr.next();
+            if (r.getBuilding().wallMapState == Building.DataState.GOOD) {
                 processDoorsOnRoom(r);
+                itr.remove();
+            }
         }
 
         running = false;
@@ -78,8 +83,6 @@ public class RoomDoorWorker implements Runnable {
                     connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
             }
         }
-
-        roomList.remove(room);
     }
 
     private void connectRooms(Box b1, Box b2, String roomKey, String boxKey) {
