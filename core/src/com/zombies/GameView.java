@@ -86,10 +86,10 @@ public class GameView implements Screen {
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         Data.workers = new HashMap<>();
-        Data.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
-        Data.workers.get("BuildingWallMap").start();
-        Data.workers.put("RoomDoor", new Thread(new RoomDoorWorker()));
-        Data.workers.get("RoomDoor").start();
+        //Data.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
+        //Data.workers.get("BuildingWallMap").start();
+        //Data.workers.put("RoomDoor", new Thread(new RoomDoorWorker()));
+        //Data.workers.get("RoomDoor").start();
     }
 
     public void reset() {

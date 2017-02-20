@@ -64,41 +64,43 @@ public class Box extends Overlappable {
         corners[3] = new Vector2(position.x + width, position.y);
     }
 
-    public void setWallMap(Modelable m) {
+    public void setAdjWallMap(Modelable m) {
         Box n = boxMap.get(key[0] + "," + (key[1] + 1));
         Box s = boxMap.get(key[0] + "," + (key[1] - 1));
         Box e = boxMap.get(key[0] + 1 + "," + key[1]);
         Box w = boxMap.get(key[0] - 1 + "," + key[1]);
 
-        String wallKey;
+        String key = this.key[0]+','+(this.key[1]+1)+",h";
         if (n == null || n.getRoom() != room) {
-            wallKey = key[0]+','+(key[1]+1)+",h";
-            putWall(wallKey,
+            putWall(key,
                     position.cpy().add(0, height),
                     position.cpy().add(width, height),
                     m);
-        }
+        } else { clearWall(key); }
+
+        key = (this.key[0]+1)+','+ this.key[1]+",v";
         if (e == null || e.getRoom() != room) {
-            wallKey = (key[0]+1)+','+key[1]+",v";
-            putWall(wallKey,
+            putWall(key,
                     position.cpy().add(width, 0),
                     position.cpy().add(width, height),
                     m);
-        }
+        } else { clearWall(key); }
+
+        key = sKey+",h";
         if (s == null || s.getRoom() != room) {
-            wallKey = sKey+",h";
-            putWall(wallKey,
+            putWall(key,
                     position.cpy(),
                     position.cpy().add(width, 0),
                     m);
-        }
+        } else { clearWall(key); }
+
+        key = sKey+",v";
         if (w == null || w.getRoom() != room) {
-            wallKey = sKey+",v";
-            putWall(wallKey,
+            putWall(key,
                     position.cpy(),
                     position.cpy().add(0, height),
                     m);
-        }
+        } else { clearWall(key); }
     }
 
     private void putWall(String key, Vector2 p1, Vector2 p2, Modelable m) {
@@ -106,43 +108,9 @@ public class Box extends Overlappable {
             building.wallMap.get(key).destroy();
         building.wallMap.put(key, new WallWall(p1, p2, m));
     }
-
-    // detect where this box should have walls, but don't create them yet.
-    public ArrayList<Vector2[]> proposeWallPositions() {
-        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
-
-        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
-        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
-        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
-        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
-
-        Vector2[] points;
-        if (n == null || n.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy().add(0, height));
-            points[1] = new Vector2(position.cpy().add(width, height));
-            proposedPositions.add(points); // top wall
-        }
-        if (e == null || e.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy().add(width, 0));
-            points[1] = new Vector2(position.cpy().add(width, height));
-            proposedPositions.add(points); // right wall
-        }
-        if (s == null || s.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy());
-            points[1] = new Vector2(position.cpy().add(width, 0));
-            proposedPositions.add(points); // bottom wall
-        }
-        if (w == null || w.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy());
-            points[1] = new Vector2(position.cpy().add(0, height));
-            proposedPositions.add(points); // left wall
-        }
-
-        return proposedPositions;
+    private void clearWall(String key) {
+        if (building.wallMap.get(key) != null)
+            building.wallMap.get(key).destroy();
     }
 
     public float x() {return position.x;}
