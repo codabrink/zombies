@@ -158,11 +158,26 @@ public class Zone {
         return zones;
     }
 
-    public static void createHole(Vector2 center, Float radius) {
-        HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
+    public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
+        Vector2 p1, p2;
+        for (Zone z : Zone.getZone(c).getAdjZones(1)) {
+            for (Wall w : z.getWalls()) {
+                p1 = w.getStart();
+                p2 = w.getEnd();
+                // http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
+                boolean intersects =
+                        (Math.abs((p2.x - p1.x) * c.x + (p1.y - p2.y) * c.y + (p1.x - p2.x) * p1.y + (p2.y - p1.y) * p1.x)) /
+                                Math.sqrt(Math.pow((double)(p2.x - p1.x), 2) + Math.pow((double)(p1.y - p2.y), 2)) <= r;
+            }
+        }
+    }
 
+    public static void createHole(Vector2 center, Float radius) {
+
+
+        HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
         for (Zone z : zones) {
-            for (com.zombies.map.room.Wall w : z.getWalls()) {
+            for (Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
                 Float d, a, b, c, square, xi1, yi1, xi2, yi2;
 

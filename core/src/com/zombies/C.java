@@ -10,7 +10,7 @@ public class C {
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
-    public static final boolean ENABLE_DEBUG_LINES = true;
+    public static final boolean ENABLE_DEBUG_LINES = false;
     public static final float BOX_DEPTH = 7 * SCALE;
     public static final float BOX_DIAMETER = 15 * SCALE;
     public static final float BOX_RADIUS = BOX_DIAMETER / 2;

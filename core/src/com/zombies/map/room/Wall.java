@@ -34,23 +34,11 @@ public class Wall implements Collideable, Loadable {
     public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
 
-        HashSet<Zone> zonesOnLine = Zone.zonesOnLine(p1, p2);
-        // Do not duplicate walls.
-
-
         this.p1 = p1;
         this.p2 = p2;
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         modelable = m;
-
-        //set up physics
-        EdgeShape shape = new EdgeShape();
-        shape.set(new Vector2(0, 0), new Vector2(p1.dst(p2), 0));
-        body = view.getWorld().createBody(new BodyDef());
-        body.createFixture(shape, 0);
-        body.setTransform(p1, (float)angle);
-        body.setUserData(new BodData("wall", this));
 
         points.add(new WallPoint(p1, 1));
         points.add(new WallPoint(p2, 0));
@@ -62,6 +50,16 @@ public class Wall implements Collideable, Loadable {
     }
 
     private void genSegmentsFromPoints() {
+        if (body != null)
+            view.getWorld().destroyBody(body);
+
+        EdgeShape shape = new EdgeShape();
+        shape.set(new Vector2(0, 0), new Vector2(p1.dst(p2), 0));
+        body = view.getWorld().createBody(new BodyDef());
+        body.createFixture(shape, 0);
+        body.setTransform(p1, (float)angle);
+        body.setUserData(new BodData("wall", this));
+
         segments = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
             if (i == points.size() - 1)

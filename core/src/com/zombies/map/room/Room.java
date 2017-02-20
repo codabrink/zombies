@@ -195,15 +195,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable, Updateable 
         return null;
     }
 
-    public Wall findWall(Body b) {
-        for (Wall w: walls) {
-            if (w != null && w.getBody().getPosition().x == b.getPosition().x && w.getBody().getPosition().y == b.getPosition().y) {
-                return w;
-            }
-        }
-        return null;
-    }
-
     public ArrayList<Wall> getWalls() { return walls; }
     public HashSet<Box> getBoxes() {
         return boxes;
