@@ -24,7 +24,5 @@ public class Data {
     public static void update() {
         currentZone = Zone.getZone(player().getPosition());
         currentBox  = currentZone.getBox(player().getPosition());
-        if (currentBox != null)
-            currentBox.getBuilding().update();
      }
 }

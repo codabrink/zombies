@@ -33,6 +33,7 @@ import com.zombies.workers.RoomDoorWorker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -88,15 +89,16 @@ public class GameView implements Screen {
         Data.workers = new HashMap<>();
         //Data.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
         //Data.workers.get("BuildingWallMap").start();
-        //Data.workers.put("RoomDoor", new Thread(new RoomDoorWorker()));
-        //Data.workers.get("RoomDoor").start();
+        Data.workers.put("RoomDoor", new Thread(new RoomDoorWorker()));
+        Data.workers.get("RoomDoor").start();
     }
 
     public void reset() {
         gv = this;
 
-        Zone.zones = new HashMap<String, Zone>();
-        Zone.loadedZones = new ArrayList<Zone>();
+        Zone.zones = new HashMap<>();
+        Zone.readyToModel = new HashSet<>();
+        Zone.loadedZones = new ArrayList<>();
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();

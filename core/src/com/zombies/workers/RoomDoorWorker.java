@@ -23,26 +23,18 @@ public class RoomDoorWorker implements Runnable {
             callback();
         }
     };
-    private boolean running = false;
     @Override
     public void run() { timer.scheduleAtFixedRate(task, C.THREAD_INTERVAL, C.THREAD_DELAY); }
 
     private void callback() {
-        if (running)
-            return;
-        running = true;
-
         Room r;
         Iterator itr = roomList.iterator();
         while (itr.hasNext()) {
             r = (Room)itr.next();
-            if (r.getBuilding().wallMapState == Building.DataState.GOOD) {
-                processDoorsOnRoom(r);
-                itr.remove();
-            }
+            processDoorsOnRoom(r);
+            r.getZone().readyToModel.add(r);
+            itr.remove();
         }
-
-        running = false;
     }
 
     private void processDoorsOnRoom(Room room) {

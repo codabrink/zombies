@@ -24,11 +24,13 @@ import com.zombies.interfaces.Updateable;
 import com.zombies.workers.RoomDoorWorker;
 
 public class Room implements Loadable, HasZone, Updateable, Drawable {
+    public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
+    public GenState genState;
+
     public static int roomCount = 0;
 
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
-    private boolean finalized = false;
     public boolean connected = false;
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private Random random = new Random();
@@ -41,37 +43,30 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     public HashMap<String, HashMap<String, Box[]>> doors = new HashMap<>();
 
     public Room(Building building) {
+        genState = GenState.CREATED;
+
         this.building = building;
+        building.rooms.add(this);
+
         id = roomCount;
         roomCount++;
     }
 
-    public void finalize() {
+    public void finalize1() {
         center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addObject(this);
 
         for (Box b: boxes)
-            b.setRoom(this);
+            b.setAdjWallMap();
 
-        building.associateBoxes();
-
-        rasterizeWalls();
-        handleZoning();
-
-        building.refresh(this);
         RoomDoorWorker.roomList.add(this); // queue for door processing
-
-        finalized = true;
+        genState = GenState.BOXED;
     }
 
-    private void handleZoning() {
-        HashSet<Zone> zones = new HashSet<>();
-        for (Box b : getBoxes())
-            for (Vector2 v : b.getCorners())
-                zones.add(Zone.getZone(v).addObject(b));
-        for (Zone z : zones)
-            z.addObject(this);
+    public void buildModel() {
+        building.rebuildModel();
+        this.genState = GenState.FINALIZED;
     }
 
     // calculates the median position of all of the boxes
@@ -110,12 +105,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         }
     }
 
-    public void rasterizeWalls() {
-        for (Box b : boxes)
-                b.setAdjWallMap(building);
-        building.rebuildModel();
-    }
-    
     // consolidate the proposed walls into as few as possible.
     public ArrayList<Vector2[]> consolidateWallPositions(ArrayList<Vector2[]> proposedPositions) {
 

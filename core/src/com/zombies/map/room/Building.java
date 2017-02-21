@@ -30,13 +30,11 @@ public class Building implements HasZone, Modelable {
 
     public enum DataState { BAD, PROCESSING, GOOD }
 
-    public static HashSet<Room> unFinalizedRooms = new HashSet<>();
-
     public DataState wallMapState = DataState.BAD;
 
     private int drawFrame = 0;
     public boolean threadLocked = false;
-    private HashSet<Room> rooms = new HashSet<>();
+    public HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Box> boxMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
     private Vector2 center;
@@ -47,31 +45,10 @@ public class Building implements HasZone, Modelable {
         Zone.getZone(center).addObject(this);
     }
 
-    public void update() {
-        for (Room r : unFinalizedRooms)
-            r.finalize();
-    }
-
-    public void refresh(Room room) { // room is the room that caused the refresh
-        for (Box b : boxMap.values())
-            rooms.add(b.getRoom());
-    }
-
     public Vector2 positionOf(int[] key) {
         float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * key[0]);
         float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * key[1]);
         return new Vector2(vx, vy);
-    }
-    public void associateBoxes() {
-        for (Box b : boxMap.values()) {
-            int[][] adjBMKeys = getAdjBMKeys(b.getKey());
-            for (int i = 0; i < adjBMKeys.length; i++) {
-                int[] key = adjBMKeys[i];
-                Box bb = boxMap.get(key);
-                //if (bb != null)
-                    //b.setAdjBox(C.DIRECTIONS[i / 2], bb);
-            }
-        }
     }
 
     public void putBoxMap(int[] key, Box b) {
@@ -149,8 +126,10 @@ public class Building implements HasZone, Modelable {
         drawFrame = GameView.gv.frame;
 
         modelBatch.begin(GameView.gv.getCamera());
-        modelBatch.render(floorModelInstance, GameView.environment);
-        modelBatch.render(wallModelInstance, GameView.environment);
+        if (floorModelInstance != null)
+            modelBatch.render(floorModelInstance, GameView.environment);
+        if (wallModelInstance != null)
+            modelBatch.render(wallModelInstance, GameView.environment);
         modelBatch.end();
     }
 

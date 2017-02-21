@@ -55,6 +55,7 @@ public class Box extends Overlappable {
         width    = C.BOX_DIAMETER;
 
         setCorners();
+        setZones();
     }
 
     private void setCorners() {
@@ -64,7 +65,17 @@ public class Box extends Overlappable {
         corners[3] = new Vector2(position.x + width, position.y);
     }
 
-    public void setAdjWallMap(Modelable m) {
+    private void setZones() {
+        zone = Zone.getZone(getCenter());
+        Zone z;
+        for (Vector2 v : corners) {
+            z = Zone.getZone(v);
+            z.addObject(this);
+            z.addObject(room);
+        }
+    }
+
+    public void setAdjWallMap() {
         Box n = boxMap.get(key[0] + "," + (key[1] + 1));
         Box s = boxMap.get(key[0] + "," + (key[1] - 1));
         Box e = boxMap.get(key[0] + 1 + "," + key[1]);
@@ -75,7 +86,7 @@ public class Box extends Overlappable {
             putWall(key,
                     position.cpy().add(0, height),
                     position.cpy().add(width, height),
-                    m);
+                    building);
         } else { clearWall(key); }
 
         key = (this.key[0]+1)+","+ this.key[1]+",v";
@@ -83,7 +94,7 @@ public class Box extends Overlappable {
             putWall(key,
                     position.cpy().add(width, 0),
                     position.cpy().add(width, height),
-                    m);
+                    building);
         } else { clearWall(key); }
 
         key = sKey+",h";
@@ -91,7 +102,7 @@ public class Box extends Overlappable {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(width, 0),
-                    m);
+                    building);
         } else { clearWall(key); }
 
         key = sKey+",v";
@@ -99,7 +110,7 @@ public class Box extends Overlappable {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(0, height),
-                    m);
+                    building);
         } else { clearWall(key); }
     }
 
@@ -118,15 +129,6 @@ public class Box extends Overlappable {
 
     public ArrayList<Powerup> getPowerups() {
         return powerups;
-    }
-
-    public int[][] getOpenAdjBMAKeys() {
-        ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
-        int[][] adjBMAKeys = Building.getAdjBMKeys(key);
-        for (int[] aKey : adjBMAKeys)
-            if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
-                openAdjBMAKeys.add(aKey);
-        return openAdjBMAKeys.toArray(new int[openAdjBMAKeys.size()][]);
     }
 
     public Survivor addSurvivor() {
@@ -191,12 +193,6 @@ public class Box extends Overlappable {
         return u;
     }
 
-    public Box setRoom(Room room) {
-        this.room = room;
-        this.zone = room.getZone();
-        return this;
-    }
-
     public int getId() { return id; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
@@ -232,7 +228,6 @@ public class Box extends Overlappable {
 
     @Override
     public void setZone(Zone z) {
-        // Zone is set in setRoom
     }
 
     @Override

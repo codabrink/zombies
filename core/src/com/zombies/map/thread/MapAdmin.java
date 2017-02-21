@@ -13,24 +13,28 @@ public class MapAdmin {
     public static HashSet<Thread> threads = new HashSet<>();
 
     public static void update(Player p) {
-        if (true) { //(p.getZone().getRooms().size() < 7) {
-            Room room = Data.currentRoom();
+        if (false)
+            return;
 
-            if (room != null) {
-                Box box = (Box)U.random(room.getOuterBoxes());
+        Room room = Data.currentRoom();
 
-                if (box == null)
-                    return;
+        if (room != null) {
+            if (room.getBuilding().getRooms().size() > 7 || room.genState != Room.GenState.FINALIZED)
+                return;
 
-                Thread thread = new Thread(new RunnableAdjRoom(box));
-                threads.add(thread);
-                thread.run();
-            } else {
-                Runnable r = new GenRoomOnPlayer(p);
-                Thread thread = new Thread(r);
-                threads.add(thread);
-                thread.run();
-            }
+            Box box = (Box)U.random(room.getOuterBoxes());
+
+            if (box == null)
+                return;
+
+            Thread thread = new Thread(new RunnableAdjRoom(box));
+            threads.add(thread);
+            thread.run();
+        } else {
+            Runnable r = new GenRoomOnPlayer(p);
+            Thread thread = new Thread(r);
+            threads.add(thread);
+            thread.run();
         }
     }
 }

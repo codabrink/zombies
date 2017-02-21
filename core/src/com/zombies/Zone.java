@@ -25,6 +25,7 @@ public class Zone {
     // Static Variables
     public static HashMap<String, Zone> zones;
     public static ArrayList<Zone> loadedZones;
+    public static HashSet<Room> readyToModel;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
@@ -78,6 +79,14 @@ public class Zone {
         for (Updateable u : updateables)
             if (u.getZone() == this)
                 u.update();
+
+        if (readyToModel.size() == 0)
+            return;
+        Iterator iter = readyToModel.iterator();
+        while (iter.hasNext()) {
+            ((Room)iter.next()).buildModel();
+            iter.remove();
+        }
     }
 
     public void load(int limit) {
@@ -274,9 +283,6 @@ public class Zone {
             addBox((Box) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
-
-        if (o.getZone() == null && o instanceof Room)
-            U.p("krap!");
 
         if (o.getZone() != this)
             return this;

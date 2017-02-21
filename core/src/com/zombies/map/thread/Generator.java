@@ -46,7 +46,7 @@ public class Generator {
                 break;
         }
 
-        room.finalize();
+        room.finalize1();
         Data.update();
         return room;
     }
