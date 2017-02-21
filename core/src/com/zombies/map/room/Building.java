@@ -53,7 +53,6 @@ public class Building implements HasZone, Modelable {
     }
 
     public void refresh(Room room) { // room is the room that caused the refresh
-        wallMapState = DataState.BAD;
         for (Box b : boxMap.values())
             rooms.add(b.getRoom());
     }

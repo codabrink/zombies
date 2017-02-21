@@ -70,7 +70,7 @@ public class Box extends Overlappable {
         Box e = boxMap.get(key[0] + 1 + "," + key[1]);
         Box w = boxMap.get(key[0] - 1 + "," + key[1]);
 
-        String key = this.key[0]+','+(this.key[1]+1)+",h";
+        String key = this.key[0]+","+(this.key[1]+1)+",h";
         if (n == null || n.getRoom() != room) {
             putWall(key,
                     position.cpy().add(0, height),
@@ -78,7 +78,7 @@ public class Box extends Overlappable {
                     m);
         } else { clearWall(key); }
 
-        key = (this.key[0]+1)+','+ this.key[1]+",v";
+        key = (this.key[0]+1)+","+ this.key[1]+",v";
         if (e == null || e.getRoom() != room) {
             putWall(key,
                     position.cpy().add(width, 0),

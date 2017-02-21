@@ -106,6 +106,10 @@ public class AssetExistsExampleTest {
         assertTrue(z4.getBoxes().contains(building.boxMap.get("0,0")));
         assertTrue(z4.getBoxes().contains(building.boxMap.get("1,0")));
         assertTrue(z4.getBoxes().contains(building.boxMap.get("0,-1")));
+
+        assertTrue(building.wallMap.get("0,-1,v") != null);
+        assertTrue(building.wallMap.get("0,-1,h") != null);
+        assertTrue(building.wallMap.get("1,1,h") != null);
     }
 
     @Test
