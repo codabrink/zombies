@@ -115,9 +115,7 @@ public class Box extends Overlappable {
     }
 
     private void putWall(String key, Vector2 p1, Vector2 p2, Modelable m) {
-        if (building.wallMap.get(key) != null)
-            building.wallMap.get(key).destroy();
-        building.wallMap.put(key, new WallWall(p1, p2, m));
+        building.putWallMap(key, new WallWall(p1, p2, m));
     }
     private void clearWall(String key) {
         if (building.wallMap.get(key) != null)

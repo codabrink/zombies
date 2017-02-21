@@ -50,9 +50,23 @@ public class Building implements HasZone, Modelable {
         float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * key[1]);
         return new Vector2(vx, vy);
     }
+    public Vector2[] wallPositionOf(String key) {
+        String[] parts = key.split(",");
+        int[] gridKey  = {Integer.parseInt(parts[0]), Integer.parseInt(parts[1])};
+        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * gridKey[0]);
+        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * gridKey[1]);
+        return new Vector2[]{
+                new Vector2(vx, vy),
+                (parts[2] == "v" ? new Vector2(vx, vy + C.BOX_DIAMETER) : new Vector2(vx + C.BOX_DIAMETER, vy))};
+    }
 
     public void putBoxMap(int[] key, Box b) {
         boxMap.put(key[0] + "," + key[1], b);
+    }
+    public void putWallMap(String key, Wall w) {
+        if (wallMap.get(key) != null)
+            wallMap.get(key).destroy();
+        wallMap.put(key, w);
     }
 
     public static int[] directionToBMKey(int[] bmKey, int direction) {

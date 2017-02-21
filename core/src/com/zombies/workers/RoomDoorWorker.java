@@ -1,9 +1,11 @@
 package com.zombies.workers;
 
+import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
+import com.zombies.map.room.WallDoor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +81,15 @@ public class RoomDoorWorker implements Runnable {
 
     private void connectRooms(Box b1, Box b2, String roomKey, String boxKey) {
         initRoomConnectionList(b1, b2, roomKey);
+
+        Building building = b1.getBuilding();
+        String wallMapKey =
+                Math.max(b1.getKey()[0], b2.getKey()[0]) + "," +
+                        Math.max(b1.getKey()[1], b2.getKey()[1]) + "," +
+                        (b1.getKey()[0] > b2.getKey()[0] ? "v" : "h");
+        Vector2[] positions = building.wallPositionOf(wallMapKey);
+
+        building.putWallMap(wallMapKey, new WallDoor(positions[0], positions[1], building));
 
         // do not generate door twice
         if (checkDoorExistence(b1, roomKey, boxKey))

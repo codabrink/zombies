@@ -27,6 +27,9 @@ public class WallSegment {
         BoundingBox bounds;
         Vector3 min, max;
 
+        if (height < 0)
+            System.out.println("yeah");
+
         min = new Vector3(0, 0, (height < 0 ? C.BOX_DEPTH * Math.abs(height) : 0));
         max = new Vector3(p1.dst(p2), 0.1f, (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH));
         bounds = new BoundingBox(min, max);

@@ -41,6 +41,8 @@ public class Zone {
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
 
+    private boolean modeled = false;
+
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
@@ -52,8 +54,6 @@ public class Zone {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)));
         }
-
-        addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
 
@@ -76,6 +76,11 @@ public class Zone {
             z.update();
     }
     public void update() {
+        if (modeled == false) {
+            addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
+            modeled = true;
+        }
+
         for (Updateable u : updateables)
             if (u.getZone() == this)
                 u.update();
