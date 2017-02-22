@@ -6,9 +6,9 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.map.*;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Room;
+import com.zombies.map.Grass;
+import com.zombies.map.room.*;
+import com.zombies.map.room.Building;
 import com.zombies.util.U;
 
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ public class Zone {
     // Static Variables
     public static HashMap<String, Zone> zones;
     public static ArrayList<Zone> loadedZones;
+    public static HashSet<Room> readyToModel;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
@@ -34,10 +35,13 @@ public class Zone {
     private HashSet<Updateable> updateables = new HashSet<>();
     private HashSet<Box> boxes = new HashSet<>();
     private HashSet<Room> rooms = new HashSet<>();
+    private HashSet<Building> buildings = new HashSet<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
+
+    private boolean modeled = false;
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
@@ -50,8 +54,6 @@ public class Zone {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x + C.ZONE_SIZE, position.y)));
         }
-
-        addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
     }
 
 
@@ -74,9 +76,23 @@ public class Zone {
             z.update();
     }
     public void update() {
+        if (modeled == false) {
+            addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
+            modeled = true;
+        }
+
         for (Updateable u : updateables)
             if (u.getZone() == this)
                 u.update();
+
+        if (readyToModel.size() == 0)
+            return;
+        // readyToModel is accessed via separate threads, need to clone it to avoid
+        // concurrent modification exceptions
+        HashSet<Room> modeling = (HashSet<Room>)readyToModel.clone();
+        readyToModel = new HashSet<>();
+        for (Room r : modeling)
+            r.buildModel();
     }
 
     public void load(int limit) {
@@ -159,9 +175,26 @@ public class Zone {
         return zones;
     }
 
+    public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
+        Vector2 p1, p2;
+        HashSet<Wall> walls = new HashSet<>();
+        for (Zone z : Zone.getZone(c).getAdjZones(1)) {
+            for (Wall w : z.getWalls()) {
+                p1 = w.getStart();
+                p2 = w.getEnd();
+                // http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
+                boolean intersects =
+                        (Math.abs((p2.x - p1.x) * c.x + (p1.y - p2.y) * c.y + (p1.x - p2.x) * p1.y + (p2.y - p1.y) * p1.x)) /
+                                Math.sqrt(Math.pow((double)(p2.x - p1.x), 2) + Math.pow((double)(p1.y - p2.y), 2)) <= r;
+                if (intersects)
+                    walls.add(w);
+            }
+        }
+        return walls;
+    }
+
     public static void createHole(Vector2 center, Float radius) {
         HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
-
         for (Zone z : zones) {
             for (Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
@@ -246,15 +279,16 @@ public class Zone {
         o.setZone(this);
 
         // KEEP RECORDS
+        if (o instanceof Wall)
+            addWall((Wall) o);
+        if (o instanceof Building)
+            addBuilding((Building) o);
         if (o instanceof Room)
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
-
-        if (o.getZone() == null && o instanceof Room)
-            U.p("krap!");
 
         if (o.getZone() != this)
             return this;
@@ -271,6 +305,10 @@ public class Zone {
     public Zone removeObject(HasZone o) {
         o.setZone(null);
 
+        if (o instanceof Wall)
+            removeWall((Wall) o);
+        if (o instanceof Building)
+            removeBuilding((Building) o);
         if (o instanceof Room)
             removeRoom((Room) o);
         if (o instanceof Box)
@@ -289,15 +327,26 @@ public class Zone {
 
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
-    public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Overlappable> getOverlappables() { return overlappables; }
+    public HashSet<Box> getBoxes() { return boxes; }
     public HashSet<Room> getRooms() { return rooms; }
+    public HashSet<Building> getBuildings() { return buildings; }
 
+    private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {
         rooms.add(r);
     }
     private void addBox(Box b) {
         boxes.add(b);
+    }
+
+    private void removeWall(Wall w) {
+        walls.remove(w);
+    }
+    private void removeBuilding(Building b) {
+        buildings.remove(b);
+        for (Room r : b.getRooms())
+            removeObject(r);
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
@@ -331,8 +380,8 @@ public class Zone {
         updateables.remove(u);
     }
 
-    public HashSet<Wall> getWalls() { return walls; }
-    public void addWall(Wall w) { walls.add(w); }
+    public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
+    private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
         HashSet<Zone> zones = getAdjZones(1);

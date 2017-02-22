@@ -29,7 +29,6 @@ public class RunnableAdjRoom implements Runnable {
 
         Vector2 position = adjBox.getBuilding().positionOf(bmKey);
         if (adjBox.getZone().checkOverlap(position, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
-            System.out.println("Generating " + bmKey[0] + ","+bmKey[1]);
             Generator.genRoom(adjBox.getBuilding(), bmKey);
         }
 

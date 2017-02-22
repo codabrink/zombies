@@ -1,78 +1,71 @@
 package com.zombies.map.room;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Unit;
-import com.zombies.Wall;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Modelable;
-import com.zombies.util.Assets;
+import com.zombies.interfaces.Updateable;
+import com.zombies.workers.RoomDoorWorker;
 
-public class Room implements Loadable, HasZone, Drawable, Modelable {
+public class Room implements Loadable, HasZone, Updateable, Drawable {
+    public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
+    public GenState genState;
+
+    public static int roomCount = 0;
+
+    private int id;
     public  HashSet<Box> boxes = new HashSet<>();
-    private boolean finalized = false;
+    public boolean connected = false;
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private Random random = new Random();
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
-    private Building building;
 
-    private Model wallModel, floorModel;
-    private ModelInstance wallModelInstance, floorModelInstance;
+    private Building building;
+    public HashSet<String> doors = new HashSet<>();
 
     public Room(Building building) {
+        genState = GenState.CREATED;
+
         this.building = building;
+        building.rooms.add(this);
+
+        id = roomCount;
+        roomCount++;
     }
 
-    public void finalize() {
+    public void finalize1() {
         center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addObject(this);
 
         for (Box b: boxes)
-            b.setRoom(this);
+            b.setAdjWallMap();
 
-        building.associateBoxes();
-
-        buildFloorModel();
-        rasterizeWalls();
-        handleZoning();
-
-        building.refresh();
-
-        finalized = true;
+        RoomDoorWorker.roomList.add(this); // queue for door processing
+        genState = GenState.BOXED;
     }
 
-    private void handleZoning() {
-        HashSet<Zone> zones = new HashSet<>();
-        for (Box b : getBoxes())
-            for (Vector2 v : b.getCorners())
-                zones.add(Zone.getZone(v).addObject(b));
-        for (Zone z : zones)
-            z.addObject(this);
+    public void buildModel() {
+        building.rebuildModel();
+        this.genState = GenState.FINALIZED;
     }
 
     // calculates the median position of all of the boxes
@@ -81,10 +74,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         for (Box b: boxes)
             center.add(b.getCenter());
         return new Vector2(center.x / boxes.size(), center.y / boxes.size());
-    }
-
-    public void currentRoom() {
-        load(); // load self
     }
 
     public void load() {
@@ -115,24 +104,6 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
     }
 
-    public void rasterizeWalls() {
-        // proposedPositions are sets of points where walls could be placed.
-        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
-
-        // propose positions for each box in the room.
-        for (Box b: boxes) {
-            proposedPositions.addAll(b.proposeWallPositions());
-        }
-        
-        proposedPositions = consolidateWallPositions(proposedPositions);
-
-        for (Vector2[] pstn: proposedPositions) {
-            walls.add(new Wall(pstn[0], pstn[1], this));
-        }
-
-        buildWallModel();
-    }
-    
     // consolidate the proposed walls into as few as possible.
     public ArrayList<Vector2[]> consolidateWallPositions(ArrayList<Vector2[]> proposedPositions) {
 
@@ -173,47 +144,13 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         return null;
     }
 
-    public Wall findWall(Body b) {
-        for (Wall w: walls) {
-            if (w != null && w.getBody().getPosition().x == b.getPosition().x && w.getBody().getPosition().y == b.getPosition().y) {
-                return w;
-            }
-        }
-        return null;
-    }
-
     public ArrayList<Wall> getWalls() { return walls; }
     public HashSet<Box> getBoxes() {
         return boxes;
     }
     public Building getBuilding() { return building; }
 
-    public void buildWallModel() {
-        Assets.modelBuilder.begin();
-        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w: walls) {
-            w.buildWallMesh(wallBuilder, center);
-        }
-        wallModel = Assets.modelBuilder.end();
-        wallModelInstance = new ModelInstance(wallModel);
-        wallModelInstance.transform.setTranslation(center.x, center.y, 0);
-    }
-
-    public void buildFloorModel() {
-        Assets.modelBuilder.begin();
-        MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(Assets.floor1Diffuse));
-        for (Box b: boxes) {
-            b.buildFloorMesh(floorBuilder, center);
-        }
-        floorModel = Assets.modelBuilder.end();
-        floorModelInstance = new ModelInstance(floorModel);
-        floorModelInstance.transform.setTranslation(center.x, center.y, 1);
-    }
-
+    public int getId() { return id; }
     public HashSet<Box> getOuterBoxes() {
         HashSet<Box> outerBoxes = new HashSet<>();
         // TODO: expensive
@@ -222,6 +159,10 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
                 outerBoxes.add(b);
         }
         return outerBoxes;
+    }
+
+    private void generateDoor(Map.Entry pair) {
+        System.out.println((String)pair.getKey());
     }
 
     @Override
@@ -234,12 +175,9 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         // Zone is set in the constructor
     }
 
-    @Override
+
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        modelBatch.begin(GameView.gv.getCamera());
-        modelBatch.render(floorModelInstance, GameView.environment);
-        modelBatch.render(wallModelInstance, GameView.environment);
-        modelBatch.end();
+        building.draw(spriteBatch, shapeRenderer, modelBatch);
 
         if (C.DEBUG) {
             BitmapFont f = Zombies.getFont("sans-reg:8:white");
@@ -257,8 +195,11 @@ public class Room implements Loadable, HasZone, Drawable, Modelable {
         }
     }
 
+    public String giveKey(Room r) {
+        return Math.min(id, r.getId()) + "," + Math.max(id, r.getId());
+    }
+
     @Override
-    public void rebuildModel() {
-        buildWallModel();
+    public void update() {
     }
 }

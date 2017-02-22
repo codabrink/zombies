@@ -15,9 +15,12 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Modelable;
 import com.zombies.powerups.Powerup;
 
 public class Box extends Overlappable {
+    public static int numBoxes = 0;
+
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
@@ -28,10 +31,14 @@ public class Box extends Overlappable {
     private Building building;
     private Room room;
 
+    private int id;
     private int[] key;
     private String sKey;
 
     public Box(Building building, Room room, int[] bmKey) {
+        id = numBoxes;
+        numBoxes++;
+
         this.building = building;
         this.room     = room;
 
@@ -48,6 +55,7 @@ public class Box extends Overlappable {
         width    = C.BOX_DIAMETER;
 
         setCorners();
+        setZones();
     }
 
     private void setCorners() {
@@ -57,42 +65,61 @@ public class Box extends Overlappable {
         corners[3] = new Vector2(position.x + width, position.y);
     }
 
-    // detect where this box should have walls, but don't create them yet.
-    public ArrayList<Vector2[]> proposeWallPositions() {
-        ArrayList<Vector2[]> proposedPositions = new ArrayList<>();
+    private void setZones() {
+        zone = Zone.getZone(getCenter());
+        Zone z;
+        for (Vector2 v : corners) {
+            z = Zone.getZone(v);
+            z.addObject(this);
+            z.addObject(room);
+        }
+    }
 
+    public void setAdjWallMap() {
         Box n = boxMap.get(key[0] + "," + (key[1] + 1));
         Box s = boxMap.get(key[0] + "," + (key[1] - 1));
         Box e = boxMap.get(key[0] + 1 + "," + key[1]);
         Box w = boxMap.get(key[0] - 1 + "," + key[1]);
 
-        Vector2[] points;
+        String key = this.key[0]+","+(this.key[1]+1)+",h";
         if (n == null || n.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy().add(0, height));
-            points[1] = new Vector2(position.cpy().add(width, height));
-            proposedPositions.add(points); // top wall
-        }
-        if (e == null || e.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy().add(width, 0));
-            points[1] = new Vector2(position.cpy().add(width, height));
-            proposedPositions.add(points); // right wall
-        }
-        if (s == null || s.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy());
-            points[1] = new Vector2(position.cpy().add(width, 0));
-            proposedPositions.add(points); // bottom wall
-        }
-        if (w == null || w.getRoom() != room) {
-            points = new Vector2[2];
-            points[0] = new Vector2(position.cpy());
-            points[1] = new Vector2(position.cpy().add(0, height));
-            proposedPositions.add(points); // left wall
-        }
+            putWall(key,
+                    position.cpy().add(0, height),
+                    position.cpy().add(width, height),
+                    building);
+        } else { clearWall(key); }
 
-        return proposedPositions;
+        key = (this.key[0]+1)+","+ this.key[1]+",v";
+        if (e == null || e.getRoom() != room) {
+            putWall(key,
+                    position.cpy().add(width, 0),
+                    position.cpy().add(width, height),
+                    building);
+        } else { clearWall(key); }
+
+        key = sKey+",h";
+        if (s == null || s.getRoom() != room) {
+            putWall(key,
+                    position.cpy(),
+                    position.cpy().add(width, 0),
+                    building);
+        } else { clearWall(key); }
+
+        key = sKey+",v";
+        if (w == null || w.getRoom() != room) {
+            putWall(key,
+                    position.cpy(),
+                    position.cpy().add(0, height),
+                    building);
+        } else { clearWall(key); }
+    }
+
+    private void putWall(String key, Vector2 p1, Vector2 p2, Modelable m) {
+        building.putWallMap(key, new WallWall(p1, p2, m));
+    }
+    private void clearWall(String key) {
+        if (building.wallMap.get(key) != null)
+            building.wallMap.get(key).destroy();
     }
 
     public float x() {return position.x;}
@@ -100,15 +127,6 @@ public class Box extends Overlappable {
 
     public ArrayList<Powerup> getPowerups() {
         return powerups;
-    }
-
-    public int[][] getOpenAdjBMAKeys() {
-        ArrayList<int[]> openAdjBMAKeys = new ArrayList<>();
-        int[][] adjBMAKeys = Building.getAdjBMKeys(key);
-        for (int[] aKey : adjBMAKeys)
-            if (building.boxMap.get(aKey[0]+","+aKey[1]) == null)
-                openAdjBMAKeys.add(aKey);
-        return openAdjBMAKeys.toArray(new int[openAdjBMAKeys.size()][]);
     }
 
     public Survivor addSurvivor() {
@@ -173,15 +191,11 @@ public class Box extends Overlappable {
         return u;
     }
 
-    public Box setRoom(Room room) {
-        this.room = room;
-        this.zone = room.getZone();
-        return this;
-    }
-
+    public int getId() { return id; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
+    public String getSKey() { return sKey; }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
         Box b;
@@ -212,7 +226,6 @@ public class Box extends Overlappable {
 
     @Override
     public void setZone(Zone z) {
-        // Zone is set in setRoom
     }
 
     @Override
@@ -228,5 +241,9 @@ public class Box extends Overlappable {
     @Override
     public void unload() {
 
+    }
+
+    public String giveKey(Box b) {
+        return Math.min(id, b.getId()) + "," + Math.max(id, b.getId());
     }
 }

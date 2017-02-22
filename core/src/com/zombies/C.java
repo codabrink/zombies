@@ -8,9 +8,12 @@ public class C {
     public static final int[] DIRECTIONS = {0, 90, 180, 270};
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
+    public static final long THREAD_DELAY = 1000l;
+    public static final long THREAD_INTERVAL = 500l;
+
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
-    public static final boolean ENABLE_DEBUG_LINES = true;
+    public static final boolean ENABLE_DEBUG_LINES = false;
     public static final float BOX_DEPTH = 7 * SCALE;
     public static final float BOX_DIAMETER = 15 * SCALE;
     public static final float BOX_RADIUS = BOX_DIAMETER / 2;
@@ -51,10 +54,9 @@ public class C {
     public static final float ZOMBIE_SPEED = 15f;
     public static final float ZOMBIE_STRENGTH = 7f;
 
-    public static final int DRAW_LAYERS=3;
     public static final float ZONE_SIZE = 100 * SCALE;
     public static final int DRAW_DISTANCE = 1;
-    public static final float FOV = 60;
+    public static final float FOV = 90;
 
     public static boolean DEBUG_SHOW_BOXMAP = false;
     public static boolean DEBUG_SHOW_ADJBOXCOUNT = false;

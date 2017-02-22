@@ -6,12 +6,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
-import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Vector;
 
 public class Bullet {
 	private Unit unit;
@@ -44,10 +41,9 @@ public class Bullet {
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData) fixture.getBody().getUserData());
-                if (bodData.getType() == "wall") {
-                    ((Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
+                if (bodData.getType().equals("wall")) {
+                    ((com.zombies.map.room.Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
                 }
-
 
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
                     destinedTrajectoryLength = position.dst(point);

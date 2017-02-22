@@ -9,10 +9,9 @@ import com.zombies.interfaces.IOverlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.GameView;
-import com.zombies.Wall;
+import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HallwaySegment extends Overlappable implements IOverlappable {
