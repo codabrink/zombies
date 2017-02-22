@@ -27,9 +27,7 @@ import com.zombies.map.room.Building;
 import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
-import com.zombies.workers.BuildingWallMapWorker;
 import com.zombies.workers.RoomDoorWorker;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,8 +87,8 @@ public class GameView implements Screen {
         Data.workers = new HashMap<>();
         //Data.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
         //Data.workers.get("BuildingWallMap").start();
-        Data.workers.put("RoomDoor", new Thread(new RoomDoorWorker()));
-        Data.workers.get("RoomDoor").start();
+        Data.workers.put(Data.WorkerName.ROOM_DOOR, new Thread(new RoomDoorWorker()));
+        Data.workers.get(Data.WorkerName.ROOM_DOOR).start();
     }
 
     public void reset() {
