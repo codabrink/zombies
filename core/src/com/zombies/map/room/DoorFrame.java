@@ -1,15 +1,16 @@
 package com.zombies.map.room;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
 import com.zombies.interfaces.Modelable;
-import com.zombies.util.FixedBoxShapeBuilder;
 
 public class DoorFrame {
+    private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
     private Vector2 p1, p2;
     private Modelable modelable;
     private double angle;
@@ -36,6 +37,6 @@ public class DoorFrame {
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
 
-        FixedBoxShapeBuilder.build(builder, bounds);
+        boxShapeBuilder.build(builder, bounds);
     }
 }

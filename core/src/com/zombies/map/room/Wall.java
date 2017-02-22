@@ -54,10 +54,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (body != null)
             view.getWorld().destroyBody(body);
 
-        EdgeShape shape = new EdgeShape();
-        shape.set(new Vector2(0, 0), new Vector2(p1.dst(p2), 0));
         body = view.getWorld().createBody(new BodyDef());
-        body.createFixture(shape, 0);
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
@@ -67,6 +64,7 @@ public class Wall implements Collideable, Loadable, HasZone {
                 break;
 
             segments.add(new WallSegment(
+                    body,
                     points.get(i).getPoint(),
                     points.get(i + 1).getPoint(),
                     points.get(i).getHeight()));
@@ -153,10 +151,7 @@ public class Wall implements Collideable, Loadable, HasZone {
             // the wall unit vector (second requirement is false if the last/first hole extends past
             // the wall, in which case this seg is not needed).
             if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
-                EdgeShape shape = new EdgeShape();
-                shape.set(v1, v2);
-                segments.add(new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2), 1));
-                body.createFixture(shape, 0);
+                segments.add(new WallSegment(body, p1.cpy().add(v1), p1.cpy().add(v2), 1));
             }
         }
         modelable.rebuildModel();
