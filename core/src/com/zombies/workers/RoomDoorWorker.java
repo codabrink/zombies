@@ -72,32 +72,23 @@ public class RoomDoorWorker implements Runnable {
                 connection = (Box[])pair.getValue();
                 Room otherRoom = connection[0].getRoom() == room ? connection[1].getRoom() : connection[0].getRoom();
                 if ((!room.connected || !otherRoom.connected) && !itr.hasNext())
-                    connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
+                    connectRooms(connection[0], connection[1], roomsKey);
                 else if (rand.nextFloat() < 0.3f)
-                    connectRooms(connection[0], connection[1], roomsKey, (String)pair.getKey());
+                    connectRooms(connection[0], connection[1], roomsKey);
             }
         }
     }
 
-    private void connectRooms(Box b1, Box b2, String roomKey, String boxKey) {
-        initRoomConnectionList(b1, b2, roomKey);
-
+    private void connectRooms(Box b1, Box b2, String roomKey) {
         Building building = b1.getBuilding();
-        String wallMapKey =
-                Math.max(b1.getKey()[0], b2.getKey()[0]) + "," +
-                        Math.max(b1.getKey()[1], b2.getKey()[1]) + "," +
-                        (b1.getKey()[0] > b2.getKey()[0] ? "v" : "h");
+        String wallMapKey = building.wallKeyBetweenBoxes(b1, b2);
         Vector2[] positions = building.wallPositionOf(wallMapKey);
 
-        building.putWallMap(wallMapKey, new WallDoor(positions[0], positions[1], building));
-
         // do not generate door twice
-        if (checkDoorExistence(b1, roomKey, boxKey))
+        if (checkDoorExistence(b1, roomKey, wallMapKey))
             return;
 
-        // u stands for "un-generated"
-        b1.getRoom().doors.get(roomKey).put("u" + boxKey, new Box[]{b1, b2});
-        b2.getRoom().doors.get(roomKey).put("u" + boxKey, new Box[]{b2, b1});
+        building.putWallMap(wallMapKey, new WallDoor(positions[0], positions[1], building));
 
         if (b1.getRoom().connected == true)
             b2.getRoom().connected = true;
@@ -106,18 +97,9 @@ public class RoomDoorWorker implements Runnable {
     }
 
     // true - exists, false - doesn't exist
-    private boolean checkDoorExistence(Box b, String roomKey, String boxKey) {
-        if (b.getRoom().doors.get(roomKey).get("u" + boxKey) != null)
-            return true;
-        if (b.getRoom().doors.get(roomKey).get(boxKey) != null)
+    private boolean checkDoorExistence(Box b, String roomKey, String wallKey) {
+        if (b.getBuilding().wallMap.get(wallKey) instanceof WallDoor)
             return true;
         return false;
-    }
-
-    private void initRoomConnectionList(Box b1, Box b2, String roomKey) {
-        if (b1.getRoom().doors.get(roomKey) == null)
-            b1.getRoom().doors.put(roomKey, new HashMap<String, Box[]>());
-        if (b2.getRoom().doors.get(roomKey) == null)
-            b2.getRoom().doors.put(roomKey, new HashMap<String, Box[]>());
     }
 }

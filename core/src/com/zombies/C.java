@@ -54,10 +54,9 @@ public class C {
     public static final float ZOMBIE_SPEED = 15f;
     public static final float ZOMBIE_STRENGTH = 7f;
 
-    public static final int DRAW_LAYERS=3;
     public static final float ZONE_SIZE = 100 * SCALE;
     public static final int DRAW_DISTANCE = 1;
-    public static final float FOV = 60;
+    public static final float FOV = 90;
 
     public static boolean DEBUG_SHOW_BOXMAP = false;
     public static boolean DEBUG_SHOW_ADJBOXCOUNT = false;

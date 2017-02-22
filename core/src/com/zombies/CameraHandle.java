@@ -22,7 +22,7 @@ public class CameraHandle {
 
     public void update(float dt) {
         cam.far = 300f;
-        cam.fieldOfView = 90f;
+        cam.fieldOfView = C.FOV;
         cam.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, zoom);
         cam.update();
     }

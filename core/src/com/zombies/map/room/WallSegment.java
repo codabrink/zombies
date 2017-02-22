@@ -37,9 +37,6 @@ public class WallSegment {
         BoundingBox bounds;
         Vector3 min, max;
 
-        if (height < 0)
-            System.out.println();
-
         float dx = p2.x - p1.x;
         float dy = p2.y - p1.y;
 

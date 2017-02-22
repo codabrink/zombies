@@ -76,7 +76,7 @@ public class AssetExistsExampleTest {
 
         genCrossRoom(building, room);
 
-        room.finalize();
+        room.finalize1();
 
         // zone 1
         assertTrue(room.getZone() == z1);
@@ -110,6 +110,13 @@ public class AssetExistsExampleTest {
         assertTrue(building.wallMap.get("0,-1,v") != null);
         assertTrue(building.wallMap.get("0,-1,h") != null);
         assertTrue(building.wallMap.get("1,1,h") != null);
+
+        // Test building features
+        Box b1 = building.boxMap.get("0,0");
+        Box b2 = building.boxMap.get("1,0");
+        assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("1,0,v"));
+        b2     = building.boxMap.get("0,1");
+        assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("0,1,h"));
     }
 
     @Test
@@ -120,7 +127,7 @@ public class AssetExistsExampleTest {
         Room room = new Room(building);
 
         genCrossRoom(building, room);
-        room.finalize();
+        room.finalize1();
 
         room = Generator.genRoom(building, new int[]{-1,1});
 

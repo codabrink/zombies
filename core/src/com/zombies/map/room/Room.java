@@ -37,10 +37,9 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
-    private Thread doorCalcThread;
 
     private Building building;
-    public HashMap<String, HashMap<String, Box[]>> doors = new HashMap<>();
+    public HashSet<String> doors = new HashSet<>();
 
     public Room(Building building) {
         genState = GenState.CREATED;
@@ -202,19 +201,5 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
 
     @Override
     public void update() {
-        if (doorCalcThread != null && !doorCalcThread.isAlive()) {
-            for (HashMap<String, Box[]> roomConnections : doors.values()) {
-                Iterator itr = roomConnections.entrySet().iterator();
-                while (itr.hasNext()) {
-                    Map.Entry pair = (Map.Entry)itr.next();
-                    String key = (String)pair.getKey();
-                    if (key.charAt(0) != 'u')
-                        continue;
-
-                    generateDoor(pair);
-                }
-            }
-            doorCalcThread = null;
-        }
     }
 }
