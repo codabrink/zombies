@@ -117,6 +117,24 @@ public class AssetExistsExampleTest {
         assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("1,0,v"));
         b2     = building.boxMap.get("0,1");
         assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("0,1,h"));
+
+        // test vertical wall positions
+        Vector2[] positions = building.wallPositionOf("1,0,v");
+        Vector2 expectedPosition = building.getCenter().cpy().sub(C.BOX_RADIUS, C.BOX_RADIUS).add(C.BOX_DIAMETER, 0);
+        assertTrue(positions[0].x == expectedPosition.x);
+        assertTrue(positions[0].y == expectedPosition.y);
+        expectedPosition.add(0, C.BOX_DIAMETER);
+        assertTrue(positions[1].x == expectedPosition.x);
+        assertTrue(positions[1].y == expectedPosition.y);
+
+        // test horizontal wall positions
+        positions = building.wallPositionOf("0,1,h");
+        expectedPosition = building.getCenter().cpy().sub(C.BOX_RADIUS, C.BOX_RADIUS).add(0, C.BOX_DIAMETER);
+        assertTrue(positions[0].x == expectedPosition.x);
+        assertTrue(positions[0].y == expectedPosition.y);
+        expectedPosition.add(C.BOX_DIAMETER, 0);
+        assertTrue(positions[1].x == expectedPosition.x);
+        assertTrue(positions[1].y == expectedPosition.y);
     }
 
     @Test

@@ -46,17 +46,23 @@ public class Building implements HasZone, Modelable {
     }
 
     public Vector2 positionOf(int[] key) {
-        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * key[0]);
-        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * key[1]);
+        return positionOf(key[0], key[1]);
+    }
+    public Vector2 positionOf(int x, int y) {
+        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * x);
+        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * y);
         return new Vector2(vx, vy);
     }
+
     public Vector2[] wallPositionOf(String key) {
         String[] parts = key.split(",");
-        int[] gridKey  = {Integer.parseInt(parts[0]), Integer.parseInt(parts[1])};
-        Vector2 p1 = positionOf(new int[]{gridKey[0], gridKey[1]});
+        return wallPositionOf(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), parts[2].charAt(0));
+    }
+    public Vector2[] wallPositionOf(int x, int y, char orientation) {
+        Vector2 p1 = positionOf(new int[]{x, y});
         return new Vector2[]{
                 p1,
-                (parts[2].charAt(0) == 'v' ? p1.cpy().add(0, C.BOX_DIAMETER) : p1.cpy().add(C.BOX_DIAMETER, 0))};
+                (orientation == 'v' ? p1.cpy().add(0, C.BOX_DIAMETER) : p1.cpy().add(C.BOX_DIAMETER, 0))};
     }
 
     public static String wallKeyBetweenBoxes(Box b1, Box b2) {

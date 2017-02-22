@@ -41,7 +41,7 @@ public class Bullet {
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData) fixture.getBody().getUserData());
-                if (bodData.getType() == "wall") {
+                if (bodData.getType().equals("wall")) {
                     ((com.zombies.map.room.Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
                 }
 

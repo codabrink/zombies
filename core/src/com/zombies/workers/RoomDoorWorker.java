@@ -73,7 +73,7 @@ public class RoomDoorWorker implements Runnable {
                 Room otherRoom = connection[0].getRoom() == room ? connection[1].getRoom() : connection[0].getRoom();
                 if ((!room.connected || !otherRoom.connected) && !itr.hasNext())
                     connectRooms(connection[0], connection[1], roomsKey);
-                else if (rand.nextFloat() < 0.3f)
+                else if (rand.nextFloat() < 0.1f)
                     connectRooms(connection[0], connection[1], roomsKey);
             }
         }
