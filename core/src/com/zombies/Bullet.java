@@ -45,7 +45,6 @@ public class Bullet {
                     ((com.zombies.map.room.Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
                 }
 
-
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {
                     destinedTrajectoryLength = position.dst(point);
                     stopFixture = fixture;

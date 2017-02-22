@@ -47,8 +47,8 @@ public class RoomDoorWorker implements Runnable {
         HashMap<String, Box[]> doorMap;
         for (Box b1 : room.getBoxes()) {
             for (Box b2 : b1.getAdjBoxes()) {
-                if (b2.getRoom() != room)
-                    adjRooms.add(b2.getRoom());
+                if (b2.getRoom() == room)
+                    continue;
 
                 String roomKey = room.giveKey(b2.getRoom());
                 if (potentialConnections.get(roomKey) == null)
