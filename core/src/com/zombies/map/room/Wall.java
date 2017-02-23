@@ -3,13 +3,11 @@ package com.zombies.map.room;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.zombies.BodData;
 import com.zombies.C;
@@ -163,7 +161,8 @@ public class Wall implements Collideable, Loadable, HasZone {
     }
 
     public void destroy() {
-        view.getWorld().destroyBody(body);
+        if (body != null)
+            view.getWorld().destroyBody(body);
     }
 
     @Override

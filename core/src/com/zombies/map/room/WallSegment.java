@@ -46,7 +46,7 @@ public class WallSegment {
 
         Matrix4 mtrans = new Matrix4();
         mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
-        //mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
+        //mtrans.rotate(Vector3.Z, (float)Math.toDegrees(getAngle));
         bounds.mul(mtrans);
 
         boxShapeBuilder.build(wallBuilder, bounds);

@@ -2,7 +2,7 @@ package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IOverlappable;
+
 import java.util.ArrayList;
 
 public class Geometry {
@@ -27,7 +27,7 @@ public class Geometry {
     public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Overlappable o) {
         Vector2 position;
 
-        double theta = angle(o.getCenter(), lp1);
+        double theta = getAngle(o.getCenter(), lp1);
         double cTheta = Math.atan2(o.getHeight() / 2, o.getWidth() / 2); // corner theta
 
         U.p("theta: " + theta + ", cTheta: " + cTheta);
@@ -100,7 +100,7 @@ public class Geometry {
         return null;
     }
 
-    public static double angle(Vector2 p1, Vector2 p2) {
+    public static double getAngle(Vector2 p1, Vector2 p2) {
         return Math.atan2(p2.y - p1.y, p2.x - p1.x);
     }
 

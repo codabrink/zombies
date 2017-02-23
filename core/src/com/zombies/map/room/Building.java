@@ -65,10 +65,13 @@ public class Building implements HasZone, Modelable {
                 (orientation == 'v' ? p1.cpy().add(0, C.BOX_DIAMETER) : p1.cpy().add(C.BOX_DIAMETER, 0))};
     }
 
+    public static String wallKeyBetweenBoxes(int[] k1, int[] k2) {
+        return Math.max(k1[0], k2[0]) + "," +
+                Math.max(k1[1], k2[1]) + "," +
+                (k1[0] != k2[0] ? "v" : "h");
+    }
     public static String wallKeyBetweenBoxes(Box b1, Box b2) {
-        return Math.max(b1.getKey()[0], b2.getKey()[0]) + "," +
-                Math.max(b1.getKey()[1], b2.getKey()[1]) + "," +
-                (b1.getKey()[0] != b2.getKey()[0] ? "v" : "h");
+        return wallKeyBetweenBoxes(b1.getKey(), b2.getKey());
     }
     public Wall wallBetweenBoxes(Box b1, Box b2) {
         return wallMap.get(wallKeyBetweenBoxes(b1, b2));
@@ -120,6 +123,8 @@ public class Building implements HasZone, Modelable {
         buildWallModel();
     }
     public void buildWallModel() {
+        for (Wall w : wallMap.values())
+            w.genSegmentsFromPoints();
         Assets.modelBuilder.begin();
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,

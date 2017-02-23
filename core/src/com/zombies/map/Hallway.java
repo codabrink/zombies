@@ -21,20 +21,17 @@ import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
+import com.zombies.map.room.Building;
+import com.zombies.map.room.WallDoor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 
 public class Hallway implements Drawable, HasZone, Modelable {
-    public static int MAX_HALLWAY_SEGMENTS = 2;
-
-    ArrayList<HallwayAxis> axes = new ArrayList<>();
+    public ArrayList<HallwaySegment> segments = new ArrayList<>();
     private Random r;
-    private ArrayList<Overlappable> hallwaySegments = new ArrayList<>();
-
     private Box originBox;
-    private Overlappable endOverlappable;
 
     private float diameter;
     private Model model;
@@ -42,22 +39,23 @@ public class Hallway implements Drawable, HasZone, Modelable {
     private Vector2 center;
     private Zone zone;
 
-    public HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
-
-    public Hallway(Box b, int direction, float width) {
+    public Hallway(Box b, int[] key) {
         r = GameView.gv.random;
         originBox = b;
-        diameter = width;
 
-        double theta = Math.toRadians(direction);
+        // create a door
+        String wallKey = Building.wallKeyBetweenBoxes(b.getKey(), key);
+        Vector2[] wallPosition = b.getBuilding().wallPositionOf(wallKey);
+        b.getBuilding().wallMap.put(wallKey, new WallDoor(wallPosition[0], wallPosition[1], b.getBuilding()));
 
-        axes.add(
-                new HallwayAxis(
-                        theta,
-                        new Vector2(
-                                (float)(b.getCenter().x + C.BOX_DIAMETER / 2 * Math.cos(theta)),
-                                (float)(b.getCenter().y + C.BOX_DIAMETER / 2 * Math.sin(theta)))));
-        move(theta);
+        // add an initial segment
+        Vector2 p = b.getPosition().cpy();
+        p.add((key[1] != b.getKey()[1] ? C.BOX_RADIUS : 0),
+                (key[0] != b.getKey()[0] ? C.BOX_RADIUS : 0));
+        p.add((key[0] > b.getKey()[0] ? C.BOX_DIAMETER : 0),
+                (key[1] > b.getKey()[1] ? C.BOX_DIAMETER : 0));
+
+        segments.add(new HallwaySegment(this, p));
     }
 
     private float hallwayLength() { return C.BOX_DIAMETER - 0.001f; }
@@ -150,6 +148,8 @@ public class Hallway implements Drawable, HasZone, Modelable {
     private float vertBoxRange(Box b, float width) {
         return b.getPosition().y + r.nextFloat() * (b.height - width) + width / 2;
     }
+    public Box getOriginBox() { return originBox; }
+
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {

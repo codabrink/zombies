@@ -113,7 +113,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
             for (Vector2[] pstn2: iteratedPositions) {
 
                 // if the first wall's end meets the other wall's start and they have the same
-                // angle...
+                // getAngle...
                 if (pstn1[1].equals(pstn2[0]) && Math.abs(pstn1[1].cpy().sub(pstn1[0]).angle() - (pstn2[1].cpy().sub(pstn2[0]).angle())) < 0.0001) {
                     Vector2[] points = new Vector2[2];
                     points[0] = pstn1[0];

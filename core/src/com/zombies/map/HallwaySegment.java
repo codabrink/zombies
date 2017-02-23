@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.IOverlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
@@ -12,24 +11,19 @@ import com.zombies.GameView;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class HallwaySegment extends Overlappable implements IOverlappable {
-    private Vector2[] corners = new Vector2[4];
-    public Vector2 center;
-    private Vector2 w1p1, w1p2, w2p1, w2p2;
     public float diameter, radius;
-    private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private HallwayAxis pAxis, axis, nAxis;
-    private com.zombies.interfaces.Modelable modelable;
+    private HashSet<Wall> walls = new HashSet<>();
 
-    public HallwaySegment(HallwayAxis pAxis, HallwayAxis axis, HallwayAxis nAxis, float diameter, Modelable m) {
-        this.pAxis = pAxis;
-        this.axis  = axis;
-        this.nAxis = nAxis;
-        this.diameter = diameter;
-        this.radius   = diameter / 2;
-        this.modelable = m;
+    private Hallway hallway;
+    private Vector2 point;
+
+    public HallwaySegment(Hallway h, Vector2 p) {
+        hallway = h;
+        point   = p;
 
         calculateInfo();
     }
@@ -48,7 +42,20 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
         Zone.getZone(getCenter()).addObject(this);
     }
 
+    private double[] getPrevAndNextAngles() {
+        int index = hallway.segments.indexOf(this);
+
+        Vector2 prev = (index == 0 ? hallway.getOriginBox().getCenter() : hallway.segments.get(index - 1).getPoint());
+        double  prevAngle = Geometry.getAngle(point, prev);
+        if (index == hallway.segments.size() - 1)
+            return new double[]{prevAngle, prevAngle - Math.PI};
+        return new double[]{prevAngle, Geometry.getAngle(point, hallway.segments.get(index + 1).position)};
+    }
+
     private void createWalls() {
+        double[] prevAndNextAngles = getPrevAndNextAngles();
+
+
         // p1aa = Point 1 Angle Average
         double p1aa = (pAxis.theta + axis.theta) / 2,
                 p2aa = (axis.theta + nAxis.theta) / 2;
@@ -90,9 +97,7 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
         center = position.cpy().add(width / 2, height / 2);
     }
 
-    public Vector2 getP1() {return axis.point;}
-    public Vector2 getP2() {return nAxis.point;}
-    public LinkedList<Wall> getWalls() { return walls; }
+    public Vector2 getPoint() { return point; }
 
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         for (Wall wall: walls)
