@@ -13,25 +13,23 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.WallDoor;
+import com.zombies.util.Geometry;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 
-public class Hallway implements Drawable, HasZone, Modelable {
+public class Hallway implements Drawable, HasZone {
     public ArrayList<HallwaySegment> segments = new ArrayList<>();
     private Random r;
-    private Box originBox;
+    private Box box;
 
     private float diameter;
     private Model model;
@@ -41,12 +39,12 @@ public class Hallway implements Drawable, HasZone, Modelable {
 
     public Hallway(Box b, int[] key) {
         r = GameView.gv.random;
-        originBox = b;
+        box = b;
 
         // create a door
         String wallKey = Building.wallKeyBetweenBoxes(b.getKey(), key);
         Vector2[] wallPosition = b.getBuilding().wallPositionOf(wallKey);
-        b.getBuilding().wallMap.put(wallKey, new WallDoor(wallPosition[0], wallPosition[1], b.getBuilding()));
+        b.getBuilding().putWallMap(wallKey, new WallDoor(wallPosition[0], wallPosition[1], b.getBuilding()));
 
         // add an initial segment
         Vector2 p = b.getPosition().cpy();
@@ -56,100 +54,24 @@ public class Hallway implements Drawable, HasZone, Modelable {
                 (key[1] > b.getKey()[1] ? C.BOX_DIAMETER : 0));
 
         segments.add(new HallwaySegment(this, p));
+
+        double angle = (Geometry.getAngle(p, b.getCenter()) + Math.PI) % Math.PI;
+        Vector2 p2 = Geometry.projectVector(p, angle, C.BOX_DIAMETER);
+        segments.add(new HallwaySegment(this, p2));
+
+        for (HallwaySegment s : segments)
+            s.materialize();
+
+        b.getBuilding().getHallways().add(this);
+
+        b.getBuilding().rebuildModel();
     }
 
-    private float hallwayLength() { return C.BOX_DIAMETER - 0.001f; }
-
-    private Vector2 calculateNewAxis(double angle) {
-        Vector2 axis = axes.get(axes.size() - 1).point.cpy();
-        float length = hallwayLength();
-        return axis.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+    public Modelable getModelable() {
+        return box.getBuilding();
     }
 
-    private void move(double theta) {
-        HallwayAxis lastAxis = axes.get(axes.size() - 1);
-        Vector2 newPoint = new Vector2(
-                (float)(lastAxis.point.x + hallwayLength() * Math.cos(theta)),
-                (float)(lastAxis.point.y + hallwayLength() * Math.sin(theta)));
-
-        HashSet<Overlappable> overlappables = Zone.getZone(newPoint).checkOverlap(newPoint.x, newPoint.y, 1);
-        for (Overlappable o : overlappables) {
-            Vector2 p = o.intersectPointOfLine(lastAxis.point, newPoint);
-            if (p != null) {
-                newPoint = p;
-                endOverlappable = o;
-            }
-        }
-
-        axes.add(
-                new HallwayAxis(
-                        theta,
-                        newPoint));
-
-        materialize();
-    }
-
-    private void materialize() {
-        center = new Vector2();
-
-
-
-        for (int i = 0; i < axes.size() - 1; i++) {
-            hallwaySegments.add(new HallwaySegment(
-                    axes.get(Math.max(i - 1, 0)),
-                    axes.get(i),
-                    axes.get(Math.min(i + 1, axes.size() - 1)),
-                    diameter,
-                    this));
-        }
-
-        new JoinOverlappableOverlappable(axes.get(0).point, (Overlappable)originBox, (Overlappable)hallwaySegments.get(0));
-
-        for (Overlappable hs: hallwaySegments) {
-            center.add(hs.getCenter());
-            ((HallwaySegment)hs).materialize();
-        }
-        center = new Vector2(center.x / hallwaySegments.size(), center.y / hallwaySegments.size());
-
-        Zone.createHole(axes.get(0).point, diameter / 2);
-        Zone.createHole(axes.get(axes.size()-1).point, diameter / 2);
-
-        buildModel();
-        Zone.getZone(center).addObject(this);
-    }
-
-    public void buildModel() {
-        com.zombies.util.Assets.modelBuilder.begin();
-        MeshPartBuilder builder = com.zombies.util.Assets.modelBuilder.part("walls",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Overlappable hs: hallwaySegments) {
-            ((HallwaySegment)hs).buildWallMesh(builder, center);
-        }
-        builder = com.zombies.util.Assets.modelBuilder.part("floor",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(com.zombies.util.Assets.floor1Diffuse));
-        for (Overlappable hs: hallwaySegments) {
-            ((HallwaySegment)hs).buildFloorMesh(builder, center);
-        }
-
-        model = com.zombies.util.Assets.modelBuilder.end();
-        modelInstance = new ModelInstance(model);
-        modelInstance.transform.setTranslation(center.x, center.y, 0);
-    }
-
-    private Zone originBoxZone() {
-        return Zone.getZone(originBox.getPosition());
-    }
-
-    private float horizBoxRange(Box b, float width) {
-        return b.getPosition().x + r.nextFloat() * (b.width - width) + width / 2;
-    }
-    private float vertBoxRange(Box b, float width) {
-        return b.getPosition().y + r.nextFloat() * (b.height - width) + width / 2;
-    }
-    public Box getOriginBox() { return originBox; }
-
+    public Box getBox() { return box; }
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
@@ -168,8 +90,17 @@ public class Hallway implements Drawable, HasZone, Modelable {
         zone = z;
     }
 
-    @Override
-    public void rebuildModel() {
-        buildModel();
+    public void rebuildModel(Vector2 modelCenter) {
+        MeshPartBuilder builder = com.zombies.util.Assets.modelBuilder.part("floor",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(com.zombies.util.Assets.floor1Diffuse));
+        for (HallwaySegment s : segments)
+            s.buildFloorModel(builder, modelCenter);
+
+        builder = com.zombies.util.Assets.modelBuilder.part("walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+        for (HallwaySegment s : segments)
+            s.buildWallModels(builder, modelCenter);
     }
 }

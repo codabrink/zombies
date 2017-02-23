@@ -46,9 +46,12 @@ public class Wall implements Collideable, Loadable, HasZone {
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addObject(this);
+
+        points.add(new WallPoint(p1, 1));
+        points.add(new WallPoint(p2, 0));
     }
 
-    protected void genSegmentsFromPoints() {
+    public void genSegmentsFromPoints() {
         if (body != null)
             view.getWorld().destroyBody(body);
 

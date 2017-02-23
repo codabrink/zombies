@@ -17,6 +17,7 @@ import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
+import com.zombies.map.Hallway;
 import com.zombies.util.Assets;
 
 import java.util.HashMap;
@@ -37,6 +38,7 @@ public class Building implements HasZone, Modelable {
     public HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Box> boxMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
+    public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
     private Zone zone;
 
@@ -116,6 +118,7 @@ public class Building implements HasZone, Modelable {
         return center;
     }
     public HashSet<Room> getRooms() { return rooms; }
+    public HashSet<Hallway> getHallways() { return hallways; }
 
     @Override
     public void rebuildModel() {
@@ -136,6 +139,11 @@ public class Building implements HasZone, Modelable {
                 new Material(ColorAttribute.createDiffuse(Color.BROWN)));
         //for (DoorContainer dc : doorContainers)
         //    dc.getDoorFrame().buildMesh(frameBuilder, center);
+
+        // build hallways
+        for (Hallway h : hallways)
+            h.rebuildModel(center);
+
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);

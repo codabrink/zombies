@@ -1,20 +1,16 @@
 package com.zombies.map;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IOverlappable;
 import com.zombies.util.Geometry;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
-public class HallwaySegment extends Overlappable implements IOverlappable {
+public class HallwaySegment extends Overlappable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
 
@@ -22,10 +18,10 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     private Vector2 point;
 
     public HallwaySegment(Hallway h, Vector2 p) {
-        hallway = h;
-        point   = p;
-
-        calculateInfo();
+        hallway  = h;
+        point    = p;
+        diameter = C.HALLWAY_WIDTH;
+        radius   = diameter / 2;
     }
 
     private void setCorners() {
@@ -36,75 +32,77 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     }
 
     public void materialize() {
+        HallwaySegment nextHallwaySegment = nextHallwaySegment();
+        if (nextHallwaySegment == null)
+            return;
+
         calculateInfo(); // do this a second time
         setCorners();
         createWalls();
         Zone.getZone(getCenter()).addObject(this);
     }
 
-    private double[] getPrevAndNextAngles() {
+    private void calculateInfo() {
+        Vector2 nPos = nextHallwaySegment().point;
+        position = new Vector2(
+                Math.min(point.x, nPos.x) - radius,
+                Math.min(point.y, nPos.y) - radius);
+
+        // calculate width and height
+        width = Math.abs(point.x - nPos.x) + diameter;
+        height = Math.abs(point.y - nPos.y) + diameter;
+    }
+
+    public double[] getAdjAngles() {
         int index = hallway.segments.indexOf(this);
 
-        Vector2 prev = (index == 0 ? hallway.getOriginBox().getCenter() : hallway.segments.get(index - 1).getPoint());
+        Vector2 prev = (index == 0 ? hallway.getBox().getCenter() : hallway.segments.get(index - 1).getPoint());
         double  prevAngle = Geometry.getAngle(point, prev);
         if (index == hallway.segments.size() - 1)
             return new double[]{prevAngle, prevAngle - Math.PI};
-        return new double[]{prevAngle, Geometry.getAngle(point, hallway.segments.get(index + 1).position)};
+        return new double[]{prevAngle, Geometry.getAngle(point, hallway.segments.get(index + 1).getPoint())};
+    }
+
+    public Vector2[] getCornerPoints() {
+        double[] adjAngles = getAdjAngles();
+        double leftAngle = ((adjAngles[0] + adjAngles[1]) / 2) % Math.PI;
+        double rightAngle = (leftAngle + Math.PI) % Math.PI;
+        return new Vector2[]{
+                Geometry.projectVector(point, leftAngle, 1),
+                Geometry.projectVector(point, rightAngle, 1)};
+    }
+
+    public HallwaySegment nextHallwaySegment() {
+        int index = hallway.segments.indexOf(this);
+        if (index == hallway.segments.size() - 1)
+            return null;
+        return hallway.segments.get(index + 1);
     }
 
     private void createWalls() {
-        double[] prevAndNextAngles = getPrevAndNextAngles();
+        HallwaySegment nextHallwaySegment = nextHallwaySegment();
+        if (nextHallwaySegment == null)
+            return;
 
+        Vector2[] cornerPoints = getCornerPoints();
+        Vector2[] nextCornerPoints = nextHallwaySegment.getCornerPoints();
 
-        // p1aa = Point 1 Angle Average
-        double p1aa = (pAxis.theta + axis.theta) / 2,
-                p2aa = (axis.theta + nAxis.theta) / 2;
-
-        // Wall 1 is on the left
-        // Wall 2 is on the right
-        // Point 1 is at the beginning
-        // Point 2 is at the end
-        double w1p1a = p1aa + Math.PI / 2;
-        double w1p2a = p2aa + Math.PI / 2;
-        double w2p1a = p1aa - Math.PI / 2;
-        double w2p2a = p2aa - Math.PI / 2;
-
-        float p1r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        float p2r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        w1p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
-        w1p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        w2p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
-        w2p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
-
-        walls.add(new Wall(w1p1, w1p2, modelable));
-        walls.add(new Wall(w2p1, w2p2, modelable));
-
-        if (C.DEBUG) {
-            GameView.gv.addDebugDots(axis.point, Color.GREEN);
-            GameView.gv.addDebugDots(nAxis.point, Color.RED);
-        }
-    }
-
-    private void calculateInfo() {
-        position = new Vector2(
-                Math.min(axis.point.x, nAxis.point.x) - radius,
-                Math.min(axis.point.y, nAxis.point.y) - radius);
-
-        // calculate width and height
-        width = Math.abs(axis.point.x - nAxis.point.x) + diameter;
-        height = Math.abs(axis.point.y - nAxis.point.y) + diameter;
-
-        center = position.cpy().add(width / 2, height / 2);
+        walls.add(new Wall(cornerPoints[0], nextCornerPoints[0], hallway.getModelable()));
+        walls.add(new Wall(cornerPoints[1], nextCornerPoints[1], hallway.getModelable()));
     }
 
     public Vector2 getPoint() { return point; }
 
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        for (Wall wall: walls)
+    public void buildWallModels(MeshPartBuilder builder, Vector2 modelCenter) {
+        for (Wall wall: walls) {
+            wall.genSegmentsFromPoints();
             wall.buildWallMesh(builder, modelCenter);
+        }
     }
+    public void buildFloorModel(MeshPartBuilder builder, Vector2 modelCenter) {
+        if (nextHallwaySegment() == null)
+            return;
 
-    public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
 
         builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
