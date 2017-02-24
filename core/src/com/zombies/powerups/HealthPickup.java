@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.BodData;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.C;
 import com.zombies.Unit;
@@ -49,7 +50,7 @@ public class HealthPickup extends Powerup implements com.zombies.interfaces.Coll
 		bDef.position.set(box.randomPoint());
 		bDef.type = BodyType.DynamicBody;
 		
-		body = view.getWorld().createBody(bDef);
+		body = D.world.createBody(bDef);
 		shape.setRadius(C.PLAYER_SIZE * 0.75f);
 		MassData mass = new MassData();
 		mass.mass = .1f;

@@ -3,7 +3,7 @@ package com.zombies.workers;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Wall;
@@ -30,10 +30,10 @@ public class BuildingWallMapWorker implements Runnable {
             return;
         running = true;
 
-        if (Data.currentBox != null)
-            if (Data.currentBox.getBuilding().wallMapState == Building.DataState.BAD)
-                buildWallMap(Data.currentBox.getBuilding());
-        for (Zone z : Data.currentZone.getAdjZones(1))
+        if (D.currentBox != null)
+            if (D.currentBox.getBuilding().wallMapState == Building.DataState.BAD)
+                buildWallMap(D.currentBox.getBuilding());
+        for (Zone z : D.currentZone.getAdjZones(1))
             for (Building b : z.getBuildings())
                 if (b.wallMapState == Building.DataState.BAD)
                     buildWallMap(b);
@@ -45,7 +45,7 @@ public class BuildingWallMapWorker implements Runnable {
         building.wallMapState = Building.DataState.PROCESSING;
         building.wallMap = new HashMap<>();
         for (Box b : building.boxMap.values()) {
-            if (building.wallMapState == Building.DataState.BAD) { // Data has been invalidated. Run again.
+            if (building.wallMapState == Building.DataState.BAD) { // D has been invalidated. Run again.
                 run();
                 return;
             }

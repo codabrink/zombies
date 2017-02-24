@@ -3,6 +3,7 @@ package com.zombies.map;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
@@ -87,8 +88,8 @@ public class HallwaySegment extends Overlappable {
         Vector2[] cornerPoints = getCornerPoints();
         Vector2[] nextCornerPoints = nextHallwaySegment.getCornerPoints();
 
-        walls.add(new Wall(cornerPoints[0], nextCornerPoints[0], hallway.getModelable()));
-        walls.add(new Wall(cornerPoints[1], nextCornerPoints[1], hallway.getModelable()));
+        walls.add(new WallWall(cornerPoints[0], nextCornerPoints[0], hallway.getModelable()));
+        walls.add(new WallWall(cornerPoints[1], nextCornerPoints[1], hallway.getModelable()));
     }
 
     public Vector2 getPoint() { return point; }

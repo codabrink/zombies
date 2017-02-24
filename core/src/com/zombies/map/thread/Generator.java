@@ -3,7 +3,7 @@ package com.zombies.map.thread;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -47,7 +47,7 @@ public class Generator {
         }
 
         room.finalize1();
-        Data.update();
+        D.update();
         return room;
     }
 }

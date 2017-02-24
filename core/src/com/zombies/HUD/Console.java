@@ -3,13 +3,12 @@ package com.zombies.HUD;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Player;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.Room;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
@@ -86,10 +85,10 @@ public class Console {
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
             case "genRoom":
-                Generator.genRoom(new Building(Data.players.get(0).getPosition()), new int[]{0, 0});
+                Generator.genRoom(new Building(D.players.get(0).getPosition()), new int[]{0, 0});
                 break;
             case "hallway":
-                b = Data.currentBox;
+                b = D.currentBox;
                 int[] key = (int[])U.random(b.getOpenAdjKeys());
                 new Hallway(b, key);
                 //p = view.getPlayer();
@@ -97,7 +96,7 @@ public class Console {
                 //new Hallway(b, Integer.parseInt(m.group(2)), 2 * C.SCALE);
                 break;
             case "debug":
-                Zone zone = Data.currentZone;
+                Zone zone = D.currentZone;
                 System.out.println("Break on this line");
             default:
                 enabled = true;

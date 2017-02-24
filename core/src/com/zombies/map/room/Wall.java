@@ -13,6 +13,7 @@ import com.zombies.BodData;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -35,6 +36,10 @@ public class Wall implements Collideable, Loadable, HasZone {
     private int[] key;
     private String sKey;
 
+    public Wall(Vector2 p1, Vector2 p2, Modelable m, boolean skipModel) {
+
+    }
+
     public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
 
@@ -46,16 +51,13 @@ public class Wall implements Collideable, Loadable, HasZone {
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addObject(this);
-
-        points.add(new WallPoint(p1, 1));
-        points.add(new WallPoint(p2, 0));
     }
 
     public void genSegmentsFromPoints() {
         if (body != null)
-            view.getWorld().destroyBody(body);
+            D.world.destroyBody(body);
 
-        body = view.getWorld().createBody(new BodyDef());
+        body = D.world.createBody(new BodyDef());
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
@@ -118,8 +120,8 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (dst > p1.dst(p2))
             return; // this is beyond the scope of the wall
 
-        view.getWorld().destroyBody(body);
-        body = view.getWorld().createBody(new BodyDef());
+        D.world.destroyBody(body);
+        body = D.world.createBody(new BodyDef());
         body.setTransform(p1, body.getAngle());
         body.setUserData(new BodData("wall", this));
         segments = new ArrayList<WallSegment>();
@@ -165,7 +167,7 @@ public class Wall implements Collideable, Loadable, HasZone {
 
     public void destroy() {
         if (body != null)
-            view.getWorld().destroyBody(body);
+            D.world.destroyBody(body);
     }
 
     @Override

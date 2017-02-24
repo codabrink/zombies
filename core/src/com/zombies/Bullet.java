@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.zombies.data.D;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public class Bullet {
         ArrayList<Unit> units = new ArrayList<Unit>();
         Vector2 p1 = position.cpy().add(direction.cpy());
         Vector2 p2 = position.cpy().add(direction.cpy().setLength(30 * C.SCALE));
-        view.getWorld().rayCast(callback, p2, p1);
+        D.world.rayCast(callback, p2, p1);
 
         ArrayList<Vector2> hitBoxCorners = new ArrayList<Vector2>();
         Vector2 behindPlayer = position.cpy().sub(direction.cpy().setLength(-C.PLAYER_SIZE * 6 * C.SCALE));

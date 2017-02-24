@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.zombies.data.D;
 import com.zombies.guns.Pistol;
 import com.zombies.interfaces.Collideable;
 
@@ -48,7 +49,7 @@ public class Survivor extends Unit implements Collideable {
         bDef.position.set(position);
         bDef.type = BodyType.DynamicBody;
 
-        body = view.getWorld().createBody(bDef);
+        body = D.world.createBody(bDef);
         shape.setRadius(C.PLAYER_SIZE * 0.75f);
         MassData mass = new MassData();
         mass.mass = .1f;

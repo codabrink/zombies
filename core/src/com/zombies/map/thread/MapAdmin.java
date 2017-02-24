@@ -1,7 +1,7 @@
 package com.zombies.map.thread;
 
 import com.zombies.Player;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -16,7 +16,7 @@ public class MapAdmin {
         if (false)
             return;
 
-        Room room = Data.currentRoom();
+        Room room = D.currentRoom();
 
         if (room != null) {
             if (room.getBuilding().getRooms().size() > 7 || room.genState != Room.GenState.FINALIZED)
