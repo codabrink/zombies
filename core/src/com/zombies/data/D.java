@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class D {
-    public enum WorkerName { ROOM_DOOR }
+    public enum Worker { ROOM_DOOR }
+
     public static Zone currentZone;
     public static Box currentBox;
     public static Room currentRoom() {
@@ -22,7 +23,7 @@ public class D {
     public static Player player() { return players.get(0); }
     public static World world;
 
-    public static HashMap<WorkerName, Thread> workers;
+    public static HashMap<Worker, Thread> workers;
 
     public static void update() {
         currentZone = Zone.getZone(player().getPosition());

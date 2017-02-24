@@ -85,8 +85,8 @@ public class GameView implements Screen {
         D.workers = new HashMap<>();
         //D.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
         //D.workers.get("BuildingWallMap").start();
-        D.workers.put(D.WorkerName.ROOM_DOOR, new Thread(new RoomDoorWorker()));
-        D.workers.get(D.WorkerName.ROOM_DOOR).start();
+        D.workers.put(D.Worker.ROOM_DOOR, new Thread(new RoomDoorWorker()));
+        D.workers.get(D.Worker.ROOM_DOOR).start();
     }
 
     public void reset() {
