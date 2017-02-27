@@ -36,10 +36,6 @@ public class Wall implements Collideable, Loadable, HasZone {
     private int[] key;
     private String sKey;
 
-    public Wall(Vector2 p1, Vector2 p2, Modelable m, boolean skipModel) {
-
-    }
-
     public Wall(Vector2 p1, Vector2 p2, Modelable m) {
         view = GameView.gv;
 

@@ -9,7 +9,7 @@ public class WallDoor extends Wall {
     private DoorContainer doorContainer;
 
     public WallDoor(Vector2 p1, Vector2 p2, Modelable m) {
-        super(p1, p2, m, true);
+        super(p1, p2, m);
 
         float dx = Math.abs(p2.x - p1.x);
         float dy = Math.abs(p2.y - p1.y);
