@@ -76,7 +76,7 @@ public class AssetExistsExampleTest {
 
         genCrossRoom(building, room);
 
-        room.finalize1();
+        room.finish();
 
         // zone 1
         assertTrue(room.getZone() == z1);
@@ -145,7 +145,7 @@ public class AssetExistsExampleTest {
         Room room = new Room(building);
 
         genCrossRoom(building, room);
-        room.finalize1();
+        room.finish();
 
         room = Generator.genRoom(building, new int[]{-1,1});
 

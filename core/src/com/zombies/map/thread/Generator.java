@@ -12,15 +12,35 @@ import com.zombies.util.U;
 import java.util.Random;
 
 public class Generator {
+    public static Building genFullBuilding(Vector2 center) {
+        Building building = new Building(center);
+        Random r = new Random();
+        Zone z   = Zone.getZone(center);
+
+        int failures = 0;
+
+        // initial room
+        genRoom(building, new int[]{0, 0});
+
+        while (building.getRooms().size() < 7 && failures < 20) {
+            Box b = (Box)U.random(building.getOuterBoxes());
+            int[] key = (int[])U.random(b.getOpenAdjKeys());
+
+            genRoom(building, key);
+        }
+
+        return building;
+    }
+
     public static Room genRoom(Building building, int[] bmKey) {
         Vector2 startPos = building.positionOf(bmKey);
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
 
-        Room room = new Room(building);
-
         if (z.checkOverlap(building.positionOf(bmKey), C.BOX_DIAMETER, C.BOX_DIAMETER, 1) != null)
             return null;
+
+        Room room = new Room(building);
 
         Box b;
         new Box(building, room, bmKey);
@@ -46,7 +66,7 @@ public class Generator {
                 break;
         }
 
-        room.finalize1();
+        room.finish();
         D.update();
         return room;
     }

@@ -51,7 +51,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         roomCount++;
     }
 
-    public void finalize1() {
+    public void finish() {
         center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addObject(this);

@@ -80,6 +80,14 @@ public class Building implements HasZone, Modelable {
         return wallMap.get(wallKeyBetweenBoxes(b1, b2));
     }
 
+    public HashSet<Box> getOuterBoxes() {
+        HashSet<Box> boxes = new HashSet<>();
+        for (Gridable g : gridMap.values())
+            if (g instanceof Box && ((Box)g).getOpenAdjKeys().size() > 0)
+                boxes.add((Box)g);
+        return boxes;
+    }
+
     public void putBoxMap(int[] key, Box b) {
         gridMap.put(key[0] + "," + key[1], b);
     }
