@@ -15,10 +15,11 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Modelable;
 import com.zombies.powerups.Powerup;
 
-public class Box extends Overlappable {
+public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
 
     private ArrayList<Unit> zombies = new ArrayList<>();

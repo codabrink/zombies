@@ -3,6 +3,7 @@ package com.zombies.map;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
@@ -11,7 +12,7 @@ import com.zombies.Zone;
 
 import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable {
+public class HallwaySegment extends Overlappable implements Gridable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
 
