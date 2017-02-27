@@ -95,7 +95,7 @@ public class Hallway implements Drawable, HasZone {
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(com.zombies.util.Assets.floor1Diffuse));
         for (HallwaySegment s : segments)
-            s.buildFloorModel(builder, modelCenter);
+            s.buildFloorMesh(builder, modelCenter);
 
         builder = com.zombies.util.Assets.modelBuilder.part("walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,

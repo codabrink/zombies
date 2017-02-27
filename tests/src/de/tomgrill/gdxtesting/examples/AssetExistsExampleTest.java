@@ -82,40 +82,40 @@ public class AssetExistsExampleTest {
         assertTrue(room.getZone() == z1);
         assertTrue(z1.getRooms().size() == 1);
         assertTrue(z1.getBoxes().size() == 3);
-        assertTrue(z1.getBoxes().contains(building.boxMap.get("0,0")));
-        assertTrue(z1.getBoxes().contains(building.boxMap.get("1,0")));
-        assertTrue(z1.getBoxes().contains(building.boxMap.get("0,1")));
+        assertTrue(z1.getBoxes().contains(building.gridMap.get("0,0")));
+        assertTrue(z1.getBoxes().contains(building.gridMap.get("1,0")));
+        assertTrue(z1.getBoxes().contains(building.gridMap.get("0,1")));
 
         // zone 2
         assertTrue(z2.getRooms().size() == 1);
         assertTrue(z2.getBoxes().size() == 3);
-        assertTrue(z2.getBoxes().contains(building.boxMap.get("0,0")));
-        assertTrue(z2.getBoxes().contains(building.boxMap.get("-1,0")));
-        assertTrue(z2.getBoxes().contains(building.boxMap.get("0,1")));
+        assertTrue(z2.getBoxes().contains(building.gridMap.get("0,0")));
+        assertTrue(z2.getBoxes().contains(building.gridMap.get("-1,0")));
+        assertTrue(z2.getBoxes().contains(building.gridMap.get("0,1")));
 
         // zone 3
         assertTrue(z3.getRooms().size() == 1);
         assertTrue(z3.getBoxes().size() == 3);
-        assertTrue(z3.getBoxes().contains(building.boxMap.get("0,0")));
-        assertTrue(z3.getBoxes().contains(building.boxMap.get("-1,0")));
-        assertTrue(z3.getBoxes().contains(building.boxMap.get("0,-1")));
+        assertTrue(z3.getBoxes().contains(building.gridMap.get("0,0")));
+        assertTrue(z3.getBoxes().contains(building.gridMap.get("-1,0")));
+        assertTrue(z3.getBoxes().contains(building.gridMap.get("0,-1")));
 
         // zone 4
         assertTrue(z4.getRooms().size() == 1);
         assertTrue(z4.getBoxes().size() == 3);
-        assertTrue(z4.getBoxes().contains(building.boxMap.get("0,0")));
-        assertTrue(z4.getBoxes().contains(building.boxMap.get("1,0")));
-        assertTrue(z4.getBoxes().contains(building.boxMap.get("0,-1")));
+        assertTrue(z4.getBoxes().contains(building.gridMap.get("0,0")));
+        assertTrue(z4.getBoxes().contains(building.gridMap.get("1,0")));
+        assertTrue(z4.getBoxes().contains(building.gridMap.get("0,-1")));
 
         assertTrue(building.wallMap.get("0,-1,v") != null);
         assertTrue(building.wallMap.get("0,-1,h") != null);
         assertTrue(building.wallMap.get("1,1,h") != null);
 
         // Test building features
-        Box b1 = building.boxMap.get("0,0");
-        Box b2 = building.boxMap.get("1,0");
+        Box b1 = building.gridMap.get("0,0");
+        Box b2 = building.gridMap.get("1,0");
         assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("1,0,v"));
-        b2     = building.boxMap.get("0,1");
+        b2     = building.gridMap.get("0,1");
         assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("0,1,h"));
 
         // test vertical wall positions
@@ -149,7 +149,7 @@ public class AssetExistsExampleTest {
 
         room = Generator.genRoom(building, new int[]{-1,1});
 
-        Box newBox = building.boxMap.get("-1,1");
+        Box newBox = building.gridMap.get("-1,1");
 
         Vector2 expectedPosition = building.getCenter().cpy();
         expectedPosition.sub(C.BOX_RADIUS, C.BOX_RADIUS);

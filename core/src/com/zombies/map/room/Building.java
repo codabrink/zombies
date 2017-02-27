@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.map.Hallway;
@@ -36,7 +37,7 @@ public class Building implements HasZone, Modelable {
     private int drawFrame = 0;
     public boolean threadLocked = false;
     public HashSet<Room> rooms = new HashSet<>();
-    public HashMap<String, Box> boxMap = new HashMap<>();
+    public HashMap<String, Gridable> gridMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
     public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
@@ -80,7 +81,7 @@ public class Building implements HasZone, Modelable {
     }
 
     public void putBoxMap(int[] key, Box b) {
-        boxMap.put(key[0] + "," + key[1], b);
+        gridMap.put(key[0] + "," + key[1], b);
     }
     public void putWallMap(String key, Wall w) {
         if (wallMap.get(key) != null)
@@ -153,8 +154,8 @@ public class Building implements HasZone, Modelable {
         MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(Assets.floor1Diffuse));
-        for (Box b: boxMap.values()) {
-            b.buildFloorMesh(floorBuilder, center);
+        for (Gridable g: gridMap.values()) {
+            g.buildFloorMesh(floorBuilder, center);
         }
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);

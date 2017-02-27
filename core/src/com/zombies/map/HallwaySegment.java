@@ -101,19 +101,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
             wall.buildWallMesh(builder, modelCenter);
         }
     }
-    public void buildFloorModel(MeshPartBuilder builder, Vector2 modelCenter) {
-        if (nextHallwaySegment() == null)
-            return;
-
-        Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
-
-        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
-        builder.rect(relp.x, relp.y, -0.1f,
-                relp.x + width, relp.y, -0.1f,
-                relp.x + width, relp.y + height, -0.1f,
-                relp.x, relp.y + height, -0.1f,
-                1, 1, 1);
-    }
 
     @Override
     public String className() { return "HallwaySegment"; }
@@ -175,5 +162,20 @@ public class HallwaySegment extends Overlappable implements Gridable {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    @Override
+    public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
+        if (nextHallwaySegment() == null)
+            return;
+
+        Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
+
+        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
+        builder.rect(relp.x, relp.y, -0.1f,
+                relp.x + width, relp.y, -0.1f,
+                relp.x + width, relp.y + height, -0.1f,
+                relp.x, relp.y + height, -0.1f,
+                1, 1, 1);
     }
 }

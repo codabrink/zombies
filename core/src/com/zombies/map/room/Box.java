@@ -26,7 +26,7 @@ public class Box extends Overlappable implements Gridable {
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
-    private HashMap<String, Box> boxMap;
+    private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
 
     private Building building;
@@ -46,7 +46,7 @@ public class Box extends Overlappable implements Gridable {
         this.key      = bmKey;
         this.sKey     = bmKey[0]+","+bmKey[1];
 
-        boxMap = building.boxMap;
+        gridMap = building.gridMap;
 
         building.putBoxMap(key, this);
         room.boxes.add(this);
@@ -77,13 +77,13 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public void setAdjWallMap() {
-        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
-        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
-        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
-        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
+        Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
+        Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
+        Gridable e = gridMap.get(key[0] + 1 + "," + key[1]);
+        Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
         String key = this.key[0]+","+(this.key[1]+1)+",h";
-        if (n == null || n.getRoom() != room) {
+        if (!(n instanceof Box) || ((Box)n).getRoom() != room) {
             putWall(key,
                     position.cpy().add(0, height),
                     position.cpy().add(width, height),
@@ -91,7 +91,7 @@ public class Box extends Overlappable implements Gridable {
         } else { clearWall(key); }
 
         key = (this.key[0]+1)+","+ this.key[1]+",v";
-        if (e == null || e.getRoom() != room) {
+        if (!(e instanceof Box) || ((Box)e).getRoom() != room) {
             putWall(key,
                     position.cpy().add(width, 0),
                     position.cpy().add(width, height),
@@ -99,7 +99,7 @@ public class Box extends Overlappable implements Gridable {
         } else { clearWall(key); }
 
         key = sKey+",h";
-        if (s == null || s.getRoom() != room) {
+        if (!(s instanceof Box) || ((Box)s).getRoom() != room) {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(width, 0),
@@ -107,7 +107,7 @@ public class Box extends Overlappable implements Gridable {
         } else { clearWall(key); }
 
         key = sKey+",v";
-        if (w == null || w.getRoom() != room) {
+        if (!(w instanceof Box) || ((Box)w).getRoom() != room) {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(0, height),
@@ -199,18 +199,18 @@ public class Box extends Overlappable implements Gridable {
     public String getSKey() { return sKey; }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
-        Box b;
+        Gridable g;
         for (int[] k : Building.getAdjBMKeys(key)) {
-            b = boxMap.get(k[0] + "," + k[1]);
-            if (b != null)
-                adjBoxes.add(b);
+            g = gridMap.get(k[0] + "," + k[1]);
+            if (g instanceof Box)
+                adjBoxes.add((Box)g);
         }
         return adjBoxes;
     }
     public HashSet<int[]> getOpenAdjKeys() {
         HashSet<int[]> adjKeys = new HashSet<>();
         for (int[] k : Building.getAdjBMKeys(key)) {
-            if (boxMap.get(k[0] + "," + k[1]) == null)
+            if (gridMap.get(k[0] + "," + k[1]) == null)
                 adjKeys.add(k);
         }
         return adjKeys;
