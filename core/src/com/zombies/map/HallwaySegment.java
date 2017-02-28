@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
+import com.zombies.map.room.Building;
 import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
@@ -15,44 +16,96 @@ import java.util.HashSet;
 public class HallwaySegment extends Overlappable implements Gridable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
+    private boolean[] connections = new boolean[4];
 
     private Hallway hallway;
-    private Vector2 point;
+    private Vector2 position;
+    private Building building;
 
-    public HallwaySegment(Hallway h, Vector2 p) {
+    private int[] key;
+    private String sKey;
+
+    public HallwaySegment(Hallway h, int[] key) {
         hallway  = h;
-        point    = p;
+        building = h.getBuilding();
+        position = building.positionOf(key);
+        corners  = building.cornersOf(position);
+
         diameter = C.HALLWAY_WIDTH;
         radius   = diameter / 2;
+        width    = C.GRID_SIZE;
+        height   = C.GRID_SIZE;
     }
 
-    private void setCorners() {
-        corners[0] = new Vector2(position.x + width, position.y + height);
-        corners[1] = new Vector2(position.x, position.y + height);
-        corners[2] = new Vector2(position.x, position.y);
-        corners[3] = new Vector2(position.x + width, position.y);
-    }
+    public void rebuildModel() {
+        HashSet<Gridable> adj = new HashSet<>();
+        Gridable g;
+        int[][] adjGridKeys = Building.getAdjBMKeys(key);
+        for (int i = 0; i < adjGridKeys.length; i++)
+            connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-    public void materialize() {
-        HallwaySegment nextHallwaySegment = nextHallwaySegment();
-        if (nextHallwaySegment == null)
-            return;
-
-        calculateInfo(); // do this a second time
-        setCorners();
         createWalls();
         Zone.getZone(getCenter()).addObject(this);
     }
 
-    private void calculateInfo() {
-        Vector2 nPos = nextHallwaySegment().point;
-        position = new Vector2(
-                Math.min(point.x, nPos.x) - radius,
-                Math.min(point.y, nPos.y) - radius);
+    // TODO: build rotation into this to reduce redundant code
+    private void buildWalls() {
+        Vector2 center = getCenter(), c;
+        // right
+        if (connections[0]) {
+            // right hallway, top
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(C.GRID_HALF_SIZE - radius, 0), building));
+            // right hallway, bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(C.GRID_HALF_SIZE - radius, 0), building));
+        } else {
+            // cap off right side
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), building));
+        }
 
-        // calculate width and height
-        width = Math.abs(point.x - nPos.x) + diameter;
-        height = Math.abs(point.y - nPos.y) + diameter;
+        // top
+        if (connections[1]) {
+            // top hallway, left
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, C.GRID_HALF_SIZE - radius), building));
+            // top hallway, right
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, C.GRID_HALF_SIZE - radius), building));
+        } else {
+            // cap off top side
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), building));
+        }
+
+        // left
+        if (connections[2]) {
+            // left hallway, top
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(C.GRID_HALF_SIZE - radius, 0), building));
+            // left hallway, bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(C.GRID_HALF_SIZE - radius, 0), building));
+        } else {
+            // cap off left
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), building));
+        }
+
+        // right
+        if (connections[3]) {
+            // bottom hallway, left
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, C.GRID_HALF_SIZE - radius), building));
+            // bottom hallway, right
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, C.GRID_HALF_SIZE - radius), building));
+        } else {
+            // capp off bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), building));
+        }
     }
 
     public double[] getAdjAngles() {
@@ -171,7 +224,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
-        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
+        builder.setUVRange(0, 0, width / C.GRID_SIZE, height / C.GRID_SIZE);
         builder.rect(relp.x, relp.y, -0.1f,
                 relp.x + width, relp.y, -0.1f,
                 relp.x + width, relp.y + height, -0.1f,

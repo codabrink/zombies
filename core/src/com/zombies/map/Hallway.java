@@ -24,11 +24,9 @@ import com.zombies.map.room.WallDoor;
 import com.zombies.util.Geometry;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Hallway implements Drawable, HasZone {
     public ArrayList<HallwaySegment> segments = new ArrayList<>();
-    private Random r;
     private Box box;
 
     private float diameter;
@@ -36,10 +34,11 @@ public class Hallway implements Drawable, HasZone {
     private ModelInstance modelInstance;
     private Vector2 center;
     private Zone zone;
+    private Building building;
 
     public Hallway(Box b, int[] key) {
-        r = GameView.gv.random;
-        box = b;
+        box      = b;
+        building = box.getBuilding();
 
         // create a door
         String wallKey = Building.wallKeyBetweenBoxes(b.getKey(), key);
@@ -48,15 +47,15 @@ public class Hallway implements Drawable, HasZone {
 
         // add an initial segment
         Vector2 p = b.getPosition().cpy();
-        p.add((key[1] != b.getKey()[1] ? C.BOX_RADIUS : 0),
-                (key[0] != b.getKey()[0] ? C.BOX_RADIUS : 0));
-        p.add((key[0] > b.getKey()[0] ? C.BOX_DIAMETER : 0),
-                (key[1] > b.getKey()[1] ? C.BOX_DIAMETER : 0));
+        p.add((key[1] != b.getKey()[1] ? C.GRID_HALF_SIZE : 0),
+                (key[0] != b.getKey()[0] ? C.GRID_HALF_SIZE : 0));
+        p.add((key[0] > b.getKey()[0] ? C.GRID_SIZE : 0),
+                (key[1] > b.getKey()[1] ? C.GRID_SIZE : 0));
 
         segments.add(new HallwaySegment(this, p));
 
         double angle = (Geometry.getAngle(p, b.getCenter()) + Math.PI) % Math.PI;
-        Vector2 p2 = Geometry.projectVector(p, angle, C.BOX_DIAMETER);
+        Vector2 p2 = Geometry.projectVector(p, angle, C.GRID_SIZE);
         segments.add(new HallwaySegment(this, p2));
 
         for (HallwaySegment s : segments)
@@ -72,6 +71,7 @@ public class Hallway implements Drawable, HasZone {
     }
 
     public Box getBox() { return box; }
+    public Building getBuilding() { return building; }
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {

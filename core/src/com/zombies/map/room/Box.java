@@ -36,34 +36,27 @@ public class Box extends Overlappable implements Gridable {
     private int[] key;
     private String sKey;
 
-    public Box(Building building, Room room, int[] bmKey) {
+    public Box(Room room, int[] key) {
         id = numBoxes;
         numBoxes++;
 
-        this.building = building;
+        this.building = room.getBuilding();
         this.room     = room;
 
-        this.key      = bmKey;
-        this.sKey     = bmKey[0]+","+bmKey[1];
+        this.key      = key;
+        this.sKey     = key[0]+","+key[1];
 
         gridMap = building.gridMap;
 
-        building.putBoxMap(key, this);
+        building.putBoxMap(this.key, this);
         room.boxes.add(this);
 
-        position = building.positionOf(bmKey);
-        height   = C.BOX_DIAMETER;
-        width    = C.BOX_DIAMETER;
+        position = building.positionOf(key);
+        height   = C.GRID_SIZE;
+        width    = C.GRID_SIZE;
 
-        setCorners();
+        corners = building.cornersOf(position);
         setZones();
-    }
-
-    private void setCorners() {
-        corners[0] = new Vector2(position.x + width, position.y + height);
-        corners[1] = new Vector2(position.x, position.y + height);
-        corners[2] = new Vector2(position.x, position.y);
-        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     private void setZones() {
@@ -163,11 +156,11 @@ public class Box extends Overlappable implements Gridable {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.BOX_DIAMETER, 0);
+            return position.cpy().add(C.GRID_SIZE, 0);
         case 3:
-            return position.cpy().add(0, C.BOX_DIAMETER);
+            return position.cpy().add(0, C.GRID_SIZE);
         case 4:
-            return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
+            return position.cpy().add(C.GRID_SIZE, C.GRID_SIZE);
         }
         return new Vector2();
     }
@@ -181,7 +174,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.BOX_DIAMETER, random.nextFloat() * C.BOX_DIAMETER);
+        return position.cpy().add(random.nextFloat() * C.GRID_SIZE, random.nextFloat() * C.GRID_SIZE);
     }
 
     public Unit randomZombie() {
@@ -201,7 +194,7 @@ public class Box extends Overlappable implements Gridable {
         HashSet<Box> adjBoxes = new HashSet<>();
         Gridable g;
         for (int[] k : Building.getAdjBMKeys(key)) {
-            g = gridMap.get(k[0] + "," + k[1]);
+            g = building.gridMapGet(k);
             if (g instanceof Box)
                 adjBoxes.add((Box)g);
         }

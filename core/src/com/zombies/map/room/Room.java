@@ -1,9 +1,7 @@
 package com.zombies.map.room;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -21,7 +19,6 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.workers.RoomDoorWorker;
 
 public class Room implements Loadable, HasZone, Updateable, Drawable {
     public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
@@ -188,7 +185,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
                     //s = b.getBMLocation();
                 if (C.DEBUG_SHOW_ADJBOXCOUNT)
                     s = b.getAdjBoxes().size() + "";
-                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_DIAMETER / 2, b.getPosition().y + C.BOX_DIAMETER / 2);
+                f.draw(spriteBatch, s, b.getPosition().x + C.GRID_SIZE / 2, b.getPosition().y + C.GRID_SIZE / 2);
             }
             spriteBatch.end();
         }

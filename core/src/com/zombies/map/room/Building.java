@@ -52,9 +52,20 @@ public class Building implements HasZone, Modelable {
         return positionOf(key[0], key[1]);
     }
     public Vector2 positionOf(int x, int y) {
-        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * x);
-        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * y);
+        float vx = center.x - C.GRID_HALF_SIZE + (C.GRID_SIZE * x);
+        float vy = center.y - C.GRID_HALF_SIZE + (C.GRID_SIZE * y);
         return new Vector2(vx, vy);
+    }
+
+    public Vector2[] cornersOf(int[] key) { return cornersOf(key[0], key[1]); }
+    public Vector2[] cornersOf(int x, int y) { return cornersOf(positionOf(x, y)); }
+    public Vector2[] cornersOf(Vector2 position) {
+        return new Vector2[] {
+                new Vector2(position.x + C.GRID_SIZE, position.y + C.GRID_SIZE),
+                new Vector2(position.x, position.y + C.GRID_SIZE),
+                new Vector2(position.x, position.y),
+                new Vector2(position.x + C.GRID_SIZE, position.y)
+        };
     }
 
     public Vector2[] wallPositionOf(String key) {
@@ -65,7 +76,7 @@ public class Building implements HasZone, Modelable {
         Vector2 p1 = positionOf(new int[]{x, y});
         return new Vector2[]{
                 p1,
-                (orientation == 'v' ? p1.cpy().add(0, C.BOX_DIAMETER) : p1.cpy().add(C.BOX_DIAMETER, 0))};
+                (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
     }
 
     public static String wallKeyBetweenBoxes(int[] k1, int[] k2) {
@@ -86,6 +97,9 @@ public class Building implements HasZone, Modelable {
             if (g instanceof Box && ((Box)g).getOpenAdjKeys().size() > 0)
                 boxes.add((Box)g);
         return boxes;
+    }
+    public Gridable gridMapGet(int[] key) {
+        return gridMap.get(key[0] + "," + key[1]);
     }
 
     public void putBoxMap(int[] key, Box b) {
