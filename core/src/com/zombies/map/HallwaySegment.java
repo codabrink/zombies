@@ -37,19 +37,19 @@ public class HallwaySegment extends Overlappable implements Gridable {
         height   = C.GRID_SIZE;
     }
 
-    public void rebuildModel() {
+    public void rebuildModel(MeshPartBuilder builder, Vector2 center) {
         HashSet<Gridable> adj = new HashSet<>();
         Gridable g;
         int[][] adjGridKeys = Building.getAdjBMKeys(key);
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-        createWalls();
+        buildWalls(builder, center);
         Zone.getZone(getCenter()).addObject(this);
     }
 
     // TODO: build rotation into this to reduce redundant code
-    private void buildWalls() {
+    private void buildWalls(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
         if (connections[0]) {
@@ -106,50 +106,8 @@ public class HallwaySegment extends Overlappable implements Gridable {
             c = center.cpy();
             walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), building));
         }
-    }
 
-    public double[] getAdjAngles() {
-        int index = hallway.segments.indexOf(this);
-
-        Vector2 prev = (index == 0 ? hallway.getBox().getCenter() : hallway.segments.get(index - 1).getPoint());
-        double  prevAngle = Geometry.getAngle(point, prev);
-        if (index == hallway.segments.size() - 1)
-            return new double[]{prevAngle, prevAngle - Math.PI};
-        return new double[]{prevAngle, Geometry.getAngle(point, hallway.segments.get(index + 1).getPoint())};
-    }
-
-    public Vector2[] getCornerPoints() {
-        double[] adjAngles = getAdjAngles();
-        double leftAngle = ((adjAngles[0] + adjAngles[1]) / 2) % Math.PI;
-        double rightAngle = (leftAngle + Math.PI) % Math.PI;
-        return new Vector2[]{
-                Geometry.projectVector(point, leftAngle, 1),
-                Geometry.projectVector(point, rightAngle, 1)};
-    }
-
-    public HallwaySegment nextHallwaySegment() {
-        int index = hallway.segments.indexOf(this);
-        if (index == hallway.segments.size() - 1)
-            return null;
-        return hallway.segments.get(index + 1);
-    }
-
-    private void createWalls() {
-        HallwaySegment nextHallwaySegment = nextHallwaySegment();
-        if (nextHallwaySegment == null)
-            return;
-
-        Vector2[] cornerPoints = getCornerPoints();
-        Vector2[] nextCornerPoints = nextHallwaySegment.getCornerPoints();
-
-        walls.add(new WallWall(cornerPoints[0], nextCornerPoints[0], hallway.getModelable()));
-        walls.add(new WallWall(cornerPoints[1], nextCornerPoints[1], hallway.getModelable()));
-    }
-
-    public Vector2 getPoint() { return point; }
-
-    public void buildWallModels(MeshPartBuilder builder, Vector2 modelCenter) {
-        for (Wall wall: walls) {
+        for (Wall wall : walls) {
             wall.genSegmentsFromPoints();
             wall.buildWallMesh(builder, modelCenter);
         }
@@ -219,9 +177,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
     @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
-        if (nextHallwaySegment() == null)
-            return;
-
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
         builder.setUVRange(0, 0, width / C.GRID_SIZE, height / C.GRID_SIZE);
