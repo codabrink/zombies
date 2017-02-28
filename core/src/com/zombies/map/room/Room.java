@@ -59,7 +59,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         for (Box b: boxes)
             b.setAdjWallMap();
 
-        RoomDoorWorker.roomList.add(this); // queue for door processing
         genState = GenState.BOXED;
     }
 

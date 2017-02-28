@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
 import com.zombies.data.D;
 import com.zombies.data.Stats;
+import com.zombies.interfaces.Modelable;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
 import com.zombies.map.thread.Generator;
@@ -42,6 +43,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
+    public static HashSet<Modelable> readyToModel;
 
     public Stats stats;
 
@@ -120,13 +122,13 @@ public class GameView implements Screen {
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
+        readyToModel = new HashSet<>();
 
         System.gc();
     }
 
     public void initialRoom() {
-        Room room = Generator.genRoom(new Building(new Vector2(0, 0)), new int[]{0, 0});
-        room.connected = true;
+        Generator.genFullBuilding(new Vector2(0, 0));
     }
 
     public HUD getHUD() {
@@ -207,6 +209,13 @@ public class GameView implements Screen {
     protected void updateLoop() {
         mh.update();
         hud.update();
+
+        if (readyToModel.size() > 0) {
+            HashSet<Modelable> modeling = (HashSet<Modelable>)readyToModel.clone();
+            readyToModel = new HashSet<>();
+            for (Modelable m : modeling)
+                m.rebuildModel();
+        }
 
         frame++;
         if (frame > 2000)

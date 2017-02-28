@@ -84,15 +84,6 @@ public class Zone {
         for (Updateable u : updateables)
             if (u.getZone() == this)
                 u.update();
-
-        if (readyToModel.size() == 0)
-            return;
-        // readyToModel is accessed via separate threads, need to clone it to avoid
-        // concurrent modification exceptions
-        HashSet<Room> modeling = (HashSet<Room>)readyToModel.clone();
-        readyToModel = new HashSet<>();
-        for (Room r : modeling)
-            r.buildModel();
     }
 
     public void load(int limit) {

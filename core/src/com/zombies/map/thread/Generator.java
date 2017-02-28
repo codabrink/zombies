@@ -2,32 +2,41 @@ package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
 import com.zombies.util.U;
+import com.zombies.workers.RoomDoorWorker;
 
 import java.util.Random;
 
 public class Generator {
     public static Building genFullBuilding(Vector2 center) {
         Building building = new Building(center);
-        Random r = new Random();
-        Zone z   = Zone.getZone(center);
+        Random rand       = new Random();
+        Zone z            = Zone.getZone(center);
 
         int failures = 0;
 
         // initial room
-        genRoom(building, new int[]{0, 0});
+        Room initialRoom = genRoom(building, new int[]{0, 0});
+        initialRoom.connected = true;
 
         while (building.getRooms().size() < 7 && failures < 20) {
             Box b = (Box)U.random(building.getOuterBoxes());
             int[] key = (int[])U.random(b.getOpenAdjKeys());
 
-            genRoom(building, key);
+            if (genRoom(building, key) == null)
+                failures++;
         }
+
+        for (Room room : building.getRooms())
+            RoomDoorWorker.processDoorsOnRoom(room);
+
+        GameView.gv.readyToModel.add(building);
 
         return building;
     }

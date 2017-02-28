@@ -39,7 +39,7 @@ public class RoomDoorWorker implements Runnable {
         }
     }
 
-    private void processDoorsOnRoom(Room room) {
+    public static void processDoorsOnRoom(Room room) {
         HashSet<Room> adjRooms = new HashSet<>();
         HashMap<String, HashMap<String, Box[]>> potentialConnections = new HashMap<>();
         Random rand = new Random();
@@ -79,7 +79,7 @@ public class RoomDoorWorker implements Runnable {
         }
     }
 
-    private void connectRooms(Box b1, Box b2, String roomKey) {
+    private static void connectRooms(Box b1, Box b2, String roomKey) {
         Building building = b1.getBuilding();
         String wallMapKey = building.wallKeyBetweenBoxes(b1, b2);
         Vector2[] positions = building.wallPositionOf(wallMapKey);
@@ -97,7 +97,7 @@ public class RoomDoorWorker implements Runnable {
     }
 
     // true - exists, false - doesn't exist
-    private boolean checkDoorExistence(Box b, String roomKey, String wallKey) {
+    private static boolean checkDoorExistence(Box b, String roomKey, String wallKey) {
         if (b.getBuilding().wallMap.get(wallKey) instanceof WallDoor)
             return true;
         return false;
