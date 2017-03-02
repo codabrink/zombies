@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
@@ -66,6 +67,15 @@ public class Building implements HasZone, Modelable {
                 new Vector2(position.x, position.y),
                 new Vector2(position.x + C.GRID_SIZE, position.y)
         };
+    }
+
+    public Overlappable checkOverlap(int[] key) {
+        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE);
+    }
+    public Overlappable checkOverlap(int[] key, float width, float height) {
+        Vector2 position = positionOf(key);
+        Zone    zone     = Zone.getZone(position);
+        return zone.checkOverlap(position, width, height, 1);
     }
 
     public Vector2[] wallPositionOf(String key) {

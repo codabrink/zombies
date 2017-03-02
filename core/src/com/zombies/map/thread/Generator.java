@@ -46,13 +46,13 @@ public class Generator {
         Zone z = Zone.getZone(startPos);
         Random r = new Random();
 
-        if (z.checkOverlap(building.positionOf(bmKey), C.GRID_SIZE, C.GRID_SIZE, 1) != null)
+        if (building.checkOverlap(bmKey) != null)
             return null;
-
+        
         Room room = new Room(building);
 
         Box b;
-        new Box(building, room, bmKey);
+        new Box(room, bmKey);
 
         int roomSize = r.nextInt(3) + 10, loops = 0;
         while (room.boxes.size() <= roomSize) {
@@ -68,7 +68,7 @@ public class Generator {
             z = Zone.getZone(building.positionOf(bmKey));
 
             if (z.checkOverlap(building.positionOf(bmKey), C.GRID_SIZE, C.GRID_SIZE, 1) == null)
-                new Box(building, room, bmKey);
+                new Box(room, bmKey);
 
             loops++;
             if (loops > roomSize * 4) // catch infinite loops

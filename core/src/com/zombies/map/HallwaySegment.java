@@ -17,6 +17,8 @@ public class HallwaySegment extends Overlappable implements Gridable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
     private boolean[] connections = new boolean[4];
+    private boolean[] connectionOverride = new boolean[4];
+    private float halfWidth, halfHeight;
 
     private Hallway hallway;
     private Vector2 position;
@@ -25,17 +27,31 @@ public class HallwaySegment extends Overlappable implements Gridable {
     private int[] key;
     private String sKey;
 
-    public HallwaySegment(Hallway h, int[] key) {
+    private void setInfo(Hallway h, int[] key) {
         hallway  = h;
         building = h.getBuilding();
         position = building.positionOf(key);
         corners  = building.cornersOf(position);
 
-        diameter = C.HALLWAY_WIDTH;
-        radius   = diameter / 2;
-        width    = C.GRID_SIZE;
-        height   = C.GRID_SIZE;
+        diameter   = C.HALLWAY_WIDTH;
+        radius     = diameter / 2;
+        this.key   = key;
+        sKey       = key[0] + "," + key[1];
+
+        halfWidth  = width / 2;
+        halfHeight = height / 2;
     }
+    public HallwaySegment(Hallway h, int[] key, float width, float height) {
+        this.width      = width;
+        this.height     = height;
+        setInfo(h, key);
+    }
+    public HallwaySegment(Hallway h, int[] key) {
+        width      = C.GRID_SIZE;
+        height     = C.GRID_SIZE;
+        setInfo(h, key);
+    }
+
 
     public void rebuildModel(MeshPartBuilder builder, Vector2 center) {
         HashSet<Gridable> adj = new HashSet<>();
@@ -55,10 +71,10 @@ public class HallwaySegment extends Overlappable implements Gridable {
         if (connections[0]) {
             // right hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(C.GRID_HALF_SIZE - radius, 0), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), building));
             // right hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(C.GRID_HALF_SIZE - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), building));
         } else {
             // cap off right side
             c = center.cpy();
@@ -69,10 +85,10 @@ public class HallwaySegment extends Overlappable implements Gridable {
         if (connections[1]) {
             // top hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, C.GRID_HALF_SIZE - radius), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), building));
             // top hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, C.GRID_HALF_SIZE - radius), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), building));
         } else {
             // cap off top side
             c = center.cpy();
@@ -83,24 +99,24 @@ public class HallwaySegment extends Overlappable implements Gridable {
         if (connections[2]) {
             // left hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(C.GRID_HALF_SIZE - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), building));
             // left hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(C.GRID_HALF_SIZE - radius, 0), building));
+            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), building));
         } else {
             // cap off left
             c = center.cpy();
             walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), building));
         }
 
-        // right
+        // bottom
         if (connections[3]) {
             // bottom hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, C.GRID_HALF_SIZE - radius), building));
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), building));
             // bottom hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, C.GRID_HALF_SIZE - radius), building));
+            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), building));
         } else {
             // capp off bottom
             c = center.cpy();
