@@ -11,6 +11,7 @@ import com.zombies.C;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class HallwaySegment extends Overlappable implements Gridable {
@@ -52,16 +53,29 @@ public class HallwaySegment extends Overlappable implements Gridable {
         setInfo(h, key);
     }
 
-
-    public void rebuildModel(MeshPartBuilder builder, Vector2 center) {
+    public void compile() {
         HashSet<Gridable> adj = new HashSet<>();
         Gridable g;
         int[][] adjGridKeys = Building.getAdjBMKeys(key);
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-        buildWalls(builder, center);
         Zone.getZone(getCenter()).addObject(this);
+    }
+
+    public ArrayList<int[]> getOpenAdjKeys() {
+        ArrayList<int[]> adjKeys = new ArrayList<>();
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            if (building.gridMap.get(k[0] + "," + k[1]) == null)
+                adjKeys.add(k);
+        }
+        return adjKeys;
+    }
+
+    @Override
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {
+        for (Wall w : walls)
+            w.buildWallMesh(builder, center);
     }
 
     // TODO: build rotation into this to reduce redundant code

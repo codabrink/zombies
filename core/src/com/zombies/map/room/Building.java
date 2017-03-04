@@ -20,6 +20,7 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.map.Hallway;
+import com.zombies.map.HallwaySegment;
 import com.zombies.util.Assets;
 
 import java.util.HashMap;
@@ -187,18 +188,21 @@ public class Building implements HasZone, Modelable {
 
     @Override
     public void rebuildModel() {
-        buildFloorModel();
-        buildWallModel();
+        buildFloorMesh();
+        buildWallMesh();
     }
-    public void buildWallModel() {
+    public void buildWallMesh() {
         for (Wall w : wallMap.values())
             w.genSegmentsFromPoints();
+
         Assets.modelBuilder.begin();
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w: wallMap.values())
+        for (Wall w : wallMap.values())
             w.buildWallMesh(wallBuilder, center);
+        for (Gridable g : gridMap.values())
+            g.buildWallMesh(wallBuilder, center);
         MeshPartBuilder frameBuilder = Assets.modelBuilder.part("DoorFrames",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.BROWN)));
@@ -213,7 +217,7 @@ public class Building implements HasZone, Modelable {
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
-    public void buildFloorModel() {
+    public void buildFloorMesh() {
         Assets.modelBuilder.begin();
         MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,

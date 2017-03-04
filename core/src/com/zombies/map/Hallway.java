@@ -24,6 +24,7 @@ import com.zombies.map.room.WallDoor;
 import com.zombies.util.Geometry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Hallway implements Drawable, HasZone {
     public ArrayList<HallwaySegment> segments = new ArrayList<>();
@@ -64,6 +65,21 @@ public class Hallway implements Drawable, HasZone {
         b.getBuilding().getHallways().add(this);
 
         b.getBuilding().rebuildModel();
+    }
+
+    public void compile() {
+        for (HallwaySegment hs : segments)
+            hs.compile();
+    }
+
+    public HashSet<HallwaySegment> getOuterSegments() {
+        HashSet<HallwaySegment> outerSegments = new HashSet<>();
+        // TODO: expensive
+        for (HallwaySegment segment : segments) {
+            if (segment.getOpenAdjKeys().size() > 0)
+                outerSegments.add(segment);
+        }
+        return outerSegments;
     }
 
     public Modelable getModelable() {

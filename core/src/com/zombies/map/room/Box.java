@@ -200,8 +200,8 @@ public class Box extends Overlappable implements Gridable {
         }
         return adjBoxes;
     }
-    public HashSet<int[]> getOpenAdjKeys() {
-        HashSet<int[]> adjKeys = new HashSet<>();
+    public ArrayList<int[]> getOpenAdjKeys() {
+        ArrayList<int[]> adjKeys = new ArrayList<>();
         for (int[] k : Building.getAdjBMKeys(key)) {
             if (gridMap.get(k[0] + "," + k[1]) == null)
                 adjKeys.add(k);
@@ -209,6 +209,10 @@ public class Box extends Overlappable implements Gridable {
         return adjKeys;
     }
 
+    @Override
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
+
+    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
         builder.rect(relp.x, relp.y, 0,

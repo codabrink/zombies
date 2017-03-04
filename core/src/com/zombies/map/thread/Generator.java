@@ -17,7 +17,6 @@ import java.util.Random;
 public class Generator {
     public static Building genFullBuilding(Vector2 center) {
         Building building = new Building(center);
-        Random rand       = new Random();
         Zone z            = Zone.getZone(center);
 
         int failures = 0;
@@ -83,7 +82,7 @@ public class Generator {
 
             z = Zone.getZone(building.positionOf(bmKey));
 
-            if (z.checkOverlap(building.positionOf(bmKey), C.GRID_SIZE, C.GRID_SIZE, 1) == null)
+            if (building.checkOverlap(bmKey) == null)
                 new Box(room, bmKey);
 
             loops++;
