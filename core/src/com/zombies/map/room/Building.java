@@ -31,13 +31,10 @@ public class Building implements HasZone, Modelable {
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public enum DataState { BAD, PROCESSING, GOOD }
-
-    public DataState wallMapState = DataState.BAD;
-
     private int drawFrame = 0;
+    public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
     public boolean threadLocked = false;
-    public HashSet<Room> rooms = new HashSet<>();
+    private HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Gridable> gridMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
     public HashSet<Hallway> hallways = new HashSet<>();
@@ -67,6 +64,28 @@ public class Building implements HasZone, Modelable {
                 new Vector2(position.x, position.y),
                 new Vector2(position.x + C.GRID_SIZE, position.y)
         };
+    }
+
+    public HashSet<Box> boxesOnCol(int col) {
+        HashSet<Box> boxes = new HashSet<>();
+        Gridable g;
+        for (int y = yLow; y <= yHigh; y++) {
+            g = gridMap.get(col + "," + y);
+            if (g instanceof Box)
+                boxes.add((Box)g);
+        }
+        return boxes;
+    }
+
+    public HashSet<Box> boxesOnRow(int row) {
+        HashSet<Box> boxes = new HashSet<>();
+        Gridable g;
+        for (int x = xLow; x <= xLow; x++) {
+            g = gridMap.get(x + "," + row);
+            if (g instanceof Box)
+                boxes.add((Box)g);
+        }
+        return boxes;
     }
 
     public Overlappable checkOverlap(int[] key) {
@@ -147,9 +166,22 @@ public class Building implements HasZone, Modelable {
         return adjKeys;
     }
 
+    private void calculateBorders() {
+        int[] key;
+        for (Gridable g : gridMap.values()) {
+            if (!(g instanceof Box)) continue;
+
+            key = ((Box)g).getKey();
+            xLow  = Math.min(xLow,  key[0]);
+            xHigh = Math.max(xHigh, key[0]);
+            yLow  = Math.min(yLow,  key[1]);
+            yHigh = Math.max(yHigh, key[1]);
+        }
+    }
     public Vector2 getCenter() {
         return center;
     }
+    public void addRoom(Room room) { rooms.add(room); calculateBorders(); }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Hallway> getHallways() { return hallways; }
 

@@ -42,7 +42,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         genState = GenState.CREATED;
 
         this.building = building;
-        building.rooms.add(this);
+        building.addRoom(this);
 
         id = roomCount;
         roomCount++;

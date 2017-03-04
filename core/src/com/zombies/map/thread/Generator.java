@@ -5,6 +5,7 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
+import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -33,6 +34,21 @@ public class Generator {
                 failures++;
         }
 
+        Box b;
+        // place hallways
+        // right hallway (xHigh)
+        b = (Box)U.random(building.boxesOnCol(building.xHigh));
+
+        // top hallway (yHigh)
+        b = (Box)U.random(building.boxesOnRow(building.yHigh));
+
+        // left hallway (xLow)
+        b = (Box)U.random(building.boxesOnCol(building.xLow));
+
+        // bottom hallway (yLow)
+        b = (Box)U.random(building.boxesOnRow(building.yLow));
+
+
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
@@ -48,7 +64,7 @@ public class Generator {
 
         if (building.checkOverlap(bmKey) != null)
             return null;
-        
+
         Room room = new Room(building);
 
         Box b;
