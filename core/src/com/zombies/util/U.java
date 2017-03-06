@@ -27,8 +27,10 @@ public class U {
         return null;
     }
     public static < E > Object random(List<E> list) {
-        if (list.size() == 0) return null;
-        return list.get(random.nextInt(list.size() - 1));
+        int size = list.size();
+        if (size == 0) return null;
+        if (size == 1) return list.get(0);
+        return l   ist.get(random.nextInt(list.size() - 1));
     }
 
     private static String getCallerClassName() {

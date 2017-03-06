@@ -209,10 +209,6 @@ public class Building implements HasZone, Modelable {
         //for (DoorContainer dc : doorContainers)
         //    dc.getDoorFrame().buildMesh(frameBuilder, center);
 
-        // build hallways
-        for (Hallway h : hallways)
-            h.rebuildModel(center);
-
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
