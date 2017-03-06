@@ -30,7 +30,7 @@ public class U {
         int size = list.size();
         if (size == 0) return null;
         if (size == 1) return list.get(0);
-        return l   ist.get(random.nextInt(list.size() - 1));
+        return list.get(random.nextInt(list.size() - 1));
     }
 
     private static String getCallerClassName() {
