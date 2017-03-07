@@ -29,12 +29,12 @@ public class MapAdmin {
 
             Thread thread = new Thread(new RunnableAdjRoom(box));
             threads.add(thread);
-            thread.run();
+            thread.start();
         } else {
             Runnable r = new GenRoomOnPlayer(p);
             Thread thread = new Thread(r);
             threads.add(thread);
-            thread.run();
+            thread.start();
         }
     }
 }
