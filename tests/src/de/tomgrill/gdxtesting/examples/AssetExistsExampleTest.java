@@ -10,6 +10,7 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
+import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -112,11 +113,11 @@ public class AssetExistsExampleTest {
         assertTrue(building.wallMap.get("1,1,h") != null);
 
         // Test building features
-        Box b1 = building.gridMap.get("0,0");
-        Box b2 = building.gridMap.get("1,0");
-        assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("1,0,v"));
-        b2     = building.gridMap.get("0,1");
-        assertTrue(Building.wallKeyBetweenBoxes(b1,b2).equals("0,1,h"));
+        Gridable g1 = building.gridMap.get("0,0");
+        Gridable g2 = building.gridMap.get("1,0");
+        assertTrue(Building.wallKeyBetweenGridables(g1, g2).equals("1,0,v"));
+        g2     = building.gridMap.get("0,1");
+        assertTrue(Building.wallKeyBetweenGridables(g1, g2).equals("0,1,h"));
 
         // test vertical wall positions
         Vector2[] positions = building.wallPositionOf("1,0,v");
@@ -149,7 +150,7 @@ public class AssetExistsExampleTest {
 
         room = Generator.genRoom(building, new int[]{-1,1});
 
-        Box newBox = building.gridMap.get("-1,1");
+        Box newBox = (Box)building.gridMap.get("-1,1");
 
         Vector2 expectedPosition = building.getCenter().cpy();
         expectedPosition.sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
@@ -160,10 +161,10 @@ public class AssetExistsExampleTest {
     }
 
     private void genCrossRoom(Building building, Room room) {
-        Box b00  = new Box(building, room, new int[]{0,0});
-        Box b10  = new Box(building, room, new int[]{1,0});
-        Box bn10 = new Box(building, room, new int[]{-1,0});
-        Box b01  = new Box(building, room, new int[]{0,1});
-        Box b0n1 = new Box(building, room, new int[]{0,-1});
+        Box b00  = new Box(room, new int[]{0,0});
+        Box b10  = new Box(room, new int[]{1,0});
+        Box bn10 = new Box(room, new int[]{-1,0});
+        Box b01  = new Box(room, new int[]{0,1});
+        Box b0n1 = new Box(room, new int[]{0,-1});
     }
 }

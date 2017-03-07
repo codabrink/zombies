@@ -45,6 +45,6 @@ class GenRoomOnPlayer implements Runnable {
         this.p = p;
     }
     public void run() {
-        Generator.genRoom(new Building(p.getPosition().cpy()), new int[]{0, 0});
+        Generator.genFullBuilding(p.getPosition().cpy());
     }
 }

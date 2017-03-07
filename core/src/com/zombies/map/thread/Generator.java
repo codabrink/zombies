@@ -23,6 +23,8 @@ public class Generator {
 
         // initial room
         Room initialRoom = genRoom(building, new int[]{0, 0});
+        if (initialRoom == null)
+            return null;
         initialRoom.connected = true;
 
         while (building.getRooms().size() < 7 && failures < 20) {

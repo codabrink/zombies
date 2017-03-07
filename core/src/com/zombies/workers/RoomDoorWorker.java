@@ -81,7 +81,7 @@ public class RoomDoorWorker implements Runnable {
 
     private static void connectRooms(Box b1, Box b2, String roomKey) {
         Building building = b1.getBuilding();
-        String wallMapKey = building.wallKeyBetweenBoxes(b1, b2);
+        String wallMapKey = building.wallKeyBetweenGridables(b1, b2);
         Vector2[] positions = building.wallPositionOf(wallMapKey);
 
         // do not generate door twice

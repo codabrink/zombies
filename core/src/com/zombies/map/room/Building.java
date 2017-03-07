@@ -20,7 +20,6 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.map.Hallway;
-import com.zombies.map.HallwaySegment;
 import com.zombies.util.Assets;
 
 import java.util.HashMap;
@@ -109,16 +108,16 @@ public class Building implements HasZone, Modelable {
                 (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
     }
 
-    public static String wallKeyBetweenBoxes(int[] k1, int[] k2) {
+    public static String wallBetweenGridables(int[] k1, int[] k2) {
         return Math.max(k1[0], k2[0]) + "," +
                 Math.max(k1[1], k2[1]) + "," +
                 (k1[0] != k2[0] ? "v" : "h");
     }
-    public static String wallKeyBetweenBoxes(Box b1, Box b2) {
-        return wallKeyBetweenBoxes(b1.getKey(), b2.getKey());
+    public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
+        return wallBetweenGridables(g1.getKey(), g2.getKey());
     }
     public Wall wallBetweenBoxes(Box b1, Box b2) {
-        return wallMap.get(wallKeyBetweenBoxes(b1, b2));
+        return wallMap.get(wallKeyBetweenGridables(b1, b2));
     }
 
     public HashSet<Box> getOuterBoxes() {

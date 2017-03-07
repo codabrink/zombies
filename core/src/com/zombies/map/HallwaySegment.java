@@ -216,4 +216,9 @@ public class HallwaySegment extends Overlappable implements Gridable {
                 relp.x, relp.y + height, -0.1f,
                 1, 1, 1);
     }
+
+    @Override
+    public int[] getKey() {
+        return key;
+    }
 }
