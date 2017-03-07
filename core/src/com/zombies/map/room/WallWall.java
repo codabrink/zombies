@@ -10,7 +10,5 @@ public class WallWall extends Wall {
 
         points.add(new WallPoint(p1, 1));
         points.add(new WallPoint(p2, 0));
-
-        genSegmentsFromPoints();
     }
 }

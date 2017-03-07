@@ -15,17 +15,18 @@ import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Modelable;
 import com.zombies.powerups.Powerup;
 
-public class Box extends Overlappable {
+public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
 
     private ArrayList<Unit> zombies = new ArrayList<>();
     private ArrayList<Unit> survivors = new ArrayList<Unit>();
     private ArrayList<Crate> crates = new ArrayList<Crate>();
     private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
-    private HashMap<String, Box> boxMap;
+    private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
 
     private Building building;
@@ -35,34 +36,27 @@ public class Box extends Overlappable {
     private int[] key;
     private String sKey;
 
-    public Box(Building building, Room room, int[] bmKey) {
+    public Box(Room room, int[] key) {
         id = numBoxes;
         numBoxes++;
 
-        this.building = building;
+        this.building = room.getBuilding();
         this.room     = room;
 
-        this.key      = bmKey;
-        this.sKey     = bmKey[0]+","+bmKey[1];
+        this.key      = key;
+        this.sKey     = key[0]+","+key[1];
 
-        boxMap = building.boxMap;
+        gridMap = building.gridMap;
 
-        building.putBoxMap(key, this);
+        building.putBoxMap(this.key, this);
         room.boxes.add(this);
 
-        position = building.positionOf(bmKey);
-        height   = C.BOX_DIAMETER;
-        width    = C.BOX_DIAMETER;
+        position = building.positionOf(key);
+        height   = C.GRID_SIZE;
+        width    = C.GRID_SIZE;
 
-        setCorners();
+        corners = building.cornersOf(position);
         setZones();
-    }
-
-    private void setCorners() {
-        corners[0] = new Vector2(position.x + width, position.y + height);
-        corners[1] = new Vector2(position.x, position.y + height);
-        corners[2] = new Vector2(position.x, position.y);
-        corners[3] = new Vector2(position.x + width, position.y);
     }
 
     private void setZones() {
@@ -76,13 +70,13 @@ public class Box extends Overlappable {
     }
 
     public void setAdjWallMap() {
-        Box n = boxMap.get(key[0] + "," + (key[1] + 1));
-        Box s = boxMap.get(key[0] + "," + (key[1] - 1));
-        Box e = boxMap.get(key[0] + 1 + "," + key[1]);
-        Box w = boxMap.get(key[0] - 1 + "," + key[1]);
+        Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
+        Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
+        Gridable e = gridMap.get(key[0] + 1 + "," + key[1]);
+        Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
         String key = this.key[0]+","+(this.key[1]+1)+",h";
-        if (n == null || n.getRoom() != room) {
+        if (!(n instanceof Box) || ((Box)n).getRoom() != room) {
             putWall(key,
                     position.cpy().add(0, height),
                     position.cpy().add(width, height),
@@ -90,7 +84,7 @@ public class Box extends Overlappable {
         } else { clearWall(key); }
 
         key = (this.key[0]+1)+","+ this.key[1]+",v";
-        if (e == null || e.getRoom() != room) {
+        if (!(e instanceof Box) || ((Box)e).getRoom() != room) {
             putWall(key,
                     position.cpy().add(width, 0),
                     position.cpy().add(width, height),
@@ -98,7 +92,7 @@ public class Box extends Overlappable {
         } else { clearWall(key); }
 
         key = sKey+",h";
-        if (s == null || s.getRoom() != room) {
+        if (!(s instanceof Box) || ((Box)s).getRoom() != room) {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(width, 0),
@@ -106,7 +100,7 @@ public class Box extends Overlappable {
         } else { clearWall(key); }
 
         key = sKey+",v";
-        if (w == null || w.getRoom() != room) {
+        if (!(w instanceof Box) || ((Box)w).getRoom() != room) {
             putWall(key,
                     position.cpy(),
                     position.cpy().add(0, height),
@@ -162,11 +156,11 @@ public class Box extends Overlappable {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.BOX_DIAMETER, 0);
+            return position.cpy().add(C.GRID_SIZE, 0);
         case 3:
-            return position.cpy().add(0, C.BOX_DIAMETER);
+            return position.cpy().add(0, C.GRID_SIZE);
         case 4:
-            return position.cpy().add(C.BOX_DIAMETER, C.BOX_DIAMETER);
+            return position.cpy().add(C.GRID_SIZE, C.GRID_SIZE);
         }
         return new Vector2();
     }
@@ -180,7 +174,7 @@ public class Box extends Overlappable {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.BOX_DIAMETER, random.nextFloat() * C.BOX_DIAMETER);
+        return position.cpy().add(random.nextFloat() * C.GRID_SIZE, random.nextFloat() * C.GRID_SIZE);
     }
 
     public Unit randomZombie() {
@@ -198,23 +192,27 @@ public class Box extends Overlappable {
     public String getSKey() { return sKey; }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
-        Box b;
+        Gridable g;
         for (int[] k : Building.getAdjBMKeys(key)) {
-            b = boxMap.get(k[0] + "," + k[1]);
-            if (b != null)
-                adjBoxes.add(b);
+            g = building.gridMapGet(k);
+            if (g instanceof Box)
+                adjBoxes.add((Box)g);
         }
         return adjBoxes;
     }
-    public HashSet<int[]> getOpenAdjKeys() {
-        HashSet<int[]> adjKeys = new HashSet<>();
+    public ArrayList<int[]> getOpenAdjKeys() {
+        ArrayList<int[]> adjKeys = new ArrayList<>();
         for (int[] k : Building.getAdjBMKeys(key)) {
-            if (boxMap.get(k[0] + "," + k[1]) == null)
+            if (gridMap.get(k[0] + "," + k[1]) == null)
                 adjKeys.add(k);
         }
         return adjKeys;
     }
 
+    @Override
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
+
+    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
         builder.rect(relp.x, relp.y, 0,

@@ -15,8 +15,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
+import com.zombies.map.Hallway;
 import com.zombies.util.Assets;
 
 import java.util.HashMap;
@@ -28,30 +31,78 @@ public class Building implements HasZone, Modelable {
     private Model wallModel, floorModel;
     private ModelInstance wallModelInstance, floorModelInstance;
 
-    public enum DataState { BAD, PROCESSING, GOOD }
-
-    public DataState wallMapState = DataState.BAD;
-
     private int drawFrame = 0;
+    public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
     public boolean threadLocked = false;
-    public HashSet<Room> rooms = new HashSet<>();
-    public HashMap<String, Box> boxMap = new HashMap<>();
+    private HashSet<Room> rooms = new HashSet<>();
+    public HashMap<String, Gridable> gridMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
+    public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
     private Zone zone;
+
+    private boolean compiled = false; // debug var
 
     public Building(Vector2 center) {
         this.center = center;
         Zone.getZone(center).addObject(this);
+    }
+    public void compile() {
+        for (Room room : rooms)
+            room.compile();
+        calculateBorders();
+        if (C.DEBUG) compiled = true;
     }
 
     public Vector2 positionOf(int[] key) {
         return positionOf(key[0], key[1]);
     }
     public Vector2 positionOf(int x, int y) {
-        float vx = center.x - C.BOX_RADIUS + (C.BOX_DIAMETER * x);
-        float vy = center.y - C.BOX_RADIUS + (C.BOX_DIAMETER * y);
+        float vx = center.x - C.GRID_HALF_SIZE + (C.GRID_SIZE * x);
+        float vy = center.y - C.GRID_HALF_SIZE + (C.GRID_SIZE * y);
         return new Vector2(vx, vy);
+    }
+
+    public Vector2[] cornersOf(int[] key) { return cornersOf(key[0], key[1]); }
+    public Vector2[] cornersOf(int x, int y) { return cornersOf(positionOf(x, y)); }
+    public Vector2[] cornersOf(Vector2 position) {
+        return new Vector2[] {
+                new Vector2(position.x + C.GRID_SIZE, position.y + C.GRID_SIZE),
+                new Vector2(position.x, position.y + C.GRID_SIZE),
+                new Vector2(position.x, position.y),
+                new Vector2(position.x + C.GRID_SIZE, position.y)
+        };
+    }
+
+    public HashSet<Box> boxesOnCol(int col) {
+        HashSet<Box> boxes = new HashSet<>();
+        Gridable g;
+        for (int y = yLow; y <= yHigh; y++) {
+            g = gridMap.get(col + "," + y);
+            if (g instanceof Box)
+                boxes.add((Box)g);
+        }
+        return boxes;
+    }
+
+    public HashSet<Box> boxesOnRow(int row) {
+        HashSet<Box> boxes = new HashSet<>();
+        Gridable g;
+        for (int x = xLow; x <= xHigh; x++) {
+            g = gridMap.get(x + "," + row);
+            if (g instanceof Box)
+                boxes.add((Box)g);
+        }
+        return boxes;
+    }
+
+    public Overlappable checkOverlap(int[] key) {
+        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE);
+    }
+    public Overlappable checkOverlap(int[] key, float width, float height) {
+        Vector2 position = positionOf(key);
+        Zone    zone     = Zone.getZone(position);
+        return zone.checkOverlap(position, width, height, 1);
     }
 
     public Vector2[] wallPositionOf(String key) {
@@ -62,20 +113,34 @@ public class Building implements HasZone, Modelable {
         Vector2 p1 = positionOf(new int[]{x, y});
         return new Vector2[]{
                 p1,
-                (orientation == 'v' ? p1.cpy().add(0, C.BOX_DIAMETER) : p1.cpy().add(C.BOX_DIAMETER, 0))};
+                (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
     }
 
-    public static String wallKeyBetweenBoxes(Box b1, Box b2) {
-        return Math.max(b1.getKey()[0], b2.getKey()[0]) + "," +
-                Math.max(b1.getKey()[1], b2.getKey()[1]) + "," +
-                (b1.getKey()[0] != b2.getKey()[0] ? "v" : "h");
+    public static String wallBetweenGridables(int[] k1, int[] k2) {
+        return Math.max(k1[0], k2[0]) + "," +
+                Math.max(k1[1], k2[1]) + "," +
+                (k1[0] != k2[0] ? "v" : "h");
+    }
+    public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
+        return wallBetweenGridables(g1.getKey(), g2.getKey());
     }
     public Wall wallBetweenBoxes(Box b1, Box b2) {
-        return wallMap.get(wallKeyBetweenBoxes(b1, b2));
+        return wallMap.get(wallKeyBetweenGridables(b1, b2));
+    }
+
+    public HashSet<Box> getOuterBoxes() {
+        HashSet<Box> boxes = new HashSet<>();
+        for (Gridable g : gridMap.values())
+            if (g instanceof Box && ((Box)g).getOpenAdjKeys().size() > 0)
+                boxes.add((Box)g);
+        return boxes;
+    }
+    public Gridable gridMapGet(int[] key) {
+        return gridMap.get(key[0] + "," + key[1]);
     }
 
     public void putBoxMap(int[] key, Box b) {
-        boxMap.put(key[0] + "," + key[1], b);
+        gridMap.put(key[0] + "," + key[1], b);
     }
     public void putWallMap(String key, Wall w) {
         if (wallMap.get(key) != null)
@@ -109,39 +174,64 @@ public class Building implements HasZone, Modelable {
         return adjKeys;
     }
 
+    private void calculateBorders() {
+        int[] key;
+        for (Gridable g : gridMap.values()) {
+            if (!(g instanceof Box)) continue;
+
+            key = ((Box)g).getKey();
+            xLow  = Math.min(xLow,  key[0]);
+            xHigh = Math.max(xHigh, key[0]);
+            yLow  = Math.min(yLow,  key[1]);
+            yHigh = Math.max(yHigh, key[1]);
+        }
+    }
     public Vector2 getCenter() {
         return center;
     }
+    public void addRoom(Room room) {
+        if (C.DEBUG) { compiled = false; }
+        rooms.add(room);
+    }
     public HashSet<Room> getRooms() { return rooms; }
+    public HashSet<Hallway> getHallways() { return hallways; }
 
     @Override
     public void rebuildModel() {
-        buildFloorModel();
-        buildWallModel();
+        if (C.DEBUG && !compiled)
+            System.out.println("Building: ERROR! Building is not compiled.");
+        buildFloorMesh();
+        buildWallMesh();
     }
-    public void buildWallModel() {
+    public void buildWallMesh() {
+        for (Wall w : wallMap.values())
+            w.genSegmentsFromPoints();
+
         Assets.modelBuilder.begin();
         MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w: wallMap.values())
+        for (Wall w : wallMap.values())
             w.buildWallMesh(wallBuilder, center);
+        for (Gridable g : gridMap.values())
+            g.buildWallMesh(wallBuilder, center);
         MeshPartBuilder frameBuilder = Assets.modelBuilder.part("DoorFrames",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.BROWN)));
         //for (DoorContainer dc : doorContainers)
         //    dc.getDoorFrame().buildMesh(frameBuilder, center);
+
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
     }
-    public void buildFloorModel() {
+    public void buildFloorMesh() {
         Assets.modelBuilder.begin();
         MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(Assets.floor1Diffuse));
-        for (Box b: boxMap.values()) {
-            b.buildFloorMesh(floorBuilder, center);
+        for (Gridable g: gridMap.values()) {
+            g.buildFloorMesh(floorBuilder, center);
         }
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);

@@ -3,18 +3,17 @@ package com.zombies.map.room;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.zombies.BodData;
 import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
+import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -50,11 +49,11 @@ public class Wall implements Collideable, Loadable, HasZone {
             z.addObject(this);
     }
 
-    protected void genSegmentsFromPoints() {
+    public void genSegmentsFromPoints() {
         if (body != null)
-            view.getWorld().destroyBody(body);
+            D.world.destroyBody(body);
 
-        body = view.getWorld().createBody(new BodyDef());
+        body = D.world.createBody(new BodyDef());
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
@@ -117,8 +116,8 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (dst > p1.dst(p2))
             return; // this is beyond the scope of the wall
 
-        view.getWorld().destroyBody(body);
-        body = view.getWorld().createBody(new BodyDef());
+        D.world.destroyBody(body);
+        body = D.world.createBody(new BodyDef());
         body.setTransform(p1, body.getAngle());
         body.setUserData(new BodData("wall", this));
         segments = new ArrayList<WallSegment>();
@@ -163,7 +162,8 @@ public class Wall implements Collideable, Loadable, HasZone {
     }
 
     public void destroy() {
-        view.getWorld().destroyBody(body);
+        if (body != null)
+            D.world.destroyBody(body);
     }
 
     @Override

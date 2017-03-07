@@ -28,7 +28,7 @@ public class RunnableAdjRoom implements Runnable {
         adjBox.getBuilding().threadLocked = true;
 
         Vector2 position = adjBox.getBuilding().positionOf(bmKey);
-        if (adjBox.getZone().checkOverlap(position, C.BOX_DIAMETER, C.BOX_DIAMETER, 1) == null) {
+        if (adjBox.getZone().checkOverlap(position, C.GRID_SIZE, C.GRID_SIZE, 1) == null) {
             Generator.genRoom(adjBox.getBuilding(), bmKey);
         }
 

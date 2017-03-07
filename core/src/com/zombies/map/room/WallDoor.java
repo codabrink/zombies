@@ -23,7 +23,5 @@ public class WallDoor extends Wall {
         points.add(new WallPoint(p2, 0));
 
         doorContainer = new DoorContainer(doorStart, doorEnd, m);
-
-        genSegmentsFromPoints();
     }
 }

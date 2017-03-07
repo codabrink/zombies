@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zombies.data.D;
 import com.zombies.interfaces.Drawable;
 import com.zombies.map.room.Box;
 
@@ -33,7 +34,7 @@ public class Zombie extends Unit implements Drawable {
         bDef.position.set(position);
         bDef.type = BodyType.DynamicBody;
 
-        body = view.getWorld().createBody(bDef);
+        body = D.world.createBody(bDef);
         shape.setRadius(C.ZOMBIE_SIZE * 0.75f);
         MassData mass = new MassData();
         mass.mass = .1f;

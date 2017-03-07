@@ -41,12 +41,12 @@ public class WallSegment {
         float dy = p2.y - p1.y;
 
         min = new Vector3(0, 0, (height < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(height) : 0));
-        max = new Vector3(Math.max(dx, 0.1f), Math.max(dy, 0.1f), (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH));
+        max = new Vector3(Math.max(dx, 0.2f), Math.max(dy, 0.2f), (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH));
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
         mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
-        //mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
+        //mtrans.rotate(Vector3.Z, (float)Math.toDegrees(getAngle));
         bounds.mul(mtrans);
 
         boxShapeBuilder.build(wallBuilder, bounds);

@@ -1,113 +1,146 @@
 package com.zombies.map;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.IOverlappable;
+import com.zombies.interfaces.Gridable;
+import com.zombies.map.room.Building;
+import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable implements IOverlappable {
-    private Vector2[] corners = new Vector2[4];
-    public Vector2 center;
-    private Vector2 w1p1, w1p2, w2p1, w2p2;
+public class HallwaySegment extends Overlappable implements Gridable {
     public float diameter, radius;
-    private LinkedList<Wall> walls = new LinkedList<Wall>();
-    private HallwayAxis pAxis, axis, nAxis;
-    private com.zombies.interfaces.Modelable modelable;
+    private HashSet<Wall> walls = new HashSet<>();
+    private boolean[] connections = new boolean[4];
+    private boolean[] connectionOverride = new boolean[4];
+    private float halfWidth, halfHeight;
 
-    public HallwaySegment(HallwayAxis pAxis, HallwayAxis axis, HallwayAxis nAxis, float diameter, Modelable m) {
-        this.pAxis = pAxis;
-        this.axis  = axis;
-        this.nAxis = nAxis;
-        this.diameter = diameter;
-        this.radius   = diameter / 2;
-        this.modelable = m;
+    private Hallway hallway;
+    private Vector2 position;
+    private Building building;
 
-        calculateInfo();
+    private int[] key;
+    private String sKey;
+
+    private void setInfo(Hallway h, int[] key) {
+        hallway  = h;
+        building = h.getBuilding();
+        position = building.positionOf(key);
+        corners  = building.cornersOf(position);
+
+        diameter   = C.HALLWAY_WIDTH;
+        radius     = diameter / 2;
+        this.key   = key;
+        sKey       = key[0] + "," + key[1];
+
+        halfWidth  = width / 2;
+        halfHeight = height / 2;
+    }
+    public HallwaySegment(Hallway h, int[] key, float width, float height) {
+        this.width      = width;
+        this.height     = height;
+        setInfo(h, key);
+    }
+    public HallwaySegment(Hallway h, int[] key) {
+        width      = C.GRID_SIZE;
+        height     = C.GRID_SIZE;
+        setInfo(h, key);
     }
 
-    private void setCorners() {
-        corners[0] = new Vector2(position.x + width, position.y + height);
-        corners[1] = new Vector2(position.x, position.y + height);
-        corners[2] = new Vector2(position.x, position.y);
-        corners[3] = new Vector2(position.x + width, position.y);
-    }
+    public void compile() {
+        HashSet<Gridable> adj = new HashSet<>();
+        Gridable g;
+        int[][] adjGridKeys = Building.getAdjBMKeys(key);
+        for (int i = 0; i < adjGridKeys.length; i++)
+            connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-    public void materialize() {
-        calculateInfo(); // do this a second time
-        setCorners();
-        createWalls();
         Zone.getZone(getCenter()).addObject(this);
     }
 
-    private void createWalls() {
-        // p1aa = Point 1 Angle Average
-        double p1aa = (pAxis.theta + axis.theta) / 2,
-                p2aa = (axis.theta + nAxis.theta) / 2;
-
-        // Wall 1 is on the left
-        // Wall 2 is on the right
-        // Point 1 is at the beginning
-        // Point 2 is at the end
-        double w1p1a = p1aa + Math.PI / 2;
-        double w1p2a = p2aa + Math.PI / 2;
-        double w2p1a = p1aa - Math.PI / 2;
-        double w2p2a = p2aa - Math.PI / 2;
-
-        float p1r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        float p2r = Math.abs(pAxis.theta - axis.theta) > 0 ? (float)Math.sqrt(radius*radius+radius*radius) : (float)radius;
-        w1p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w1p1a)), (float)(p1r * Math.sin(w1p1a)))); // starting point of the wall
-        w1p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w1p2a)), (float)(p2r * Math.sin(w1p2a)))); // simply used for calculating the length of the wall
-        w2p1 = new Vector2(axis.point.cpy().add((float)(p1r * Math.cos(w2p1a)), (float)(p1r * Math.sin(w2p1a))));
-        w2p2 = new Vector2(nAxis.point.cpy().add((float)(p2r * Math.cos(w2p2a)), (float)(p2r * Math.sin(w2p2a))));
-
-        walls.add(new Wall(w1p1, w1p2, modelable));
-        walls.add(new Wall(w2p1, w2p2, modelable));
-
-        if (C.DEBUG) {
-            GameView.gv.addDebugDots(axis.point, Color.GREEN);
-            GameView.gv.addDebugDots(nAxis.point, Color.RED);
+    public ArrayList<int[]> getOpenAdjKeys() {
+        ArrayList<int[]> adjKeys = new ArrayList<>();
+        for (int[] k : Building.getAdjBMKeys(key)) {
+            if (building.gridMap.get(k[0] + "," + k[1]) == null)
+                adjKeys.add(k);
         }
+        return adjKeys;
     }
 
-    private void calculateInfo() {
-        position = new Vector2(
-                Math.min(axis.point.x, nAxis.point.x) - radius,
-                Math.min(axis.point.y, nAxis.point.y) - radius);
-
-        // calculate width and height
-        width = Math.abs(axis.point.x - nAxis.point.x) + diameter;
-        height = Math.abs(axis.point.y - nAxis.point.y) + diameter;
-
-        center = position.cpy().add(width / 2, height / 2);
+    @Override
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {
+        for (Wall w : walls)
+            w.buildWallMesh(builder, center);
     }
 
-    public Vector2 getP1() {return axis.point;}
-    public Vector2 getP2() {return nAxis.point;}
-    public LinkedList<Wall> getWalls() { return walls; }
+    // TODO: build rotation into this to reduce redundant code
+    private void buildWalls(MeshPartBuilder builder, Vector2 modelCenter) {
+        Vector2 center = getCenter(), c;
+        // right
+        if (connections[0]) {
+            // right hallway, top
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), building));
+            // right hallway, bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), building));
+        } else {
+            // cap off right side
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), building));
+        }
 
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        for (Wall wall: walls)
+        // top
+        if (connections[1]) {
+            // top hallway, left
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), building));
+            // top hallway, right
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), building));
+        } else {
+            // cap off top side
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), building));
+        }
+
+        // left
+        if (connections[2]) {
+            // left hallway, top
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), building));
+            // left hallway, bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), building));
+        } else {
+            // cap off left
+            c = center.cpy();
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), building));
+        }
+
+        // bottom
+        if (connections[3]) {
+            // bottom hallway, left
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), building));
+            // bottom hallway, right
+            c = center.cpy();
+            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), building));
+        } else {
+            // capp off bottom
+            c = center.cpy();
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), building));
+        }
+
+        for (Wall wall : walls) {
+            wall.genSegmentsFromPoints();
             wall.buildWallMesh(builder, modelCenter);
-    }
-
-    public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
-
-        builder.setUVRange(0, 0, width / C.BOX_DIAMETER, height / C.BOX_DIAMETER);
-        builder.rect(relp.x, relp.y, -0.1f,
-                relp.x + width, relp.y, -0.1f,
-                relp.x + width, relp.y + height, -0.1f,
-                relp.x, relp.y + height, -0.1f,
-                1, 1, 1);
+        }
     }
 
     @Override
@@ -170,5 +203,22 @@ public class HallwaySegment extends Overlappable implements IOverlappable {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    @Override
+    public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
+        Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
+
+        builder.setUVRange(0, 0, width / C.GRID_SIZE, height / C.GRID_SIZE);
+        builder.rect(relp.x, relp.y, -0.1f,
+                relp.x + width, relp.y, -0.1f,
+                relp.x + width, relp.y + height, -0.1f,
+                relp.x, relp.y + height, -0.1f,
+                1, 1, 1);
+    }
+
+    @Override
+    public int[] getKey() {
+        return key;
     }
 }

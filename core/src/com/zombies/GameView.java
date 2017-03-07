@@ -20,10 +20,9 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.data.Stats;
-import com.zombies.map.room.*;
-import com.zombies.map.room.Building;
+import com.zombies.interfaces.Modelable;
 import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
@@ -42,6 +41,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
+    public static HashSet<Modelable> readyToModel;
 
     public Stats stats;
 
@@ -50,8 +50,6 @@ public class GameView implements Screen {
     public ShapeRenderer shapeRenderer;
     public ModelBatch modelBatch;
     private Assets assets = new Assets();
-
-    protected World world;
 
     public Random random = new Random();
     protected CameraHandle camHandle;
@@ -84,11 +82,11 @@ public class GameView implements Screen {
         Gdx.gl20.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        Data.workers = new HashMap<>();
-        //Data.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
-        //Data.workers.get("BuildingWallMap").start();
-        Data.workers.put(Data.WorkerName.ROOM_DOOR, new Thread(new RoomDoorWorker()));
-        Data.workers.get(Data.WorkerName.ROOM_DOOR).start();
+        D.workers = new HashMap<>();
+        //D.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
+        //D.workers.get("BuildingWallMap").start();
+        D.workers.put(D.Worker.ROOM_DOOR, new Thread(new RoomDoorWorker()));
+        D.workers.get(D.Worker.ROOM_DOOR).start();
     }
 
     public void reset() {
@@ -100,7 +98,7 @@ public class GameView implements Screen {
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();
-        world = new World(new Vector2(), true);
+        D.world = new World(new Vector2(), true);
 
         player = new Player(new Vector2(0, 0));
 
@@ -122,13 +120,13 @@ public class GameView implements Screen {
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
+        readyToModel = new HashSet<>();
 
         System.gc();
     }
 
     public void initialRoom() {
-        Room room = Generator.genRoom(new Building(new Vector2(0, 0)), new int[]{0, 0});
-        room.connected = true;
+        Generator.genFullBuilding(new Vector2(0, 0));
     }
 
     public HUD getHUD() {
@@ -172,10 +170,6 @@ public class GameView implements Screen {
         return player;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
     @Override
     public void render(float dt) {
         updateLoop();
@@ -187,9 +181,9 @@ public class GameView implements Screen {
         spriteBatch.setProjectionMatrix(camHandle.cam.combined);
 
         //lists
-        world.step(Gdx.graphics.getDeltaTime(), 3, 4);
+        D.world.step(Gdx.graphics.getDeltaTime(), 3, 4);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        // renderer.draw(view.getWorld());
+        // renderer.draw(D.world);
         Gdx.gl.glFlush();
         handleKeys();
 
@@ -214,6 +208,13 @@ public class GameView implements Screen {
         mh.update();
         hud.update();
 
+        if (readyToModel.size() > 0) {
+            HashSet<Modelable> modeling = (HashSet<Modelable>)readyToModel.clone();
+            readyToModel = new HashSet<>();
+            for (Modelable m : modeling)
+                m.rebuildModel();
+        }
+
         frame++;
         if (frame > 2000)
             frame = 0;
@@ -228,7 +229,7 @@ public class GameView implements Screen {
     }
 
     protected void handleContacts() {
-        for (Contact c: world.getContactList()) {
+        for (Contact c: D.world.getContactList()) {
             Fixture f1 = c.getFixtureA();
             Fixture f2 = c.getFixtureB();
             if (f1 == null || f2 == null)
@@ -271,16 +272,16 @@ public class GameView implements Screen {
         float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, C.BOX_DIAMETER), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.GRID_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(C.BOX_DIAMETER, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.GRID_SIZE, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.BOX_DIAMETER), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.GRID_SIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-C.BOX_DIAMETER, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.GRID_SIZE, 0), player.getBody().getAngle());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {

@@ -8,15 +8,15 @@ public class C {
     public static final int[] DIRECTIONS = {0, 90, 180, 270};
     public static final float HALLWAY_WIDTH = 4f * SCALE;
 
-    public static final long THREAD_DELAY = 1000l;
-    public static final long THREAD_INTERVAL = 500l;
+    public static final long THREAD_DELAY = 200l;
+    public static final long THREAD_INTERVAL = 200l;
 
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = false;
     public static final float BOX_DEPTH = 7 * SCALE;
-    public static final float BOX_DIAMETER = 15 * SCALE;
-    public static final float BOX_RADIUS = BOX_DIAMETER / 2;
+    public static final float GRID_SIZE = 15 * SCALE;
+    public static final float GRID_HALF_SIZE = GRID_SIZE / 2;
     public static final int BULLET_DAMAGE_FACTOR = 2;
     public static final float BULLET_RADIUS = 0.1f * SCALE;
     public static final long CRATE_MPOS_DURATION = 500l;

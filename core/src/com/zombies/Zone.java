@@ -84,15 +84,6 @@ public class Zone {
         for (Updateable u : updateables)
             if (u.getZone() == this)
                 u.update();
-
-        if (readyToModel.size() == 0)
-            return;
-        // readyToModel is accessed via separate threads, need to clone it to avoid
-        // concurrent modification exceptions
-        HashSet<Room> modeling = (HashSet<Room>)readyToModel.clone();
-        readyToModel = new HashSet<>();
-        for (Room r : modeling)
-            r.buildModel();
     }
 
     public void load(int limit) {
@@ -178,7 +169,7 @@ public class Zone {
     public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
         Vector2 p1, p2;
         HashSet<Wall> walls = new HashSet<>();
-        for (Zone z : Zone.getZone(c).getAdjZones(1)) {
+        for (Zone z : Zone.getZone(c).getAdjZones(C.DRAW_DISTANCE)) {
             for (Wall w : z.getWalls()) {
                 p1 = w.getStart();
                 p2 = w.getEnd();
@@ -194,7 +185,7 @@ public class Zone {
     }
 
     public static void createHole(Vector2 center, Float radius) {
-        HashSet<Zone> zones = Zone.getZone(center).getAdjZones(1);
+        HashSet<Zone> zones = Zone.getZone(center).getAdjZones(C.DRAW_DISTANCE);
         for (Zone z : zones) {
             for (Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
@@ -265,7 +256,7 @@ public class Zone {
     }
 
     public Box getBox(float x, float y) {
-        for (Zone z : getAdjZones(1))
+        for (Zone z : getAdjZones(C.DRAW_DISTANCE))
             for (Box b : z.getBoxes())
                 if (b.contains(x, y))
                     return b;
@@ -384,7 +375,7 @@ public class Zone {
     private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        HashSet<Zone> zones = getAdjZones(1);
+        HashSet<Zone> zones = getAdjZones(C.DRAW_DISTANCE);
         for (Zone z : zones) {
             for (Overlappable o : z.getOverlappables()) {
                 if (o.overlaps(x, y, w, h)) {

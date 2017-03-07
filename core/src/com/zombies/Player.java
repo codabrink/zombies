@@ -1,7 +1,6 @@
 package com.zombies;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 
 import com.zombies.HUD.*;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zombies.data.Data;
+import com.zombies.data.D;
 import com.zombies.guns.Pistol;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -58,7 +57,7 @@ public class Player extends Unit implements Collideable {
         bDef.position.set(position);
         bDef.type = BodyType.DynamicBody;
 
-        body = view.getWorld().createBody(bDef);
+        body = D.world.createBody(bDef);
         shape.setRadius(C.PLAYER_SIZE * 0.75f);
         MassData mass = new MassData();
         mass.mass = .1f;
@@ -74,7 +73,7 @@ public class Player extends Unit implements Collideable {
         updateZone();
         updateBox();
 
-        Data.players.add(this);
+        D.players.add(this);
     }
 
     public float getHealth() {
@@ -311,7 +310,7 @@ public class Player extends Unit implements Collideable {
     }
 
     private void updateInfo() {
-        Data.update();
+        D.update();
         MapAdmin.update(this);
     }
 

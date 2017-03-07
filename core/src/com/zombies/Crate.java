@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 
 public class Crate implements Collideable {
@@ -40,7 +41,7 @@ public class Crate implements Collideable {
 		bDef.linearDamping = 4f;
 		bDef.angularDamping = 2f;
 		
-		body = view.getWorld().createBody(bDef);
+		body = D.world.createBody(bDef);
 		shape = new PolygonShape();
 		shape.setAsBox(width, height);
 		MassData mass = new MassData();
@@ -79,7 +80,7 @@ public class Crate implements Collideable {
 	public void unload() {
 		shape.dispose();
 		body.setUserData(null);
-		view.getWorld().destroyBody(body);
+		D.world.destroyBody(body);
 		body = null;
 	}
 

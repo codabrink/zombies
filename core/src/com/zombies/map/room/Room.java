@@ -1,9 +1,7 @@
 package com.zombies.map.room;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -21,7 +19,6 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.workers.RoomDoorWorker;
 
 public class Room implements Loadable, HasZone, Updateable, Drawable {
     public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
@@ -45,13 +42,13 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         genState = GenState.CREATED;
 
         this.building = building;
-        building.rooms.add(this);
+        building.addRoom(this);
 
         id = roomCount;
         roomCount++;
     }
 
-    public void finalize1() {
+    public void compile() {
         center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addObject(this);
@@ -59,7 +56,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         for (Box b: boxes)
             b.setAdjWallMap();
 
-        RoomDoorWorker.roomList.add(this); // queue for door processing
         genState = GenState.BOXED;
     }
 
@@ -113,7 +109,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
             for (Vector2[] pstn2: iteratedPositions) {
 
                 // if the first wall's end meets the other wall's start and they have the same
-                // angle...
+                // getAngle...
                 if (pstn1[1].equals(pstn2[0]) && Math.abs(pstn1[1].cpy().sub(pstn1[0]).angle() - (pstn2[1].cpy().sub(pstn2[0]).angle())) < 0.0001) {
                     Vector2[] points = new Vector2[2];
                     points[0] = pstn1[0];
@@ -189,7 +185,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
                     //s = b.getBMLocation();
                 if (C.DEBUG_SHOW_ADJBOXCOUNT)
                     s = b.getAdjBoxes().size() + "";
-                f.draw(spriteBatch, s, b.getPosition().x + C.BOX_DIAMETER / 2, b.getPosition().y + C.BOX_DIAMETER / 2);
+                f.draw(spriteBatch, s, b.getPosition().x + C.GRID_SIZE / 2, b.getPosition().y + C.GRID_SIZE / 2);
             }
             spriteBatch.end();
         }

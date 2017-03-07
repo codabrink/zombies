@@ -1,6 +1,8 @@
 package com.zombies.util;
 
 import com.zombies.C;
+
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -23,6 +25,12 @@ public class U {
             i++;
         }
         return null;
+    }
+    public static < E > Object random(List<E> list) {
+        int size = list.size();
+        if (size == 0) return null;
+        if (size == 1) return list.get(0);
+        return list.get(random.nextInt(list.size() - 1));
     }
 
     private static String getCallerClassName() {

@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -82,7 +83,7 @@ public class Unit implements Collideable, Loadable, HasZone {
 
     public void destroy() {
         state = State.DEAD;
-        view.getWorld().destroyBody(body);
+        D.world.destroyBody(body);
         shape.dispose();
         body.setUserData(null);
         body = null;
@@ -150,7 +151,7 @@ public class Unit implements Collideable, Loadable, HasZone {
 
     public boolean isVisionClear() {
         obstacles.clear();
-        view.getWorld().rayCast(vision, body.getPosition(), view.getPlayer().getBody().getPosition());
+        D.world.rayCast(vision, body.getPosition(), view.getPlayer().getBody().getPosition());
         for (Fixture f: obstacles) {
             if (f == null || f.getBody() == null || f.getBody().getUserData() == null)
                 return false;
