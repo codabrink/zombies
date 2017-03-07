@@ -63,7 +63,9 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
-        GameView.gv.readyToModel.add(building);
+        synchronized (GameView.gv.readyToModel) {
+            GameView.gv.readyToModel.add(building);
+        }
 
         return building;
     }

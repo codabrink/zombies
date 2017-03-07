@@ -29,9 +29,12 @@ import com.zombies.interfaces.Collideable;
 import com.zombies.workers.RoomDoorWorker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class GameView implements Screen {
@@ -41,7 +44,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
-    public static HashSet<Modelable> readyToModel;
+    public static List readyToModel = Collections.synchronizedList(new ArrayList());
 
     public Stats stats;
 
@@ -119,7 +122,7 @@ public class GameView implements Screen {
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
-        readyToModel = new HashSet<>();
+        readyToModel = Collections.synchronizedList(new ArrayList());
 
         System.gc();
     }
@@ -207,11 +210,12 @@ public class GameView implements Screen {
         mh.update();
         hud.update();
 
-        if (readyToModel.size() > 0) {
-            HashSet<Modelable> modeling = (HashSet<Modelable>)readyToModel.clone();
-            readyToModel = new HashSet<>();
-            for (Modelable m : modeling)
-                m.rebuildModel();
+        synchronized (readyToModel) {
+            Iterator i = readyToModel.iterator();
+            while (i.hasNext()) {
+                ((Modelable)i.next()).rebuildModel();
+                i.remove();
+            }
         }
 
         frame++;
