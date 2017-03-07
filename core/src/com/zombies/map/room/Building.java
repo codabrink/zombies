@@ -45,7 +45,11 @@ public class Building implements HasZone, Modelable {
 
     public Building(Vector2 center) {
         this.center = center;
-        Zone.getZone(center).addObject(this);
+
+        Zone z = Zone.getZone(center);
+        synchronized (z.pendingObjects) {
+            z.pendingObjects.add(this);
+        }
     }
     public void compile() {
         for (Room room : rooms)

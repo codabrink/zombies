@@ -34,7 +34,6 @@ public class RoomDoorWorker implements Runnable {
         while (itr.hasNext()) {
             r = (Room)itr.next();
             processDoorsOnRoom(r);
-            r.getZone().readyToModel.add(r);
             itr.remove();
         }
     }

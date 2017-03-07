@@ -12,9 +12,11 @@ import com.zombies.map.room.Building;
 import com.zombies.util.U;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class Zone {
@@ -25,7 +27,6 @@ public class Zone {
     // Static Variables
     public static HashMap<String, Zone> zones;
     public static ArrayList<Zone> loadedZones;
-    public static HashSet<Room> readyToModel;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
@@ -40,6 +41,8 @@ public class Zone {
     private HashSet<Loadable> loadables = new HashSet<>();
     private HashSet<Drawable> drawables = new HashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
+
+    public List pendingObjects = Collections.synchronizedList(new ArrayList());
 
     private boolean modeled = false;
 
@@ -76,6 +79,14 @@ public class Zone {
             z.update();
     }
     public void update() {
+        synchronized (pendingObjects) {
+            Iterator i = pendingObjects.iterator();
+            while (i.hasNext()) {
+                addObject((HasZone) i.next());
+                i.remove();
+            }
+        }
+
         if (modeled == false) {
             addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
             modeled = true;

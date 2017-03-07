@@ -51,7 +51,9 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     public void compile() {
         center = calculateMedian();
         zone = Zone.getZone(center);
-        zone.addObject(this);
+        synchronized (zone.pendingObjects) {
+            zone.pendingObjects.add(this);
+        }
 
         for (Box b: boxes)
             b.setAdjWallMap();

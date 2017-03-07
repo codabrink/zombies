@@ -93,7 +93,6 @@ public class GameView implements Screen {
         gv = this;
 
         Zone.zones = new HashMap<>();
-        Zone.readyToModel = new HashSet<>();
         Zone.loadedZones = new ArrayList<>();
         stats = new Stats();
 

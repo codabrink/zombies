@@ -64,8 +64,10 @@ public class Box extends Overlappable implements Gridable {
         Zone z;
         for (Vector2 v : corners) {
             z = Zone.getZone(v);
-            z.addObject(this);
-            z.addObject(room);
+            synchronized (z.pendingObjects) {
+                z.addObject(this);
+                z.addObject(room);
+            }
         }
     }
 
