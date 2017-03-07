@@ -22,7 +22,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
     private float halfWidth, halfHeight;
 
     private Hallway hallway;
-    private Vector2 position;
     private Building building;
 
     private int[] key;

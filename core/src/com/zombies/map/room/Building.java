@@ -50,6 +50,8 @@ public class Building implements HasZone, Modelable {
     public void compile() {
         for (Room room : rooms)
             room.compile();
+        for (Hallway hallway : hallways)
+            hallway.compile();
         calculateBorders();
         if (C.DEBUG) compiled = true;
     }
@@ -138,6 +140,11 @@ public class Building implements HasZone, Modelable {
     public Gridable gridMapGet(int[] key) {
         return gridMap.get(key[0] + "," + key[1]);
     }
+    public Gridable gridMapPut(int[] key, Gridable g) {
+        Gridable oldGridable = gridMapGet(key);
+        gridMap.put(key[0] + "," + key[1], g);
+        return oldGridable;
+    }
 
     public void putBoxMap(int[] key, Box b) {
         gridMap.put(key[0] + "," + key[1], b);
@@ -174,7 +181,7 @@ public class Building implements HasZone, Modelable {
         return adjKeys;
     }
 
-    private void calculateBorders() {
+    public void calculateBorders() {
         int[] key;
         for (Gridable g : gridMap.values()) {
             if (!(g instanceof Box)) continue;

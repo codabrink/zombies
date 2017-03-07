@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
+import com.zombies.map.Hallway;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -33,19 +34,29 @@ public class Generator {
                 failures++;
         }
 
+        building.calculateBorders();
+
         Box b;
         // place hallways
         // right hallway (xHigh)
         b = (Box)U.random(building.boxesOnCol(building.xHigh));
+        int[] newKey = Building.directionToBMKey(b.getKey(), 0);
+        new Hallway(b, newKey);
 
         // top hallway (yHigh)
         b = (Box)U.random(building.boxesOnRow(building.yHigh));
+        newKey = Building.directionToBMKey(b.getKey(), 1);
+        new Hallway(b, newKey);
 
         // left hallway (xLow)
         b = (Box)U.random(building.boxesOnCol(building.xLow));
+        newKey = Building.directionToBMKey(b.getKey(), 2);
+        new Hallway(b, newKey);
 
         // bottom hallway (yLow)
         b = (Box)U.random(building.boxesOnRow(building.yLow));
+        newKey = Building.directionToBMKey(b.getKey(), 3);
+        new Hallway(b, newKey);
 
         building.compile();
 

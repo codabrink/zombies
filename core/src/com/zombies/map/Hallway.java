@@ -35,10 +35,11 @@ public class Hallway implements Drawable, HasZone {
         building = box.getBuilding();
         firstKey = key;
 
-        segments.add(new HallwaySegment(this, key));
         b.getBuilding().getHallways().add(this);
 
-        b.getBuilding().rebuildModel();
+        HallwaySegment segment = new HallwaySegment(this, key);
+        b.getBuilding().gridMapPut(key, segment);
+        segments.add(segment);
     }
 
     public void compile() {
