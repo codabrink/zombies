@@ -47,11 +47,10 @@ public class Generator {
         // bottom hallway (yLow)
         b = (Box)U.random(building.boxesOnRow(building.yLow));
 
+        building.compile();
 
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
-
-        building.compile();
 
         GameView.gv.readyToModel.add(building);
 

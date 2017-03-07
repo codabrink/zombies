@@ -40,7 +40,8 @@ public class Building implements HasZone, Modelable {
     public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
     private Zone zone;
-    private boolean compiled = false;
+
+    private boolean compiled = false; // debug var
 
     public Building(Vector2 center) {
         this.center = center;
@@ -50,7 +51,7 @@ public class Building implements HasZone, Modelable {
         for (Room room : rooms)
             room.compile();
         calculateBorders();
-        compiled = true;
+        if (C.DEBUG) compiled = true;
     }
 
     public Vector2 positionOf(int[] key) {
