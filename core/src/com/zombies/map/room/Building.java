@@ -40,10 +40,17 @@ public class Building implements HasZone, Modelable {
     public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
     private Zone zone;
+    private boolean compiled = false;
 
     public Building(Vector2 center) {
         this.center = center;
         Zone.getZone(center).addObject(this);
+    }
+    public void compile() {
+        for (Room room : rooms)
+            room.compile();
+        calculateBorders();
+        compiled = true;
     }
 
     public Vector2 positionOf(int[] key) {
@@ -80,7 +87,7 @@ public class Building implements HasZone, Modelable {
     public HashSet<Box> boxesOnRow(int row) {
         HashSet<Box> boxes = new HashSet<>();
         Gridable g;
-        for (int x = xLow; x <= xLow; x++) {
+        for (int x = xLow; x <= xHigh; x++) {
             g = gridMap.get(x + "," + row);
             if (g instanceof Box)
                 boxes.add((Box)g);
@@ -181,12 +188,17 @@ public class Building implements HasZone, Modelable {
     public Vector2 getCenter() {
         return center;
     }
-    public void addRoom(Room room) { rooms.add(room); calculateBorders(); }
+    public void addRoom(Room room) {
+        if (C.DEBUG) { compiled = false; }
+        rooms.add(room);
+    }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Hallway> getHallways() { return hallways; }
 
     @Override
     public void rebuildModel() {
+        if (C.DEBUG && !compiled)
+            System.out.println("Building: ERROR! Building is not compiled.");
         buildFloorMesh();
         buildWallMesh();
     }

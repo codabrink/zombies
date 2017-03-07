@@ -1,11 +1,9 @@
 package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
-import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -53,6 +51,8 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
+        building.compile();
+
         GameView.gv.readyToModel.add(building);
 
         return building;
@@ -92,7 +92,6 @@ public class Generator {
                 break;
         }
 
-        room.finish();
         D.update();
         return room;
     }
