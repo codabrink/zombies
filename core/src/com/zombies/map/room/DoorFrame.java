@@ -1,21 +1,13 @@
 package com.zombies.map.room;
 
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
-import com.zombies.interfaces.ModelingCallback;
-import com.zombies.util.Assets;
+import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.util.Geometry;
 
 public class DoorFrame {
@@ -30,7 +22,7 @@ public class DoorFrame {
         building = b;
         angle = Geometry.getAngle(p1, p2);
 
-        building.modelables.get(Building.MATERIAL.FLOOR_WOOD).add(new ModelingCallback() {
+        building.modelables.get(Building.MATERIAL.FLOOR_WOOD).add(new ModelMeCallback() {
             @Override
             public void buildModel(MeshPartBuilder builder, Vector2 center) {
                 buildMesh(builder, center);

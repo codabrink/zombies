@@ -11,13 +11,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.graphics.GL20;
 import com.zombies.HUD.HUD;
 import com.zombies.data.D;
@@ -27,16 +27,17 @@ import com.zombies.map.thread.Generator;
 import com.zombies.map.thread.MapAdmin;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
+import com.zombies.util.ThreadedModelBuilder;
 import com.zombies.workers.RoomDoorWorker;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 public class GameView implements Screen {
     // STATIC VARIABLES
@@ -46,6 +47,7 @@ public class GameView implements Screen {
     public static Player player;
     public static Random r = new Random();
     private static List readyToModel = Collections.synchronizedList(new ArrayList());
+    private static List endableBuilders = Collections.synchronizedList(new ArrayList());
 
     public Stats stats;
 
@@ -125,6 +127,7 @@ public class GameView implements Screen {
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
         readyToModel = Collections.synchronizedList(new ArrayList());
+        endableBuilders = Collections.synchronizedList(new ArrayList());
 
         MapAdmin.reset = true;
 
@@ -221,6 +224,14 @@ public class GameView implements Screen {
                 i.remove();
             }
         }
+        synchronized (endableBuilders) {
+            Iterator i = endableBuilders.iterator();
+            while (i.hasNext()) {
+                ThreadedModelBuilder mb = (ThreadedModelBuilder)i.next();
+                mb.end();
+                i.remove();
+            }
+        }
 
         frame++;
         if (frame > 2000)
@@ -311,6 +322,11 @@ public class GameView implements Screen {
 
     }
 
+    public static void addEndableBuilder(ModelBuilder mb) {
+        synchronized (endableBuilders) {
+            endableBuilders.add(mb);
+        }
+    }
     public void addReadyToModel(Modelable m) {
         synchronized (readyToModel) {
             readyToModel.add(m);

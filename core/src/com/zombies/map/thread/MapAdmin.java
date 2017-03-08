@@ -30,6 +30,8 @@ public class MapAdmin implements Runnable {
 
         if (room != null) {
             Hallway h = (Hallway)U.random(room.getBuilding().getHallways());
+            if (h == null)
+                return;
             HallwaySegment s = h.segments.get(h.segments.size() - 1);
             (new Thread(new RunnableAdjRoom(s))).start();
         } else {
