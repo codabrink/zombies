@@ -45,7 +45,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
-    public static List readyToModel = Collections.synchronizedList(new ArrayList());
+    private static List readyToModel = Collections.synchronizedList(new ArrayList());
 
     public Stats stats;
 
@@ -309,6 +309,12 @@ public class GameView implements Screen {
             }
         }
 
+    }
+
+    public void addReadyToModel(Modelable m) {
+        synchronized (readyToModel) {
+            readyToModel.add(m);
+        }
     }
 
     public void end() {

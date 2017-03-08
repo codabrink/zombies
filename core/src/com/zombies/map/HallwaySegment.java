@@ -84,7 +84,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
     // TODO: build rotation into this to reduce redundant code
     @Override
-    public void buildWallMesh(Vector2 modelCenter) {
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
         if (connections[0]) {
@@ -144,7 +144,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
         for (Wall wall : walls) {
             wall.genSegmentsFromPoints();
-            wall.buildWallMesh(modelCenter);
+            wall.buildWallMesh(builder, modelCenter);
         }
     }
 

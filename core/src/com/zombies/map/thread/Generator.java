@@ -32,9 +32,11 @@ public class Generator {
     }
 
     public static Building genFullBuilding(Vector2 center) {
-        Building building = genBuilding(center);
-        modelBuilding(building);
-        return building;
+        Building newBuilding = genBuilding(center);
+        if (newBuilding == null)
+            return null;
+        modelBuilding(newBuilding);
+        return newBuilding;
     }
 
     private static Building genBuilding(Vector2 center) {
@@ -90,9 +92,7 @@ public class Generator {
     }
 
     private static void modelBuilding(Building building) {
-        synchronized (GameView.gv.readyToModel) {
-            GameView.gv.readyToModel.add(building);
-        }
+        GameView.gv.addReadyToModel(building);
     }
 
     public static Room genRoom(Building building, int[] bmKey) {

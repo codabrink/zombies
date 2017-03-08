@@ -19,8 +19,10 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
+import com.zombies.interfaces.ModelingCallback;
 import com.zombies.map.Hallway;
 import com.zombies.util.Assets;
+import com.zombies.util.ZTexture;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,8 +30,8 @@ import java.util.HashSet;
 public class Building implements HasZone, Modelable {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
 
-    private Model wallModel, floorModel;
-    private ModelInstance wallModelInstance, floorModelInstance;
+    private Model model;
+    private ModelInstance modelInstance;
 
     private int drawFrame = 0;
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
@@ -41,13 +43,27 @@ public class Building implements HasZone, Modelable {
     private Vector2 center;
     private Zone zone;
 
-    public enum BuildingPart {WALL, DOOR, DOOR_FRAME}
-    private HashMap<BuildingPart, MeshPartBuilder> buildingParts = new HashMap<>();
+    public enum MATERIAL {
+        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
+        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
+        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
+
+        public ZTexture texture;
+        public String partName;
+        MATERIAL(String partName, String path) {
+            this.partName = partName;
+            texture = new ZTexture(path);
+        }
+    }
+    public HashMap<MATERIAL, HashSet<ModelingCallback>> modelables = new HashMap<>();
 
     private boolean compiled = false; // debug var
 
     public Building(Vector2 center) {
         this.center = center;
+
+        for (MATERIAL m : MATERIAL.values())
+            modelables.put(m, new HashSet<ModelingCallback>());
 
         Zone z = Zone.getZone(center);
         synchronized (z.pendingObjects) {
@@ -211,35 +227,32 @@ public class Building implements HasZone, Modelable {
     public void rebuildModel() {
         if (C.DEBUG && !compiled)
             System.out.println("Building: ERROR! Building is not compiled.");
-        buildFloorMesh();
-        buildWallMesh();
-    }
-    public void buildWallMesh() {
+
         for (Wall w : wallMap.values())
             w.genSegmentsFromPoints();
 
         Assets.modelBuilder.begin();
-
-        buildingParts.put(BuildingPart.WALL, Assets.modelBuilder.part("Walls",
+        // build walls
+        MeshPartBuilder builder = Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE))));
-
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w : wallMap.values())
-            w.buildWallMesh(center);
+            w.buildWallMesh(builder, center);
         for (Gridable g : gridMap.values())
-            g.buildWallMesh(center);
+            g.buildWallMesh(builder, center);
+        // done with walls
+        // modeling callbacks
+        for (MATERIAL m : modelables.keySet()) {
+            builder = Assets.modelBuilder.part(m.partName,
+                    GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                    new Material(m.texture.textureAttribute));
+            for (ModelingCallback mc : modelables.get(m))
+                mc.buildModel(builder, center);
+        }
 
-        wallModel = Assets.modelBuilder.end();
-        wallModelInstance = new ModelInstance(wallModel);
-        wallModelInstance.transform.setTranslation(center.x, center.y, 0);
-    }
-    public void buildFloorMesh() {
-        Assets.modelBuilder.begin();
-        for (Room r : rooms)
-            r.rebuildFloorMesh(center);
-        floorModel = Assets.modelBuilder.end();
-        floorModelInstance = new ModelInstance(floorModel);
-        floorModelInstance.transform.setTranslation(center.x, center.y, 1);
+        model = Assets.modelBuilder.end();
+        modelInstance = new ModelInstance(model);
+        modelInstance.transform.setTranslation(center.x, center.y, 0);
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
@@ -248,10 +261,8 @@ public class Building implements HasZone, Modelable {
         drawFrame = GameView.gv.frame;
 
         modelBatch.begin(GameView.gv.getCamera());
-        if (floorModelInstance != null)
-            modelBatch.render(floorModelInstance, GameView.environment);
-        if (wallModelInstance != null)
-            modelBatch.render(wallModelInstance, GameView.environment);
+        if (modelInstance != null)
+            modelBatch.render(modelInstance, GameView.environment);
         modelBatch.end();
     }
 

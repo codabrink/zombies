@@ -212,7 +212,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     @Override
-    public void buildWallMesh(Vector2 center) {}
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
 
     @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
