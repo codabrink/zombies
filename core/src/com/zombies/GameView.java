@@ -23,6 +23,7 @@ import com.zombies.HUD.HUD;
 import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
+import com.zombies.interfaces.ZCallback;
 import com.zombies.map.thread.Generator;
 import com.zombies.map.thread.MapAdmin;
 import com.zombies.util.Assets;
@@ -46,8 +47,9 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
-    private static List readyToModel = Collections.synchronizedList(new ArrayList());
+    private static List readyToModel    = Collections.synchronizedList(new ArrayList());
     private static List endableBuilders = Collections.synchronizedList(new ArrayList());
+    private static List callbacks       = Collections.synchronizedList(new ArrayList());
 
     public Stats stats;
 
@@ -126,8 +128,9 @@ public class GameView implements Screen {
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
-        readyToModel = Collections.synchronizedList(new ArrayList());
+        readyToModel    = Collections.synchronizedList(new ArrayList());
         endableBuilders = Collections.synchronizedList(new ArrayList());
+        callbacks       = Collections.synchronizedList(new ArrayList());
 
         MapAdmin.reset = true;
 
@@ -232,6 +235,14 @@ public class GameView implements Screen {
                 i.remove();
             }
         }
+        synchronized (callbacks) {
+            Iterator i = callbacks.iterator();
+            while (i.hasNext()) {
+                ZCallback c = (ZCallback)i.next();
+                c.call();
+                i.remove();
+            }
+        }
 
         frame++;
         if (frame > 2000)
@@ -322,9 +333,16 @@ public class GameView implements Screen {
 
     }
 
+    // builders that are ready to dump models to gpu
     public static void addEndableBuilder(ModelBuilder mb) {
         synchronized (endableBuilders) {
             endableBuilders.add(mb);
+        }
+    }
+    // callbacks that need to happen in the main thread
+    public static void addCallback(ZCallback c) {
+        synchronized (callbacks) {
+            callbacks.add(c);
         }
     }
     public void addReadyToModel(Modelable m) {
