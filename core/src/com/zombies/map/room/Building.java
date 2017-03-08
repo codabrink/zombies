@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -126,16 +125,39 @@ public class Building implements HasZone, Modelable {
                 (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
     }
 
-    public static String wallBetweenGridables(int[] k1, int[] k2) {
+    public static String wallKeyBetweenGridables(int[] k1, int[] k2) {
         return Math.max(k1[0], k2[0]) + "," +
                 Math.max(k1[1], k2[1]) + "," +
                 (k1[0] != k2[0] ? "v" : "h");
     }
     public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
-        return wallBetweenGridables(g1.getKey(), g2.getKey());
+        return wallKeyBetweenGridables(g1.getKey(), g2.getKey());
     }
     public Wall wallBetweenBoxes(Box b1, Box b2) {
         return wallMap.get(wallKeyBetweenGridables(b1, b2));
+    }
+    public String wallKeyFromGridableAndDirection(Gridable g, int direction) {
+        return wallKeyFromGridableAndDirection(g.getKey(), direction);
+    }
+    public static String wallKeyFromGridableAndDirection(int[] key, int direction) {
+        switch (direction) {
+            case 0:
+                return (key[0] + 1) + "," + key[1] + ",v";
+            case 1:
+                return key[0] + "," + (key[1] + 1) + ",h";
+            case 2:
+                return key[0] + "," + key[1] + ",v";
+            case 3:
+                return key[0] + "," + key[1] + ",h";
+            default:
+                throw new IllegalArgumentException("Direction should be between 0 and 3.");
+        }
+    }
+    public Wall wallFromGridableAndDirection(Gridable g, int direction) {
+        return wallFromGridableAndDirection(g.getKey(), direction);
+    }
+    public Wall wallFromGridableAndDirection(int[] key, int direction) {
+        return wallMap.get(wallKeyFromGridableAndDirection(key, direction));
     }
 
     public HashSet<Box> getOuterBoxes() {
@@ -161,32 +183,6 @@ public class Building implements HasZone, Modelable {
         if (wallMap.get(key) != null)
             wallMap.get(key).destroy();
         wallMap.put(key, w);
-    }
-
-    public static int[] directionToBMKey(int[] bmKey, int direction) {
-        int[] key = bmKey.clone();
-        switch(direction) {
-            case 0:
-                key[0]++;
-                break;
-            case 1:
-                key[1]++;
-                break;
-            case 2:
-                key[0]--;
-                break;
-            case 3:
-                key[1]--;
-                break;
-        }
-        return key;
-    }
-    public static int[][] getAdjBMKeys(int[] key) {
-        int[][] adjKeys = new int[4][];
-        for (int i = 0; i < MODIFIERS.length; i += 2) {
-            adjKeys[i / 2] = new int[] { key[0] + MODIFIERS[i], key[1] + MODIFIERS[i + 1] };
-        }
-        return adjKeys;
     }
 
     public void calculateBorders() {
@@ -233,9 +229,6 @@ public class Building implements HasZone, Modelable {
         for (Gridable g : gridMap.values())
             g.buildWallMesh(center);
 
-        //for (DoorContainer dc : doorContainers)
-        //    dc.getDoorFrame().buildMesh(frameBuilder, center);
-
         wallModel = Assets.modelBuilder.end();
         wallModelInstance = new ModelInstance(wallModel);
         wallModelInstance.transform.setTranslation(center.x, center.y, 0);
@@ -270,5 +263,42 @@ public class Building implements HasZone, Modelable {
     @Override
     public void setZone(Zone z) {
         zone = z;
+    }
+
+    public static int bmKeyToDirection(int[] bmKey1, int[] bmKey2) {
+        if (bmKey2[0] == bmKey1[0] + 1 && bmKey2[1] == bmKey1[1])
+            return 0;
+        if (bmKey2[0] == bmKey1[0] && bmKey2[1] == bmKey1[1] + 1)
+            return 1;
+        if (bmKey2[0] == bmKey1[0] - 1 && bmKey2[1] == bmKey1[1])
+            return 2;
+        if (bmKey2[0] == bmKey1[0] && bmKey2[1] == bmKey1[1] - 1)
+            return 3;
+        throw new IllegalArgumentException("Keys are not adjacent");
+    }
+    public static int[] directionToBMKey(int[] bmKey, int direction) {
+        int[] key = bmKey.clone();
+        switch(direction) {
+            case 0:
+                key[0]++;
+                break;
+            case 1:
+                key[1]++;
+                break;
+            case 2:
+                key[0]--;
+                break;
+            case 3:
+                key[1]--;
+                break;
+        }
+        return key;
+    }
+    public static int[][] getAdjBMKeys(int[] key) {
+        int[][] adjKeys = new int[4][];
+        for (int i = 0; i < MODIFIERS.length; i += 2) {
+            adjKeys[i / 2] = new int[] { key[0] + MODIFIERS[i], key[1] + MODIFIERS[i + 1] };
+        }
+        return adjKeys;
     }
 }

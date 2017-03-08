@@ -95,6 +95,9 @@ public class Door implements Drawable, Modelable, HasZone, Collideable {
 
     @Override
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        if (modelInstance == null)
+            return;
+
         //modelInstance.transform.setTranslation(body.getPosition().x, body.getPosition().y, 1);
         //modelInstance.transform.setToRotation(Vector3.Z, body.getAngle());
         Matrix4 mTrans = new Matrix4();
@@ -104,8 +107,7 @@ public class Door implements Drawable, Modelable, HasZone, Collideable {
         modelInstance.transform.set(mTrans);
 
         modelBatch.begin(GameView.gv.getCamera());
-        if (modelInstance != null)
-            modelBatch.render(modelInstance);
+        modelBatch.render(modelInstance);
         modelBatch.end();
     }
 

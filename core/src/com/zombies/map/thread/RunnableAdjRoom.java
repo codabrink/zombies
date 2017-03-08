@@ -24,15 +24,16 @@ public class RunnableAdjRoom implements Runnable {
 
 
         int[] bmKey = (int[])U.random(adjGridable.getOpenAdjKeys());
-
         if (bmKey == null)
             return;
+
+        int direction = Building.bmKeyToDirection(adjGridable.getKey(), bmKey);
 
         Building building = adjGridable.getBuilding();
         building.threadLocked = true;
 
         if (building.checkOverlap(bmKey) == null)
-            Generator.genFullBuilding(building.positionOf(bmKey).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE));
+            Generator.genFullBuilding(adjGridable, direction);
 
         adjGridable.getBuilding().threadLocked = false;
     }

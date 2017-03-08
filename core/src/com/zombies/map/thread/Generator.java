@@ -1,10 +1,13 @@
 package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
+import com.zombies.interfaces.Gridable;
 import com.zombies.map.Hallway;
+import com.zombies.map.HallwaySegment;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -14,6 +17,19 @@ import com.zombies.workers.RoomDoorWorker;
 import java.util.Random;
 
 public class Generator {
+    public static Building genFullBuilding(Gridable g, int direction) {
+        int[] key = Building.directionToBMKey(g.getKey(), direction);
+        Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
+        Building newBuilding = genFullBuilding(center);
+        if (newBuilding == null)
+            return null;
+
+        if (g instanceof HallwaySegment)
+            ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0,0}), direction);
+
+        return newBuilding;
+    }
+
     public static Building genFullBuilding(Vector2 center) {
         Building building = new Building(center);
         Zone z            = Zone.getZone(center);

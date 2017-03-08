@@ -5,11 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Building;
+import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
+import com.zombies.util.U;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +63,14 @@ public class HallwaySegment extends Overlappable implements Gridable {
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
         Zone.getZone(getCenter()).addObject(this);
+    }
+
+    public void connect(Gridable g, int direction) {
+        connectionOverride[direction] = true;
+        Building otherBuilding = g.getBuilding();
+        String wallKey = otherBuilding.wallKeyFromGridableAndDirection(g.getKey(), U.oppositeDirection(direction));
+        Vector2[] wallPositions = otherBuilding.wallPositionOf(wallKey);
+        otherBuilding.putWallMap(wallKey, new DoorWall(wallPositions[0], wallPositions[1], otherBuilding));
     }
 
     public ArrayList<int[]> getOpenAdjKeys() {
