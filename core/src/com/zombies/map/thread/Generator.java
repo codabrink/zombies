@@ -92,7 +92,8 @@ public class Generator {
     }
 
     private static void modelBuilding(Building building) {
-        GameView.gv.addReadyToModel(building);
+        //GameView.gv.addReadyToModel(building);
+        building.rebuildModel();
     }
 
     public static Room genRoom(Building building, int[] bmKey) {

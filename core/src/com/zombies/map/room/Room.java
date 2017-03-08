@@ -19,7 +19,7 @@ import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.ModelingCallback;
+import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.Updateable;
 
 public class Room implements Loadable, HasZone, Updateable, Drawable {
@@ -62,7 +62,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         id = roomCount;
         roomCount++;
 
-        building.modelables.get(roomType.floorMaterial).add(new ModelingCallback() {
+        building.modelables.get(roomType.floorMaterial).add(new ModelMeCallback() {
             @Override
             public void buildModel(MeshPartBuilder builder, Vector2 center) {
                 buildFloorMesh(builder, center);

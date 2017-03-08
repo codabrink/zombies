@@ -19,9 +19,11 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.ModelingCallback;
+import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.map.Hallway;
 import com.zombies.util.Assets;
+import com.zombies.util.ThreadedModelBuilder;
 import com.zombies.util.ZTexture;
 
 import java.util.HashMap;
@@ -43,6 +45,8 @@ public class Building implements HasZone, Modelable {
     private Vector2 center;
     private Zone zone;
 
+    private ThreadedModelBuilder modelBuilder;
+
     public enum MATERIAL {
         GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
         FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
@@ -55,15 +59,24 @@ public class Building implements HasZone, Modelable {
             texture = new ZTexture(path);
         }
     }
-    public HashMap<MATERIAL, HashSet<ModelingCallback>> modelables = new HashMap<>();
+    public HashMap<MATERIAL, HashSet<ModelMeCallback>> modelables = new HashMap<>();
 
     private boolean compiled = false; // debug var
 
-    public Building(Vector2 center) {
-        this.center = center;
+    public Building(Vector2 c) {
+        center = c;
 
         for (MATERIAL m : MATERIAL.values())
-            modelables.put(m, new HashSet<ModelingCallback>());
+            modelables.put(m, new HashSet<ModelMeCallback>());
+
+        modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
+            @Override
+            public void response(Model m) {
+                model = m;
+                modelInstance = new ModelInstance(model);
+                modelInstance.transform.setTranslation(center.x, center.y, 0);
+            }
+        });
 
         Zone z = Zone.getZone(center);
         synchronized (z.pendingObjects) {
@@ -231,9 +244,9 @@ public class Building implements HasZone, Modelable {
         for (Wall w : wallMap.values())
             w.genSegmentsFromPoints();
 
-        Assets.modelBuilder.begin();
+        modelBuilder.begin();
         // build walls
-        MeshPartBuilder builder = Assets.modelBuilder.part("Walls",
+        MeshPartBuilder builder = modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w : wallMap.values())
@@ -243,16 +256,13 @@ public class Building implements HasZone, Modelable {
         // done with walls
         // modeling callbacks
         for (MATERIAL m : modelables.keySet()) {
-            builder = Assets.modelBuilder.part(m.partName,
+            builder = modelBuilder.part(m.partName,
                     GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                     new Material(m.texture.textureAttribute));
-            for (ModelingCallback mc : modelables.get(m))
+            for (ModelMeCallback mc : modelables.get(m))
                 mc.buildModel(builder, center);
         }
-
-        model = Assets.modelBuilder.end();
-        modelInstance = new ModelInstance(model);
-        modelInstance.transform.setTranslation(center.x, center.y, 0);
+        modelBuilder.finish();
     }
 
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {

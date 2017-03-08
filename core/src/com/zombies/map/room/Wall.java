@@ -3,6 +3,7 @@ package com.zombies.map.room;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -28,6 +29,7 @@ import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
+import com.zombies.interfaces.ZCallback;
 import com.zombies.util.Assets;
 
 public class Wall implements Collideable, Loadable, HasZone {
@@ -76,23 +78,32 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (body != null)
             D.world.destroyBody(body);
 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        body = D.world.createBody(bodyDef);
-        body.setTransform(p1, (float)angle);
-        body.setUserData(new BodData("wall", this));
-
         segments = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
             if (i == points.size() - 1)
                 break;
 
             segments.add(new WallSegment(
-                    body,
                     points.get(i).getPoint(),
                     points.get(i + 1).getPoint(),
                     points.get(i).getHeight()));
         }
+
+        final Wall wall = this;
+        GameView.gv.addCallback(new ZCallback() {
+            @Override
+            public void call() {
+                BodyDef bodyDef = new BodyDef();
+                bodyDef.type = BodyDef.BodyType.StaticBody;
+                body = D.world.createBody(bodyDef);
+                body.setTransform(p1, (float)angle);
+                body.setUserData(new BodData("wall", wall));
+
+                for (WallSegment ws : segments)
+                    ws.genShapes(body);
+            }
+        });
+
     }
 
     // Check if two lines are very close
@@ -175,7 +186,9 @@ public class Wall implements Collideable, Loadable, HasZone {
             // the wall unit vector (second requirement is false if the last/first hole extends past
             // the wall, in which case this seg is not needed).
             if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
-                segments.add(new WallSegment(body, p1.cpy().add(v1), p1.cpy().add(v2), 1));
+                WallSegment s = new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2), 1);
+                segments.add(s);
+                s.genShapes(body);
             }
         }
         building.rebuildModel();
