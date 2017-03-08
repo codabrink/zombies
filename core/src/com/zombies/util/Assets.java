@@ -30,6 +30,7 @@ public class Assets {
         roomFloorTextures.put(Room.RoomType.DINING_ROOM, new ZTexture("data/room/floor/dining_room.jpg"));
 
         a.load("data/texture/wildgrass.jpg", Texture.class);
+        a.load("data/room/wall/wall.jpg", Texture.class);
         a.finishLoading();
 
         Texture rawWildGrass = a.get("data/texture/wildgrass.jpg", Texture.class);

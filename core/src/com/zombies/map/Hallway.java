@@ -13,7 +13,7 @@ import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.WallDoor;
+import com.zombies.map.room.DoorWall;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,6 +38,8 @@ public class Hallway implements Drawable, HasZone {
         firstKey = key;
 
         start = b.getBuilding();
+        if (start.checkOverlap(firstKey) != null)
+            return;
         start.getHallways().add(this);
 
         HallwaySegment segment = new HallwaySegment(this, key);
@@ -49,7 +51,7 @@ public class Hallway implements Drawable, HasZone {
         // create a door
         String wallKey = Building.wallBetweenGridables(box.getKey(), firstKey);
         Vector2[] wallPosition = box.getBuilding().wallPositionOf(wallKey);
-        box.getBuilding().putWallMap(wallKey, new WallDoor(wallPosition[0], wallPosition[1], building));
+        box.getBuilding().putWallMap(wallKey, new DoorWall(wallPosition[0], wallPosition[1], building));
 
         for (HallwaySegment hs : segments)
             hs.compile();

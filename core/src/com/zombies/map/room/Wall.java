@@ -6,11 +6,15 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -32,6 +36,18 @@ public class Wall implements Collideable, Loadable, HasZone {
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
 
+    private static Texture texture;
+    private static TextureAttribute textureAttribute;
+    private static Material material;
+    static {
+        texture = Assets.a.get("data/room/wall/wall.jpg", Texture.class);
+        texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
+                new TextureDescriptor<>(texture),
+                0, 0, 1, 1);
+        material = new Material(textureAttribute);
+    }
+
     protected ArrayList<WallPoint>   points   = new ArrayList<>();
     protected ArrayList<WallSegment> segments = new ArrayList<>();
 
@@ -42,7 +58,6 @@ public class Wall implements Collideable, Loadable, HasZone {
     private int[] key;
     private String sKey;
 
-    protected static Material material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
 
     public Wall(Vector2 p1, Vector2 p2, Building b) {
         view = GameView.gv;

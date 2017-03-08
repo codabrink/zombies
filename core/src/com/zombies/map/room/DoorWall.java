@@ -1,16 +1,12 @@
 package com.zombies.map.room;
 
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.interfaces.Modelable;
 
-import java.util.HashMap;
-
-public class WallDoor extends Wall {
+public class DoorWall extends Wall {
     private static final float widthFactor = 0.3f;
     private DoorContainer doorContainer;
 
-    public WallDoor(Vector2 p1, Vector2 p2, Building b) {
+    public DoorWall(Vector2 p1, Vector2 p2, Building b) {
         super(p1, p2, b);
 
         float dx = Math.abs(p2.x - p1.x);

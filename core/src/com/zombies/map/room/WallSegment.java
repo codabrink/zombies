@@ -23,7 +23,8 @@ public class WallSegment {
 
         if (height > 0) {
             EdgeShape shape = new EdgeShape();
-            shape.set(new Vector2(0, 0), new Vector2(p1.dst(p2), 0));
+            Vector2 p0 = body.getPosition();
+            shape.set(new Vector2(p0.dst(p1), 0), new Vector2(p0.dst(p2), 0));
             body.createFixture(shape, 0);
         }
 
