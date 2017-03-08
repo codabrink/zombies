@@ -20,17 +20,24 @@ public class Generator {
     public static Building genFullBuilding(Gridable g, int direction) {
         int[] key = Building.directionToBMKey(g.getKey(), direction);
         Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
-        Building newBuilding = genFullBuilding(center);
+        Building newBuilding = genBuilding(center);
         if (newBuilding == null)
             return null;
 
         if (g instanceof HallwaySegment)
             ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0,0}), direction);
 
+        modelBuilding(newBuilding);
         return newBuilding;
     }
 
     public static Building genFullBuilding(Vector2 center) {
+        Building building = genBuilding(center);
+        modelBuilding(building);
+        return building;
+    }
+
+    private static Building genBuilding(Vector2 center) {
         Building building = new Building(center);
         Zone z            = Zone.getZone(center);
 
@@ -79,11 +86,13 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
+        return building;
+    }
+
+    private static void modelBuilding(Building building) {
         synchronized (GameView.gv.readyToModel) {
             GameView.gv.readyToModel.add(building);
         }
-
-        return building;
     }
 
     public static Room genRoom(Building building, int[] bmKey) {
