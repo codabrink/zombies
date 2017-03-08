@@ -238,12 +238,8 @@ public class Building implements HasZone, Modelable {
     }
     public void buildFloorMesh() {
         Assets.modelBuilder.begin();
-        MeshPartBuilder floorBuilder = Assets.modelBuilder.part("floor",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(Assets.floor1Diffuse));
-        for (Gridable g: gridMap.values()) {
-            g.buildFloorMesh(floorBuilder, center);
-        }
+        for (Room r : rooms)
+            r.rebuildFloorMesh(center);
         floorModel = Assets.modelBuilder.end();
         floorModelInstance = new ModelInstance(floorModel);
         floorModelInstance.transform.setTranslation(center.x, center.y, 1);

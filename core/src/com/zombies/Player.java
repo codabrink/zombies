@@ -311,7 +311,6 @@ public class Player extends Unit implements Collideable {
 
     private void updateInfo() {
         D.update();
-        MapAdmin.update(this);
     }
 
     @Override

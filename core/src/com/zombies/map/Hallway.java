@@ -22,6 +22,8 @@ public class Hallway implements Drawable, HasZone {
     public ArrayList<HallwaySegment> segments = new ArrayList<>();
     private Box box;
 
+    public Building start, end;
+
     private float diameter;
     private Model model;
     private ModelInstance modelInstance;
@@ -35,7 +37,8 @@ public class Hallway implements Drawable, HasZone {
         building = box.getBuilding();
         firstKey = key;
 
-        b.getBuilding().getHallways().add(this);
+        start = b.getBuilding();
+        start.getHallways().add(this);
 
         HallwaySegment segment = new HallwaySegment(this, key);
         b.getBuilding().gridMapPut(key, segment);

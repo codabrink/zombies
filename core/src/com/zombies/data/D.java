@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class D {
-    public enum Worker { ROOM_DOOR }
+    public enum Worker { MAP_ADMIN, ROOM_DOOR }
 
     public static Zone currentZone;
     public static Box currentBox;

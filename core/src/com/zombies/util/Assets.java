@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
+import com.zombies.map.room.Room;
+
+import java.util.HashMap;
 
 public class Assets {
     public static AssetManager a;
@@ -15,11 +18,16 @@ public class Assets {
     public static Texture floor1Texture;
     public static TextureAttribute wildGrassTextureDiffuse, floor1Diffuse;
 
+    public static HashMap<Room.RoomType, ZTexture> roomFloorTextures = new HashMap<>();
+
     public Assets() {
         a = new AssetManager();
         modelBuilder = new ModelBuilder();
         meshBuilder = new MeshBuilder();
-        a.load("data/floor1.png", Texture.class);
+
+        roomFloorTextures.put(Room.RoomType.KITCHEN, new ZTexture("data/room/floor/kitchen.png"));
+        roomFloorTextures.put(Room.RoomType.LIVING_ROOM, new ZTexture("data/room/floor/living_room.jpg"));
+
         a.load("data/texture/wildgrass.jpg", Texture.class);
         a.finishLoading();
 
@@ -28,11 +36,5 @@ public class Assets {
         wildGrassTextureDiffuse = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
                 new TextureDescriptor<Texture>(rawWildGrass),
                 0, 0, 7f, 7f);                     // offsetU, offsetV, scaleU, scaleV
-
-        floor1Texture = a.get("data/floor1.png", Texture.class);
-        floor1Texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        floor1Diffuse = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
-                new TextureDescriptor<Texture>(floor1Texture),
-                0, 0, 1, 1);
     }
 }

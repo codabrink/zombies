@@ -21,7 +21,6 @@ public class Meshes {
     public Texture shotgunTexture;
     public Texture pistolTexture;
     public Texture healthTexture;
-    public Texture floor1Texture;
     public Texture floor2Texture;
     public Mesh gunMesh;
     public Model floorModel;
@@ -43,8 +42,6 @@ public class Meshes {
 		pistolTexture = new Texture(imageFileHandle);
 		imageFileHandle = Gdx.files.internal("data/health.png");
 		healthTexture = new Texture(imageFileHandle);
-		imageFileHandle = Gdx.files.internal("data/floor1.png");
-		floor1Texture = new Texture(imageFileHandle);
 		imageFileHandle = Gdx.files.internal("data/floor2.png");
 		floor2Texture = new Texture(imageFileHandle);
 

@@ -24,6 +24,7 @@ import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.map.thread.Generator;
+import com.zombies.map.thread.MapAdmin;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 import com.zombies.workers.RoomDoorWorker;
@@ -86,10 +87,11 @@ public class GameView implements Screen {
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         D.workers = new HashMap<>();
-        //D.workers.put("BuildingWallMap", new Thread(new BuildingWallMapWorker()));
-        //D.workers.get("BuildingWallMap").start();
         D.workers.put(D.Worker.ROOM_DOOR, new Thread(new RoomDoorWorker()));
         D.workers.get(D.Worker.ROOM_DOOR).start();
+
+        D.workers.put(D.Worker.MAP_ADMIN, new Thread(new MapAdmin()));
+        D.workers.get(D.Worker.MAP_ADMIN).start();
     }
 
     public void reset() {
@@ -123,6 +125,8 @@ public class GameView implements Screen {
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
         readyToModel = Collections.synchronizedList(new ArrayList());
+
+        MapAdmin.reset = true;
 
         System.gc();
     }
