@@ -76,7 +76,9 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (body != null)
             D.world.destroyBody(body);
 
-        body = D.world.createBody(new BodyDef());
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        body = D.world.createBody(bodyDef);
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 

@@ -102,7 +102,7 @@ public class GameView implements Screen {
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();
-        D.world = new World(new Vector2(), true);
+        D.reset();
 
         player = new Player(new Vector2(0, 0));
 

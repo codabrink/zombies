@@ -1,12 +1,9 @@
 package com.zombies.map.room;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
@@ -18,6 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
 import com.zombies.util.Assets;
+import com.zombies.util.Geometry;
 
 public class DoorFrame {
     private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
@@ -40,7 +38,7 @@ public class DoorFrame {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
-        angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        angle = Geometry.getAngle(p1, p2);
     }
 
     public void buildMesh(Vector2 modelCenter) {
