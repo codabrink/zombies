@@ -1,5 +1,6 @@
 package com.zombies.map.room;
 
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 
 public class DoorWall extends Wall {
@@ -24,8 +25,8 @@ public class DoorWall extends Wall {
     }
 
     @Override
-    public void buildWallMesh(Vector2 center) {
-        super.buildWallMesh(center);
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {
+        super.buildWallMesh(builder, center);
         doorContainer.buildMesh(center);
     }
 }

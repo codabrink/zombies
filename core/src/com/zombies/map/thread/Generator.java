@@ -1,10 +1,13 @@
 package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
+import com.zombies.interfaces.Gridable;
 import com.zombies.map.Hallway;
+import com.zombies.map.HallwaySegment;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -14,7 +17,29 @@ import com.zombies.workers.RoomDoorWorker;
 import java.util.Random;
 
 public class Generator {
+    public static Building genFullBuilding(Gridable g, int direction) {
+        int[] key = Building.directionToBMKey(g.getKey(), direction);
+        Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
+        Building newBuilding = genBuilding(center);
+        if (newBuilding == null)
+            return null;
+
+        if (g instanceof HallwaySegment)
+            ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0,0}), direction);
+
+        modelBuilding(newBuilding);
+        return newBuilding;
+    }
+
     public static Building genFullBuilding(Vector2 center) {
+        Building newBuilding = genBuilding(center);
+        if (newBuilding == null)
+            return null;
+        modelBuilding(newBuilding);
+        return newBuilding;
+    }
+
+    private static Building genBuilding(Vector2 center) {
         Building building = new Building(center);
         Zone z            = Zone.getZone(center);
 
@@ -63,11 +88,11 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
-        synchronized (GameView.gv.readyToModel) {
-            GameView.gv.readyToModel.add(building);
-        }
-
         return building;
+    }
+
+    private static void modelBuilding(Building building) {
+        GameView.gv.addReadyToModel(building);
     }
 
     public static Room genRoom(Building building, int[] bmKey) {

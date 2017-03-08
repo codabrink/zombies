@@ -1,5 +1,8 @@
 package com.zombies.data;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.zombies.Player;
 import com.zombies.Zone;
@@ -22,8 +25,18 @@ public class D {
     public static ArrayList<Player> players = new ArrayList<>();
     public static Player player() { return players.get(0); }
     public static World world;
+    public static Body groundBody;
 
     public static HashMap<Worker, Thread> workers;
+
+    public static void reset() {
+        world = new World(new Vector2(), true);
+
+        BodyDef groundBodyDef = new BodyDef();
+        groundBodyDef.type = BodyDef.BodyType.StaticBody;
+        groundBody = world.createBody(groundBodyDef);
+        groundBody.setTransform(new Vector2(0, 0), 0);
+    }
 
     public static void update() {
         currentZone = Zone.getZone(player().getPosition());

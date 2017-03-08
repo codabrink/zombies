@@ -5,11 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,26 +19,29 @@ import com.zombies.Zone;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.ModelingCallback;
 import com.zombies.interfaces.Updateable;
-import com.zombies.util.Assets;
-import com.zombies.util.U;
 
 public class Room implements Loadable, HasZone, Updateable, Drawable {
-    public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
     public enum RoomType {
-        LIVING_ROOM,
-        DINING_ROOM,
-        KITCHEN;
+        LIVING_ROOM (Building.MATERIAL.FLOOR_CARPET),
+        DINING_ROOM (Building.MATERIAL.FLOOR_WOOD),
+        KITCHEN (Building.MATERIAL.GREEN_TILE);
+
+        public Building.MATERIAL floorMaterial;
+        RoomType(Building.MATERIAL floorMaterial) {
+            this.floorMaterial = floorMaterial;
+        }
 
         public static RoomType random() {
             return values()[random.nextInt(values().length)];
         }
     }
-    public GenState genState;
 
     public static int roomCount = 0;
+    private static Random random = new Random();
 
-    private RoomType roomType = RoomType.random();
+    private RoomType roomType;
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
     public boolean connected = false;
@@ -49,19 +49,25 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
-    private static Random random = new Random();
 
     private Building building;
     public HashSet<String> doors = new HashSet<>();
 
     public Room(Building building) {
-        genState = GenState.CREATED;
+        roomType = RoomType.random();
 
         this.building = building;
         building.addRoom(this);
 
         id = roomCount;
         roomCount++;
+
+        building.modelables.get(roomType.floorMaterial).add(new ModelingCallback() {
+            @Override
+            public void buildModel(MeshPartBuilder builder, Vector2 center) {
+                buildFloorMesh(builder, center);
+            }
+        });
     }
 
     public void compile() {
@@ -73,13 +79,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
 
         for (Box b: boxes)
             b.setAdjWallMap();
-
-        genState = GenState.BOXED;
-    }
-
-    public void buildModel() {
-        building.rebuildModel();
-        this.genState = GenState.FINALIZED;
     }
 
     // calculates the median position of all of the boxes
@@ -189,10 +188,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
         // Zone is set in the constructor
     }
 
-    public void rebuildFloorMesh(Vector2 center) {
-        MeshPartBuilder builder = Assets.modelBuilder.part("Walls-" + id,
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(Assets.roomFloorTextures.get(roomType).textureAttribute));
+    public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         for (Box b : boxes)
             b.buildFloorMesh(builder, center);
     }

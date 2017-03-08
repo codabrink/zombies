@@ -45,7 +45,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
                 new TextureDescriptor<>(texture),
                 0, 0, 1, 1);
-        material = new Material(textureAttribute);
+        material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
     }
 
     protected ArrayList<WallPoint>   points   = new ArrayList<>();
@@ -76,7 +76,9 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (body != null)
             D.world.destroyBody(body);
 
-        body = D.world.createBody(new BodyDef());
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        body = D.world.createBody(bodyDef);
         body.setTransform(p1, (float)angle);
         body.setUserData(new BodData("wall", this));
 
@@ -179,12 +181,9 @@ public class Wall implements Collideable, Loadable, HasZone {
         building.rebuildModel();
     }
 
-    public void buildWallMesh(Vector2 modelCenter) {
-        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                material);
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         for (WallSegment ws: segments)
-            ws.buildMesh(wallBuilder, modelCenter);
+            ws.buildMesh(builder, modelCenter);
     }
 
     public void destroy() {

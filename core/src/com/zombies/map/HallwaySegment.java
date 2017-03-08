@@ -5,11 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Building;
+import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
 import com.zombies.util.Geometry;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
+import com.zombies.util.U;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +65,14 @@ public class HallwaySegment extends Overlappable implements Gridable {
         Zone.getZone(getCenter()).addObject(this);
     }
 
+    public void connect(Gridable g, int direction) {
+        connectionOverride[direction] = true;
+        Building otherBuilding = g.getBuilding();
+        String wallKey = otherBuilding.wallKeyFromGridableAndDirection(g.getKey(), U.oppositeDirection(direction));
+        Vector2[] wallPositions = otherBuilding.wallPositionOf(wallKey);
+        otherBuilding.putWallMap(wallKey, new DoorWall(wallPositions[0], wallPositions[1], otherBuilding));
+    }
+
     public ArrayList<int[]> getOpenAdjKeys() {
         ArrayList<int[]> adjKeys = new ArrayList<>();
         for (int[] k : Building.getAdjBMKeys(key)) {
@@ -74,7 +84,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
     // TODO: build rotation into this to reduce redundant code
     @Override
-    public void buildWallMesh(Vector2 modelCenter) {
+    public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
         if (connections[0]) {
@@ -134,7 +144,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
         for (Wall wall : walls) {
             wall.genSegmentsFromPoints();
-            wall.buildWallMesh(modelCenter);
+            wall.buildWallMesh(builder, modelCenter);
         }
     }
 

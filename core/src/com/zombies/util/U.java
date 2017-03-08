@@ -33,6 +33,10 @@ public class U {
         return list.get(random.nextInt(list.size() - 1));
     }
 
+    public static int oppositeDirection(int direction) {
+        return (direction + 2) % 4;
+    }
+
     private static String getCallerClassName() {
         StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
         for (int i=1; i<stElements.length; i++) {
