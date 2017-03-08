@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
+import com.zombies.interfaces.ModelingCallback;
 import com.zombies.util.Assets;
 import com.zombies.util.Geometry;
 
@@ -22,26 +23,22 @@ public class DoorFrame {
     private Vector2 p1, p2;
     private Building building;
     private double angle;
-    private static Texture texture;
-    private static TextureAttribute textureAttribute;
-    private static Material material;
-    static {
-        texture = Assets.a.get("data/room/floor/dining_room.jpg", Texture.class);
-        texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
-                new TextureDescriptor<>(texture),
-                0, 0, 1, 1);
-        material = new Material(textureAttribute);
-    }
 
     public DoorFrame(Vector2 p1, Vector2 p2, Building b) {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
         angle = Geometry.getAngle(p1, p2);
+
+        building.modelables.get(Building.MATERIAL.FLOOR_WOOD).add(new ModelingCallback() {
+            @Override
+            public void buildModel(MeshPartBuilder builder, Vector2 center) {
+                buildMesh(builder, center);
+            }
+        });
     }
 
-    public void buildMesh(Vector2 modelCenter) {
+    public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         BoundingBox bounds;
         Vector3 min, max;
 
@@ -55,10 +52,6 @@ public class DoorFrame {
         mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, frameTop);
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
-
-        MeshPartBuilder builder = Assets.modelBuilder.part("DoorFrames",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                material);
 
         boxShapeBuilder.build(builder, bounds);
 
