@@ -110,8 +110,8 @@ public class Box extends Overlappable implements Gridable {
         } else { clearWall(key); }
     }
 
-    private void putWall(String key, Vector2 p1, Vector2 p2, Modelable m) {
-        building.putWallMap(key, new WallWall(p1, p2, m));
+    private void putWall(String key, Vector2 p1, Vector2 p2, Building b) {
+        building.putWallMap(key, new WallWall(p1, p2, b));
     }
     private void clearWall(String key) {
         if (building.wallMap.get(key) != null)
@@ -212,7 +212,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     @Override
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
+    public void buildWallMesh(Vector2 center) {}
 
     @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {

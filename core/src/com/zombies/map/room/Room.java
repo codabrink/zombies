@@ -30,6 +30,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     public enum GenState {CREATED, BOXED, DOORED, FINALIZED}
     public enum RoomType {
         LIVING_ROOM,
+        DINING_ROOM,
         KITCHEN;
 
         public static RoomType random() {

@@ -25,8 +25,9 @@ public class Assets {
         modelBuilder = new ModelBuilder();
         meshBuilder = new MeshBuilder();
 
-        roomFloorTextures.put(Room.RoomType.KITCHEN, new ZTexture("data/room/floor/kitchen.png"));
+        roomFloorTextures.put(Room.RoomType.KITCHEN, new ZTexture("data/room/floor/kitchen.jpg"));
         roomFloorTextures.put(Room.RoomType.LIVING_ROOM, new ZTexture("data/room/floor/living_room.jpg"));
+        roomFloorTextures.put(Room.RoomType.DINING_ROOM, new ZTexture("data/room/floor/dining_room.jpg"));
 
         a.load("data/texture/wildgrass.jpg", Texture.class);
         a.finishLoading();

@@ -5,8 +5,8 @@ import com.zombies.interfaces.Modelable;
 
 public class WallWall extends Wall {
 
-    public WallWall(Vector2 p1, Vector2 p2, Modelable m) {
-        super(p1, p2, m);
+    public WallWall(Vector2 p1, Vector2 p2, Building b) {
+        super(p1, p2, b);
 
         points.add(new WallPoint(p1, 1));
         points.add(new WallPoint(p2, 0));

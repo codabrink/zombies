@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -18,6 +24,7 @@ import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Modelable;
+import com.zombies.util.Assets;
 
 public class Wall implements Collideable, Loadable, HasZone {
     private Vector2 p1, p2, center;
@@ -29,21 +36,22 @@ public class Wall implements Collideable, Loadable, HasZone {
     protected ArrayList<WallSegment> segments = new ArrayList<>();
 
     private GameView view;
-    private Modelable modelable;
 
     public Building building;
     public boolean vertical;
     private int[] key;
     private String sKey;
 
-    public Wall(Vector2 p1, Vector2 p2, Modelable m) {
+    protected static Material material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
+
+    public Wall(Vector2 p1, Vector2 p2, Building b) {
         view = GameView.gv;
 
         this.p1 = p1;
         this.p2 = p2;
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-        modelable = m;
+        building = b;
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addObject(this);
@@ -153,10 +161,13 @@ public class Wall implements Collideable, Loadable, HasZone {
                 segments.add(new WallSegment(body, p1.cpy().add(v1), p1.cpy().add(v2), 1));
             }
         }
-        modelable.rebuildModel();
+        building.rebuildModel();
     }
 
-    public void buildWallMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
+    public void buildWallMesh(Vector2 modelCenter) {
+        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                material);
         for (WallSegment ws: segments)
             ws.buildMesh(wallBuilder, modelCenter);
     }

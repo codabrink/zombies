@@ -15,7 +15,7 @@ public class ZTexture {
         texture = Assets.a.get(path, Texture.class);
         texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
-                new TextureDescriptor<Texture>(texture),
+                new TextureDescriptor<>(texture),
                 0, 0, 1, 1);
     }
 }

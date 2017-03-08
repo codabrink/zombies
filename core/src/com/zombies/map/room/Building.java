@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -40,6 +41,9 @@ public class Building implements HasZone, Modelable {
     public HashSet<Hallway> hallways = new HashSet<>();
     private Vector2 center;
     private Zone zone;
+
+    public enum BuildingPart {WALL, DOOR, DOOR_FRAME}
+    private HashMap<BuildingPart, MeshPartBuilder> buildingParts = new HashMap<>();
 
     private boolean compiled = false; // debug var
 
@@ -219,16 +223,16 @@ public class Building implements HasZone, Modelable {
             w.genSegmentsFromPoints();
 
         Assets.modelBuilder.begin();
-        MeshPartBuilder wallBuilder = Assets.modelBuilder.part("Walls",
+
+        buildingParts.put(BuildingPart.WALL, Assets.modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+                new Material(ColorAttribute.createDiffuse(Color.WHITE))));
+
         for (Wall w : wallMap.values())
-            w.buildWallMesh(wallBuilder, center);
+            w.buildWallMesh(center);
         for (Gridable g : gridMap.values())
-            g.buildWallMesh(wallBuilder, center);
-        MeshPartBuilder frameBuilder = Assets.modelBuilder.part("DoorFrames",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.BROWN)));
+            g.buildWallMesh(center);
+
         //for (DoorContainer dc : doorContainers)
         //    dc.getDoorFrame().buildMesh(frameBuilder, center);
 

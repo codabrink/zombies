@@ -12,6 +12,7 @@ import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class HallwaySegment extends Overlappable implements Gridable {
@@ -71,14 +72,9 @@ public class HallwaySegment extends Overlappable implements Gridable {
         return adjKeys;
     }
 
-    @Override
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {
-        for (Wall w : walls)
-            w.buildWallMesh(builder, center);
-    }
-
     // TODO: build rotation into this to reduce redundant code
-    private void buildWalls(MeshPartBuilder builder, Vector2 modelCenter) {
+    @Override
+    public void buildWallMesh(Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
         if (connections[0]) {
@@ -138,7 +134,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
 
         for (Wall wall : walls) {
             wall.genSegmentsFromPoints();
-            wall.buildWallMesh(builder, modelCenter);
+            wall.buildWallMesh(modelCenter);
         }
     }
 
