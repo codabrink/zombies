@@ -13,7 +13,7 @@ import java.util.HashSet;
 
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     public float width, height;
-    protected Vector2 position;
+    protected Vector2 position, center;
     protected Vector2[] corners = new Vector2[4];
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
@@ -24,7 +24,12 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
 
     public Vector2[] getCorners() { return corners; }
     public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
+        if (center != null)
+            return center;
+        center = new Vector2();
+        for (Vector2 corner : corners)
+            center.add(corner);
+        return center.scl(1 / corners.length);
     }
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
