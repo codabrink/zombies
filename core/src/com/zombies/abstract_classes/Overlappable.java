@@ -1,6 +1,7 @@
 package com.zombies.abstract_classes;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.IOverlappable;
@@ -56,6 +57,23 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
             if (j.o1 == this || j.o2 == this)
                 return;
         joinOverlappableOverlappables.add(joo);
+    }
+
+    public void processZoning() {
+        if (C.DEBUG)
+            checkForOversizing();
+
+        for (int i = 0; i < corners.length; i++)
+            for (Zone z : Zone.zonesOnLine(corners[i], corners[(i+1)%corners.length]))
+                z.addObject(this);
+    }
+
+    private void checkForOversizing() {
+        float max = 0;
+        for (int i = 1; i < corners.length; i++)
+            max = Math.max(max, corners[i - 1].dst(corners[i]));
+        if (max > C.ZONE_SIZE * (C.DRAW_DISTANCE + 1))
+            System.out.println("Overlappable: ERROR! Object is too large to render properly.");
     }
 
     @Override

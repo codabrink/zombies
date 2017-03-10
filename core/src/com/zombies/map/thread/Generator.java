@@ -2,7 +2,6 @@ package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
 import com.zombies.interfaces.Gridable;
@@ -25,9 +24,8 @@ public class Generator {
             return null;
 
         if (g instanceof HallwaySegment)
-            ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0,0}), direction);
+            ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0, 0}), direction);
 
-        modelBuilding(newBuilding);
         return newBuilding;
     }
 
@@ -35,7 +33,6 @@ public class Generator {
         Building newBuilding = genBuilding(center);
         if (newBuilding == null)
             return null;
-        modelBuilding(newBuilding);
         return newBuilding;
     }
 
@@ -88,12 +85,8 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
-        return building;
-    }
-
-    private static void modelBuilding(Building building) {
-        //GameView.gv.addReadyToModel(building);
         building.rebuildModel();
+        return building;
     }
 
     public static Room genRoom(Building building, int[] bmKey) {
