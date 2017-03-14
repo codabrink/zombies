@@ -9,7 +9,6 @@ import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
-import com.zombies.util.U;
 
 import java.util.ArrayList;
 import java.util.Collections;

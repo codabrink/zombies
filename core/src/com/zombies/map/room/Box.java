@@ -18,14 +18,16 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Modelable;
 import com.zombies.powerups.Powerup;
+import com.zombies.util.U;
 
 public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
 
-    private ArrayList<Unit> zombies = new ArrayList<>();
-    private ArrayList<Unit> survivors = new ArrayList<Unit>();
-    private ArrayList<Crate> crates = new ArrayList<Crate>();
-    private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
+    private HashSet<Unit> zombies = new HashSet<>();
+    private HashSet<Unit> survivors = new HashSet<Unit>();
+    private HashSet<Crate> crates = new HashSet<Crate>();
+    private HashSet<Powerup> powerups = new HashSet<Powerup>();
+    public HashSet<DoorContainer> doors = new HashSet<>();
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
 
@@ -121,10 +123,6 @@ public class Box extends Overlappable implements Gridable {
     public float x() {return position.x;}
     public float y() {return position.y;}
 
-    public ArrayList<Powerup> getPowerups() {
-        return powerups;
-    }
-
     public Survivor addSurvivor() {
         Survivor s = new Survivor(this.randomPoint());
         survivors.add(s);
@@ -167,11 +165,7 @@ public class Box extends Overlappable implements Gridable {
         return new Vector2();
     }
 
-    public ArrayList<Unit> getSurvivorList() {
-        return survivors;
-    }
-
-    public ArrayList<Unit> getUnits() {
+    public HashSet<Unit> getUnits() {
         return zombies;
     }
 
@@ -180,11 +174,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public Unit randomZombie() {
-        if (zombies.isEmpty() || zombies.size() == 1) {
-            return null;
-        }
-        Unit u = zombies.get(random.nextInt(zombies.size()));
-        return u;
+        return (Unit)U.random(zombies);
     }
 
     public int getId() { return id; }
