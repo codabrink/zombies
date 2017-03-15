@@ -1,20 +1,27 @@
 package com.zombies;
 
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
+import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
+import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.util.ZTexture;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -23,6 +30,24 @@ public class Zone {
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r;
 
+    private Model model;
+    private ModelInstance modelInstance;
+    private ThreadedModelBuilder modelBuilder;
+
+    public enum MATERIAL {
+        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
+        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
+        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
+
+        public ZTexture texture;
+        public String partName;
+        MATERIAL(String partName, String path) {
+            this.partName = partName;
+            texture = new ZTexture(path);
+        }
+    }
+    public LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
+
     // Static Variables
     public static HashMap<String, Zone> zones;
     public static ArrayList<Zone> loadedZones;
@@ -30,15 +55,15 @@ public class Zone {
     public static int globalLoadIndex = 0;
 
     // Collections
-    private HashMap<Integer, HashSet<Zone>> adjZones = new HashMap<>();
+    private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
     private HashSet<Overlappable> overlappables = new HashSet<>();
-    private HashSet<Updateable> updateables = new HashSet<>();
-    private HashSet<Box> boxes = new HashSet<>();
-    private HashSet<Room> rooms = new HashSet<>();
+    private LinkedHashSet<Updateable> updateables = new LinkedHashSet<>();
+    private LinkedHashSet<Box> boxes = new LinkedHashSet<>();
+    private LinkedHashSet<Room> rooms = new LinkedHashSet<>();
     private HashSet<Building> buildings = new HashSet<>();
     private HashSet<Wall> walls = new HashSet<>();
     private HashSet<Loadable> loadables = new HashSet<>();
-    private HashSet<Drawable> drawables = new HashSet<>();
+    private LinkedHashSet<Drawable> drawables = new LinkedHashSet<>();
     private HashSet<Drawable> debugLines = new HashSet<>();
 
     public List pendingObjects = Collections.synchronizedList(new ArrayList());
@@ -48,6 +73,8 @@ public class Zone {
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
+        for (MATERIAL m : MATERIAL.values())
+            modelables.put(m, new HashSet<ModelMeCallback>());
         r = GameView.gv.random;
         position = new Vector2(x, y);
         numRooms = r.nextInt(numRooms);
@@ -406,11 +433,11 @@ public class Zone {
     }
 
     public HashSet<Zone> getAdjZones(int limit) {
-        HashSet<Zone> zones = adjZones.get(limit);
+        LinkedHashSet<Zone> zones = adjZones.get(limit);
         if (zones != null)
             return zones;
 
-        zones = new HashSet<>();
+        zones = new LinkedHashSet<>();
         Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
 
@@ -442,5 +469,11 @@ public class Zone {
         float randomX = r.nextFloat() * C.ZONE_SIZE;
         float randomY = r.nextFloat() * C.ZONE_SIZE;
         return position.cpy().add(randomX, randomY);
+    }
+
+    public void rebuildModel() {
+        if (model != null)
+            model.dispose();
+
     }
 }

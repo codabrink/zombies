@@ -47,27 +47,10 @@ public class Building implements HasZone, Modelable {
 
     private ThreadedModelBuilder modelBuilder;
 
-    public enum MATERIAL {
-        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
-        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
-        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
-
-        public ZTexture texture;
-        public String partName;
-        MATERIAL(String partName, String path) {
-            this.partName = partName;
-            texture = new ZTexture(path);
-        }
-    }
-    public HashMap<MATERIAL, HashSet<ModelMeCallback>> modelables = new HashMap<>();
-
     private boolean compiled = false; // debug var
 
     public Building(Vector2 c) {
         center = c;
-
-        for (MATERIAL m : MATERIAL.values())
-            modelables.put(m, new HashSet<ModelMeCallback>());
 
         modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
             @Override
