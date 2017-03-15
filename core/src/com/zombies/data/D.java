@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class D {
     public enum Worker { MAP_ADMIN, ROOM_DOOR }
 
+    public static long tick;
     public static Zone currentZone;
     public static Box currentBox;
     public static Room currentRoom() {
@@ -30,6 +31,8 @@ public class D {
     public static HashMap<Worker, Thread> workers;
 
     public static void reset() {
+        tick = 0l;
+
         world = new World(new Vector2(), true);
 
         BodyDef groundBodyDef = new BodyDef();

@@ -68,7 +68,6 @@ public class GameView implements Screen {
     private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private ArrayList<DebugCircle> debugCircles = new ArrayList<DebugCircle>();
-    public int frame = 0;
 
     private Box2DDebugRenderer debugRenderer;
     private Matrix4 debugMatrix;
@@ -183,6 +182,8 @@ public class GameView implements Screen {
 
     @Override
     public void render(float dt) {
+        D.tick++;
+
         updateLoop();
 
         handleContacts();
@@ -198,7 +199,7 @@ public class GameView implements Screen {
         Gdx.gl.glFlush();
         handleKeys();
 
-        player.update(frame);
+        player.update();
 
         for (DebugCircle dc: debugCircles)
             dc.draw(spriteBatch, shapeRenderer, modelBatch);
@@ -242,10 +243,6 @@ public class GameView implements Screen {
                 i.remove();
             }
         }
-
-        frame++;
-        if (frame > 2000)
-            frame = 0;
     }
 
     protected void handleKeys() {

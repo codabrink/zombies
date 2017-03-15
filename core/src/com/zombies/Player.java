@@ -282,7 +282,7 @@ public class Player extends Unit implements Collideable {
     }
 
     @Override
-    public void update(int frame) {
+    public void update() {
         updateBox();
         updateZone();
         zone.update(1);
@@ -293,7 +293,7 @@ public class Player extends Unit implements Collideable {
         for (Gun g: guns)
             g.update();
         for (Survivor s: survivors) {
-            s.update(frame);
+            s.update();
 
             if (s.getState() == State.DEAD)
                 survivors.remove(s);
@@ -305,7 +305,7 @@ public class Player extends Unit implements Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
 
-        if (frame % 10 == 0)
+        if (D.tick % 10 == 0)
             updateInfo();
     }
 

@@ -1,13 +1,20 @@
 package com.zombies;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.room.*;
@@ -74,7 +81,19 @@ public class Zone {
 
     public Zone(float x, float y) {
         for (MATERIAL m : MATERIAL.values())
-            modelables.put(m, new HashSet<ModelMeCallback>());
+            modelables.put(m, new LinkedHashSet<ModelMeCallback>());
+
+        modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
+            @Override
+            public void response(Model m) {
+                if (model != null)
+                    model.dispose();
+                model = m;
+                modelInstance = new ModelInstance(model);
+                modelInstance.transform.setTranslation(position.x, position.y, 0);
+            }
+        });
+
         r = GameView.gv.random;
         position = new Vector2(x, y);
         numRooms = r.nextInt(numRooms);
@@ -475,5 +494,19 @@ public class Zone {
         if (model != null)
             model.dispose();
 
+        modelBuilder.begin();
+        MeshPartBuilder builder = modelBuilder.part("Walls",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
+        for (Wall w : walls)
+            w.buildWallMesh(builder, position);
+        for (MATERIAL m : modelables.keySet()) {
+            builder = modelBuilder.part(m.partName,
+                    GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                    new Material(m.texture.textureAttribute));
+            for (ModelMeCallback mc : modelables.get(m))
+                mc.buildModel(builder, position);
+        }
+        modelBuilder.finish();
     }
 }
