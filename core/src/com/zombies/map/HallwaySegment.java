@@ -143,7 +143,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
         }
 
         for (Wall wall : walls) {
-            wall.genSegmentsFromPoints();
             wall.buildWallMesh(builder, modelCenter);
         }
     }

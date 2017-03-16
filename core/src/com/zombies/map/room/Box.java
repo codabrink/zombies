@@ -60,21 +60,9 @@ public class Box extends Overlappable implements Gridable {
         width    = C.GRID_SIZE;
 
         corners = building.cornersOf(position);
-        setZones();
 
-        zone.modelables.get(room.roomType.floorMaterial).add(modelFloorCallback);
-    }
-
-    private void setZones() {
         zone = Zone.getZone(getCenter());
-        Zone z;
-        for (Vector2 v : corners) {
-            z = Zone.getZone(v);
-            synchronized (z.pendingObjects) {
-                z.addObject(this);
-                z.addObject(room);
-            }
-        }
+        zone.addModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
     }
 
     public void setAdjWallMap() {
@@ -219,14 +207,12 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public void dispose() {
-        zone.modelables.get(room.roomType).remove(modelFloorCallback);
-        for (Vector2 v : corners)
-            Zone.getZone(v).removeObject(this);
+        zone.removeModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
+        zone.removeObject(this);
     }
 
     @Override
-    public void setZone(Zone z) {
-    }
+    public void setZone(Zone z) {}
 
     @Override
     public String className() {

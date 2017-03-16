@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
+import com.zombies.Zone;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.Geometry;
 
 public class DoorFrame {
@@ -15,6 +17,12 @@ public class DoorFrame {
     private Vector2 p1, p2;
     private Building building;
     private double angle;
+    private ModelMeCallback modelFrameCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildMesh(builder, center);
+        }
+    };
 
     public DoorFrame(Vector2 p1, Vector2 p2, Building b) {
         this.p1 = p1;
@@ -22,12 +30,7 @@ public class DoorFrame {
         building = b;
         angle = Geometry.getAngle(p1, p2);
 
-        building.modelables.get(Building.MATERIAL.FLOOR_WOOD).add(new ModelMeCallback() {
-            @Override
-            public void buildModel(MeshPartBuilder builder, Vector2 center) {
-                buildMesh(builder, center);
-            }
-        });
+        Zone.getZone(p1).addModelingCallback(MATERIAL.FLOOR_WOOD, modelFrameCallback);
     }
 
     public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {

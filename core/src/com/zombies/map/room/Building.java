@@ -35,9 +35,9 @@ public class Building implements HasZone {
     public Building(Vector2 c) {
         center = c;
 
-        Zone z = Zone.getZone(center);
-        synchronized (z.pendingObjects) {
-            z.pendingObjects.add(this);
+        zone = Zone.getZone(center);
+        synchronized (zone.pendingObjects) {
+            zone.pendingObjects.add(this);
         }
     }
     public void compile() {
@@ -197,9 +197,7 @@ public class Building implements HasZone {
     }
 
     @Override
-    public void setZone(Zone z) {
-        zone = z;
-    }
+    public void setZone(Zone z) {}
 
     public static int bmKeyToDirection(int[] bmKey1, int[] bmKey2) {
         if (bmKey2[0] == bmKey1[0] + 1 && bmKey2[1] == bmKey1[1])

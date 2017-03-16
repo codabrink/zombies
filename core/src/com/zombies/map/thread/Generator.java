@@ -85,7 +85,9 @@ public class Generator {
         for (Room room : building.getRooms())
             RoomDoorWorker.processDoorsOnRoom(room);
 
-        building.rebuildModel();
+        // TODO: this is not to stay
+        building.getZone().rebuildModel();
+
         return building;
     }
 

@@ -56,7 +56,6 @@ public class Wall implements Collideable, Loadable, HasZone {
     private GameView view;
 
     public Building building;
-    public boolean vertical;
     private int[] key;
     private String sKey;
     private Zone zone;
@@ -74,6 +73,8 @@ public class Wall implements Collideable, Loadable, HasZone {
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addObject(this);
+
+        genSegmentsFromPoints();
     }
 
     public void genSegmentsFromPoints() {

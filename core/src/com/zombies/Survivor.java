@@ -183,8 +183,8 @@ public class Survivor extends Unit implements Collideable {
     }
 
     @Override
-    public void update(int frame) {
-        super.update(frame);
+    public void update() {
+        super.update();
         if (state == State.DEAD)
             return;
         if (state == State.FOUND)

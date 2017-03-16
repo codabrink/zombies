@@ -22,6 +22,7 @@ import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Zone {
-    private Vector2 position;
+    private Vector2 position, center;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r;
 
@@ -47,7 +48,7 @@ public class Zone {
                 model.dispose();
             model = m;
             modelInstance = new ModelInstance(model);
-            modelInstance.transform.setTranslation(position.x, position.y, 0);
+            modelInstance.transform.setTranslation(center.x, center.y, 0);
         }
     });
     private Thread modelingThread = new Thread(new Runnable() {
@@ -61,6 +62,9 @@ public class Zone {
             }
             needsRerun = false;
             running    = true;
+            // Wait for model builder to become ready
+            while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
+                try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
             rebuildModel();
             running    = false;
             if (needsRerun)
@@ -68,7 +72,7 @@ public class Zone {
         }
     });
 
-    public LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
+    private LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
 
     // Static Variables
     public static HashMap<String, Zone> zones;
@@ -97,6 +101,7 @@ public class Zone {
     public Zone(float x, float y) {
         r = GameView.gv.random;
         position = new Vector2(x, y);
+        center = position.cpy().add(C.ZONE_SIZE / 2, C.ZONE_SIZE / 2);
         numRooms = r.nextInt(numRooms);
 
         if (C.ENABLE_DEBUG_LINES) {
@@ -125,11 +130,19 @@ public class Zone {
             z.draw();
     }
     public void draw() {
+        drawThineself();
         for (Drawable d : drawables)
             if (d.getZone() == this)
                 d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
         for (Drawable d : debugLines)
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
+    }
+    private void drawThineself() {
+        if (modelInstance == null)
+            return;
+        GameView.gv.modelBatch.begin(GameView.gv.getCamera());
+        GameView.gv.modelBatch.render(modelInstance, GameView.outsideEnvironment);
+        GameView.gv.modelBatch.end();
     }
 
     public void update(int limit) {
@@ -505,21 +518,18 @@ public class Zone {
             return;
         }
 
-        if (model != null)
-            model.dispose();
-
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w : walls)
-            w.buildWallMesh(builder, position);
+            w.buildWallMesh(builder, center);
         for (MATERIAL m : modelables.keySet()) {
             builder = modelBuilder.part(m.partName,
                     GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                     new Material(m.texture.textureAttribute));
             for (ModelMeCallback mc : modelables.get(m))
-                mc.buildModel(builder, position);
+                mc.buildModel(builder, center);
         }
         modelBuilder.finish();
     }

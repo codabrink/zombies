@@ -67,7 +67,6 @@ public class ShotgunPickup extends Powerup implements Collideable {
 	private void destroy() {
 		shape.dispose();
 		body.getWorld().destroyBody(body);
-		box.getPowerups().remove(this);
 	}
 	
 	@Override
