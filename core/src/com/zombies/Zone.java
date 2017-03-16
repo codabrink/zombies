@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.data.D;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
@@ -19,8 +20,8 @@ import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
+import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.ThreadedModelBuilder;
-import com.zombies.util.ZTexture;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,21 +40,34 @@ public class Zone {
 
     private Model model;
     private ModelInstance modelInstance;
-    private ThreadedModelBuilder modelBuilder;
-
-    public enum MATERIAL {
-        GRASS ("grass", "data/texture/wildgrass.jpg"),
-        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
-        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
-        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
-
-        public ZTexture texture;
-        public String partName;
-        MATERIAL(String partName, String path) {
-            this.partName = partName;
-            texture = new ZTexture(path);
+    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
+        @Override
+        public void response(Model m) {
+            if (model != null)
+                model.dispose();
+            model = m;
+            modelInstance = new ModelInstance(model);
+            modelInstance.transform.setTranslation(position.x, position.y, 0);
         }
-    }
+    });
+    private Thread modelingThread = new Thread(new Runnable() {
+        private boolean running = false;
+        private boolean needsRerun = false;
+        @Override
+        public void run() {
+            if (running) {
+                needsRerun = true;
+                return;
+            }
+            needsRerun = false;
+            running    = true;
+            rebuildModel();
+            running    = false;
+            if (needsRerun)
+                run();
+        }
+    });
+
     public LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
 
     // Static Variables
@@ -81,20 +95,6 @@ public class Zone {
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
-        for (MATERIAL m : MATERIAL.values())
-            modelables.put(m, new LinkedHashSet<ModelMeCallback>());
-
-        modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
-            @Override
-            public void response(Model m) {
-                if (model != null)
-                    model.dispose();
-                model = m;
-                modelInstance = new ModelInstance(model);
-                modelInstance.transform.setTranslation(position.x, position.y, 0);
-            }
-        });
-
         r = GameView.gv.random;
         position = new Vector2(x, y);
         numRooms = r.nextInt(numRooms);
@@ -105,6 +105,19 @@ public class Zone {
         }
     }
 
+    public void addModelingCallback(MATERIAL m, ModelMeCallback mmc) {
+        LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
+        if (modelableSet == null) {
+            modelableSet = new LinkedHashSet<>();
+            modelables.put(m, modelableSet);
+        }
+        modelableSet.add(mmc);
+    }
+    public void removeModelingCallback(MATERIAL m, ModelMeCallback mmc) {
+        LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
+        if (modelableSet != null)
+            modelableSet.remove(mmc);
+    }
 
     public void draw(int limit) {
         HashSet<Zone> zones = getAdjZones(limit);
@@ -486,6 +499,12 @@ public class Zone {
     }
 
     public void rebuildModel() {
+        // avoid main thread
+        if (Thread.currentThread().getId() == D.mainThreadId) {
+            modelingThread.start();
+            return;
+        }
+
         if (model != null)
             model.dispose();
 

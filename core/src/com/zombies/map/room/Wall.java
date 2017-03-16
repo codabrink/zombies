@@ -59,7 +59,7 @@ public class Wall implements Collideable, Loadable, HasZone {
     public boolean vertical;
     private int[] key;
     private String sKey;
-
+    private Zone zone;
 
     public Wall(Vector2 p1, Vector2 p2, Building b) {
         view = GameView.gv;
@@ -69,6 +69,8 @@ public class Wall implements Collideable, Loadable, HasZone {
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         building = b;
+
+        zone = Zone.getZone(p1);
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addObject(this);
@@ -191,7 +193,7 @@ public class Wall implements Collideable, Loadable, HasZone {
                 s.genShapes(body);
             }
         }
-        building.rebuildModel();
+        zone.rebuildModel();
     }
 
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
@@ -223,11 +225,9 @@ public class Wall implements Collideable, Loadable, HasZone {
 
     @Override
     public Zone getZone() {
-        return null;
+        return zone;
     }
 
     @Override
-    public void setZone(Zone z) {
-
-    }
+    public void setZone(Zone z) {}
 }

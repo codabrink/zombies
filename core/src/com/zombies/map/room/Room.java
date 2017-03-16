@@ -13,15 +13,16 @@ import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
+import com.zombies.util.Assets.MATERIAL;
 
 public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
-        LIVING_ROOM (Zone.MATERIAL.FLOOR_CARPET),
-        DINING_ROOM (Zone.MATERIAL.FLOOR_WOOD),
-        KITCHEN (Zone.MATERIAL.GREEN_TILE);
+        LIVING_ROOM (MATERIAL.FLOOR_CARPET),
+        DINING_ROOM (MATERIAL.FLOOR_WOOD),
+        KITCHEN (MATERIAL.GREEN_TILE);
 
-        public Zone.MATERIAL floorMaterial;
-        RoomType(Zone.MATERIAL floorMaterial) {
+        public MATERIAL floorMaterial;
+        RoomType(MATERIAL floorMaterial) {
             this.floorMaterial = floorMaterial;
         }
 

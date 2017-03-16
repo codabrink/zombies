@@ -5,15 +5,13 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.zombies.GameView;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 
-import java.util.concurrent.Callable;
-
 public class ThreadedModelBuilder extends ModelBuilder {
     // This can be run in any thread
     // 1. builds entire model in thread up until .end()
     // 2. calls .end() in main thread and receives model
     // 3. sends model back as parameter to callback given to constructor
 
-    private boolean locked = false;
+    private boolean begun = false;
     private ThreadedModelBuilderCallback callback;
 
     public ThreadedModelBuilder(ThreadedModelBuilderCallback callback) {
@@ -22,9 +20,9 @@ public class ThreadedModelBuilder extends ModelBuilder {
 
     @Override
     public void begin() {
-        if (locked)
+        if (begun)
             return;
-        locked = true;
+        begun = true;
         super.begin();
     }
 
@@ -40,7 +38,7 @@ public class ThreadedModelBuilder extends ModelBuilder {
         return model;
     }
 
-    public boolean isLocked() {
-        return locked;
+    public boolean isBegun() {
+        return begun;
     }
 }

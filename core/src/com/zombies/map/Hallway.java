@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Modelable;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
@@ -65,10 +64,6 @@ public class Hallway implements Drawable, HasZone {
                 outerSegments.add(segment);
         }
         return outerSegments;
-    }
-
-    public Modelable getModelable() {
-        return box.getBuilding();
     }
 
     public Box getBox() { return box; }

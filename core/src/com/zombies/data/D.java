@@ -27,12 +27,14 @@ public class D {
     public static Player player() { return players.get(0); }
     public static World world;
     public static Body groundBody;
+    public static long mainThreadId;
 
     public static HashMap<Worker, Thread> workers;
 
     public static void reset() {
         tick = 0l;
 
+        mainThreadId = Thread.currentThread().getId();
         world = new World(new Vector2(), true);
 
         BodyDef groundBodyDef = new BodyDef();

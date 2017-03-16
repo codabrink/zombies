@@ -20,6 +20,20 @@ public class Assets {
 
     public static HashMap<Room.RoomType, ZTexture> roomFloorTextures = new HashMap<>();
 
+    public enum MATERIAL {
+        GRASS ("grass", "data/texture/wildgrass.jpg"),
+        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
+        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
+        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
+
+        public ZTexture texture;
+        public String partName;
+        MATERIAL(String partName, String path) {
+            this.partName = partName;
+            texture = new ZTexture(path);
+        }
+    }
+
     public Assets() {
         a = new AssetManager();
         modelBuilder = new ModelBuilder();

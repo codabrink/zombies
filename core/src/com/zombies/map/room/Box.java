@@ -29,7 +29,7 @@ public class Box extends Overlappable implements Gridable {
 
     private Building building;
     private Room room;
-    private ModelMeCallback modelMeCallback = new ModelMeCallback() {
+    private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
         @Override
         public void buildModel(MeshPartBuilder builder, Vector2 center) {
             buildFloorMesh(builder, center);
@@ -62,7 +62,7 @@ public class Box extends Overlappable implements Gridable {
         corners = building.cornersOf(position);
         setZones();
 
-        zone.modelables.get(room.roomType.floorMaterial).add(modelMeCallback);
+        zone.modelables.get(room.roomType.floorMaterial).add(modelFloorCallback);
     }
 
     private void setZones() {
@@ -219,7 +219,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public void dispose() {
-        zone.modelables.get(room.roomType).remove(modelMeCallback);
+        zone.modelables.get(room.roomType).remove(modelFloorCallback);
         for (Vector2 v : corners)
             Zone.getZone(v).removeObject(this);
     }
