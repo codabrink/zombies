@@ -46,7 +46,6 @@ public class Building implements HasZone {
         for (Hallway hallway : hallways)
             hallway.compile();
         calculateBorders();
-        if (C.DEBUG) compiled = true;
     }
 
     public Vector2 positionOf(int[] key) {
@@ -187,7 +186,6 @@ public class Building implements HasZone {
         return center;
     }
     public void addRoom(Room room) {
-        if (C.DEBUG) { compiled = false; }
         rooms.add(room);
     }
     public HashSet<Room> getRooms() { return rooms; }

@@ -8,7 +8,6 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.Crate;
 import com.zombies.GameView;
 import com.zombies.Survivor;
 import com.zombies.Unit;
@@ -16,8 +15,7 @@ import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
-import com.zombies.interfaces.Modelable;
-import com.zombies.powerups.Powerup;
+import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.util.U;
 
 public class Box extends Overlappable implements Gridable {
@@ -25,14 +23,18 @@ public class Box extends Overlappable implements Gridable {
 
     private HashSet<Unit> zombies = new HashSet<>();
     private HashSet<Unit> survivors = new HashSet<Unit>();
-    private HashSet<Crate> crates = new HashSet<Crate>();
-    private HashSet<Powerup> powerups = new HashSet<Powerup>();
     public HashSet<DoorContainer> doors = new HashSet<>();
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
 
     private Building building;
     private Room room;
+    private ModelMeCallback modelMeCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildFloorMesh(builder, center);
+        }
+    };
 
     private int id;
     private int[] key;
@@ -59,6 +61,8 @@ public class Box extends Overlappable implements Gridable {
 
         corners = building.cornersOf(position);
         setZones();
+
+        zone.modelables.get(room.roomType.floorMaterial).add(modelMeCallback);
     }
 
     private void setZones() {
@@ -212,6 +216,12 @@ public class Box extends Overlappable implements Gridable {
                 relp.x + width, relp.y + height, 0,
                 relp.x, relp.y + height, 0,
                 1, 1, 1);
+    }
+
+    public void dispose() {
+        zone.modelables.get(room.roomType).remove(modelMeCallback);
+        for (Vector2 v : corners)
+            Zone.getZone(v).removeObject(this);
     }
 
     @Override

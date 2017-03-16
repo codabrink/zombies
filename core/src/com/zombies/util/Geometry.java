@@ -19,6 +19,12 @@ public class Geometry {
         return true;
     }
 
+    public float distanceOfPointFromLine(Vector2 p1, Vector2 p2, Vector2 p0) {
+        double distance = Math.abs((p2.y - p1.y) * p0.x - (p2.x - p1.x) * p0.y + p2.x * p1.y - p2.y * p1.x)
+                / Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
+        return (float)distance;
+    }
+
     private static boolean valueInRange(float value, float min, float max) {
         return (value > min) && (value < max);
     }

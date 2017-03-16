@@ -42,6 +42,7 @@ public class Zone {
     private ThreadedModelBuilder modelBuilder;
 
     public enum MATERIAL {
+        GRASS ("grass", "data/texture/wildgrass.jpg"),
         GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
         FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
         FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
@@ -166,10 +167,10 @@ public class Zone {
         int indX = (int)Math.floor(x / C.ZONE_SIZE);
         int indY = (int)Math.floor(y / C.ZONE_SIZE);
 
-        Zone z = zones.get("row"+indY+"column"+indX);
+        Zone z = zones.get(indY + "," + indX);
         if (z == null) {
             z = new Zone(indX * C.ZONE_SIZE, indY * C.ZONE_SIZE);
-            zones.put("row"+indY+"column"+indX, z);
+            zones.put(indY + "," + indX, z);
         }
         return z;
     }
@@ -482,12 +483,6 @@ public class Zone {
             if (o.contains(x, y))
                 overlapped.add(o);
         return overlapped;
-    }
-
-    public Vector2 randomPosition() {
-        float randomX = r.nextFloat() * C.ZONE_SIZE;
-        float randomY = r.nextFloat() * C.ZONE_SIZE;
-        return position.cpy().add(randomX, randomY);
     }
 
     public void rebuildModel() {

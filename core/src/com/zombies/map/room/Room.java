@@ -5,31 +5,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.zombies.C;
 import com.zombies.Unit;
-import com.zombies.Zombies;
 import com.zombies.Zone;
-import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.Updateable;
 
-public class Room implements Loadable, HasZone, Updateable, Drawable {
+public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
-        LIVING_ROOM (Building.MATERIAL.FLOOR_CARPET),
-        DINING_ROOM (Building.MATERIAL.FLOOR_WOOD),
-        KITCHEN (Building.MATERIAL.GREEN_TILE);
+        LIVING_ROOM (Zone.MATERIAL.FLOOR_CARPET),
+        DINING_ROOM (Zone.MATERIAL.FLOOR_WOOD),
+        KITCHEN (Zone.MATERIAL.GREEN_TILE);
 
-        public Building.MATERIAL floorMaterial;
-        RoomType(Building.MATERIAL floorMaterial) {
+        public Zone.MATERIAL floorMaterial;
+        RoomType(Zone.MATERIAL floorMaterial) {
             this.floorMaterial = floorMaterial;
         }
 
@@ -41,7 +33,7 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     public static int roomCount = 0;
     private static Random random = new Random();
 
-    private RoomType roomType;
+    public RoomType roomType;
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
     public boolean connected = false;
@@ -61,13 +53,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
 
         id = roomCount;
         roomCount++;
-
-        building.modelables.get(roomType.floorMaterial).add(new ModelMeCallback() {
-            @Override
-            public void buildModel(MeshPartBuilder builder, Vector2 center) {
-                buildFloorMesh(builder, center);
-            }
-        });
     }
 
     public void compile() {
@@ -191,26 +176,6 @@ public class Room implements Loadable, HasZone, Updateable, Drawable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         for (Box b : boxes)
             b.buildFloorMesh(builder, center);
-    }
-
-
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        building.draw(spriteBatch, shapeRenderer, modelBatch);
-
-        if (C.DEBUG) {
-            BitmapFont f = Zombies.getFont("sans-reg:8:white");
-            String s = "";
-
-            spriteBatch.begin();
-            for (Box b : boxes) {
-                if (C.DEBUG_SHOW_BOXMAP)
-                    //s = b.getBMLocation();
-                if (C.DEBUG_SHOW_ADJBOXCOUNT)
-                    s = b.getAdjBoxes().size() + "";
-                f.draw(spriteBatch, s, b.getPosition().x + C.GRID_SIZE / 2, b.getPosition().y + C.GRID_SIZE / 2);
-            }
-            spriteBatch.end();
-        }
     }
 
     public String giveKey(Room r) {
