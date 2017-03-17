@@ -226,7 +226,7 @@ public class Zone {
 
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
         // slope intercept form (y = mx + b)
-        float m = (end.y - start.y) / (end.x - end.y);
+        float m = (end.y - start.y) / (end.x - start.x);
         float b = start.y - (m * start.x);
 
         HashSet<Zone> zones = new HashSet<>(); // HashSet gives uniqueness constraint for free
