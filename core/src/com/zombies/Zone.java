@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Zone {
     private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
@@ -97,7 +98,7 @@ public class Zone {
     private LinkedHashSet<Drawable> drawables = new LinkedHashSet<>();
     private LinkedHashSet<Drawable> debugLines = new LinkedHashSet<>();
 
-    private List pendingObjects = Collections.synchronizedList(new ArrayList());
+    private Set pendingObjects = Collections.synchronizedSet(new LinkedHashSet());
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
@@ -410,10 +411,11 @@ public class Zone {
 
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
-    public HashSet<Overlappable> getOverlappables() { return overlappables; }
-    public HashSet<Box> getBoxes() { return boxes; }
-    public HashSet<Room> getRooms() { return rooms; }
-    public HashSet<Building> getBuildings() { return buildings; }
+    public LinkedHashSet<Overlappable> getOverlappables() { return overlappables; }
+    public Set getPendingObjects() { return pendingObjects; }
+    public LinkedHashSet<Box> getBoxes() { return boxes; }
+    public LinkedHashSet<Room> getRooms() { return rooms; }
+    public LinkedHashSet<Building> getBuildings() { return buildings; }
 
     private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {
@@ -466,14 +468,20 @@ public class Zone {
     public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
     private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, ArrayList<Overlappable> ignore) {
-        HashSet<Zone> zones = getAdjZones(C.DRAW_DISTANCE);
+    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, HashSet<Overlappable> ignore) {
+        HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             for (Overlappable o : z.getOverlappables()) {
                 if (o.overlaps(x, y, w, h)) {
-                    if (ignore != null && ignore.indexOf(o) != -1)
+                    if (ignore != null && ignore.contains(o))
                         continue;
                     return o;
+                }
+            }
+            synchronized (z.getPendingObjects()) {
+                for (Object o : z.getPendingObjects()) {
+                    if (o instanceof Overlappable && ((Overlappable) o).overlaps(x, y, w, h))
+                        return (Overlappable)o;
                 }
             }
         }
@@ -483,17 +491,12 @@ public class Zone {
         return checkOverlap(v.x, v.y, w, h, limit, null);
     }
 
-    private Vector2 center() {
-        return new Vector2(position.x + C.ZONE_SIZE / 2, position.y + C.ZONE_SIZE / 2);
-    }
-
     public HashSet<Zone> getAdjZones(int limit) {
         LinkedHashSet<Zone> zones = adjZones.get(limit);
         if (zones != null)
             return zones;
 
         zones = new LinkedHashSet<>();
-        Vector2 center = center();
         float variance = C.ZONE_SIZE * limit;
 
         for (float x = center.x - variance; x <= center.x + variance; x += C.ZONE_SIZE)
