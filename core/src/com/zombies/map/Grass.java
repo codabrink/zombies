@@ -22,13 +22,12 @@ public class Grass implements HasZone {
         }
     };
 
-    public Grass(Vector2 p, float w, float h) {
+    public Grass(Zone z, Vector2 p, float w, float h) {
         position = p;
         width = w;
         height = h;
 
-        zone = Zone.getZone(p);
-        zone.addModelingCallback(MATERIAL.GRASS, modelGroundCallback);
+        z.addModelingCallback(MATERIAL.GRASS, modelGroundCallback);
     }
 
     @Override

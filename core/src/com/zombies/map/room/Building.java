@@ -36,9 +36,7 @@ public class Building implements HasZone {
         center = c;
 
         zone = Zone.getZone(center);
-        synchronized (zone.pendingObjects) {
-            zone.pendingObjects.add(this);
-        }
+        zone.addPendingObject(this);
     }
     public void compile() {
         for (Room room : rooms)

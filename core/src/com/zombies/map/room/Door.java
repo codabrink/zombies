@@ -68,7 +68,7 @@ public class Door implements Drawable, Modelable, HasZone, Collideable {
         building = b;
         angle = Geometry.getAngle(p1, p2);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-        Zone.getZone(center).pendingObjects.add(this);
+        Zone.getZone(center).addPendingObject(this);
 
         body = D.world.createBody(new BodyDef());
         body.setType(BodyDef.BodyType.DynamicBody);

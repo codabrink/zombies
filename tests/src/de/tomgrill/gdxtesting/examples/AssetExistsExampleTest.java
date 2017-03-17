@@ -37,6 +37,9 @@ public class AssetExistsExampleTest {
 
         building.compile();
 
+        // process pending objects
+        zone.update();
+
         // assert a room is generating
 		assertTrue(zone.getRooms().size() > 0);
 
@@ -87,6 +90,14 @@ public class AssetExistsExampleTest {
         Box b0n1 = new Box(room, new int[]{0,-1});
 
         building.compile();
+
+        // process pendingObjects list
+        room.getZone().update();
+
+        assertTrue(b00.getCenter().x == 0);
+        assertTrue(b00.getCenter().y == 0);
+        assertTrue(b10.getCenter().x == 0);
+        assertTrue(b10.getCenter().y == C.GRID_HALF_SIZE);
 
         // zone 1
         assertTrue(room.getZone() == z1);

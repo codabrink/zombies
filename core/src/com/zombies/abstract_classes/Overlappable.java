@@ -90,9 +90,6 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
 
         zonedPosition = position;
         zonedTimestamp = System.currentTimeMillis();
-
-        for (Vector2 corner : corners)
-            Zone.getZone(corner).addObject(this);
     }
 
     @Override

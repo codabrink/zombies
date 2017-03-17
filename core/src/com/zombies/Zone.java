@@ -35,12 +35,6 @@ import java.util.List;
 import java.util.Random;
 
 public class Zone {
-    private Vector2 position, center;
-    public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
-    private static Random r;
-
-    private Model model;
-    private ModelInstance modelInstance;
     private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
         @Override
         public void response(Model m) {
@@ -51,28 +45,36 @@ public class Zone {
             modelInstance.transform.setTranslation(center.x, center.y, 0);
         }
     });
-    private Thread modelingThread = new Thread(new Runnable() {
-        private boolean running = false;
-        private boolean needsRerun = false;
+    private Thread modelingThread;
+    private static class ZoneModelingRunnable implements Runnable {
+        private ThreadedModelBuilder modelBuilder;
+        private Zone zone;
+        public ZoneModelingRunnable(Zone zone, ThreadedModelBuilder modelBuilder) {
+            this.modelBuilder = modelBuilder;
+            this.zone = zone;
+        }
         @Override
         public void run() {
-            if (running) {
-                needsRerun = true;
-                return;
-            }
-            needsRerun = false;
-            running    = true;
-            // Wait for model builder to become ready
+            D.addRunningThread(Thread.currentThread());
+            zone.needsRemodel = false;
             while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
                 try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
-            rebuildModel();
-            running    = false;
-            if (needsRerun)
+            zone.rebuildModel();
+            if (zone.needsRemodel) // reuse the thread
                 run();
         }
-    });
+    };
 
-    private LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
+
+
+
+    private Vector2 position, center;
+    public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
+    private static Random r = new Random();
+
+    private Model model;
+    private ModelInstance modelInstance;
+
 
     // Static Variables
     public static HashMap<String, Zone> zones;
@@ -80,29 +82,30 @@ public class Zone {
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
+    private LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
+    public boolean needsRemodel = false; // flag true, and the model will rebuild at next possible moment
+
     // Collections
     private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
-    private HashSet<Overlappable> overlappables = new HashSet<>();
+    private LinkedHashSet<Overlappable> overlappables = new LinkedHashSet<>();
     private LinkedHashSet<Updateable> updateables = new LinkedHashSet<>();
     private LinkedHashSet<Box> boxes = new LinkedHashSet<>();
     private LinkedHashSet<Room> rooms = new LinkedHashSet<>();
-    private HashSet<Building> buildings = new HashSet<>();
-    private HashSet<Wall> walls = new HashSet<>();
-    private HashSet<Loadable> loadables = new HashSet<>();
+    private LinkedHashSet<Building> buildings = new LinkedHashSet<>();
+    private LinkedHashSet<Wall> walls = new LinkedHashSet<>();
+    private LinkedHashSet<Loadable> loadables = new LinkedHashSet<>();
     private LinkedHashSet<Drawable> drawables = new LinkedHashSet<>();
-    private HashSet<Drawable> debugLines = new HashSet<>();
+    private LinkedHashSet<Drawable> debugLines = new LinkedHashSet<>();
 
-    public List pendingObjects = Collections.synchronizedList(new ArrayList());
-
-    private boolean modeled = false;
+    private List pendingObjects = Collections.synchronizedList(new ArrayList());
 
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
-        r = GameView.gv.random;
         position = new Vector2(x, y);
-        center = position.cpy().add(C.ZONE_SIZE / 2, C.ZONE_SIZE / 2);
+        center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
         numRooms = r.nextInt(numRooms);
+        addObject(new Grass(this, position, C.ZONE_SIZE, C.ZONE_SIZE));
 
         if (C.ENABLE_DEBUG_LINES) {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
@@ -159,10 +162,8 @@ public class Zone {
             }
         }
 
-        if (modeled == false) {
-            addObject(new Grass(position, C.ZONE_SIZE, C.ZONE_SIZE));
-            modeled = true;
-        }
+        if (needsRemodel && (modelingThread == null || !modelingThread.isAlive()))
+            modelingThread = new Thread(new ZoneModelingRunnable(this, modelBuilder));
 
         for (Updateable u : updateables)
             if (u.getZone() == this)
@@ -351,6 +352,12 @@ public class Zone {
         return getBox(v.x, v.y);
     }
 
+    public Zone addPendingObject(HasZone o) {
+        synchronized (pendingObjects) {
+            pendingObjects.add(o);
+        }
+        return this;
+    }
     public Zone addObject(HasZone o) {
         o.setZone(this);
 
@@ -516,7 +523,7 @@ public class Zone {
     public void rebuildModel() {
         // avoid main thread
         if (Thread.currentThread().getId() == D.mainThreadId) {
-            modelingThread.start();
+            needsRemodel = true;
             return;
         }
 

@@ -10,7 +10,10 @@ import com.zombies.map.room.Box;
 import com.zombies.map.room.Room;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class D {
     public enum Worker { MAP_ADMIN, ROOM_DOOR }
@@ -28,11 +31,18 @@ public class D {
     public static World world;
     public static Body groundBody;
     public static long mainThreadId;
+    private static Set runningThreads = Collections.synchronizedSet(new HashSet<>());
 
     public static HashMap<Worker, Thread> workers;
 
     public static void reset() {
         tick = 0l;
+
+        synchronized (runningThreads) {
+            for (Object thread : runningThreads)
+                ((Thread)thread).interrupt();
+            runningThreads = Collections.synchronizedSet(new HashSet<>());
+        }
 
         mainThreadId = Thread.currentThread().getId();
         world = new World(new Vector2(), true);
@@ -41,6 +51,12 @@ public class D {
         groundBodyDef.type = BodyDef.BodyType.StaticBody;
         groundBody = world.createBody(groundBodyDef);
         groundBody.setTransform(new Vector2(0, 0), 0);
+    }
+
+    public static void addRunningThread(Thread thread) {
+        synchronized (runningThreads) {
+            runningThreads.add(thread);
+        }
     }
 
     public static void update() {
