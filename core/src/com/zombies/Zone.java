@@ -241,10 +241,12 @@ public class Zone {
             zones.add(getZone(x - halfZoneSize, m * x + b));
             zones.add(getZone(x + halfZoneSize, m * x + b));
         }
-        // find all horizontal intercepts of line on zone grid
-        for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
-            zones.add(getZone((y - b) / m, y - halfZoneSize));
-            zones.add(getZone((y - b) / m, y + halfZoneSize));
+        if (m != 0) {
+            // find all horizontal intercepts of line on zone grid
+            for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
+                zones.add(getZone((y - b) / m, y - halfZoneSize));
+                zones.add(getZone((y - b) / m, y + halfZoneSize));
+            }
         }
         return zones;
     }
