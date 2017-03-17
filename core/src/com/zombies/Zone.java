@@ -106,7 +106,7 @@ public class Zone {
         position = new Vector2(x, y);
         center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
         numRooms = r.nextInt(numRooms);
-        addObject(new Grass(this, position, C.ZONE_SIZE, C.ZONE_SIZE));
+        addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
 
         if (C.ENABLE_DEBUG_LINES) {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
