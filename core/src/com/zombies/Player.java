@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.zombies.interfaces.Collideable;
-import com.zombies.map.thread.MapAdmin;
 
 public class Player extends Unit implements Collideable {
     private long beginAttacks = System.currentTimeMillis();
@@ -176,10 +175,6 @@ public class Player extends Unit implements Collideable {
             die(u);
     }
         lastAttack = System.currentTimeMillis();
-    }
-
-    public boolean isBody(Body b) {
-        return b == body;
     }
 
     @Override

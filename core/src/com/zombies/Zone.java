@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -57,7 +56,6 @@ public class Zone {
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            zone.needsRemodel = false;
             while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
                 try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
             zone.rebuildModel();
@@ -74,8 +72,7 @@ public class Zone {
     private static Random r = new Random();
 
     private Model model;
-    private ModelInstance modelInstance;
-
+    public ModelInstance modelInstance;
 
     // Static Variables
     public static HashMap<String, Zone> zones;
@@ -163,8 +160,11 @@ public class Zone {
             }
         }
 
-        if (needsRemodel && (modelingThread == null || !modelingThread.isAlive()))
+        if (needsRemodel && (modelingThread == null || !modelingThread.isAlive())) {
+            needsRemodel = false;
             modelingThread = new Thread(new ZoneModelingRunnable(this, modelBuilder));
+            modelingThread.start();
+        }
 
         for (Updateable u : updateables)
             if (u.getZone() == this)
@@ -524,8 +524,8 @@ public class Zone {
     }
 
     public void rebuildModel() {
-        // avoid main thread
-        if (Thread.currentThread().getId() == D.mainThreadId) {
+        // only run in modeling thread
+        if (modelingThread == null || Thread.currentThread().getId() != modelingThread.getId()) {
             needsRemodel = true;
             return;
         }

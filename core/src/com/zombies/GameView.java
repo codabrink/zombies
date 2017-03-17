@@ -122,7 +122,7 @@ public class GameView implements Screen {
         environment.add(player.pointLight);
 
         outsideEnvironment = new Environment();
-        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
+        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
