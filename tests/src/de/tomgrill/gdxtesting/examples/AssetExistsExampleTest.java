@@ -91,13 +91,38 @@ public class AssetExistsExampleTest {
 
         building.compile();
 
-        // process pendingObjects list
-        room.getZone().update();
+        // process pendingObjects lists
+        z1.update();
+        z2.update();
+        z3.update();
+        z4.update();
 
+        // assert corners
+        assertTrue(b00.getCorners()[0].x == C.GRID_HALF_SIZE);
+        assertTrue(b00.getCorners()[0].y == C.GRID_HALF_SIZE);
+        assertTrue(b00.getCorners()[1].x == -C.GRID_HALF_SIZE);
+        assertTrue(b00.getCorners()[1].y == C.GRID_HALF_SIZE);
+
+        assertTrue(b10.getCorners()[0].x == C.GRID_HALF_SIZE + C.GRID_SIZE);
+        assertTrue(b10.getCorners()[0].y == C.GRID_HALF_SIZE);
+        assertTrue(b10.getCorners()[1].x == C.GRID_HALF_SIZE);
+        assertTrue(b10.getCorners()[1].y == C.GRID_HALF_SIZE);
+        assertTrue(b10.getCorners()[2].x == C.GRID_HALF_SIZE);
+        assertTrue(b10.getCorners()[2].y == -C.GRID_HALF_SIZE);
+        assertTrue(b10.getCorners()[3].x == C.GRID_HALF_SIZE + C.GRID_SIZE);
+        assertTrue(b10.getCorners()[3].y == -C.GRID_HALF_SIZE);
+
+        // assert centers
         assertTrue(b00.getCenter().x == 0);
         assertTrue(b00.getCenter().y == 0);
-        assertTrue(b10.getCenter().x == 0);
-        assertTrue(b10.getCenter().y == C.GRID_HALF_SIZE);
+        assertTrue(b10.getCenter().x == C.GRID_SIZE);
+        assertTrue(b10.getCenter().y == 0);
+        assertTrue(bn10.getCenter().x == -C.GRID_SIZE);
+        assertTrue(bn10.getCenter().y == 0);
+        assertTrue(b01.getCenter().x == 0);
+        assertTrue(b01.getCenter().y == C.GRID_SIZE);
+        assertTrue(b0n1.getCenter().x == 0);
+        assertTrue(b0n1.getCenter().y == -C.GRID_SIZE);
 
         // zone 1
         assertTrue(room.getZone() == z1);
@@ -109,23 +134,16 @@ public class AssetExistsExampleTest {
 
         // zone 2
         assertTrue(z2.getRooms().size() == 1);
-        assertTrue(z2.getBoxes().size() == 3);
-        assertTrue(z2.getBoxes().contains(building.gridMap.get("0,0")));
+        assertTrue(z2.getBoxes().size() == 1);
         assertTrue(z2.getBoxes().contains(building.gridMap.get("-1,0")));
-        assertTrue(z2.getBoxes().contains(building.gridMap.get("0,1")));
 
         // zone 3
-        assertTrue(z3.getRooms().size() == 1);
-        assertTrue(z3.getBoxes().size() == 3);
-        assertTrue(z3.getBoxes().contains(building.gridMap.get("0,0")));
-        assertTrue(z3.getBoxes().contains(building.gridMap.get("-1,0")));
-        assertTrue(z3.getBoxes().contains(building.gridMap.get("0,-1")));
+        assertTrue(z3.getRooms().size() == 0);
+        assertTrue(z3.getBoxes().size() == 0);
 
         // zone 4
         assertTrue(z4.getRooms().size() == 1);
-        assertTrue(z4.getBoxes().size() == 3);
-        assertTrue(z4.getBoxes().contains(building.gridMap.get("0,0")));
-        assertTrue(z4.getBoxes().contains(building.gridMap.get("1,0")));
+        assertTrue(z4.getBoxes().size() == 1);
         assertTrue(z4.getBoxes().contains(building.gridMap.get("0,-1")));
 
         assertTrue(building.wallMap.get("0,-1,v") != null);

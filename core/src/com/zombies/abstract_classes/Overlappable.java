@@ -26,10 +26,13 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     public Vector2 getCenter() {
         if (center != null)
             return center;
-        center = new Vector2();
-        for (Vector2 corner : corners)
-            center.add(corner);
-        return center.scl(1 / corners.length);
+        float x = 0, y = 0;
+        for (Vector2 corner : corners) {
+            x += corner.x;
+            y += corner.y;
+        }
+        center = new Vector2(x / corners.length, y / corners.length);
+        return center;
     }
     public boolean overlaps(float x, float y, float w, float h) {
         return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);

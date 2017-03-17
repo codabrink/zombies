@@ -63,6 +63,7 @@ public class Box extends Overlappable implements Gridable {
 
         zone = Zone.getZone(getCenter());
         zone.addPendingObject(this);
+        zone.addPendingObject(room);
         zone.addModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
     }
 
