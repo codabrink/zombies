@@ -18,6 +18,8 @@ import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
+import com.zombies.map.neighborhood.Street;
+import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
 import com.zombies.util.Assets.MATERIAL;
@@ -59,11 +61,13 @@ public class Zone {
             while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
                 try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
             zone.rebuildModel();
-            if (zone.needsRemodel) // reuse the thread
+            if (zone.needsRemodel) { // reuse the thread
                 run();
+                return;
+            }
+            D.removeRunningThread(Thread.currentThread());
         }
     };
-
 
 
 
@@ -72,7 +76,10 @@ public class Zone {
     private static Random r = new Random();
 
     private Model model;
-    public ModelInstance modelInstance;
+    private ModelInstance modelInstance;
+
+    public enum GENERATOR_STATE { UNINITIATED, GENERATING, GENERATED }
+    public GENERATOR_STATE genState = GENERATOR_STATE.UNINITIATED;
 
     // Static Variables
     public static HashMap<String, Zone> zones;
@@ -84,12 +91,16 @@ public class Zone {
     public boolean needsRemodel = false; // flag true, and the model will rebuild at next possible moment
 
     // Collections
-    private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
-    private LinkedHashSet<Overlappable> overlappables = new LinkedHashSet<>();
-    private LinkedHashSet<Updateable> updateables = new LinkedHashSet<>();
+
     private LinkedHashSet<Box> boxes = new LinkedHashSet<>();
     private LinkedHashSet<Room> rooms = new LinkedHashSet<>();
     private LinkedHashSet<Building> buildings = new LinkedHashSet<>();
+    private LinkedHashSet<Street> streets = new LinkedHashSet<>();
+    private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
+
+    private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
+    private LinkedHashSet<Overlappable> overlappables = new LinkedHashSet<>();
+    private LinkedHashSet<Updateable> updateables = new LinkedHashSet<>();
     private LinkedHashSet<Wall> walls = new LinkedHashSet<>();
     private LinkedHashSet<Loadable> loadables = new LinkedHashSet<>();
     private LinkedHashSet<Drawable> drawables = new LinkedHashSet<>();
@@ -359,8 +370,9 @@ public class Zone {
         }
         return this;
     }
-    public Zone addObject(HasZone o) {
-        o.setZone(this);
+    public Zone addObject(Object o) {
+        if (o instanceof HasZone)
+            ((HasZone)o).setZone(this);
 
         // KEEP RECORDS
         if (o instanceof Wall)
@@ -373,10 +385,6 @@ public class Zone {
             addBox((Box) o);
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
-
-        if (o.getZone() != this)
-            return this;
-
         if (o instanceof Loadable)
             addLoadable((Loadable) o);
         if (o instanceof Updateable)
@@ -416,6 +424,7 @@ public class Zone {
     public LinkedHashSet<Box> getBoxes() { return boxes; }
     public LinkedHashSet<Room> getRooms() { return rooms; }
     public LinkedHashSet<Building> getBuildings() { return buildings; }
+    public LinkedHashSet<Street> getStreets() { return streets; }
 
     private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {

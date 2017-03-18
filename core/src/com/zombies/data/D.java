@@ -58,6 +58,11 @@ public class D {
             runningThreads.add(thread);
         }
     }
+    public static void removeRunningThread(Thread thread) {
+        synchronized (runningThreads) {
+            runningThreads.remove(thread);
+        }
+    }
 
     public static void update() {
         currentZone = Zone.getZone(player().getPosition());

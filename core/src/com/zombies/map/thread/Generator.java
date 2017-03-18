@@ -7,6 +7,7 @@ import com.zombies.data.D;
 import com.zombies.interfaces.Gridable;
 import com.zombies.map.Hallway;
 import com.zombies.map.HallwaySegment;
+import com.zombies.map.neighborhood.Street;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
@@ -16,6 +17,17 @@ import com.zombies.workers.RoomDoorWorker;
 import java.util.Random;
 
 public class Generator {
+    public static void generateZone(Zone zone) {
+        // I know this is probably already set to GENERATING.
+        zone.genState = Zone.GENERATOR_STATE.GENERATING;
+
+        // Generate roads
+        // Search for nearby roads
+        for (Zone z : zone.getAdjZones(1)) {
+            for (Street s : z.getStreets())
+        }
+    }
+
     public static Building genFullBuilding(Gridable g, int direction) {
         int[] key = Building.directionToBMKey(g.getKey(), direction);
         Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);

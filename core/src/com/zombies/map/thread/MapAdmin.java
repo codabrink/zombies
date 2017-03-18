@@ -1,11 +1,8 @@
 package com.zombies.map.thread;
 
-import com.zombies.Player;
+import com.zombies.Zone;
+import com.zombies.Zone.GENERATOR_STATE;
 import com.zombies.data.D;
-import com.zombies.map.Hallway;
-import com.zombies.map.HallwaySegment;
-import com.zombies.map.room.Room;
-import com.zombies.util.U;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,17 +23,15 @@ public class MapAdmin implements Runnable {
             return;
         }
 
-        Room room = D.currentRoom();
+        Zone zone = D.currentZone;
+        if (zone == null)
+            return;
 
-        if (room != null) {
-            Hallway h = (Hallway)U.random(room.getBuilding().getHallways());
-            if (h == null)
-                return;
-            HallwaySegment s = h.segments.get(h.segments.size() - 1);
-            (new Thread(new RunnableAdjRoom(s))).start();
-        } else {
-            Runnable r = new GenRoomOnPlayer(D.player());
-            (new Thread(r)).start();
+        for (Zone z : zone.getAdjZones(1)) {
+            if (z.genState == GENERATOR_STATE.UNINITIATED) {
+                z.genState = GENERATOR_STATE.GENERATING;
+                new Thread(new GenZone(z)).start();
+            }
         }
     }
 
@@ -49,12 +44,14 @@ public class MapAdmin implements Runnable {
     }
 }
 
-class GenRoomOnPlayer implements Runnable {
-    private Player p;
-    public GenRoomOnPlayer(Player p) {
-        this.p = p;
+class GenZone implements Runnable {
+    private Zone zone;
+    public GenZone(Zone z) {
+        zone = z;
     }
     public void run() {
-        Generator.genFullBuilding(p.getPosition().cpy());
+        D.addRunningThread(Thread.currentThread());
+        Generator.generateZone(zone);
+        D.removeRunningThread(Thread.currentThread());
     }
 }
