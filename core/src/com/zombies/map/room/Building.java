@@ -1,7 +1,5 @@
 package com.zombies.map.room;
 
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
@@ -9,7 +7,8 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
-import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.util.U;
+import com.zombies.workers.RoomDoorWorker;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,27 +16,54 @@ import java.util.HashSet;
 public class Building implements HasZone {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
 
-    private Model model;
-    private ModelInstance modelInstance;
-
-    private int drawFrame = 0;
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
     public boolean threadLocked = false;
-    private HashSet<Room> rooms = new HashSet<>();
+    protected HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Gridable> gridMap = new HashMap<>();
     public HashMap<String, Wall> wallMap = new HashMap<>();
     public HashSet<Hallway> hallways = new HashSet<>();
-    private Vector2 center;
-    private Zone zone;
+    protected Vector2 center;
+    protected Zone zone;
 
-    private ThreadedModelBuilder modelBuilder;
+    public static Building createBuilding(Vector2 c, int maxRooms) {
+        Zone z = Zone.getZone(c);
+        float bufferRadius = C.GRID_SIZE * 5;
+        float bufferDiameter = bufferRadius * 2;
+        if (z.checkOverlap(c.x - bufferRadius, c.y - bufferRadius, bufferDiameter, bufferDiameter, 1, null) != null)
+            return null;
 
-    public Building(Vector2 c) {
+        return new Building(c, maxRooms);
+    }
+
+    protected Building(Vector2 c, int maxRooms) {
         center = c;
+
+        generate(maxRooms);
+        compile();
+
+        for (Room room : rooms)
+            RoomDoorWorker.processDoorsOnRoom(room);
 
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
     }
+
+    private void generate(int maxRooms) {
+        final int preferredRoomSize = 8;
+
+        int[] key = new int[]{0, 0};
+        Room.createRoom(this, key, preferredRoomSize);
+
+        int loops = 0;
+
+        while(rooms.size() < maxRooms && loops < maxRooms * C.ERROR_TOLERANCE) {
+            loops++;
+            Box b = (Box) U.random(getOuterBoxes());
+            key   = (int[]) U.random(b.getOpenAdjKeys());
+            Room.createRoom(this, key, preferredRoomSize);
+        }
+    }
+
     public void compile() {
         for (Room room : rooms)
             room.compile();
@@ -89,12 +115,18 @@ public class Building implements HasZone {
     }
 
     public Overlappable checkOverlap(int[] key) {
-        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE);
+        return checkOverlap(key, 0);
     }
-    public Overlappable checkOverlap(int[] key, float width, float height) {
+    public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
+        Gridable g = gridMapGet(key);
+        if (g != null)
+            return (Overlappable)g;
+        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE, margin);
+    }
+    public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
         Zone    zone     = Zone.getZone(position);
-        return zone.checkOverlap(position, width, height, 1);
+        return zone.checkOverlap(position.x, position.y, width, height, 1, gridMap.values());
     }
 
     public Vector2[] wallPositionOf(String key) {

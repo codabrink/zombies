@@ -8,12 +8,15 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.zombies.C;
 import com.zombies.Unit;
 import com.zombies.Zone;
+import com.zombies.data.D;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
 import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.U;
 
 public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
@@ -38,7 +41,6 @@ public class Room implements Loadable, HasZone, Updateable {
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
     public boolean connected = false;
-    private ArrayList<Wall> walls = new ArrayList<Wall>();
     private boolean alarmed = false;
     private Zone zone;
     private Vector2 center;
@@ -46,18 +48,50 @@ public class Room implements Loadable, HasZone, Updateable {
     private Building building;
     public HashSet<String> doors = new HashSet<>();
 
-    public Room(Building building) {
-        roomType = RoomType.random();
+    public static Room createRoom(Building building, int[] key, int maxBoxes) {
+        if (building.checkOverlap(key) != null)
+            return null;
+        return new Room(building, key, maxBoxes);
+    }
 
-        this.building = building;
+    protected Room(Building building, int[] key, int maxBoxes) {
+        roomType = RoomType.random();
+        generate(key, maxBoxes);
+
         building.addRoom(this);
+        this.building = building;
 
         id = roomCount;
         roomCount++;
+
+        D.update();
+    }
+
+    private void generate(int[] key, int maxSize) {
+        new Box(this, key);
+
+        int loops = 0; Box b;
+        float cx = 0, cy = 0;
+        while (boxes.size() < maxSize) {
+            loops++;
+            if (loops > maxSize * C.ERROR_TOLERANCE)
+                break;
+
+            b = (Box)U.random(getOuterBoxes());
+            if (b == null)
+                continue;
+
+            key = (int[]) U.random(b.getOpenAdjKeys());
+            b = Box.createBox(this, key);
+
+            cx += b.getCenter().x;
+            cy += b.getCenter().y;
+        }
+
+        center = new Vector2(cx / boxes.size(), cy / boxes.size());
     }
 
     public void compile() {
-        center = calculateMedian();
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
 
@@ -65,27 +99,14 @@ public class Room implements Loadable, HasZone, Updateable {
             b.setAdjWallMap();
     }
 
-    // calculates the median position of all of the boxes
-    private Vector2 calculateMedian() {
-        Vector2 center = new Vector2(0, 0);
-        for (Box b: boxes)
-            center.add(b.getCenter());
-        return new Vector2(center.x / boxes.size(), center.y / boxes.size());
-    }
-
     public void load() {
         for (Box b : boxes)
             b.load();
-        for (Wall w: walls)
-            w.load();
     }
 
     public void unload() {
-        for (Box b: boxes) {
+        for (Box b: boxes)
             b.unload();
-        }
-        for (Wall w: walls)
-            w.unload();
     }
 
     public void alarm(Unit victim) {
@@ -141,7 +162,6 @@ public class Room implements Loadable, HasZone, Updateable {
         return null;
     }
 
-    public ArrayList<Wall> getWalls() { return walls; }
     public HashSet<Box> getBoxes() {
         return boxes;
     }

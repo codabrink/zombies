@@ -40,7 +40,13 @@ public class Box extends Overlappable implements Gridable {
     private int[] key;
     private String sKey;
 
-    public Box(Room room, int[] key) {
+    public static Box createBox(Room room, int[] key) {
+        if (room.getBuilding().checkOverlap(key) != null)
+            return null;
+        return new Box(room, key);
+    }
+
+    protected Box(Room room, int[] key) {
         id = numBoxes;
         numBoxes++;
 

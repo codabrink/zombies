@@ -58,6 +58,7 @@ public class C {
     public static final float ZONE_HALF_SIZE = ZONE_SIZE / 2;
     public static final int DRAW_DISTANCE = 1;
     public static final float FOV = 90;
+    public static final int ERROR_TOLERANCE = 4;
 
     public static boolean DEBUG_SHOW_BOXMAP = false;
     public static boolean DEBUG_SHOW_ADJBOXCOUNT = false;

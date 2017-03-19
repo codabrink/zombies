@@ -27,6 +27,7 @@ import com.zombies.util.ThreadedModelBuilder;
 import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -425,6 +426,7 @@ public class Zone {
     public LinkedHashSet<Room> getRooms() { return rooms; }
     public LinkedHashSet<Building> getBuildings() { return buildings; }
     public LinkedHashSet<Street> getStreets() { return streets; }
+    public LinkedHashSet<StreetSegment> getStreetSegments() { return streetSegments; }
 
     private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {
@@ -477,7 +479,7 @@ public class Zone {
     public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
     private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, HashSet<Overlappable> ignore) {
+    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, Collection ignore) {
         HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             for (Overlappable o : z.getOverlappables()) {
@@ -495,6 +497,9 @@ public class Zone {
             }
         }
         return null;
+    }
+    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, Collection ignore) {
+        return checkOverlap(v.x, v.y, w, h, limit, ignore);
     }
     public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
         return checkOverlap(v.x, v.y, w, h, limit, null);
