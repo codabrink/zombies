@@ -37,7 +37,7 @@ public class Generator {
     public static Building genFullBuilding(Gridable g, int direction) {
         int[] key = Building.directionToBMKey(g.getKey(), direction);
         Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
-        Building newBuilding = genBuilding(center);
+        Building newBuilding = Building.createBuilding(center, 3);
         if (newBuilding == null)
             return null;
 

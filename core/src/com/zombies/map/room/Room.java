@@ -67,19 +67,19 @@ public class Room implements Loadable, HasZone, Updateable {
         D.update();
     }
 
-    private void generate(int[] key, int maxSize) {
+    private void generate(int[] key, int maxBoxes) {
         new Box(this, key);
 
         int loops = 0; Box b;
         float cx = 0, cy = 0;
-        while (boxes.size() < maxSize) {
+        while (boxes.size() < maxBoxes) {
             loops++;
-            if (loops > maxSize * C.ERROR_TOLERANCE)
+            if (loops > maxBoxes * C.ERROR_TOLERANCE)
                 break;
 
             b = (Box)U.random(getOuterBoxes());
             if (b == null)
-                continue;
+                break;
 
             key = (int[]) U.random(b.getOpenAdjKeys());
             b = Box.createBox(this, key);

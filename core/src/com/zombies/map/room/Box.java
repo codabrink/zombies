@@ -73,6 +73,10 @@ public class Box extends Overlappable implements Gridable {
         zone.addModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
     }
 
+    public void compile() {
+
+    }
+
     public void setAdjWallMap() {
         Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
         Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
