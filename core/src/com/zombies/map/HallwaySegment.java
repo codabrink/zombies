@@ -7,14 +7,13 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
-import com.zombies.util.Geometry;
+import com.zombies.util.Geom;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
 import com.zombies.util.U;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class HallwaySegment extends Overlappable implements Gridable {
@@ -153,10 +152,10 @@ public class HallwaySegment extends Overlappable implements Gridable {
     public Vector2[] getCorners() { return corners; }
     @Override
     public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(x, y, w, h, position.x, position.y, width, height);
+        return Geom.rectOverlap(x, y, w, h, position.x, position.y, width, height);
     }
     @Override
-    public boolean contains(float x, float y) { return Geometry.rectContains(x, y, position, width, height); }
+    public boolean contains(float x, float y) { return Geom.rectContains(x, y, position, width, height); }
     @Override
     public float edge(int direction) {
         switch(direction) {
@@ -178,7 +177,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
     }
 
     @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geom.edgeIntersection(p1, p2, this); }
 
     @Override
     public float getWidth() {

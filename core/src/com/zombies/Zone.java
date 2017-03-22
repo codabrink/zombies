@@ -23,6 +23,7 @@ import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.room.*;
 import com.zombies.map.room.Building;
 import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.Bounds2;
 import com.zombies.util.ThreadedModelBuilder;
 import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
 
@@ -73,6 +74,7 @@ public class Zone {
 
 
     private Vector2 position, center;
+    public Bounds2 bounds;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r = new Random();
 
@@ -114,6 +116,7 @@ public class Zone {
     public Zone(float x, float y) {
         position = new Vector2(x, y);
         center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
+        bounds = new Bounds2(x, y, C.ZONE_SIZE, C.ZONE_SIZE);
         numRooms = r.nextInt(numRooms);
         addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
 
@@ -365,7 +368,7 @@ public class Zone {
         return getBox(v.x, v.y);
     }
 
-    public Zone addPendingObject(HasZone o) {
+    public Zone addPendingObject(Object o) {
         synchronized (pendingObjects) {
             pendingObjects.add(o);
         }
@@ -420,6 +423,7 @@ public class Zone {
 
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
+    public Vector2 getCenter() { return center; }
     public LinkedHashSet<Overlappable> getOverlappables() { return overlappables; }
     public Set getPendingObjects() { return pendingObjects; }
     public LinkedHashSet<Box> getBoxes() { return boxes; }

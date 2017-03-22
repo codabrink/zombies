@@ -3,18 +3,11 @@ package com.zombies.map.thread;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.data.D;
 import com.zombies.interfaces.Gridable;
-import com.zombies.map.Hallway;
 import com.zombies.map.HallwaySegment;
-import com.zombies.map.neighborhood.Street;
-import com.zombies.map.room.Box;
+import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.Room;
-import com.zombies.util.U;
-import com.zombies.workers.RoomDoorWorker;
-
-import java.util.Random;
+import com.zombies.util.Geom;
 
 public class Generator {
     public static void generateZone(Zone zone) {
@@ -30,7 +23,9 @@ public class Generator {
         // Search for nearby roads
         final float streetSearchRadius = C.GRID_SIZE * 30;
         for (Zone z : zone.getAdjZones(1)) {
-            for (Street s : z.getStreets())
+            for (StreetSegment ss : z.getStreetSegments())
+                if (Geom.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
+
         }
     }
 

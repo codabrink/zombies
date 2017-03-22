@@ -5,7 +5,11 @@ import com.zombies.abstract_classes.Overlappable;
 
 import java.util.ArrayList;
 
-public class Geometry {
+public class Geom {
+    public static final double PIHALF = Math.PI / 2;
+    public static final double THRPIHALF = (3 * Math.PI) / 2;
+    public static final double TWOPI = 2 * Math.PI;
+
     public static boolean rectContains(float x, float y, Vector2 p, float w, float h) {
         return valueInRange(x, p.x, p.x + w) &&
                 valueInRange(y, p.y, p.y + h);
@@ -19,7 +23,7 @@ public class Geometry {
         return true;
     }
 
-    public float distanceOfPointFromLine(Vector2 p1, Vector2 p2, Vector2 p0) {
+    public static float distanceOfPointFromLine(Vector2 p1, Vector2 p2, Vector2 p0) {
         double distance = Math.abs((p2.y - p1.y) * p0.x - (p2.x - p1.x) * p0.y + p2.x * p1.y - p2.y * p1.x)
                 / Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
         return (float)distance;
@@ -96,6 +100,10 @@ public class Geometry {
             return null; // lines are parallel
 
         return new Vector2((B2 * C1 - B1 * C2) / delta, (A1 * C2 - A2 * C1) / delta);
+    }
+
+    public static Vector2 center(Vector2 p1, Vector2 p2) {
+        return new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
     }
 
     public static Overlappable checkOverlap(float x, float y, float w, float h, ArrayList<Overlappable> overlappables) {

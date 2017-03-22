@@ -1,5 +1,7 @@
 package com.zombies.util;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Bounds2 {
     public float x, y, w, h;
 
@@ -15,6 +17,12 @@ public class Bounds2 {
 
     public static Bounds2 crop(Bounds2 b1, Bounds2 b2) {
         return crop(b1.x, b1.y, b1.w, b1.h, b2.x, b2.y, b2.w, b2.h);
+    }
+    public static Bounds2 crop(Bounds2 b, Vector2 p, float w, float h) {
+        return crop(b.x, b.y, b.w, b.h, p.x, p.y, w, h);
+    }
+    public static Bounds2 crop(Bounds2 b, float x, float y, float w, float h) {
+        return crop(b.x, b.y, b.w, b.h, x, y, w, h);
     }
     public static Bounds2 crop(float x0, float y0, float w0, float h0, float x1, float y1, float w1, float h1) {
         Bounds2 bounds = new Bounds2();

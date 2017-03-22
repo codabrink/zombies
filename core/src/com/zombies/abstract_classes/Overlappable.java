@@ -7,7 +7,7 @@ import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.IOverlappable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
-import com.zombies.util.Geometry;
+import com.zombies.util.Geom;
 
 import java.util.HashSet;
 
@@ -35,10 +35,10 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
         return center;
     }
     public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+        return Geom.rectOverlap(position.x, position.y, width, height, x, y, w, h);
     }
     public boolean contains(float x, float y) {
-        return Geometry.rectContains(x, y, position, width, height);
+        return Geom.rectContains(x, y, position, width, height);
     }
     public float edge(int direction) {
         switch(direction) {
@@ -56,7 +56,7 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     public float oppositeEdge(int direction) {
         return edge((direction + 180) % 360);
     }
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
+    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geom.edgeIntersection(p1, p2, this); }
 
     public float getWidth() { return width; }
     public float getHeight() { return height; }

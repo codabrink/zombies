@@ -23,7 +23,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.zombies.BodData;
 import com.zombies.C;
@@ -35,7 +34,7 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.util.Assets;
-import com.zombies.util.Geometry;
+import com.zombies.util.Geom;
 
 public class Door implements Drawable, Modelable, HasZone, Collideable {
     private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
@@ -66,7 +65,7 @@ public class Door implements Drawable, Modelable, HasZone, Collideable {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
-        angle = Geometry.getAngle(p1, p2);
+        angle = Geom.getAngle(p1, p2);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         Zone.getZone(center).addPendingObject(this);
 
