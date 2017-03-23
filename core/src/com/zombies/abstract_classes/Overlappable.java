@@ -8,14 +8,15 @@ import com.zombies.interfaces.IOverlappable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Geom;
+import com.zombies.util.LineSegment;
 
 import java.util.HashSet;
 
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
-    public float width, height;
-    protected Vector2 position, center;
-    private Vector2[] corners;
-    public float[][]   lines;
+    public float         width, height;
+    protected Vector2    position, center;
+    private Vector2[]    corners;
+    public LineSegment[] lines;
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     private Vector2 zonedPosition = null;
@@ -26,9 +27,9 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     // corners need to be oriented in counter-clockwise fashion
     protected void setCorners(Vector2[] corners) {
         this.corners = corners;
-        lines = new float[corners.length][]; // line forumlas are cached for performance
+        lines = new LineSegment[corners.length]; // line forumlas are cached for performance
         for (int i = 0; i < corners.length; i++)
-            lines[i] = Geom.line(corners[i], corners[(i + 1) % corners.length]);
+            lines[i] = new LineSegment(corners[i], corners[(i + 1) % corners.length]);
     }
     public Vector2[] getCorners() { return corners; }
 
@@ -50,11 +51,10 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
         int oClosest     = o.closestCornerTo(this);
         for (int i = -1; i <= 0; i++)
             for (int ii = -1; ii <= 0; ii++)
-                if (Geom.lineIntersectionPoint(lines[(closest + i) % lines.length], o.lines[(oClosest + ii) % o.lines.length]) != null)
+                if (lines[(closest + i) % lines.length].intersectionPoint(o.lines[(oClosest + ii) % o.lines.length]) != null)
                     return true;
         return false;
     }
-
 
     public boolean contains(float x, float y) {
         return Geom.rectContains(x, y, position, width, height);
