@@ -68,6 +68,9 @@ public class Room implements Loadable, HasZone, Updateable {
     }
 
     private void generate(int[] key, int maxBoxes) {
+        if (maxBoxes == 0)
+            return;
+
         new Box(this, key);
 
         int loops = 0; Box b;

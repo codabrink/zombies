@@ -7,8 +7,6 @@ import com.zombies.interfaces.HasZone;
 import com.zombies.util.Geom;
 import com.zombies.util.LineSegment;
 
-import java.util.HashSet;
-
 public class Overlappable implements HasZone {
     public float         width, height;
     protected Vector2    position, center;

@@ -1,6 +1,7 @@
 package com.zombies.map.room;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
@@ -50,6 +51,9 @@ public class Building implements HasZone {
     }
 
     private void generate(int maxRooms) {
+        if (maxRooms == 0)
+            return;
+
         final int preferredRoomSize = 8;
 
         int[] key = new int[]{0, 0};

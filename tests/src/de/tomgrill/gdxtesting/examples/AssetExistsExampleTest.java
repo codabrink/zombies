@@ -32,8 +32,7 @@ public class AssetExistsExampleTest {
         GameView.gv.reset();
 
         Zone zone = Zone.getZone(0, 0);
-        Building building = new Building(new Vector2(0, 0));
-        Room room = Generator.genRoom(building, new int[]{0,0});
+        Building building = Building.createBuilding(new Vector2(0, 0), 3);
 
         building.compile();
 
@@ -79,15 +78,15 @@ public class AssetExistsExampleTest {
         assertTrue(z3.getRooms().size() == 0);
         assertTrue(z4.getRooms().size() == 0);
 
-        Building building = new Building(new Vector2(0, 0));
-        Room room = new Room(building);
+        Building building = Building.createBuilding(new Vector2(0, 0), 0);
+        Room room = Room.createRoom(building, new int[]{0, 0}, 0);
 
         // gen cross room
-        Box b00  = new Box(room, new int[]{0,0});
-        Box b10  = new Box(room, new int[]{1,0});
-        Box bn10 = new Box(room, new int[]{-1,0});
-        Box b01  = new Box(room, new int[]{0,1});
-        Box b0n1 = new Box(room, new int[]{0,-1});
+        Box b00  = Box.createBox(room, new int[]{0,0});
+        Box b10  = Box.createBox(room, new int[]{1,0});
+        Box bn10 = Box.createBox(room, new int[]{-1,0});
+        Box b01  = Box.createBox(room, new int[]{0,1});
+        Box b0n1 = Box.createBox(room, new int[]{0,-1});
 
         building.compile();
 
@@ -190,18 +189,18 @@ public class AssetExistsExampleTest {
     public void testDisplacedRoomGen() {
         GameView.gv.reset();
 
-        Building building = new Building(new Vector2(500, 500));
-        Room room = new Room(building);
+        Building building = Building.createBuilding(new Vector2(500, 500), 0);
+        Room room = Room.createRoom(building, new int[]{0, 0}, 0);
 
         // gen cross room
-        Box b00  = new Box(room, new int[]{0,0});
-        Box b10  = new Box(room, new int[]{1,0});
-        Box bn10 = new Box(room, new int[]{-1,0});
-        Box b01  = new Box(room, new int[]{0,1});
-        Box b0n1 = new Box(room, new int[]{0,-1});
+        Box b00  = Box.createBox(room, new int[]{0,0});
+        Box b10  = Box.createBox(room, new int[]{1,0});
+        Box bn10 = Box.createBox(room, new int[]{-1,0});
+        Box b01  = Box.createBox(room, new int[]{0,1});
+        Box b0n1 = Box.createBox(room, new int[]{0,-1});
         room.compile();
 
-        room = Generator.genRoom(building, new int[]{-1,1});
+        room = Room.createRoom(building, new int[]{-1, 1}, 0);
 
         Box newBox = (Box)building.gridMap.get("-1,1");
 
