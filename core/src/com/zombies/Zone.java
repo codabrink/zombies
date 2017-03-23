@@ -330,7 +330,7 @@ public class Zone {
                 Vector2 i1 = new Vector2(xi1, yi1);
                 Vector2 i2 = new Vector2(xi2, yi2);
 
-                // if either intersection is beyond the wall, pull it back to the wall's endpoint so
+                // if either lineIntersectionPoint is beyond the wall, pull it back to the wall's endpoint so
                 // the hole will draw correctly.
                 if (i1.cpy().dst(w.getStart()) < i1.cpy().dst(w.getEnd())) {
                     if (w.getEnd().dst(i1) > w.getEnd().dst(w.getStart()))

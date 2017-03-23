@@ -26,7 +26,7 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     // corners need to be oriented in counter-clockwise fashion
     protected void setCorners(Vector2[] corners) {
         this.corners = corners;
-        lines = new float[corners.length][]; // lines are cached for performance
+        lines = new float[corners.length][]; // line forumlas are cached for performance
         for (int i = 0; i < corners.length; i++)
             lines[i] = Geom.line(corners[i], corners[(i + 1) % corners.length]);
     }
@@ -50,7 +50,7 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
         int oClosest     = o.closestCornerTo(this);
         for (int i = -1; i <= 0; i++)
             for (int ii = -1; ii <= 0; ii++)
-                if (Geom.intersection(lines[(closest + i) % lines.length], o.lines[(oClosest + ii) % o.lines.length]) != null)
+                if (Geom.lineIntersectionPoint(lines[(closest + i) % lines.length], o.lines[(oClosest + ii) % o.lines.length]) != null)
                     return true;
         return false;
     }

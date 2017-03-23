@@ -3,16 +3,14 @@ package com.zombies.util;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 
-import java.util.ArrayList;
-
 public class Geom {
     public static final double PIHALF = Math.PI / 2;
     public static final double THRPIHALF = (3 * Math.PI) / 2;
     public static final double TWOPI = 2 * Math.PI;
 
     public static boolean rectContains(float x, float y, Vector2 p, float w, float h) {
-        return valueInRange(x, p.x, p.x + w) &&
-                valueInRange(y, p.y, p.y + h);
+        return inRange(x, p.x, p.x + w) &&
+                inRange(y, p.y, p.y + h);
     }
 
     public static boolean rectOverlap(float x, float y, float w, float h, float x2, float y2, float w2, float h2) {
@@ -29,11 +27,11 @@ public class Geom {
         return (float)distance;
     }
 
-    private static boolean valueInRange(float value, float min, float max) {
-        return (value > min) && (value < max);
+    private static boolean inRange(float value, float a, float b) {
+        return value > a && value < b || value < a && value > b;
     }
 
-    // get intersection point of a line and a box
+    // get lineIntersectionPoint point of a line and a box
     public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Overlappable o) {
         Vector2 position;
 
@@ -44,29 +42,43 @@ public class Geom {
 
         if (Math.abs(theta) < Math.abs(cTheta)) { // right wall
             U.p("Intersecting right wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[3])) != null)
+            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[3])) != null)
                 return position;
         }
         if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) { // top wall
             U.p("Intersecting top wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[1])) != null)
+            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[1])) != null)
                 return position;
         }
         if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) { // bottom wall
             U.p("Intersecting bottom wall");
-            if ((position = intersectPoint(lp1, lp2, o.getCorners()[2], o.getCorners()[3])) != null)
+            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[2], o.getCorners()[3])) != null)
                 return position;
         }
         U.p("Default: Intersecting left wall");
         // otherwise, assume left wall
-        if ((position = intersectPoint(lp1, lp2, o.getCorners()[1], o.getCorners()[2])) != null)
+        if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[1], o.getCorners()[2])) != null)
             return position;
 
         return null;
     }
 
-    public static Vector2 intersectPoint(Vector2 l1p1, Vector2 l1p2, Vector2 l2p1, Vector2 l2p2) {
-        return intersection(line(l1p1, l1p2), line(l2p1, l2p2));
+    // check if line segment AB intersects segment CD
+    public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
+        return segmentIntersectionPoint(a, b, c, d, line(a, b), line(c, d));
+    }
+    public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float[] ab, float[] cd) {
+        Vector2 point = lineIntersectionPoint(ab, cd);
+        if (point == null)
+            return null; // lines have same slope
+
+        if (!inRange(point.x, a.x, b.x) ||
+                !inRange(point.y, a.y, b.y) ||
+                !inRange(point.x, c.x, d.x) ||
+                !inRange(point.y, c.y, d.y))
+            return null; // point is outside of the segment(s)
+
+        return point;
     }
 
     public static float[] line(Vector2 p1, Vector2 p2) {
@@ -75,26 +87,19 @@ public class Geom {
         float C = -(p1.x * p2.y - p2.x * p1.y);
         return new float[] {A, B, C};
     }
-    public static Vector2 intersection(float[] l1, float[] l2) {
+    // http://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines-in-python#20679579
+    public static Vector2 lineIntersectionPoint(float[] l1, float[] l2) {
         float d = l1[0] * l2[1] - l1[1] * l2[0];
+        if (d == 0)
+            return null;
+
         float dx = l1[2] * l2[1] - l1[1] * l2[2];
         float dy = l1[0] * l2[2] - l1[2] * l2[0];
-        if (d != 0)
-            return new Vector2(dx / d, dy / d);
-        else
-            return null;
+        return new Vector2(dx / d, dy / d);
     }
 
     public static Vector2 center(Vector2 p1, Vector2 p2) {
         return new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-    }
-
-    public static Overlappable checkOverlap(float x, float y, float w, float h, ArrayList<Overlappable> overlappables) {
-        for (Overlappable o: overlappables) {
-            if (o.overlaps(x, y, w, h))
-                return o;
-        }
-        return null;
     }
 
     public static double getAngle(Vector2 p1, Vector2 p2) {
