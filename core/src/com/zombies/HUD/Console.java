@@ -84,9 +84,6 @@ public class Console {
                 p = view.getPlayer();
                 b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
                 break;
-            case "genRoom":
-                Generator.genRoom(new Building(D.players.get(0).getPosition()), new int[]{0, 0});
-                break;
             case "hallway":
                 b = D.currentBox;
                 int[] key = (int[])U.random(b.getOpenAdjKeys());

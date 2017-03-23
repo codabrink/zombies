@@ -483,30 +483,23 @@ public class Zone {
     public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
     private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
-    public Overlappable checkOverlap(float x, float y, float w, float h, int limit, Collection ignore) {
+    public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
         HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             for (Overlappable o : z.getOverlappables()) {
-                if (o.overlaps(x, y, w, h)) {
+                if (overlappable.overlaps(o)) {
                     if (ignore != null && ignore.contains(o))
                         continue;
                     return o;
                 }
             }
             synchronized (z.getPendingObjects()) {
-                for (Object o : z.getPendingObjects()) {
-                    if (o instanceof Overlappable && ((Overlappable) o).overlaps(x, y, w, h))
+                for (Object o : z.getPendingObjects())
+                    if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o))
                         return (Overlappable)o;
-                }
             }
         }
         return null;
-    }
-    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit, Collection ignore) {
-        return checkOverlap(v.x, v.y, w, h, limit, ignore);
-    }
-    public Overlappable checkOverlap(Vector2 v, float w, float h, int limit) {
-        return checkOverlap(v.x, v.y, w, h, limit, null);
     }
 
     public HashSet<Zone> getAdjZones(int limit) {

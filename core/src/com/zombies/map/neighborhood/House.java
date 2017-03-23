@@ -8,7 +8,6 @@ public class House extends Building {
     private float margin;
 
     public House(Vector2 c, int roomCount, float margin) {
-        super(c);
         this.roomCount = roomCount;
         this.margin    = margin;
 

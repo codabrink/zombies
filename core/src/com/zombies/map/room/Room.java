@@ -100,13 +100,9 @@ public class Room implements Loadable, HasZone, Updateable {
     }
 
     public void load() {
-        for (Box b : boxes)
-            b.load();
     }
 
     public void unload() {
-        for (Box b: boxes)
-            b.unload();
     }
 
     public void alarm(Unit victim) {

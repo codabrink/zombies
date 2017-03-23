@@ -65,7 +65,7 @@ public class Box extends Overlappable implements Gridable {
         height   = C.GRID_SIZE;
         width    = C.GRID_SIZE;
 
-        corners = building.cornersOf(position);
+        setCorners(building.cornersOf(position));
 
         zone = Zone.getZone(getCenter());
         zone.addPendingObject(this);
@@ -205,10 +205,6 @@ public class Box extends Overlappable implements Gridable {
         return adjKeys;
     }
 
-    @Override
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
-
-    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
         builder.rect(relp.x, relp.y, 0,
@@ -225,21 +221,6 @@ public class Box extends Overlappable implements Gridable {
 
     @Override
     public void setZone(Zone z) {}
-
-    @Override
-    public String className() {
-        return "Box";
-    }
-
-
-    @Override
-    public void load() {
-
-    }
-    @Override
-    public void unload() {
-
-    }
 
     public String giveKey(Box b) {
         return Math.min(id, b.getId()) + "," + Math.max(id, b.getId());

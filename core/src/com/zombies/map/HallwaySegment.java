@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
+import com.zombies.interfaces.Loadable;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
@@ -16,7 +17,7 @@ import com.zombies.util.U;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable implements Gridable {
+public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
     private boolean[] connections = new boolean[4];
@@ -33,7 +34,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
         hallway  = h;
         building = h.getBuilding();
         position = building.positionOf(key);
-        corners  = building.cornersOf(position);
+        setCorners(building.cornersOf(position));
 
         diameter   = C.HALLWAY_WIDTH;
         radius     = diameter / 2;
@@ -82,7 +83,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
     }
 
     // TODO: build rotation into this to reduce redundant code
-    @Override
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
@@ -147,37 +147,9 @@ public class HallwaySegment extends Overlappable implements Gridable {
     }
 
     @Override
-    public String className() { return "HallwaySegment"; }
-    @Override
     public Vector2[] getCorners() { return corners; }
     @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geom.rectOverlap(x, y, w, h, position.x, position.y, width, height);
-    }
-    @Override
     public boolean contains(float x, float y) { return Geom.rectContains(x, y, position, width, height); }
-    @Override
-    public float edge(int direction) {
-        switch(direction) {
-            case 0:
-                return position.x + width;
-            case 90:
-                return position.y + height;
-            case 180:
-                return position.x;
-            case 270:
-                return position.y;
-        }
-        throw new  IllegalArgumentException();
-    }
-
-    @Override
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
-    }
-
-    @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geom.edgeIntersection(p1, p2, this); }
 
     @Override
     public float getWidth() {
@@ -208,7 +180,6 @@ public class HallwaySegment extends Overlappable implements Gridable {
         zone = z;
     }
 
-    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 

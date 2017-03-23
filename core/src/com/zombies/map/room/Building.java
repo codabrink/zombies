@@ -29,12 +29,13 @@ public class Building implements HasZone {
         Zone z = Zone.getZone(c);
         float bufferRadius = C.GRID_SIZE * 5;
         float bufferDiameter = bufferRadius * 2;
-        if (z.checkOverlap(c.x - bufferRadius, c.y - bufferRadius, bufferDiameter, bufferDiameter, 1, null) != null)
+        if (z.checkOverlap(new Overlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
             return null;
 
         return new Building(c, maxRooms);
     }
 
+    protected Building() {}
     protected Building(Vector2 c, int maxRooms) {
         center = c;
 
@@ -126,7 +127,7 @@ public class Building implements HasZone {
     public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
         Zone    zone     = Zone.getZone(position);
-        return zone.checkOverlap(position.x, position.y, width, height, 1, gridMap.values());
+        return zone.checkOverlap(new Overlappable(position, width, height), 1, gridMap.values());
     }
 
     public Vector2[] wallPositionOf(String key) {

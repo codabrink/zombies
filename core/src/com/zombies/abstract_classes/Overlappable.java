@@ -4,25 +4,32 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.IOverlappable;
-import com.zombies.interfaces.Loadable;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
 import com.zombies.util.Geom;
 import com.zombies.util.LineSegment;
 
 import java.util.HashSet;
 
-public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
+public class Overlappable implements HasZone {
     public float         width, height;
     protected Vector2    position, center;
-    private Vector2[]    corners;
+    protected Vector2[]    corners;
     public LineSegment[] lines;
-    protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     private Vector2 zonedPosition = null;
     private long zonedTimestamp = 0l;
 
     protected Zone zone;
+
+    public Overlappable() {}
+
+    public Overlappable(Vector2 position, float width, float height) {
+        setCorners(new Vector2[]{
+                position,
+                position.cpy().add(width, 0),
+                position.cpy().add(width, height),
+                position.cpy().add(0, height)
+        });
+    }
 
     // corners need to be oriented in counter-clockwise fashion
     protected void setCorners(Vector2[] corners) {
@@ -62,12 +69,6 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
 
     public float getWidth() { return width; }
     public float getHeight() { return height; }
-    public void addJoinOverlappableOverlappable(JoinOverlappableOverlappable joo) {
-        for (JoinOverlappableOverlappable j : joinOverlappableOverlappables)
-            if (j.o1 == this || j.o2 == this)
-                return;
-        joinOverlappableOverlappables.add(joo);
-    }
 
     public void processZoning() {
         if (C.DEBUG)

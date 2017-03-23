@@ -136,7 +136,7 @@ public class GameView implements Screen {
     }
 
     public void initialRoom() {
-        Generator.genFullBuilding(new Vector2(0, 0));
+        //TODO: initial room
     }
 
     public HUD getHUD() {
