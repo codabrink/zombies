@@ -16,24 +16,26 @@ public class Street implements StreetConnection {
     private StreetSystem streetSystem;
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
     private LinkedHashSet<Building> buildings           = new LinkedHashSet<>();
-    private StreetNode[] nodes = new StreetNode[2];
+    private StreetNode n1, n2;
     private Vector2 p1, p2;
     private double angle;
     private boolean compiled = false;
 
-    public static Street createStreet(StreetSystem ss, StreetNode[] nodes) {
-        return new Street(ss, nodes);
+    public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
+        if ()
+        return new Street(ss, n1, n2);
     }
 
-    protected Street(StreetSystem ss, StreetNode[] nodes) {
-        p1 = nodes[0].getPosition();
-        p2 = nodes[1].getPosition();
+    protected Street(StreetSystem ss, StreetNode n1, StreetNode n2) {
+        p1 = n1.getPosition();
+        p2 = n2.getPosition();
 
         angle = Geom.getAngle(p1, p2);
-        this.nodes = nodes;
+        this.n1 = n1;
+        this.n2 = n2;
 
-        nodes[0].addConnection(this);
-        nodes[1].addConnection(this);
+        n1.addConnection(this);
+        n2.addConnection(this);
 
         streetSystem = ss;
         streetSystem.addConnection(this);

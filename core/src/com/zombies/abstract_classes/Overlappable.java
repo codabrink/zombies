@@ -14,7 +14,8 @@ import java.util.HashSet;
 public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     public float width, height;
     protected Vector2 position, center;
-    protected Vector2[] corners = new Vector2[4];
+    private Vector2[] corners;
+    public float[][]   lines;
     protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
 
     private Vector2 zonedPosition = null;
@@ -22,7 +23,16 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
 
     protected Zone zone;
 
+    // corners need to be oriented in counter-clockwise fashion
+    protected void setCorners(Vector2[] corners) {
+        this.corners = corners;
+        lines = new float[corners.length][]; // lines are cached for performance
+        for (int i = 0; i < corners.length; i++)
+            lines[i] = Geom.line(corners[i], corners[(i + 1) % corners.length]);
+    }
     public Vector2[] getCorners() { return corners; }
+
+
     public Vector2 getCenter() {
         if (center != null)
             return center;
@@ -34,29 +44,21 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
         center = new Vector2(x / corners.length, y / corners.length);
         return center;
     }
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geom.rectOverlap(position.x, position.y, width, height, x, y, w, h);
+    // TODO: currently only returns true if lines intersect
+    public boolean overlaps(Overlappable o) {
+        int closest      = closestCornerTo(o);
+        int oClosest     = o.closestCornerTo(this);
+        for (int i = -1; i <= 0; i++)
+            for (int ii = -1; ii <= 0; ii++)
+                if (Geom.intersection(lines[(closest + i) % lines.length], o.lines[(oClosest + ii) % o.lines.length]) != null)
+                    return true;
+        return false;
     }
+
+
     public boolean contains(float x, float y) {
         return Geom.rectContains(x, y, position, width, height);
     }
-    public float edge(int direction) {
-        switch(direction) {
-            case 90:
-                return position.y + height;
-            case 0:
-                return position.x + width;
-            case 270:
-                return position.y;
-            case 180:
-                return position.x;
-        }
-        return 0;
-    }
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
-    }
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geom.edgeIntersection(p1, p2, this); }
 
     public float getWidth() { return width; }
     public float getHeight() { return height; }
@@ -98,5 +100,19 @@ public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
     @Override
     public Zone getZone() {
         return zone;
+    }
+
+    public int closestCornerTo(Overlappable o) {
+        int closestIndex = 0;
+        float closestDistance = corners[0].dst(o.getCenter());
+        for (int i = 1; i < corners.length; i++) {
+            float distance = corners[i].dst(o.getCenter());
+            if (distance > closestDistance)
+                continue;
+
+            closestDistance = distance;
+            closestIndex    = i;
+        }
+        return closestIndex;
     }
 }

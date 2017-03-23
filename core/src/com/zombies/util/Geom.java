@@ -69,13 +69,12 @@ public class Geom {
         return intersection(line(l1p1, l1p2), line(l2p1, l2p2));
     }
 
-    private static float[] line(Vector2 p1, Vector2 p2) {
+    public static float[] line(Vector2 p1, Vector2 p2) {
         float A = p1.y - p2.y;
         float B = p2.x - p1.x;
-        float C = p1.x * p2.y - p2.x * p1.y;
-        return new float[] {A, B, -C};
+        float C = -(p1.x * p2.y - p2.x * p1.y);
+        return new float[] {A, B, C};
     }
-
     public static Vector2 intersection(float[] l1, float[] l2) {
         float d = l1[0] * l2[1] - l1[1] * l2[0];
         float dx = l1[2] * l2[1] - l1[1] * l2[2];
@@ -84,22 +83,6 @@ public class Geom {
             return new Vector2(dx / d, dy / d);
         else
             return null;
-    }
-
-    public static Vector2 intersectPoint(float l1p1x, float l1p1y, float l1p2x, float l1p2y, float l2p1x, float l2p1y, float l2p2x, float l2p2y) {
-        float A1 = l1p2y - l1p1y;
-        float B1 = l1p2x - l1p1x;
-        float C1 = A1 * l1p1x + B1 * l1p1y;
-
-        float A2 = l2p2y - l2p1y;
-        float B2 = l2p2x - l2p1x;
-        float C2 = A2 * l2p1x + B2 * l2p1y;
-
-        float delta = A1 * B2 - A2 * B1;
-        if (delta == 0)
-            return null; // lines are parallel
-
-        return new Vector2((B2 * C1 - B1 * C2) / delta, (A1 * C2 - A2 * C1) / delta);
     }
 
     public static Vector2 center(Vector2 p1, Vector2 p2) {
@@ -116,6 +99,10 @@ public class Geom {
 
     public static double getAngle(Vector2 p1, Vector2 p2) {
         return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    }
+
+    public static double angleDelta(double a1, double a2) {
+        return TWOPI - (Math.abs(a2 - a1) % TWOPI);
     }
 
     public static Vector2 projectVector(Vector2 v, double angle, float length) {
