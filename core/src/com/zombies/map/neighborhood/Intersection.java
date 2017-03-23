@@ -19,7 +19,8 @@ public class Intersection implements StreetNode {
     }
     public static Intersection createIntersection(StreetSystem ss, StreetNode sn, Vector2 p) {
         Intersection intersection = new Intersection(ss, p);
-        if (intersection.addConnection() && )
+        // TODO: finish
+        return intersection;
     }
 
 

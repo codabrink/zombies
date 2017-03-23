@@ -23,8 +23,8 @@ public class Generator {
         // Search for nearby roads
         final float streetSearchRadius = C.GRID_SIZE * 30;
         for (Zone z : zone.getAdjZones(1)) {
-            for (StreetSegment ss : z.getStreetSegments())
-                if (Geom.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
+            for (StreetSegment ss : z.getStreetSegments()) {}
+                //if (Geom.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
 
         }
     }

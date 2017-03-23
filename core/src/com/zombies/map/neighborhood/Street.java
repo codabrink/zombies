@@ -22,7 +22,6 @@ public class Street implements StreetConnection {
     private boolean compiled = false;
 
     public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
-        if ()
         return new Street(ss, n1, n2);
     }
 
@@ -65,7 +64,7 @@ public class Street implements StreetConnection {
     public double getAngle() { return angle; }
     @Override
     public double getAngle(StreetNode sn) {
-        if (sn == nodes[1])
+        if (sn == n2)
             return (angle + Geom.PIHALF) % Geom.TWOPI;
         return  angle;
     }
