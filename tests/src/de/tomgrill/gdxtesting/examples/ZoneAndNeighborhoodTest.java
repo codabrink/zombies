@@ -22,7 +22,7 @@ import java.util.HashSet;
 import de.tomgrill.gdxtesting.GdxTestRunner;
 
 @RunWith(GdxTestRunner.class)
-public class AssetExistsExampleTest {
+public class ZoneAndNeighborhoodTest {
 
 	@Test
 	public void getAdjZone() {

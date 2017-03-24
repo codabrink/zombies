@@ -56,10 +56,11 @@ public class Room implements Loadable, HasZone, Updateable {
 
     protected Room(Building building, int[] key, int maxBoxes) {
         roomType = RoomType.random();
-        generate(key, maxBoxes);
 
         building.addRoom(this);
         this.building = building;
+
+        generate(key, maxBoxes);
 
         id = roomCount;
         roomCount++;

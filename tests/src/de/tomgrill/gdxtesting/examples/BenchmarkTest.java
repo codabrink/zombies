@@ -37,6 +37,6 @@ public class BenchmarkTest {
             o1.overlaps(o2);
         }
         end = System.currentTimeMillis();
-        System.out.println("A million square overlap tests took " + (System.currentTimeMillis() - start) + " milliseconds.");
+        System.out.println("A million square overlap tests took " + (end - start) + " milliseconds.");
     }
 }

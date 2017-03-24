@@ -69,15 +69,6 @@ public class Overlappable implements HasZone {
     public float getWidth() { return width; }
     public float getHeight() { return height; }
 
-    public void processZoning() {
-        if (C.DEBUG)
-            checkForOversizing();
-
-        for (int i = 0; i < corners.length; i++)
-            for (Zone z : Zone.zonesOnLine(corners[i], corners[(i+1)%corners.length]))
-                z.addObject(this);
-    }
-
     private void checkForOversizing() {
         float max = 0;
         for (int i = 1; i < corners.length; i++)

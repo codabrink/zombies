@@ -28,6 +28,9 @@ public class Geom {
     }
 
     private static boolean inRange(float value, float a, float b) {
+        return value > a && value < b || value < a && value > b;
+    }
+    private static boolean inRangeInclusive(float value, float a, float b) {
         return value >= a && value <= b || value <= a && value >= b;
     }
 
@@ -72,10 +75,10 @@ public class Geom {
         if (point == null)
             return null; // lines have same slope
 
-        if (!inRange(point.x, a.x, b.x) ||
-                !inRange(point.y, a.y, b.y) ||
-                !inRange(point.x, c.x, d.x) ||
-                !inRange(point.y, c.y, d.y))
+        if (!inRangeInclusive(point.x, a.x, b.x) ||
+                !inRangeInclusive(point.y, a.y, b.y) ||
+                !inRangeInclusive(point.x, c.x, d.x) ||
+                !inRangeInclusive(point.y, c.y, d.y))
             return null; // point is outside of the segment(s)
 
         return point;
