@@ -16,15 +16,25 @@
 
 package de.tomgrill.gdxtesting.examples;
 
+import com.badlogic.gdx.math.Vector2;
+import com.zombies.abstract_classes.Overlappable;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class UnitTestExample {
+public class BenchmarkTest {
 
 	@Test
 	public void oneEqualsOne() {
-		assertEquals(1, 1);
-	}
+		Overlappable o1 = new Overlappable(new Vector2(0, 0), 100, 100);
+		Overlappable o2 = new Overlappable(new Vector2(50, 50), 100, 100);
 
+		assertTrue(o1.overlaps(o2) == true);
+
+		for (int i = 0; i < 1000000; i++) {
+			o1.overlaps(o2);
+		}
+	}
 }

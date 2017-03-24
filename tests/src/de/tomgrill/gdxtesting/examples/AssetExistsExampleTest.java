@@ -14,7 +14,6 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
-import com.zombies.map.thread.Generator;
 import com.zombies.util.U;
 
 import java.util.HashMap;

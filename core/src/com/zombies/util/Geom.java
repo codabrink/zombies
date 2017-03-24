@@ -28,7 +28,7 @@ public class Geom {
     }
 
     private static boolean inRange(float value, float a, float b) {
-        return value > a && value < b || value < a && value > b;
+        return value >= a && value <= b || value <= a && value >= b;
     }
 
     // get lineIntersectionPoint point of a line and a box
@@ -84,8 +84,8 @@ public class Geom {
     public static float[] line(Vector2 p1, Vector2 p2) {
         float A = p1.y - p2.y;
         float B = p2.x - p1.x;
-        float C = -(p1.x * p2.y - p2.x * p1.y);
-        return new float[] {A, B, C};
+        float C = p1.x * p2.y - p2.x * p1.y;
+        return new float[] {A, B, -C};
     }
     // http://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines-in-python#20679579
     public static Vector2 lineIntersectionPoint(float[] l1, float[] l2) {

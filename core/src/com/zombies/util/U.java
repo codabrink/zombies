@@ -14,6 +14,10 @@ public class U {
         System.out.println(getCallerClassName() + ": " + s);
     }
 
+    public static int mod(int n, int m) {
+        return (n < 0) ? (m - (Math.abs(n) % m)) % m : (n % m);
+    }
+
     public static < E > Object random(Set<E> set) {
         if (set.size() == 0) return null;
 

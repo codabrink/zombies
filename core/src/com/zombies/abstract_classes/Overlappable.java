@@ -6,6 +6,7 @@ import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.util.Geom;
 import com.zombies.util.LineSegment;
+import com.zombies.util.U;
 
 public class Overlappable implements HasZone {
     public float         width, height;
@@ -56,7 +57,7 @@ public class Overlappable implements HasZone {
         int oClosest     = o.closestCornerTo(this);
         for (int i = -1; i <= 0; i++)
             for (int ii = -1; ii <= 0; ii++)
-                if (lines[(closest + i) % lines.length].intersectionPoint(o.lines[(oClosest + ii) % o.lines.length]) != null)
+                if (lines[U.mod(closest + i, lines.length)].intersectionPoint(o.lines[U.mod(oClosest + ii, o.lines.length)]) != null)
                     return true;
         return false;
     }
