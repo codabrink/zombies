@@ -6,7 +6,7 @@ import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.map.room.Building;
 import com.zombies.util.Bounds2;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 
 import java.util.LinkedHashSet;
 
@@ -29,7 +29,7 @@ public class Street implements StreetConnection {
         p1 = n1.getPosition();
         p2 = n2.getPosition();
 
-        angle = Geom.getAngle(p1, p2);
+        angle = G.getAngle(p1, p2);
         this.n1 = n1;
         this.n2 = n2;
 
@@ -58,14 +58,14 @@ public class Street implements StreetConnection {
 
     @Override
     public float distance(Vector2 p) {
-        return Geom.distanceOfPointFromLine(p1, p2, p);
+        return G.distanceOfPointFromLine(p1, p2, p);
     }
     @Override
     public double getAngle() { return angle; }
     @Override
     public double getAngle(StreetNode sn) {
         if (sn == n2)
-            return (angle + Geom.PIHALF) % Geom.TWOPI;
+            return (angle + G.PIHALF) % G.TWOPI;
         return  angle;
     }
 }

@@ -7,7 +7,6 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.map.HallwaySegment;
 import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.room.Building;
-import com.zombies.util.Geom;
 
 public class Generator {
     public static void generateZone(Zone zone) {
@@ -24,7 +23,7 @@ public class Generator {
         final float streetSearchRadius = C.GRID_SIZE * 30;
         for (Zone z : zone.getAdjZones(1)) {
             for (StreetSegment ss : z.getStreetSegments()) {}
-                //if (Geom.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
+                //if (G.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
 
         }
     }

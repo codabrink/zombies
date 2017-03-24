@@ -8,10 +8,10 @@ public class LineSegment {
     public LineSegment(Vector2 p1, Vector2 p2) {
         this.p1 = p1;
         this.p2 = p2;
-        formula = Geom.line(p1, p2);
+        formula = G.line(p1, p2);
     }
 
     public Vector2 intersectionPoint(LineSegment ls) {
-        return Geom.segmentIntersectionPoint(p1, p2, ls.p1, ls.p2, formula, ls.formula);
+        return G.segmentIntersectionPoint(p1, p2, ls.p1, ls.p2, formula, ls.formula);
     }
 }

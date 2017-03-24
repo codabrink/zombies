@@ -96,11 +96,21 @@ public class Room implements Loadable, HasZone, Updateable {
     }
 
     public void compile() {
+        for (Box b: boxes)
+            b.setAdjWallMap();
+
+        if (center != null)
+            return;
+
+        float cx = 0, cy = 0;
+        for (Box b : boxes) {
+            cx += b.getCenter().x;
+            cy += b.getCenter().y;
+        }
+        center = new Vector2(cx / boxes.size(), cy / boxes.size());
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
 
-        for (Box b: boxes)
-            b.setAdjWallMap();
     }
 
     public void load() {

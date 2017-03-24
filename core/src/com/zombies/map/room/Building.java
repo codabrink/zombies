@@ -125,7 +125,7 @@ public class Building implements HasZone {
     public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
         Gridable g = gridMapGet(key);
         if (g != null)
-            return (Overlappable)g;
+            return (Overlappable) g;
         return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE, margin);
     }
     public Overlappable checkOverlap(int[] key, float width, float height, float margin) {

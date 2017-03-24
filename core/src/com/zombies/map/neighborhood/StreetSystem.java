@@ -3,7 +3,7 @@ package com.zombies.map.neighborhood;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ public class StreetSystem {
     private LinkedHashSet<StreetConnection> connections = new LinkedHashSet<>();
     private LinkedHashSet<StreetNode>       nodes       = new LinkedHashSet<>();
     private ArrayList<StreetGrid>           grids       = new ArrayList<>();
-    private double                          orientation = Geom.PIHALF;
+    private double                          orientation = G.PIHALF;
 
     public StreetSystem() {
         grids.add(new StreetGrid());

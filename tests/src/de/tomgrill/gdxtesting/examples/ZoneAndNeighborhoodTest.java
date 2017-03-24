@@ -197,11 +197,9 @@ public class ZoneAndNeighborhoodTest {
         Box bn10 = Box.createBox(room, new int[]{-1,0});
         Box b01  = Box.createBox(room, new int[]{0,1});
         Box b0n1 = Box.createBox(room, new int[]{0,-1});
-        room.compile();
 
         room = Room.createRoom(building, new int[]{-1, 1}, 0);
-
-        Box newBox = (Box)building.gridMap.get("-1,1");
+        Box newBox = Box.createBox(room, new int[]{-1, 1});
 
         Vector2 expectedPosition = building.getCenter().cpy();
         expectedPosition.sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);

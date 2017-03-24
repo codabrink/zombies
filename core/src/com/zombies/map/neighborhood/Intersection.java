@@ -3,7 +3,7 @@ package com.zombies.map.neighborhood;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 
 import java.util.LinkedHashMap;
 
@@ -45,7 +45,7 @@ public class Intersection implements StreetNode {
     @Override
     public boolean checkAvailability(StreetConnection connection) {
         for (StreetConnection sc : connections.values())
-            if (Geom.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
+            if (G.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
                 return false;
         return true;
     }

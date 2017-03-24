@@ -34,7 +34,7 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
 import com.zombies.util.Assets;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 
 public class Door implements Drawable, Modelable, HasZone, Collideable {
     private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
@@ -65,7 +65,7 @@ public class Door implements Drawable, Modelable, HasZone, Collideable {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
-        angle = Geom.getAngle(p1, p2);
+        angle = G.getAngle(p1, p2);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         Zone.getZone(center).addPendingObject(this);
 

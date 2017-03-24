@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 import com.zombies.util.LineSegment;
 import com.zombies.util.U;
 
@@ -63,7 +63,7 @@ public class Overlappable implements HasZone {
     }
 
     public boolean contains(float x, float y) {
-        return Geom.rectContains(x, y, position, width, height);
+        return G.rectContains(x, y, position, width, height);
     }
 
     public float getWidth() { return width; }

@@ -3,7 +3,7 @@ package com.zombies.util;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 
-public class Geom {
+public class G {
     public static final double PIHALF = Math.PI / 2;
     public static final double THRPIHALF = (3 * Math.PI) / 2;
     public static final double TWOPI = 2 * Math.PI;
@@ -75,10 +75,10 @@ public class Geom {
         if (point == null)
             return null; // lines have same slope
 
-        if (!inRangeInclusive(point.x, a.x, b.x) ||
-                !inRangeInclusive(point.y, a.y, b.y) ||
-                !inRangeInclusive(point.x, c.x, d.x) ||
-                !inRangeInclusive(point.y, c.y, d.y))
+        if (!inRange(point.x, a.x, b.x) ||
+                !inRange(point.y, a.y, b.y) ||
+                !inRange(point.x, c.x, d.x) ||
+                !inRange(point.y, c.y, d.y))
             return null; // point is outside of the segment(s)
 
         return point;

@@ -10,7 +10,7 @@ import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.Geom;
+import com.zombies.util.G;
 
 public class DoorFrame {
     private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
@@ -28,7 +28,7 @@ public class DoorFrame {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
-        angle = Geom.getAngle(p1, p2);
+        angle = G.getAngle(p1, p2);
 
         Zone.getZone(p1).addModelingCallback(MATERIAL.FLOOR_WOOD, modelFrameCallback);
     }
