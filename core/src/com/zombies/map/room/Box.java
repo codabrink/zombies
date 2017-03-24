@@ -63,8 +63,8 @@ public class Box extends Overlappable implements Gridable {
         room.boxes.add(this);
 
         position = building.positionOf(key);
-        height   = C.GRID_SIZE;
-        width    = C.GRID_SIZE;
+        height   = C.GRIDSIZE;
+        width    = C.GRIDSIZE;
 
         setCorners(building.cornersOf(position));
 
@@ -161,11 +161,11 @@ public class Box extends Overlappable implements Gridable {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.GRID_SIZE, 0);
+            return position.cpy().add(C.GRIDSIZE, 0);
         case 3:
-            return position.cpy().add(0, C.GRID_SIZE);
+            return position.cpy().add(0, C.GRIDSIZE);
         case 4:
-            return position.cpy().add(C.GRID_SIZE, C.GRID_SIZE);
+            return position.cpy().add(C.GRIDSIZE, C.GRIDSIZE);
         }
         return new Vector2();
     }
@@ -175,7 +175,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.GRID_SIZE, random.nextFloat() * C.GRID_SIZE);
+        return position.cpy().add(random.nextFloat() * C.GRIDSIZE, random.nextFloat() * C.GRIDSIZE);
     }
 
     public Unit randomZombie() {

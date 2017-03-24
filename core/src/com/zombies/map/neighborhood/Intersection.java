@@ -12,20 +12,29 @@ public class Intersection implements StreetNode {
 
     private StreetSystem streetSystem;
     private Vector2      position;
+    private int[] key;
     public LinkedHashMap<Double, StreetConnection> connections = new LinkedHashMap<>();
 
-    public static Intersection createIntersection(StreetSystem ss, Vector2 p) {
+    public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
+        StreetNode node = ss.getNode(p);
+        if (node != null)
+            return node;
+
         return new Intersection(ss, p);
     }
-    public static Intersection createIntersection(StreetSystem ss, StreetNode sn, Vector2 p) {
+    public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
+        StreetNode node = ss.getNode(p);
+        if (node != null)
+            return node;
+
         Intersection intersection = new Intersection(ss, p);
-        // TODO: finish
+        Street.createStreet(ss, sn, intersection);
         return intersection;
     }
 
-
     protected Intersection(StreetSystem ss, Vector2 p) {
         position     = p;
+        key          = ss.key(position);
         streetSystem = ss;
         streetSystem.addNode(this);
     }
@@ -36,6 +45,11 @@ public class Intersection implements StreetNode {
 
     @Override
     public Vector2 getPosition() { return position; }
+
+    @Override
+    public int[] getKey() {
+        return new int[0];
+    }
 
     @Override
     public void addConnection(StreetConnection connection) {

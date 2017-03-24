@@ -101,26 +101,26 @@ public class ZoneAndNeighborhoodTest {
         assertTrue(b00.getCorners()[1].x == -C.GRID_HALF_SIZE);
         assertTrue(b00.getCorners()[1].y == C.GRID_HALF_SIZE);
 
-        assertTrue(b10.getCorners()[0].x == C.GRID_HALF_SIZE + C.GRID_SIZE);
+        assertTrue(b10.getCorners()[0].x == C.GRID_HALF_SIZE + C.GRIDSIZE);
         assertTrue(b10.getCorners()[0].y == C.GRID_HALF_SIZE);
         assertTrue(b10.getCorners()[1].x == C.GRID_HALF_SIZE);
         assertTrue(b10.getCorners()[1].y == C.GRID_HALF_SIZE);
         assertTrue(b10.getCorners()[2].x == C.GRID_HALF_SIZE);
         assertTrue(b10.getCorners()[2].y == -C.GRID_HALF_SIZE);
-        assertTrue(b10.getCorners()[3].x == C.GRID_HALF_SIZE + C.GRID_SIZE);
+        assertTrue(b10.getCorners()[3].x == C.GRID_HALF_SIZE + C.GRIDSIZE);
         assertTrue(b10.getCorners()[3].y == -C.GRID_HALF_SIZE);
 
         // assert centers
         assertTrue(b00.getCenter().x == 0);
         assertTrue(b00.getCenter().y == 0);
-        assertTrue(b10.getCenter().x == C.GRID_SIZE);
+        assertTrue(b10.getCenter().x == C.GRIDSIZE);
         assertTrue(b10.getCenter().y == 0);
-        assertTrue(bn10.getCenter().x == -C.GRID_SIZE);
+        assertTrue(bn10.getCenter().x == -C.GRIDSIZE);
         assertTrue(bn10.getCenter().y == 0);
         assertTrue(b01.getCenter().x == 0);
-        assertTrue(b01.getCenter().y == C.GRID_SIZE);
+        assertTrue(b01.getCenter().y == C.GRIDSIZE);
         assertTrue(b0n1.getCenter().x == 0);
-        assertTrue(b0n1.getCenter().y == -C.GRID_SIZE);
+        assertTrue(b0n1.getCenter().y == -C.GRIDSIZE);
 
         // zone 1
         assertTrue(room.getZone() == z1);
@@ -157,19 +157,19 @@ public class ZoneAndNeighborhoodTest {
 
         // test vertical wall positions
         Vector2[] positions = building.wallPositionOf("1,0,v");
-        Vector2 expectedPosition = building.getCenter().cpy().sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE).add(C.GRID_SIZE, 0);
+        Vector2 expectedPosition = building.getCenter().cpy().sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE).add(C.GRIDSIZE, 0);
         assertTrue(positions[0].x == expectedPosition.x);
         assertTrue(positions[0].y == expectedPosition.y);
-        expectedPosition.add(0, C.GRID_SIZE);
+        expectedPosition.add(0, C.GRIDSIZE);
         assertTrue(positions[1].x == expectedPosition.x);
         assertTrue(positions[1].y == expectedPosition.y);
 
         // test horizontal wall positions
         positions = building.wallPositionOf("0,1,h");
-        expectedPosition = building.getCenter().cpy().sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE).add(0, C.GRID_SIZE);
+        expectedPosition = building.getCenter().cpy().sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE).add(0, C.GRIDSIZE);
         assertTrue(positions[0].x == expectedPosition.x);
         assertTrue(positions[0].y == expectedPosition.y);
-        expectedPosition.add(C.GRID_SIZE, 0);
+        expectedPosition.add(C.GRIDSIZE, 0);
         assertTrue(positions[1].x == expectedPosition.x);
         assertTrue(positions[1].y == expectedPosition.y);
 
@@ -205,7 +205,7 @@ public class ZoneAndNeighborhoodTest {
 
         Vector2 expectedPosition = building.getCenter().cpy();
         expectedPosition.sub(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
-        expectedPosition.add(-C.GRID_SIZE, C.GRID_SIZE);
+        expectedPosition.add(-C.GRIDSIZE, C.GRIDSIZE);
 
         assertTrue(newBox.getPosition().x == expectedPosition.x);
         assertTrue(newBox.getPosition().y == expectedPosition.y);

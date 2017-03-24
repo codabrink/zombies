@@ -15,8 +15,8 @@ public class C {
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = false;
     public static final float BOX_DEPTH = 7 * SCALE;
-    public static final float GRID_SIZE = 15 * SCALE;
-    public static final float GRID_HALF_SIZE = GRID_SIZE / 2;
+    public static final float GRIDSIZE = 15 * SCALE;
+    public static final float GRID_HALF_SIZE = GRIDSIZE / 2;
     public static final int BULLET_DAMAGE_FACTOR = 2;
     public static final float BULLET_RADIUS = 0.1f * SCALE;
     public static final long CRATE_MPOS_DURATION = 500l;

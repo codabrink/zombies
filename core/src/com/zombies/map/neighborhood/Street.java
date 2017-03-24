@@ -2,6 +2,7 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.map.room.Building;
@@ -10,7 +11,7 @@ import com.zombies.util.G;
 
 import java.util.LinkedHashSet;
 
-public class Street implements StreetConnection {
+public class Street extends Overlappable implements StreetConnection {
     public static final float RADIUS = 1f;
 
     private StreetSystem streetSystem;
@@ -47,6 +48,13 @@ public class Street implements StreetConnection {
             Bounds2 bounds = Bounds2.crop(z.bounds, p1, dx, dy);
             z.addObject(new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle));
         }
+
+        setCorners(new Vector2[]{
+                G.projectVector(p1, angle - G.PIHALF, RADIUS),
+                G.projectVector(p2, angle - G.PIHALF, RADIUS),
+                G.projectVector(p2, angle + G.PIHALF, RADIUS),
+                G.projectVector(p1, angle + G.PIHALF, RADIUS)
+        });
     }
 
     public void compile() {

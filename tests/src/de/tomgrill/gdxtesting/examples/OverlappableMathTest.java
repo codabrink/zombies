@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class BenchmarkTest {
+public class OverlappableMathTest {
 
     @Test
     public void OverlappableTest() {
@@ -15,14 +15,12 @@ public class BenchmarkTest {
         Overlappable o2 = new Overlappable(new Vector2(50, 50), 100, 100);
         Overlappable o3 = new Overlappable(new Vector2(100, 0), 100, 100);
 
-        assertTrue(!o1.overlaps(o3));
         assertTrue(o1.overlaps(o2));
-
+        assertTrue(!o1.overlaps(o3));
 
         long start = System.currentTimeMillis(), end;
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 1000000; i++)
             o1.overlaps(o2);
-        }
         end = System.currentTimeMillis();
         System.out.println("A million square overlap tests took " + (end - start) + " milliseconds.");
     }

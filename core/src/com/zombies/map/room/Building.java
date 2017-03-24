@@ -1,7 +1,6 @@
 package com.zombies.map.room;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
@@ -28,7 +27,7 @@ public class Building implements HasZone {
 
     public static Building createBuilding(Vector2 c, int maxRooms) {
         Zone z = Zone.getZone(c);
-        float bufferRadius = C.GRID_SIZE * 5;
+        float bufferRadius = C.GRIDSIZE * 5;
         float bufferDiameter = bufferRadius * 2;
         if (z.checkOverlap(new Overlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
             return null;
@@ -81,8 +80,8 @@ public class Building implements HasZone {
         return positionOf(key[0], key[1]);
     }
     public Vector2 positionOf(int x, int y) {
-        float vx = center.x - C.GRID_HALF_SIZE + (C.GRID_SIZE * x);
-        float vy = center.y - C.GRID_HALF_SIZE + (C.GRID_SIZE * y);
+        float vx = center.x - C.GRID_HALF_SIZE + (C.GRIDSIZE * x);
+        float vy = center.y - C.GRID_HALF_SIZE + (C.GRIDSIZE * y);
         return new Vector2(vx, vy);
     }
 
@@ -90,10 +89,10 @@ public class Building implements HasZone {
     public Vector2[] cornersOf(int x, int y) { return cornersOf(positionOf(x, y)); }
     public Vector2[] cornersOf(Vector2 position) {
         return new Vector2[] {
-                new Vector2(position.x + C.GRID_SIZE, position.y + C.GRID_SIZE),
-                new Vector2(position.x, position.y + C.GRID_SIZE),
+                new Vector2(position.x + C.GRIDSIZE, position.y + C.GRIDSIZE),
+                new Vector2(position.x, position.y + C.GRIDSIZE),
                 new Vector2(position.x, position.y),
-                new Vector2(position.x + C.GRID_SIZE, position.y)
+                new Vector2(position.x + C.GRIDSIZE, position.y)
         };
     }
 
@@ -126,7 +125,7 @@ public class Building implements HasZone {
         Gridable g = gridMapGet(key);
         if (g != null)
             return (Overlappable) g;
-        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE, margin);
+        return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
     }
     public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
@@ -142,7 +141,7 @@ public class Building implements HasZone {
         Vector2 p1 = positionOf(new int[]{x, y});
         return new Vector2[]{
                 p1,
-                (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
+                (orientation == 'v' ? p1.cpy().add(0, C.GRIDSIZE) : p1.cpy().add(C.GRIDSIZE, 0))};
     }
 
     public static String wallKeyBetweenGridables(int[] k1, int[] k2) {

@@ -71,7 +71,7 @@ public class G {
         return segmentIntersectionPoint(a, b, c, d, line(a, b), line(c, d));
     }
     public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float[] ab, float[] cd) {
-        //TODO: I think this math is correct?
+        //TODO: I think this math is correct? Verify.
         if (Math.abs(ab[2]) == Math.abs(cd[2]))
             return null;
 
@@ -117,7 +117,10 @@ public class G {
         return TWOPI - (Math.abs(a2 - a1) % TWOPI);
     }
 
+    public static Vector2 projectVector$(Vector2 v, double angle, float length) {
+        return v.add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+    }
     public static Vector2 projectVector(Vector2 v, double angle, float length) {
-        return v.cpy().add((float)(length * Math.cos(angle)), (float)(length * Math.sin(angle)));
+        return projectVector$(v.cpy(), angle, length);
     }
 }

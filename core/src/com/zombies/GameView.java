@@ -24,7 +24,6 @@ import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
-import com.zombies.map.thread.Generator;
 import com.zombies.map.thread.MapAdmin;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
@@ -297,16 +296,16 @@ public class GameView implements Screen {
         float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, C.GRID_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.GRIDSIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(C.GRID_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.GRIDSIZE, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.GRID_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.GRIDSIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-C.GRID_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.GRIDSIZE, 0), player.getBody().getAngle());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {

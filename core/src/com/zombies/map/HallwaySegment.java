@@ -50,8 +50,8 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         setInfo(h, key);
     }
     public HallwaySegment(Hallway h, int[] key) {
-        width      = C.GRID_SIZE;
-        height     = C.GRID_SIZE;
+        width      = C.GRIDSIZE;
+        height     = C.GRIDSIZE;
         setInfo(h, key);
     }
 
@@ -183,7 +183,7 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
-        builder.setUVRange(0, 0, width / C.GRID_SIZE, height / C.GRID_SIZE);
+        builder.setUVRange(0, 0, width / C.GRIDSIZE, height / C.GRIDSIZE);
         builder.rect(relp.x, relp.y, -0.1f,
                 relp.x + width, relp.y, -0.1f,
                 relp.x + width, relp.y + height, -0.1f,
