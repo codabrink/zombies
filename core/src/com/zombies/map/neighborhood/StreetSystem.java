@@ -5,6 +5,7 @@ import com.zombies.C;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -17,8 +18,8 @@ public class StreetSystem {
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
     private LinkedHashMap<String, StreetNode>                 nodes         = new LinkedHashMap<>();
-    private LinkedHashMap<Integer, LinkedHashSet<StreetNode>> nodesColindex = new LinkedHashMap<>();
-    private LinkedHashMap<Integer, LinkedHashSet<StreetNode>> nodesRowIndex = new LinkedHashMap<>();
+    private HashMap<Integer, LinkedHashSet<StreetNode>> nodesColindex = new HashMap<>();
+    private HashMap<Integer, LinkedHashSet<StreetNode>> nodesRowIndex = new HashMap<>();
 
     private double                            orientation = 0;
     public StreetSystem(Vector2 center) {
@@ -81,7 +82,7 @@ public class StreetSystem {
         return result;
     }
 
-    private LinkedHashSet<StreetNode> getCache(LinkedHashMap<Integer, LinkedHashSet<StreetNode>> c, int i) {
+    private LinkedHashSet<StreetNode> getCache(HashMap<Integer, LinkedHashSet<StreetNode>> c, int i) {
         LinkedHashSet<StreetNode> cache = c.get(i);
         if (cache == null)
             return c.put(i, new LinkedHashSet<StreetNode>());
