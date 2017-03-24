@@ -34,7 +34,7 @@ public class Intersection implements StreetNode {
 
     protected Intersection(StreetSystem ss, Vector2 p) {
         position     = p;
-        key          = ss.key(position);
+        key          = ss.keyOf(position);
         streetSystem = ss;
         streetSystem.addNode(this);
     }
