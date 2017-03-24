@@ -65,20 +65,26 @@ public class StreetSystem {
         StreetNode result = null;
         int[] key = keyOf(p);
         int lower = key[0] - limit, upper = key[0] + limit;
-        for (StreetNode n : nodes.values())
-            if (n.getKey()[0] >= lower && n.getKey()[0] <= upper)
+        for (int i = lower; i <= upper; i++) {
+            LinkedHashSet<StreetNode> cache = nodesColindex.get(i);
+            if (cache == null) continue;
+            for (StreetNode n : cache)
                 if (result == null || Math.abs(n.getKey()[1] - key[1]) < Math.abs(result.getKey()[1] - key[1]))
                     result = n;
+        }
         return result;
     }
     public StreetNode closestOnRow(Vector2 p, int limit) {
         StreetNode result = null;
         int[] key = keyOf(p);
         int lower = key[1] - limit, upper = key[1] + limit;
-        for (StreetNode n : nodes.values())
-            if (n.getKey()[1] >= lower && n.getKey()[1] <= upper)
+        for (int i = lower; i <= upper; i++) {
+            LinkedHashSet<StreetNode> cache = nodesRowIndex.get(i);
+            if (cache == null) continue;
+            for (StreetNode n : cache)
                 if (result == null || Math.abs(n.getKey()[0] - key[0]) < Math.abs(result.getKey()[0] - key[0]))
                     result = n;
+        }
         return result;
     }
 
