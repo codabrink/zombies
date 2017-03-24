@@ -71,14 +71,18 @@ public class G {
         return segmentIntersectionPoint(a, b, c, d, line(a, b), line(c, d));
     }
     public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float[] ab, float[] cd) {
+        //TODO: I think this math is correct?
+        if (Math.abs(ab[2]) == Math.abs(cd[2]))
+            return null;
+
         Vector2 point = lineIntersectionPoint(ab, cd);
         if (point == null)
             return null; // lines have same slope
 
-        if (!inRange(point.x, a.x, b.x) ||
-                !inRange(point.y, a.y, b.y) ||
-                !inRange(point.x, c.x, d.x) ||
-                !inRange(point.y, c.y, d.y))
+        if (!inRangeInclusive(point.x, a.x, b.x) ||
+                !inRangeInclusive(point.y, a.y, b.y) ||
+                !inRangeInclusive(point.x, c.x, d.x) ||
+                !inRangeInclusive(point.y, c.y, d.y))
             return null; // point is outside of the segment(s)
 
         return point;
