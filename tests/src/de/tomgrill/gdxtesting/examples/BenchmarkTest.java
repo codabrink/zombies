@@ -27,14 +27,17 @@ import org.junit.Test;
 public class BenchmarkTest {
 
 	@Test
-	public void oneEqualsOne() {
+	public void BenchmarkOverlappable() {
 		Overlappable o1 = new Overlappable(new Vector2(0, 0), 100, 100);
 		Overlappable o2 = new Overlappable(new Vector2(50, 50), 100, 100);
 
-		assertTrue(o1.overlaps(o2) == true);
+		assertTrue(o1.overlaps(o2));
 
+        long start = System.currentTimeMillis(), end;
 		for (int i = 0; i < 1000000; i++) {
 			o1.overlaps(o2);
 		}
+		end = System.currentTimeMillis();
+		System.out.println("A million square overlap tests took " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 }
