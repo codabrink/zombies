@@ -32,30 +32,6 @@ public class Intersection implements StreetNode {
         return intersection;
     }
 
-    public static void populateBox(StreetSystem ss, Vector2 p, float w, float h, float resolution) {
-        p = p.cpy();
-        for (float x = p.x; x <= p.x + w; x += resolution) {
-            for (float y = p.y; y <= p.y + h; y += resolution) {
-                StreetNode node = ss.getClosestNode(new Vector2(x, y), 1);
-                if (node != null) continue;
-
-                StreetNode row = ss.closestOnRow(p, 1);
-                StreetNode col = ss.closestOnCol(p, 1);
-
-                if (row != null)
-                    p.set(p.x, row.getPosition().y);
-                if (col != null)
-                    p.set(col.getPosition().x, p.y);
-
-                node = new Intersection(ss, p);
-
-                if (row != null)
-                    new Street(ss, node, row);
-                if (col != null)
-                    new Street(ss, node, col);
-            }
-        }
-    }
 
     protected Intersection(StreetSystem ss, Vector2 p) {
         position     = p;

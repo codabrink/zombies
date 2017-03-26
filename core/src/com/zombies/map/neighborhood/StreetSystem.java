@@ -14,6 +14,8 @@ public class StreetSystem {
     public final static float GRIDSIZE = C.GRIDSIZE * 10;
     public final static float MAXGAP = GRIDSIZE * 3;
 
+    public static LinkedHashSet<StreetSystem> systems = new LinkedHashSet<>();
+
     public Vector2 center;
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
@@ -22,9 +24,48 @@ public class StreetSystem {
     private HashMap<Integer, LinkedHashSet<StreetNode>> nodesRowIndex = new HashMap<>();
 
     private double                            orientation = 0;
+
+    public static void populateBox(Vector2 p, float w, float h, float resolution) {
+        StreetSystem ss = closestStreetSystem(p);
+        p = p.cpy();
+        for (float x = p.x; x <= p.x + w; x += resolution) {
+            for (float y = p.y; y <= p.y + h; y += resolution) {
+                StreetNode node = ss.getClosestNode(new Vector2(x, y), 1);
+                if (node != null) continue;
+
+                StreetNode row = ss.closestOnRow(p, 1);
+                StreetNode col = ss.closestOnCol(p, 1);
+
+                if (row != null)
+                    p.set(p.x, row.getPosition().y);
+                if (col != null)
+                    p.set(col.getPosition().x, p.y);
+
+                node = new Intersection(ss, p);
+
+                if (row != null)
+                    new Street(ss, node, row);
+                if (col != null)
+                    new Street(ss, node, col);
+            }
+        }
+    }
+
     public StreetSystem(Vector2 center) {
         this.center = center;
+        systems.add(this);
         StreetNode node = Intersection.createIntersection(this, center);
+    }
+
+    public static StreetSystem closestStreetSystem(Vector2 p) {
+        StreetSystem streetSystem = null;
+        float dst;
+        for (StreetSystem ss : systems) {
+            if (streetSystem == null || ss.getCenter().dst(p) < dst) {
+                dst = ss.getCenter().dst(p);
+                streetSystem = ss;
+            }
+        }
     }
 
     public StreetConnection closestConnection(Vector2 p) {
@@ -116,6 +157,7 @@ public class StreetSystem {
     private Vector2 normalize$(Vector2 v) { return v.sub(center).rotateRad((float) -orientation); }
     private Vector2 denormalize$(Vector2 v) { return v.rotateRad((float) orientation).add(center); }
 
+    public Vector2 getCenter() { return center; }
     public  int[] keyOf(Vector2 p) { return normalizedKey(normalize(p)); }
     private int[] normalizedKey(Vector2 p) { return new int[]{ (int) Math.floor(p.x / GRIDSIZE), (int) Math.floor(p.y / GRIDSIZE) }; }
     private String sKey(int[] key) { return key[0] + "," + key[1]; }
