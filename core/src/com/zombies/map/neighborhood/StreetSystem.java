@@ -17,7 +17,7 @@ public class StreetSystem {
     public Vector2 center;
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
-    private LinkedHashMap<String, StreetNode>                 nodes         = new LinkedHashMap<>();
+    private LinkedHashMap<String, StreetNode>           nodes         = new LinkedHashMap<>();
     private HashMap<Integer, LinkedHashSet<StreetNode>> nodesColindex = new HashMap<>();
     private HashMap<Integer, LinkedHashSet<StreetNode>> nodesRowIndex = new HashMap<>();
 
@@ -59,6 +59,23 @@ public class StreetSystem {
     }
     public StreetNode getNode(Vector2 p) {
         return nodes.get(sKey(p));
+    }
+    public StreetNode getClosestNode(Vector2 p, int limit) {
+        int[] key = keyOf(p);
+        StreetNode node = null;
+        float dst = 0;
+
+        for (int y = -limit; y <= limit; y++) {
+            for (int x = -limit; x <= limit; x++) {
+                StreetNode sn = nodes.get((key[0]+x) + "," + (key[1]+y));
+                if (sn == null) continue;
+                if (node == null || node.getPosition().dst(p) < dst) {
+                    node = sn;
+                    dst  = node.getPosition().dst(p);
+                }
+            }
+        }
+        return node;
     }
 
     public StreetNode closestOnCol(Vector2 p, int limit) {
