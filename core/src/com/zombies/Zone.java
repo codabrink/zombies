@@ -487,19 +487,17 @@ public class Zone {
         HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             for (Overlappable o : z.getOverlappables()) {
-                if (overlappable.overlaps(o)) {
-                    if (ignore != null && ignore.contains(o))
-                        continue;
+                if (ignore != null && ignore.contains(o))
+                    continue;
+                if (overlappable.overlaps(o))
                     return o;
-                }
             }
             synchronized (z.getPendingObjects()) {
                 for (Object o : z.getPendingObjects()) {
-                    if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o)) {
-                        if (ignore != null && ignore.contains(o))
-                            continue;
-                        return (Overlappable)o;
-                    }
+                    if (ignore != null && ignore.contains(o))
+                        continue;
+                    if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o))
+                        return (Overlappable) o;
                 }
             }
         }
