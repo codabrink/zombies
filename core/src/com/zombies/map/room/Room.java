@@ -46,7 +46,6 @@ public class Room implements Loadable, HasZone, Updateable {
     private Vector2 center;
 
     private Building building;
-    public HashSet<String> doors = new HashSet<>();
 
     public static Room createRoom(Building building, int[] key, int maxBoxes) {
         if (building.checkOverlap(key) != null)

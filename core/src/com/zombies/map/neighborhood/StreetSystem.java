@@ -23,25 +23,25 @@ public class StreetSystem {
     private HashMap<Integer, LinkedHashSet<StreetNode>> nodesColindex = new HashMap<>();
     private HashMap<Integer, LinkedHashSet<StreetNode>> nodesRowIndex = new HashMap<>();
 
-    private double                            orientation = 0;
+    private double orientation = 0;
 
-    public static void populateBox(Vector2 p, float w, float h, float resolution) {
-        StreetSystem ss = closestStreetSystem(p);
-        p = p.cpy();
-        for (float x = p.x; x <= p.x + w; x += resolution) {
-            for (float y = p.y; y <= p.y + h; y += resolution) {
-                StreetNode node = ss.getClosestNode(new Vector2(x, y), 1);
+    public static void populateBox(Vector2 point, float w, float h, float resolution) {
+        StreetSystem ss = closestStreetSystem(point);
+        for (float x = point.x; x <= point.x + w; x += resolution) {
+            for (float y = point.y; y <= point.y + h; y += resolution) {
+                Vector2 p = new Vector2(x, y);
+                StreetNode node = ss.getClosestNode(p, 1);
                 if (node != null) continue;
 
-                StreetNode row = ss.closestOnRow(p, 1);
-                StreetNode col = ss.closestOnCol(p, 1);
+                StreetNode row = ss.closestOnRow(p, 0);
+                StreetNode col = ss.closestOnCol(p, 0);
 
                 if (row != null)
                     p.set(p.x, row.getPosition().y);
                 if (col != null)
                     p.set(col.getPosition().x, p.y);
 
-                node = new Intersection(ss, p);
+                node = Intersection.createIntersection(ss, p);
 
                 if (row != null)
                     new Street(ss, node, row);
@@ -90,13 +90,14 @@ public class StreetSystem {
         connections.add(sc);
     }
     public StreetNode addNode(StreetNode sn) {
-        StreetNode node = nodes.get(sn.getKey());
+        StreetNode node = nodes.get(sKey(sn.getKey()));
         if (node != null)
             return node;
 
         getCache(nodesColindex, sn.getKey()[0]).add(sn);
         getCache(nodesRowIndex, sn.getKey()[1]).add(sn);
 
+        sn.getZone().addObject(sn);
         return nodes.put(sKey(sn.getKey()), sn);
     }
     public StreetNode getNode(Vector2 p) {
@@ -149,8 +150,12 @@ public class StreetSystem {
 
     private LinkedHashSet<StreetNode> getCache(HashMap<Integer, LinkedHashSet<StreetNode>> c, int i) {
         LinkedHashSet<StreetNode> cache = c.get(i);
-        if (cache == null)
-            return c.put(i, new LinkedHashSet<StreetNode>());
+        if (cache == null) {
+            cache = new LinkedHashSet<>();
+            c.put(i, cache);
+            return cache;
+        }
+
         return cache;
     }
     private Vector2 normalize(Vector2 v) { return normalize$(v.cpy()); }
@@ -158,10 +163,12 @@ public class StreetSystem {
     private Vector2 normalize$(Vector2 v) { return v.sub(center).rotateRad((float) -orientation); }
     private Vector2 denormalize$(Vector2 v) { return v.rotateRad((float) orientation).add(center); }
 
-    public Vector2 getCenter() { return center; }
     public  int[] keyOf(Vector2 p) { return normalizedKey(normalize(p)); }
     private int[] normalizedKey(Vector2 p) { return new int[]{ (int) Math.floor(p.x / GRIDSIZE), (int) Math.floor(p.y / GRIDSIZE) }; }
     private String sKey(int[] key) { return key[0] + "," + key[1]; }
     private String sKey(Vector2 p) { return (int) Math.floor(p.x / GRIDSIZE) + "," + (int) Math.floor(p.y / GRIDSIZE); }
     private String sKey(StreetNode sn) { return sKey(sn.getPosition()); }
+
+    public Vector2 getCenter() { return center; }
+    public LinkedHashMap<String, StreetNode> getNodes() { return nodes; }
 }

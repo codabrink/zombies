@@ -1,6 +1,7 @@
 package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.Zone;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.util.G;
@@ -13,6 +14,7 @@ public class Intersection implements StreetNode {
     private StreetSystem streetSystem;
     private Vector2      position;
     private int[] key;
+    private Zone zone;
     public LinkedHashMap<Double, StreetConnection> connections = new LinkedHashMap<>();
 
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
@@ -37,6 +39,7 @@ public class Intersection implements StreetNode {
         position     = p;
         key          = ss.keyOf(position);
         streetSystem = ss;
+        zone         = Zone.getZone(p);
         streetSystem.addNode(this);
     }
 
@@ -46,6 +49,11 @@ public class Intersection implements StreetNode {
 
     @Override
     public Vector2 getPosition() { return position; }
+
+    @Override
+    public Zone getZone() {
+        return zone;
+    }
 
     @Override
     public int[] getKey() {

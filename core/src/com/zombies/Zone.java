@@ -15,6 +15,7 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
@@ -27,7 +28,6 @@ import com.zombies.util.Bounds2;
 import com.zombies.util.ThreadedModelBuilder;
 import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,11 +95,12 @@ public class Zone {
 
     // Collections
 
-    private LinkedHashSet<Box> boxes = new LinkedHashSet<>();
-    private LinkedHashSet<Room> rooms = new LinkedHashSet<>();
-    private LinkedHashSet<Building> buildings = new LinkedHashSet<>();
-    private LinkedHashSet<Street> streets = new LinkedHashSet<>();
+    private LinkedHashSet<Box>           boxes          = new LinkedHashSet<>();
+    private LinkedHashSet<Room>          rooms          = new LinkedHashSet<>();
+    private LinkedHashSet<Building>      buildings      = new LinkedHashSet<>();
+    private LinkedHashSet<Street>        streets        = new LinkedHashSet<>();
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
+    private LinkedHashSet<StreetNode>    streetNodes    = new LinkedHashSet<>();
 
     private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
     private LinkedHashSet<Overlappable> overlappables = new LinkedHashSet<>();
@@ -376,9 +377,8 @@ public class Zone {
     }
     public Zone addObject(Object o) {
         if (o instanceof HasZone)
-            ((HasZone)o).setZone(this);
+            ((HasZone) o).setZone(this);
 
-        // KEEP RECORDS
         if (o instanceof Wall)
             addWall((Wall) o);
         if (o instanceof Building)
@@ -387,6 +387,9 @@ public class Zone {
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
+        if (o instanceof StreetNode)
+            streetNodes.add((StreetNode) o);
+
         if (o instanceof Overlappable)
             addOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -398,8 +401,9 @@ public class Zone {
 
         return this;
     }
-    public Zone removeObject(HasZone o) {
-        o.setZone(null);
+    public Zone removeObject(Object o) {
+        if (o instanceof HasZone)
+            ((HasZone) o).setZone(null);
 
         if (o instanceof Wall)
             removeWall((Wall) o);
@@ -409,6 +413,9 @@ public class Zone {
             removeRoom((Room) o);
         if (o instanceof Box)
             removeBox((Box) o);
+        if (o instanceof StreetNode)
+            streetNodes.remove((StreetNode) o);
+
         if (o instanceof Overlappable)
             removeOverlappable((Overlappable) o);
         if (o instanceof Loadable)
@@ -431,6 +438,7 @@ public class Zone {
     public LinkedHashSet<Building> getBuildings() { return buildings; }
     public LinkedHashSet<Street> getStreets() { return streets; }
     public LinkedHashSet<StreetSegment> getStreetSegments() { return streetSegments; }
+    public LinkedHashSet<StreetNode> getStreetNodes() { return streetNodes; }
 
     private void addBuilding(Building b) { buildings.add(b); }
     private void addRoom(Room r) {
