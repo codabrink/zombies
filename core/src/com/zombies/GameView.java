@@ -98,8 +98,6 @@ public class GameView implements Screen {
     public void reset() {
         gv = this;
 
-        Zone.zones = new HashMap<>();
-        Zone.loadedZones = new ArrayList<>();
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();
@@ -107,15 +105,15 @@ public class GameView implements Screen {
 
         player = new Player(new Vector2(0, 0));
 
-        camHandle = new CameraHandle(this);
-        thumbpadLeft = new ThumbpadLeft(this);
+        camHandle     = new CameraHandle(this);
+        thumbpadLeft  = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
-        mh = new MessageHandler(this);
+        mh            = new MessageHandler(this);
         //meshes.main.play();
 
         Gdx.input.setInputProcessor(hud);
 
-        modelBatch = new ModelBatch();
+        modelBatch  = new ModelBatch();
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(player.pointLight);
@@ -125,9 +123,9 @@ public class GameView implements Screen {
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
-        readyToModel    = Collections.synchronizedList(new ArrayList());
-        endableBuilders = Collections.synchronizedList(new ArrayList());
-        callbacks       = Collections.synchronizedList(new ArrayList());
+        readyToModel            = Collections.synchronizedList(new ArrayList());
+        endableBuilders         = Collections.synchronizedList(new ArrayList());
+        callbacks               = Collections.synchronizedList(new ArrayList());
 
         MapAdmin.reset = true;
 

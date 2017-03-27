@@ -86,7 +86,7 @@ public class Zone {
 
     // Static Variables
     public static HashMap<String, Zone> zones;
-    public static ArrayList<Zone> loadedZones;
+    public static HashSet<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
@@ -494,9 +494,13 @@ public class Zone {
                 }
             }
             synchronized (z.getPendingObjects()) {
-                for (Object o : z.getPendingObjects())
-                    if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o))
+                for (Object o : z.getPendingObjects()) {
+                    if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o)) {
+                        if (ignore != null && ignore.contains(o))
+                            continue;
                         return (Overlappable)o;
+                    }
+                }
             }
         }
         return null;

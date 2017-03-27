@@ -16,7 +16,7 @@ public class StreetSystem {
 
     public static LinkedHashSet<StreetSystem> systems = new LinkedHashSet<>();
 
-    public Vector2 center;
+    private Vector2 center;
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
     private LinkedHashMap<String, StreetNode>           nodes         = new LinkedHashMap<>();
@@ -59,13 +59,14 @@ public class StreetSystem {
 
     public static StreetSystem closestStreetSystem(Vector2 p) {
         StreetSystem streetSystem = null;
-        float dst;
+        float dst = 0;
         for (StreetSystem ss : systems) {
             if (streetSystem == null || ss.getCenter().dst(p) < dst) {
                 dst = ss.getCenter().dst(p);
                 streetSystem = ss;
             }
         }
+        return streetSystem;
     }
 
     public StreetConnection closestConnection(Vector2 p) {

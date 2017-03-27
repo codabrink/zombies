@@ -30,7 +30,7 @@ public class ZoneAndNeighborhoodTest {
 		instance.setScreen(new GameView());
         GameView.gv.reset();
 
-        Zone zone = Zone.getZone(0, 0);
+        Zone zone         = Zone.getZone(0, 0);
         Building building = Building.createBuilding(new Vector2(0, 0), 3);
 
         building.compile();
