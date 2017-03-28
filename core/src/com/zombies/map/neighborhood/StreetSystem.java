@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 public class StreetSystem {
-    public final static float GRIDSIZE = C.GRIDSIZE * 10;
+    public final static float GRIDSIZE = C.GRIDSIZE * 5;
     public final static float MAXGAP = GRIDSIZE * 3;
 
     public static LinkedHashSet<StreetSystem> systems = new LinkedHashSet<>();

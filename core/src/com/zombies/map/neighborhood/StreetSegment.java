@@ -10,6 +10,7 @@ import com.zombies.util.G;
 public class StreetSegment {
     public Vector2 p1, p2;
     public double angle;
+    private float width, height;
     private Vector2[] corners = new Vector2[4];
     private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
         @Override
@@ -19,9 +20,11 @@ public class StreetSegment {
     };
 
     public StreetSegment(Vector2 p1, Vector2 p2, double angle) {
-        this.p1 = p1;
-        this.p2 = p2;
+        this.p1    = p1;
+        this.p2    = p2;
         this.angle = angle;
+        width      = p1.dst(p2);
+        height     = Street.RADIUS * 2;
         Zone.getZone(p1).addModelingCallback(Assets.MATERIAL.STREET, modelFloorCallback);
 
         compile();
@@ -36,12 +39,13 @@ public class StreetSegment {
     }
 
     private void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        Vector2 relp = G.center(p1, p2).sub(modelCenter);
+
+        Vector2 relp = modelCenter;
         builder.rect(
-                corners[2].x + relp.x, corners[2].y + relp.y, 0,
-                corners[3].x + relp.x, corners[3].y + relp.y, 0,
-                corners[0].x + relp.x, corners[0].y + relp.y, 0,
-                corners[1].x + relp.x, corners[1].y + relp.y, 0,
+                corners[2].x - relp.x, corners[2].y - relp.y, 0,
+                corners[3].x - relp.x, corners[3].y - relp.y, 0,
+                corners[0].x - relp.x, corners[0].y - relp.y, 0,
+                corners[1].x - relp.x, corners[1].y - relp.y, 0,
                 1, 1, 1);
     }
 }

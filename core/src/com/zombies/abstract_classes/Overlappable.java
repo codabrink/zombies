@@ -79,13 +79,6 @@ public class Overlappable implements HasZone {
 
     @Override
     public void setZone(Zone z) {
-        this.zone = Zone.getZone(getCenter());
-
-        if (zonedPosition == position || System.currentTimeMillis() < zonedTimestamp + 1000l)
-            return;
-
-        zonedPosition = position;
-        zonedTimestamp = System.currentTimeMillis();
     }
 
     @Override

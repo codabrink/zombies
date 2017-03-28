@@ -35,7 +35,9 @@ public class Generator {
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            StreetSystem.populateBox(zone.getPosition(), C.ZONE_SIZE, C.ZONE_SIZE, StreetSystem.GRIDSIZE);
+            StreetSystem.populateBox(zone.getPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, StreetSystem.GRIDSIZE);
+            System.out.println(zone.getStreetSegments().size());
+            zone.rebuildModel();
             D.removeRunningThread(Thread.currentThread());
         }
     }
