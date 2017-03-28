@@ -26,7 +26,7 @@ public class Street extends Overlappable implements StreetConnection {
         return new Street(ss, n1, n2);
     }
 
-    protected Street(StreetSystem ss, StreetNode n1, StreetNode n2) {
+    private Street(StreetSystem ss, StreetNode n1, StreetNode n2) {
         p1 = n1.getPosition();
         p2 = n2.getPosition();
 

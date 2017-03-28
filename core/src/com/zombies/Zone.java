@@ -387,6 +387,11 @@ public class Zone {
             addRoom((Room) o);
         if (o instanceof Box)
             addBox((Box) o);
+
+        if (o instanceof Street)
+            streets.add((Street) o);
+        if (o instanceof StreetSegment)
+            streetSegments.add((StreetSegment) o);
         if (o instanceof StreetNode)
             streetNodes.add((StreetNode) o);
 

@@ -44,9 +44,9 @@ public class StreetSystem {
                 node = Intersection.createIntersection(ss, p);
 
                 if (row != null)
-                    new Street(ss, node, row);
+                    Street.createStreet(ss, node, row);
                 if (col != null)
-                    new Street(ss, node, col);
+                    Street.createStreet(ss, node, col);
             }
         }
     }
@@ -121,29 +121,39 @@ public class StreetSystem {
         return node;
     }
 
-    public StreetNode closestOnCol(Vector2 p, int limit) {
-        StreetNode result = null;
-        int[] key = keyOf(p);
-        int lower = key[0] - limit, upper = key[0] + limit;
-        for (int i = lower; i <= upper; i++) {
-            LinkedHashSet<StreetNode> cache = nodesColindex.get(i);
-            if (cache == null) continue;
-            for (StreetNode n : cache)
-                if (result == null || Math.abs(n.getKey()[1] - key[1]) < Math.abs(result.getKey()[1] - key[1]))
-                    result = n;
-        }
-        return result;
+
+    public StreetNode[] closestOnRow(Vector2 p, int limit) {
+        return closestOnCache(p, limit, nodesRowIndex);
     }
-    public StreetNode closestOnRow(Vector2 p, int limit) {
-        StreetNode result = null;
-        int[] key = keyOf(p);
-        int lower = key[1] - limit, upper = key[1] + limit;
+    public StreetNode[] closestOnCol(Vector2 p, int limit) {
+        return closestOnCache(p, limit, nodesColindex);
+    }
+    public StreetNode[] closestOnCache(Vector2 p, int limit, HashMap<Integer, LinkedHashSet<StreetNode>> index) {
+        int[]        key           = keyOf(p);
+        StreetNode[] result        = new StreetNode[2]; // 0 is closer to origin, 1 is further away
+        float[]      dst           = new float[2];
+        float        dstFromCenter = p.dst(center);
+        int          lower         = key[1] - limit, upper = key[1] + limit;
         for (int i = lower; i <= upper; i++) {
-            LinkedHashSet<StreetNode> cache = nodesRowIndex.get(i);
+            LinkedHashSet<StreetNode> cache = index.get(i);
             if (cache == null) continue;
-            for (StreetNode n : cache)
-                if (result == null || Math.abs(n.getKey()[0] - key[0]) < Math.abs(result.getKey()[0] - key[0]))
-                    result = n;
+            for (StreetNode n : cache) {
+                if (n.dstFromCenter() < dstFromCenter) {
+                    float tDst = n.getPosition().dst(p);
+                    if (!(result[0] == null || tDst < dst[0]))
+                        continue;
+
+                    dst[0]    = tDst;
+                    result[0] = n;
+                } else if (n.dstFromCenter() > dstFromCenter) {
+                    float tDst = n.getPosition().dst(p);
+                    if (!(result[1] == null || tDst < dst[1]))
+                        continue;
+
+                    dst[1]    = tDst;
+                    result[1] = n;
+                }
+            }
         }
         return result;
     }
@@ -171,4 +181,5 @@ public class StreetSystem {
 
     public Vector2 getCenter() { return center; }
     public LinkedHashMap<String, StreetNode> getNodes() { return nodes; }
+    public LinkedHashSet<StreetConnection> getConnections() { return connections; }
 }

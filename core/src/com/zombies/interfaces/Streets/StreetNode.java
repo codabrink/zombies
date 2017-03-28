@@ -9,4 +9,5 @@ public interface StreetNode {
     public Vector2 getPosition();
     public Zone getZone();
     public int[] getKey();
+    public float dstFromCenter();
 }
