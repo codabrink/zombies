@@ -24,7 +24,8 @@ public class Assets {
         GRASS ("grass", "data/texture/wildgrass.jpg"),
         GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
         FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
-        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
+        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg"),
+        STREET ("street", "data/neighborhood/street.jpg");
 
         public ZTexture texture;
         public String partName;

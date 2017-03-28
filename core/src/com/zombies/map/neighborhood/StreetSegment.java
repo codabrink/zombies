@@ -2,17 +2,27 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.Zone;
+import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.util.Assets;
 import com.zombies.util.G;
 
 public class StreetSegment {
     public Vector2 p1, p2;
     public double angle;
     private Vector2[] corners = new Vector2[4];
+    private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildMesh(builder, center);
+        }
+    };
 
     public StreetSegment(Vector2 p1, Vector2 p2, double angle) {
         this.p1 = p1;
         this.p2 = p2;
         this.angle = angle;
+        Zone.getZone(p1).addModelingCallback(Assets.MATERIAL.STREET, modelFloorCallback);
 
         compile();
     }

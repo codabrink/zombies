@@ -24,7 +24,7 @@ import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
-import com.zombies.map.thread.MapAdmin;
+import com.zombies.map.thread.Generator;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 import com.zombies.util.ThreadedModelBuilder;
@@ -90,9 +90,6 @@ public class GameView implements Screen {
         D.workers = new HashMap<>();
         D.workers.put(D.Worker.ROOM_DOOR, new Thread(new RoomDoorWorker()));
         D.workers.get(D.Worker.ROOM_DOOR).start();
-
-        D.workers.put(D.Worker.MAP_ADMIN, new Thread(new MapAdmin()));
-        D.workers.get(D.Worker.MAP_ADMIN).start();
     }
 
     public void reset() {
@@ -126,8 +123,6 @@ public class GameView implements Screen {
         readyToModel            = Collections.synchronizedList(new ArrayList());
         endableBuilders         = Collections.synchronizedList(new ArrayList());
         callbacks               = Collections.synchronizedList(new ArrayList());
-
-        MapAdmin.reset = true;
 
         System.gc();
     }
@@ -216,6 +211,8 @@ public class GameView implements Screen {
     protected void updateLoop() {
         mh.update();
         hud.update();
+
+        Generator.update();
 
         synchronized (readyToModel) {
             Iterator i = readyToModel.iterator();

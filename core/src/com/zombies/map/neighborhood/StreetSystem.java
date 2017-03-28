@@ -27,6 +27,7 @@ public class StreetSystem {
 
     public static void populateBox(Vector2 point, float w, float h, float resolution) {
         StreetSystem ss = closestStreetSystem(point);
+        if (ss == null) ss = new StreetSystem(new Vector2(0, 0));
         for (float x = point.x; x <= point.x + w; x += resolution) {
             for (float y = point.y; y <= point.y + h; y += resolution) {
                 Vector2 p = new Vector2(x, y);

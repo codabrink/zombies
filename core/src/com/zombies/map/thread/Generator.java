@@ -1,43 +1,42 @@
 package com.zombies.map.thread;
 
-import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.interfaces.Gridable;
-import com.zombies.map.HallwaySegment;
-import com.zombies.map.neighborhood.StreetSegment;
-import com.zombies.map.room.Building;
+import com.zombies.data.D;
+import com.zombies.map.neighborhood.StreetSystem;
 
 public class Generator {
-    public static void generateZone(Zone zone) {
-        // I know this is probably already set to GENERATING.
-        zone.genState = Zone.GENERATOR_STATE.GENERATING;
+    private static Thread thread;
 
-        // Generate roads
-        // Check if zone already has a road
-        if (zone.getStreetSegments().size() > 0) {
+    public static void update() {
+        if (thread != null && thread.isAlive())
+            return;
 
-        }
+        if (D.currentZone == null)
+            D.update();
 
-        // Search for nearby roads
-        final float streetSearchRadius = C.GRIDSIZE * 30;
-        for (Zone z : zone.getAdjZones(1)) {
-            for (StreetSegment ss : z.getStreetSegments()) {}
-                //if (G.distanceOfPointFromLine(ss.p1, ss.p2, zone.getCenter()) > streetSearchRadius)
+        for (Zone z: D.currentZone.getAdjZones(1)) {
+            if (z.genState != Zone.GENERATOR_STATE.UNINITIATED)
+                continue;
 
+            z.genState = Zone.GENERATOR_STATE.GENERATING;
+            thread = new Thread(new NeighborhoodGenerator(z));
+            thread.start();
+            break;
         }
     }
 
-    public static Building genFullBuilding(Gridable g, int direction) {
-        int[] key = Building.directionToBMKey(g.getKey(), direction);
-        Vector2 center = g.getBuilding().positionOf(key).add(C.GRID_HALF_SIZE, C.GRID_HALF_SIZE);
-        Building newBuilding = Building.createBuilding(center, 3);
-        if (newBuilding == null)
-            return null;
+    static class NeighborhoodGenerator implements Runnable {
+        private Zone zone;
+        public NeighborhoodGenerator(Zone zone) {
+            this.zone = zone;
+        }
 
-        if (g instanceof HallwaySegment)
-            ((HallwaySegment)g).connect(newBuilding.gridMapGet(new int[]{0, 0}), direction);
-
-        return newBuilding;
+        @Override
+        public void run() {
+            D.addRunningThread(Thread.currentThread());
+            StreetSystem.populateBox(zone.getPosition(), C.ZONE_SIZE, C.ZONE_SIZE, StreetSystem.GRIDSIZE);
+            D.removeRunningThread(Thread.currentThread());
+        }
     }
 }

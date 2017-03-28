@@ -31,12 +31,11 @@ public class StreetSystemTest {
 
         zone.update();
 
-
-        System.out.println(ss.getNodes().size());
+        System.out.println("Street System node count: " + ss.getNodes().size());
         System.out.println("Zone node count: " + zone.getStreetNodes().size());
         System.out.println("Zone street count: " + zone.getStreets().size());
         System.out.println("Zone street segment count: " + zone.getStreetSegments().size());
-        System.out.println(Zone.zones.size());
+        System.out.println("Zone count: " + Zone.zones.size());
 
         assertTrue(zone.getStreetNodes().size() > 0);
     }
