@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
@@ -44,9 +45,18 @@ public class Zone {
         public void response(Model m) {
             if (model != null)
                 model.dispose();
+            if (modelCache != null)
+                modelCache.dispose();
             model = m;
             modelInstance = new ModelInstance(model);
             modelInstance.transform.setTranslation(center.x, center.y, 0);
+
+            modelCache = new ModelCache();
+            modelCache.begin();
+            modelCache.add(modelInstance);
+            for (ModelInstance instance : modelInstances)
+                modelCache.add(instance);
+            modelCache.end();
         }
     });
     private Thread modelingThread;
@@ -80,6 +90,8 @@ public class Zone {
 
     private Model model;
     private ModelInstance modelInstance;
+    private ModelCache modelCache;
+    private LinkedHashSet<ModelInstance> modelInstances = new LinkedHashSet<>();
 
     public enum GENERATOR_STATE { UNINITIATED, GENERATING, GENERATED }
     public GENERATOR_STATE genState = GENERATOR_STATE.UNINITIATED;
@@ -103,12 +115,12 @@ public class Zone {
     private LinkedHashSet<StreetNode>    streetNodes    = new LinkedHashSet<>();
 
     private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
-    private LinkedHashSet<Overlappable> overlappables = new LinkedHashSet<>();
-    private LinkedHashSet<Updateable> updateables = new LinkedHashSet<>();
-    private LinkedHashSet<Wall> walls = new LinkedHashSet<>();
-    private LinkedHashSet<Loadable> loadables = new LinkedHashSet<>();
-    private LinkedHashSet<Drawable> drawables = new LinkedHashSet<>();
-    private LinkedHashSet<Drawable> debugLines = new LinkedHashSet<>();
+    private Set<Overlappable> overlappables                      = Collections.synchronizedSet(new LinkedHashSet<Overlappable>());
+    private LinkedHashSet<Updateable> updateables                = new LinkedHashSet<>();
+    private LinkedHashSet<Wall> walls                            = new LinkedHashSet<>();
+    private LinkedHashSet<Loadable> loadables                    = new LinkedHashSet<>();
+    private LinkedHashSet<Drawable> drawables                    = new LinkedHashSet<>();
+    private LinkedHashSet<Drawable> debugLines                   = new LinkedHashSet<>();
 
     private Set pendingObjects = Collections.synchronizedSet(new LinkedHashSet());
 
@@ -158,7 +170,7 @@ public class Zone {
         if (modelInstance == null)
             return;
         GameView.gv.modelBatch.begin(GameView.gv.getCamera());
-        GameView.gv.modelBatch.render(modelInstance, GameView.outsideEnvironment);
+        GameView.gv.modelBatch.render(modelCache, GameView.outsideEnvironment);
         GameView.gv.modelBatch.end();
     }
 
@@ -171,7 +183,16 @@ public class Zone {
         synchronized (pendingObjects) {
             Iterator i = pendingObjects.iterator();
             while (i.hasNext()) {
-                addObject((HasZone) i.next());
+                Object o = i.next();
+                if (o instanceof ModelInstance) {
+                    modelInstances.add((ModelInstance) o);
+                    i.remove();
+                    if (modelInstance != null)
+                        rebuildModel();
+                    continue;
+                }
+
+                addObject(o);
                 i.remove();
             }
         }
@@ -436,7 +457,7 @@ public class Zone {
     public String getKey() { return (int)Math.floor(position.x / C.ZONE_SIZE) + "," + (int)Math.floor(position.y / C.ZONE_SIZE); }
     public Vector2 getPosition() { return position; }
     public Vector2 getCenter() { return center; }
-    public LinkedHashSet<Overlappable> getOverlappables() { return overlappables; }
+    private Set<Overlappable> getOverlappables() { return overlappables; }
     public Set getPendingObjects() { return pendingObjects; }
     public LinkedHashSet<Box> getBoxes() { return boxes; }
     public LinkedHashSet<Room> getRooms() { return rooms; }
@@ -499,11 +520,14 @@ public class Zone {
     public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
         HashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
-            for (Overlappable o : z.getOverlappables()) {
-                if (ignore != null && ignore.contains(o))
-                    continue;
-                if (overlappable.overlaps(o))
-                    return o;
+            Set<Overlappable> overlappables = z.getOverlappables();
+            synchronized (overlappables) {
+                for (Overlappable o : overlappables) {
+                    if (ignore != null && ignore.contains(o))
+                        continue;
+                    if (overlappable.overlaps(o))
+                        return o;
+                }
             }
             synchronized (z.getPendingObjects()) {
                 for (Object o : z.getPendingObjects()) {

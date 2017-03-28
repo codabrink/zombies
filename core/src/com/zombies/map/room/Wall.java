@@ -38,18 +38,6 @@ public class Wall implements Collideable, Loadable, HasZone {
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
 
-    private static Texture texture;
-    private static TextureAttribute textureAttribute;
-    private static Material material;
-    static {
-        texture = Assets.a.get("data/room/wall/wall.jpg", Texture.class);
-        texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
-                new TextureDescriptor<>(texture),
-                0, 0, 1, 1);
-        material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
-    }
-
     protected ArrayList<WallPoint>   points   = new ArrayList<>();
     protected ArrayList<WallSegment> segments = new ArrayList<>();
 

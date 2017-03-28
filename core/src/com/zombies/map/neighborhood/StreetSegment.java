@@ -1,33 +1,49 @@
 package com.zombies.map.neighborhood;
 
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
-import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.util.Assets;
 import com.zombies.util.G;
+import com.zombies.util.ThreadedModelBuilder;
 
 public class StreetSegment {
-    public Vector2 p1, p2;
+    public Vector2 p1, p2, center;
     public double angle;
     private float width, height;
     private Vector2[] corners = new Vector2[4];
-    private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
+    private Zone zone;
+    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
         @Override
-        public void buildModel(MeshPartBuilder builder, Vector2 center) {
-            buildMesh(builder, center);
+        public void response(Model model) {
+            ModelInstance modelInstance = new ModelInstance(model);
+            modelInstance.transform.setTranslation(center.x, center.y, 0);
+            modelInstance.transform.rotateRad(Vector3.Z, (float) angle);
+
+            zone.addPendingObject(modelInstance);
         }
-    };
+    });
 
     public StreetSegment(Vector2 p1, Vector2 p2, double angle) {
         this.p1    = p1;
         this.p2    = p2;
         this.angle = angle;
+
+        center = G.center(p1, p2);
         width      = p1.dst(p2);
         height     = Street.RADIUS * 2;
-        Zone.getZone(p1).addModelingCallback(Assets.MATERIAL.STREET, modelFloorCallback);
 
+        zone = Zone.getZone(p1);
         compile();
+
+        buildMesh();
     }
 
     private void compile() {
@@ -38,14 +54,17 @@ public class StreetSegment {
         corners[3] = new Vector2(G.projectVector(p1, angle + G.PIHALF, Street.RADIUS));
     }
 
-    private void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-
-        Vector2 relp = modelCenter;
+    private void buildMesh() {
+        modelBuilder.begin();
+        MeshPartBuilder builder = modelBuilder.part("street",
+                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                new Material(Assets.MATERIAL.STREET.texture.textureAttribute));
         builder.rect(
-                corners[2].x - relp.x, corners[2].y - relp.y, 0,
-                corners[3].x - relp.x, corners[3].y - relp.y, 0,
-                corners[0].x - relp.x, corners[0].y - relp.y, 0,
-                corners[1].x - relp.x, corners[1].y - relp.y, 0,
+                -width / 2, -height / 2, 0,
+                width / 2,  -height / 2, 0,
+                width / 2, height / 2, 0,
+                -width / 2, height / 2, 0,
                 1, 1, 1);
+        modelBuilder.finish();
     }
 }

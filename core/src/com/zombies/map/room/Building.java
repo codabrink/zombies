@@ -27,7 +27,7 @@ public class Building implements HasZone {
 
     public static Building createBuilding(Vector2 c, int maxRooms) {
         Zone z = Zone.getZone(c);
-        float bufferRadius = C.GRIDSIZE * 5;
+        float bufferRadius = C.GRIDSIZE * 2;
         float bufferDiameter = bufferRadius * 2;
         if (z.checkOverlap(new Overlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
             return null;

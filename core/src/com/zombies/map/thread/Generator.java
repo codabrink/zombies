@@ -4,6 +4,7 @@ import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.data.D;
 import com.zombies.map.neighborhood.StreetSystem;
+import com.zombies.map.room.Building;
 
 public class Generator {
     private static Thread thread;
@@ -37,6 +38,7 @@ public class Generator {
             D.addRunningThread(Thread.currentThread());
             StreetSystem.populateBox(zone.getPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, StreetSystem.GRIDSIZE);
             System.out.println(zone.getStreetSegments().size());
+            Building.createBuilding(zone.getCenter(), 3);
             zone.rebuildModel();
             D.removeRunningThread(Thread.currentThread());
         }

@@ -12,7 +12,7 @@ import com.zombies.util.G;
 import java.util.LinkedHashSet;
 
 public class Street extends Overlappable implements StreetConnection {
-    public static final float RADIUS = 1f;
+    public static final float RADIUS = 3f;
 
     private StreetSystem streetSystem;
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
