@@ -87,6 +87,9 @@ public class Room implements Loadable, HasZone, Updateable {
             key = (int[]) U.random(b.getOpenAdjKeys());
             b = Box.createBox(this, key);
 
+            if (b == null)
+                continue;
+
             cx += b.getCenter().x;
             cy += b.getCenter().y;
         }

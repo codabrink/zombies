@@ -21,6 +21,9 @@ public class Overlappable implements HasZone {
 
     public Overlappable() {}
 
+    public Overlappable(Vector2[] corners) {
+        setCorners(corners);
+    }
     public Overlappable(Vector2 position, float width, float height) {
         setCorners(new Vector2[]{
                 position,

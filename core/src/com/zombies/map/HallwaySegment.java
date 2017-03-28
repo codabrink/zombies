@@ -62,7 +62,7 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-        Zone.getZone(getCenter()).addObject(this);
+        Zone.getZone(getCenter()).addPendingObject(this);
     }
 
     public void connect(Gridable g, int direction) {

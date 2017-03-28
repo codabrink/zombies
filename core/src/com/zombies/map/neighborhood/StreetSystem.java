@@ -31,7 +31,7 @@ public class StreetSystem {
         for (float x = point.x; x <= point.x + w; x += resolution) {
             for (float y = point.y; y <= point.y + h; y += resolution) {
                 Vector2 p = new Vector2(x, y);
-                StreetNode node = ss.getClosestNode(p, 1);
+                StreetNode node = ss.getClosestNode(p, 0);
                 if (node != null) continue;
 
                 StreetNode[] row = ss.closestOnRow(p, 0);
@@ -102,7 +102,7 @@ public class StreetSystem {
         getCache(nodesColindex, sn.getKey()[0]).add(sn);
         getCache(nodesRowIndex, sn.getKey()[1]).add(sn);
 
-        sn.getZone().addObject(sn);
+        sn.getZone().addPendingObject(sn);
         return nodes.put(sKey(sn.getKey()), sn);
     }
     public StreetNode getNode(Vector2 p) {

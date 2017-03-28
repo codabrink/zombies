@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Vector3;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.D;
@@ -396,7 +397,7 @@ public class Zone {
         }
         return this;
     }
-    public Zone addObject(Object o) {
+    private Zone addObject(Object o) {
         if (o instanceof HasZone)
             ((HasZone) o).setZone(this);
 
@@ -512,6 +513,9 @@ public class Zone {
     }
     private void removeUpdateable(Updateable u) {
         updateables.remove(u);
+    }
+    public Vector2 randomPosition() {
+        return new Vector2(position.x + r.nextFloat() * C.ZONE_SIZE, position.y + r.nextFloat() + C.ZONE_SIZE);
     }
 
     public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }

@@ -63,6 +63,8 @@ public class Building implements HasZone {
         while(rooms.size() < maxRooms && loops < maxRooms * C.ERROR_TOLERANCE) {
             loops++;
             Box b = (Box) U.random(getOuterBoxes());
+            if (b == null)
+                continue;
             key   = (int[]) U.random(b.getOpenAdjKeys());
             Room.createRoom(this, key, preferredRoomSize);
         }

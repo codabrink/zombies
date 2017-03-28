@@ -48,6 +48,9 @@ public class DoorFrame {
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
 
+        if (builder == null || bounds == null)
+            System.out.println("What?");
+
         boxShapeBuilder.build(builder, bounds);
 
         min = new Vector3(-0.4f, -0.4f, 0);

@@ -9,12 +9,13 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
+import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.util.Assets;
 import com.zombies.util.G;
 import com.zombies.util.ThreadedModelBuilder;
 
-public class StreetSegment {
+public class StreetSegment extends Overlappable {
     public Vector2 p1, p2, center;
     public double angle;
     private float width, height;
@@ -52,6 +53,8 @@ public class StreetSegment {
         corners[1] = new Vector2(G.projectVector(p2, angle + G.THRPIHALF, Street.RADIUS));
         corners[2] = new Vector2(G.projectVector(p2, angle + G.PIHALF, Street.RADIUS));
         corners[3] = new Vector2(G.projectVector(p1, angle + G.PIHALF, Street.RADIUS));
+
+        setCorners(corners);
     }
 
     private void buildMesh() {

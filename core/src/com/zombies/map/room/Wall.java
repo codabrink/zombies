@@ -60,7 +60,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         zone = Zone.getZone(p1);
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
-            z.addObject(this);
+            z.addPendingObject(this);
 
         genSegmentsFromPoints();
     }

@@ -73,7 +73,7 @@ public class Survivor extends Unit implements Collideable {
     @Override
     protected void updateZone() {
         zone = Zone.getZone(body.getPosition());
-        zone.addObject(this);
+        zone.addPendingObject(this);
     }
 
 

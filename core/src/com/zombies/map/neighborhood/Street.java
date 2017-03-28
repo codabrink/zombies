@@ -23,14 +23,32 @@ public class Street extends Overlappable implements StreetConnection {
     private boolean compiled = false;
 
     public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
-        return new Street(ss, n1, n2);
+        Vector2 p1 = n1.getPosition();
+        Vector2 p2 = n2.getPosition();
+        double angle = G.getAngle(p1, p2);
+        Overlappable overlappable = new Overlappable(getCorners(p1, p2, angle, RADIUS));
+
+        for (Zone z : Zone.zonesOnLine(p1, p2))
+            if (z.checkOverlap(overlappable, 0, null) != null)
+                return null;
+
+        return new Street(ss, n1, n2, angle, overlappable.getCorners());
     }
 
-    private Street(StreetSystem ss, StreetNode n1, StreetNode n2) {
+    public static Vector2[] getCorners(Vector2 p1, Vector2 p2, double angle, float radius) {
+        return new Vector2[]{
+                G.projectVector(p1, angle - G.PIHALF, radius),
+                G.projectVector(p2, angle - G.PIHALF, radius),
+                G.projectVector(p2, angle + G.PIHALF, radius),
+                G.projectVector(p1, angle + G.PIHALF, radius)
+        };
+    }
+
+    private Street(StreetSystem ss, StreetNode n1, StreetNode n2, double angle, Vector2[] corners) {
         p1 = n1.getPosition();
         p2 = n2.getPosition();
 
-        angle = G.getAngle(p1, p2);
+        this.angle = angle;
         this.n1 = n1;
         this.n2 = n2;
 
@@ -46,15 +64,10 @@ public class Street extends Overlappable implements StreetConnection {
         for (Zone z : Zone.zonesOnLine(p1, p2)) {
             z.addPendingObject(this);
             Bounds2 bounds = Bounds2.crop(z.bounds, p1, dx, dy);
-            z.addObject(new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle));
+            z.addPendingObject(new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle));
         }
 
-        setCorners(new Vector2[]{
-                G.projectVector(p1, angle - G.PIHALF, RADIUS),
-                G.projectVector(p2, angle - G.PIHALF, RADIUS),
-                G.projectVector(p2, angle + G.PIHALF, RADIUS),
-                G.projectVector(p1, angle + G.PIHALF, RADIUS)
-        });
+        setCorners(corners);
     }
 
     public void compile() {
