@@ -33,20 +33,24 @@ public class StreetSystem {
                 StreetNode node = ss.getClosestNode(p, 1);
                 if (node != null) continue;
 
-                StreetNode row = ss.closestOnRow(p, 0);
-                StreetNode col = ss.closestOnCol(p, 0);
+                StreetNode[] row = ss.closestOnRow(p, 0);
+                StreetNode[] col = ss.closestOnCol(p, 0);
 
-                if (row != null)
-                    p.set(p.x, row.getPosition().y);
-                if (col != null)
-                    p.set(col.getPosition().x, p.y);
+                if (row[0] != null)
+                    p.set(p.x, row[0].getPosition().y);
+                if (col[0] != null)
+                    p.set(col[0].getPosition().x, p.y);
 
                 node = Intersection.createIntersection(ss, p);
 
-                if (row != null)
-                    Street.createStreet(ss, node, row);
-                if (col != null)
-                    Street.createStreet(ss, node, col);
+                if (row[0] != null)
+                    Street.createStreet(ss, node, row[0]);
+                if (row[1] != null)
+                    Street.createStreet(ss, node, row[1]);
+                if (col[0] != null)
+                    Street.createStreet(ss, node, col[0]);
+                if (col[1] != null)
+                    Street.createStreet(ss, node, col[1]);
             }
         }
     }
