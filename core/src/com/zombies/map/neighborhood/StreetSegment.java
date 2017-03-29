@@ -25,8 +25,8 @@ public class StreetSegment extends Overlappable {
         @Override
         public void response(Model model) {
             ModelInstance modelInstance = new ModelInstance(model);
-            modelInstance.transform.setTranslation(center.x, center.y, 0);
             modelInstance.transform.rotateRad(Vector3.Z, (float) angle);
+            modelInstance.transform.setTranslation(center.x, center.y, 0);
 
             zone.addPendingObject(modelInstance);
         }
@@ -42,6 +42,7 @@ public class StreetSegment extends Overlappable {
         height     = Street.RADIUS * 2;
 
         zone = Zone.getZone(p1);
+        zone.addPendingObject(this);
         compile();
 
         buildMesh();

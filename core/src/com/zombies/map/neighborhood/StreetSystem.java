@@ -25,22 +25,27 @@ public class StreetSystem {
 
     private double orientation = 0;
 
-    public static void populateBox(Vector2 point, float w, float h, float resolution) {
+    public static void populateBox(Vector2 point, float w, float h, int resolution) {
         StreetSystem ss = closestStreetSystem(point);
         if (ss == null) ss = new StreetSystem(new Vector2(0, 0));
-        for (float x = point.x; x <= point.x + w; x += resolution) {
-            for (float y = point.y; y <= point.y + h; y += resolution) {
-                Vector2 p = new Vector2(x, y);
-                StreetNode node = ss.getClosestNode(p, 0);
+        int[] key = ss.keyOf(point);
+
+        int xLow  = key[0] - (int) Math.floor(w / GRIDSIZE);
+        int xHigh = key[0] + (int) Math.floor(w / GRIDSIZE);
+        int yLow  = key[1] - (int) Math.floor(h / GRIDSIZE);
+        int yHigh = key[1] + (int) Math.floor(h / GRIDSIZE);
+
+        for (int x = xLow; x <= xHigh; x += resolution) {
+            for (int y = yLow; y <= yHigh; y += resolution) {
+                key[0] = x; key[1] = y;
+
+                StreetNode node = ss.getNode(key);
                 if (node != null) continue;
 
-                StreetNode[] row = ss.closestOnRow(p, 0);
-                StreetNode[] col = ss.closestOnCol(p, 0);
+                Vector2 p = ss.positionOf(key);
 
-                if (row[0] != null)
-                    p.set(p.x, row[0].getPosition().y);
-                if (col[0] != null)
-                    p.set(col[0].getPosition().x, p.y);
+                StreetNode[] row = ss.closestOnRow(key, p, 0);
+                StreetNode[] col = ss.closestOnCol(key, p, 0);
 
                 node = Intersection.createIntersection(ss, p);
 
@@ -108,6 +113,7 @@ public class StreetSystem {
     public StreetNode getNode(Vector2 p) {
         return nodes.get(sKey(p));
     }
+    public StreetNode getNode(int[] key) { return nodes.get(sKey(key)); }
     public StreetNode getClosestNode(Vector2 p, int limit) {
         int[] key = keyOf(p);
         StreetNode node = null;
@@ -127,18 +133,17 @@ public class StreetSystem {
     }
 
 
-    public StreetNode[] closestOnRow(Vector2 p, int limit) {
-        return closestOnCache(p, limit, nodesRowIndex);
+    public StreetNode[] closestOnRow(int[] key, Vector2 p, int limit) {
+        return closestOnCache(key[1], p, limit, nodesRowIndex);
     }
-    public StreetNode[] closestOnCol(Vector2 p, int limit) {
-        return closestOnCache(p, limit, nodesColindex);
+    public StreetNode[] closestOnCol(int[] key, Vector2 p, int limit) {
+        return closestOnCache(key[0], p, limit, nodesColindex);
     }
-    public StreetNode[] closestOnCache(Vector2 p, int limit, HashMap<Integer, LinkedHashSet<StreetNode>> index) {
-        int[]        key           = keyOf(p);
+    public StreetNode[] closestOnCache(int key, Vector2 p, int limit, HashMap<Integer, LinkedHashSet<StreetNode>> index) {
         StreetNode[] result        = new StreetNode[2]; // 0 is closer to origin, 1 is further away
         float[]      dst           = new float[2];
         float        dstFromCenter = p.dst(center);
-        int          lower         = key[1] - limit, upper = key[1] + limit;
+        int          lower         = key - limit, upper = key + limit;
         for (int i = lower; i <= upper; i++) {
             LinkedHashSet<StreetNode> cache = index.get(i);
             if (cache == null) continue;
@@ -178,7 +183,14 @@ public class StreetSystem {
     private Vector2 normalize$(Vector2 v) { return v.sub(center).rotateRad((float) -orientation); }
     private Vector2 denormalize$(Vector2 v) { return v.rotateRad((float) orientation).add(center); }
 
+    public Vector2 snap$(Vector2 p) {
+        int[] key = keyOf(p);
+        return denormalize$(p.set(key[0] * GRIDSIZE, key[1] * GRIDSIZE));
+    }
     public  int[] keyOf(Vector2 p) { return normalizedKey(normalize(p)); }
+    public  Vector2 positionOf(int[] key) {
+        return denormalize$(new Vector2(key[0] * GRIDSIZE, key[1] * GRIDSIZE));
+    }
     private int[] normalizedKey(Vector2 p) { return new int[]{ (int) Math.floor(p.x / GRIDSIZE), (int) Math.floor(p.y / GRIDSIZE) }; }
     private String sKey(int[] key) { return key[0] + "," + key[1]; }
     private String sKey(Vector2 p) { return (int) Math.floor(p.x / GRIDSIZE) + "," + (int) Math.floor(p.y / GRIDSIZE); }

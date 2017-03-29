@@ -8,19 +8,12 @@ import com.zombies.util.G;
 import com.zombies.util.LineSegment;
 import com.zombies.util.U;
 
-public class Overlappable implements HasZone {
-    public float         width, height;
-    protected Vector2    position, center;
-    protected Vector2[]    corners;
+public class Overlappable {
+    protected Vector2    center;
+    protected Vector2[]  corners;
     public LineSegment[] lines;
 
-    private Vector2 zonedPosition = null;
-    private long zonedTimestamp = 0l;
-
-    protected Zone zone;
-
     public Overlappable() {}
-
     public Overlappable(Vector2[] corners) {
         setCorners(corners);
     }
@@ -65,28 +58,12 @@ public class Overlappable implements HasZone {
         return false;
     }
 
-    public boolean contains(float x, float y) {
-        return G.rectContains(x, y, position, width, height);
-    }
-
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-
     private void checkForOversizing() {
         float max = 0;
         for (int i = 1; i < corners.length; i++)
             max = Math.max(max, corners[i - 1].dst(corners[i]));
         if (max > C.ZONE_SIZE * (C.DRAW_DISTANCE + 1))
             System.out.println("Overlappable: ERROR! Object is too large to render properly.");
-    }
-
-    @Override
-    public void setZone(Zone z) {
-    }
-
-    @Override
-    public Zone getZone() {
-        return zone;
     }
 
     public int closestCornerTo(Overlappable o) {
@@ -101,5 +78,29 @@ public class Overlappable implements HasZone {
             closestIndex    = i;
         }
         return closestIndex;
+    }
+
+    public boolean isInside(Vector2 p1) {
+
+    }
+
+    public Vector2[] cropLine(Vector2 p1, Vector2 p2) {
+        Vector2[] result = new Vector2[2];
+
+    }
+
+    public Vector2 lineIntersect(Vector2 p1, Vector2 p2) {
+        Vector2 result = null;
+        float intersectionDst = 0;
+        LineSegment lineSegment = new LineSegment(p1, p2);
+        for (LineSegment ls : lines) {
+            Vector2 intersection = ls.intersectionPoint(lineSegment);
+            if (intersection == null) continue;
+            if (!(result == null || intersection.dst(p1) < intersectionDst)) continue;
+
+            intersectionDst = intersection.dst(p1);
+            result          = intersection;
+        }
+        return result;
     }
 }

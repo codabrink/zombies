@@ -64,7 +64,7 @@ public class Street extends Overlappable implements StreetConnection {
         for (Zone z : Zone.zonesOnLine(p1, p2)) {
             z.addPendingObject(this);
             Bounds2 bounds = Bounds2.crop(z.bounds, p1, dx, dy);
-            z.addPendingObject(new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle));
+            new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle);
         }
 
         setCorners(corners);

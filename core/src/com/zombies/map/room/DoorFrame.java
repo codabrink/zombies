@@ -34,6 +34,8 @@ public class DoorFrame {
     }
 
     public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+        if (true)
+            return;
         BoundingBox bounds;
         Vector3 min, max;
 
@@ -47,9 +49,6 @@ public class DoorFrame {
         mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, frameTop);
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
-
-        if (builder == null || bounds == null)
-            System.out.println("What?");
 
         boxShapeBuilder.build(builder, bounds);
 

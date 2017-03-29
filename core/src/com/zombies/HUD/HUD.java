@@ -76,6 +76,11 @@ public class HUD implements InputProcessor{
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             view.getPlayer().getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
+            C.DRAW_DISTANCE++;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
+            C.DRAW_DISTANCE--;
     }
 
     @Override

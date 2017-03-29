@@ -1,14 +1,21 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.abstract_classes.Overlappable;
 
-public class Bounds2 {
+public class Bounds2 extends Overlappable {
     public float x, y, w, h;
 
     public Bounds2() {
         x = 0; y = 0; w = 0; h = 0;
     }
     public Bounds2(float x, float y, float w, float h) {
+        super(new Vector2[]{
+                new Vector2(x, y),
+                new Vector2(x + w, y),
+                new Vector2(x + w, y + h),
+                new Vector2(x, y + h)});
+
         this.x = x;
         this.y = y;
         this.w = w;

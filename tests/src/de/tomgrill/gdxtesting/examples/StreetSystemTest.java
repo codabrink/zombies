@@ -27,7 +27,7 @@ public class StreetSystemTest {
 
         Zone zone = Zone.getZone(0, 0);
         StreetSystem ss = new StreetSystem(new Vector2(0, 0));
-        StreetSystem.populateBox(new Vector2(0, 0), C.ZONE_SIZE * 10, C.ZONE_SIZE * 10, StreetSystem.GRIDSIZE);
+        StreetSystem.populateBox(new Vector2(0, 0), C.ZONE_SIZE * 10, C.ZONE_SIZE * 10, 1);
 
         zone.update();
 
