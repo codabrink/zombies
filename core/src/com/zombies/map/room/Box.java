@@ -26,6 +26,7 @@ public class Box extends Overlappable implements Gridable {
     public HashSet<DoorContainer> doors = new HashSet<>();
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
+    private Zone zone;
 
     private Building building;
     private Room room;
@@ -219,9 +220,6 @@ public class Box extends Overlappable implements Gridable {
         zone.removeModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
         zone.removeObject(this);
     }
-
-    @Override
-    public void setZone(Zone z) {}
 
     public String giveKey(Box b) {
         return Math.min(id, b.getId()) + "," + Math.max(id, b.getId());

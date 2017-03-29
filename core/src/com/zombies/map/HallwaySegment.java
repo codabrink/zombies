@@ -171,14 +171,6 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         for (Wall w: walls)
             w.unload();
     }
-    @Override
-    public Zone getZone() {
-        return zone;
-    }
-    @Override
-    public void setZone(Zone z) {
-        zone = z;
-    }
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);

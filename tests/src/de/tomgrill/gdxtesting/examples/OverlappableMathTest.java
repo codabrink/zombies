@@ -2,6 +2,7 @@ package de.tomgrill.gdxtesting.examples;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.util.G;
 
 import static org.junit.Assert.assertTrue;
 
@@ -17,11 +18,16 @@ public class OverlappableMathTest {
 
         assertTrue(o1.overlaps(o2));
         assertTrue(!o1.overlaps(o3));
+        assertTrue(o1.contains(50, 50));
+        assertTrue(!o1.contains(150, 150));
 
         long start = System.currentTimeMillis(), end;
         for (int i = 0; i < 1000000; i++)
             o1.overlaps(o2);
         end = System.currentTimeMillis();
         System.out.println("A million square overlap tests took " + (end - start) + " milliseconds.");
+
+        float[] line = G.line(new Vector2(2, 3), new Vector2(3, 3));
+        float[] line2 = G.line(new Vector2(0, 3), new Vector2(2, 3));
     }
 }

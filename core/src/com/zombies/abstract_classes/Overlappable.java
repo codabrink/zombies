@@ -6,10 +6,12 @@ import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.util.G;
 import com.zombies.util.LineSegment;
+import com.zombies.util.Ray;
 import com.zombies.util.U;
 
 public class Overlappable {
-    protected Vector2    center;
+    public float width, height;
+    protected Vector2    position, center;
     protected Vector2[]  corners;
     public LineSegment[] lines;
 
@@ -80,13 +82,23 @@ public class Overlappable {
         return closestIndex;
     }
 
-    public boolean isInside(Vector2 p1) {
-
+    public boolean contains(float x, float y) {
+        return contains(new Vector2(x, y));
     }
+    public boolean contains(Vector2 p) {
+        Ray r = new Ray(p);
+        int count = 0;
+        for (LineSegment line : lines) {
+            if (line.intersectionPoint(r) != null)
+                count++;
+        }
+        return !((count & 1) == 0);
+    }
+
 
     public Vector2[] cropLine(Vector2 p1, Vector2 p2) {
         Vector2[] result = new Vector2[2];
-
+        return null;
     }
 
     public Vector2 lineIntersect(Vector2 p1, Vector2 p2) {
@@ -103,4 +115,7 @@ public class Overlappable {
         }
         return result;
     }
+
+    public float getHeight() { return height;}
+    public float getWidth() { return width; }
 }

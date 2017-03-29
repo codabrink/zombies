@@ -27,64 +27,28 @@ public class G {
         return (float)distance;
     }
 
-    private static boolean inRange(float value, float a, float b) {
+    public static boolean inRange(float value, float a, float b) {
         return value > a && value < b || value < a && value > b;
     }
-    private static boolean inRangeInclusive(float value, float a, float b) {
+    public static boolean inRangeInclusive(float value, float a, float b) {
         return value >= a && value <= b || value <= a && value >= b;
     }
 
-    // get lineIntersectionPoint point of a line and a box
-    public static Vector2 edgeIntersection(Vector2 lp1, Vector2 lp2, Overlappable o) {
-        Vector2 position;
-
-        double theta = getAngle(o.getCenter(), lp1);
-        double cTheta = Math.atan2(o.getHeight() / 2, o.getWidth() / 2); // corner theta
-
-        U.p("theta: " + theta + ", cTheta: " + cTheta);
-
-        if (Math.abs(theta) < Math.abs(cTheta)) { // right wall
-            U.p("Intersecting right wall");
-            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[3])) != null)
-                return position;
-        }
-        if (theta > 0 && theta > cTheta && theta < Math.PI - cTheta) { // top wall
-            U.p("Intersecting top wall");
-            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[0], o.getCorners()[1])) != null)
-                return position;
-        }
-        if (theta < 0 && theta < -cTheta && theta > -(Math.PI - cTheta)) { // bottom wall
-            U.p("Intersecting bottom wall");
-            if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[2], o.getCorners()[3])) != null)
-                return position;
-        }
-        U.p("Default: Intersecting left wall");
-        // otherwise, assume left wall
-        if ((position = segmentIntersectionPoint(lp1, lp2, o.getCorners()[1], o.getCorners()[2])) != null)
-            return position;
-
-        return null;
-    }
-
-    // check if line segment AB intersects segment CD
-    public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
-        return segmentIntersectionPoint(a, b, c, d, line(a, b), line(c, d));
-    }
-    public static Vector2 segmentIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d, float[] ab, float[] cd) {
-        //TODO: I think this math is correct? Verify.
-        if (Math.abs(ab[2]) == Math.abs(cd[2]))
+    public static Vector2 segmentIntersectionPoint(LineSegment ls1, LineSegment ls2) {
+        if (Math.abs(ls1.formula[2]) == Math.abs(ls2.formula[2]))
             return null;
+        Vector2 point = lineIntersectionPoint(ls1.formula, ls2.formula);
+        if (point == null || !ls1.inRange(point) || !ls2.inRange(point))
+            return null;
+        return point;
+    }
 
-        Vector2 point = lineIntersectionPoint(ab, cd);
-        if (point == null)
-            return null; // lines have same slope
-
-        if (!inRangeInclusive(point.x, a.x, b.x) ||
-                !inRangeInclusive(point.y, a.y, b.y) ||
-                !inRangeInclusive(point.x, c.x, d.x) ||
-                !inRangeInclusive(point.y, c.y, d.y))
-            return null; // point is outside of the segment(s)
-
+    public static Vector2 segmentRayIntersectionPoint(LineSegment ls, Ray r) {
+        if (Math.abs(ls.formula[2]) == Math.abs(r.formula[2]))
+            return null;
+        Vector2 point = lineIntersectionPoint(ls.formula, r.formula);
+        if (point == null || !ls.inRange(point) || !r.inRange(point))
+            return null;
         return point;
     }
 
