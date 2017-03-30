@@ -12,20 +12,29 @@ public class LineSegment implements Line {
         formula = G.line(p1, p2);
     }
 
-    public Vector2 intersectionPoint(LineSegment ls) {
-        return G.segmentIntersectionPoint(ls, this);
-    }
-    public Vector2 intersectionPoint(Ray r) {
-        return G.segmentRayIntersectionPoint(this, r);
-    }
-
     public boolean inRange(Vector2 point) {
         return (point.x == p1.x && p1.x == p2.x || G.inRange(point.x, p1.x, p2.x)) &&
                 (point.y == p1.y && p1.y == p2.y || G.inRange(point.y, p1.y, p2.y));
     }
 
     @Override
+    public boolean inRangeInclusive(Vector2 point) {
+        return (point.x == p1.x && p1.x == p2.x || G.inRangeInclusive(point.x, p1.x, p2.x)) &&
+                (point.y == p1.y && p1.y == p2.y || G.inRangeInclusive(point.y, p1.y, p2.y));
+    }
+
+    @Override
     public float[] getFormula() {
         return formula;
+    }
+
+    @Override
+    public Vector2 intersectionPoint(Line l) {
+        return G.lineIntersectionPoint(this, l);
+    }
+
+    @Override
+    public Vector2 intersectionPointInclusive(Line l) {
+        return  G.lineIntersectionPointInclusive(this, l);
     }
 }

@@ -19,11 +19,22 @@ public class Ray implements Line {
         formula = G.line(p, p2);
     }
 
-    public Vector2 intersectionPoint(LineSegment ls) {
-        return G.segmentRayIntersectionPoint(ls, this);
+    @Override
+    public Vector2 intersectionPoint(Line l) {
+        return G.lineIntersectionPoint(this, l);
+    }
+    @Override
+    public Vector2 intersectionPointInclusive(Line l) { return G.lineIntersectionPointInclusive(this, l); }
+    @Override
+    public boolean inRange(Vector2 point) {
+        if ((G.inRange(point.x, p.x, p2.x) || Math.abs(p2.x - point.x) < Math.abs(p.x - point.x)) &&
+                (G.inRange(point.y, p.y, p2.y) || Math.abs(p2.y - point.y) < Math.abs(p.y - point.y)))
+            return true;
+        return false;
     }
 
-    public boolean inRange(Vector2 point) {
+    @Override
+    public boolean inRangeInclusive(Vector2 point) {
         if ((G.inRangeInclusive(point.x, p.x, p2.x) || Math.abs(p2.x - point.x) < Math.abs(p.x - point.x)) &&
                 (G.inRangeInclusive(point.y, p.y, p2.y) || Math.abs(p2.y - point.y) < Math.abs(p.y - point.y)))
             return true;
@@ -32,6 +43,6 @@ public class Ray implements Line {
 
     @Override
     public float[] getFormula() {
-        return new float[0];
+        return formula;
     }
 }

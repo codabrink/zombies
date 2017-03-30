@@ -95,7 +95,6 @@ public class Overlappable {
         return !((count & 1) == 0);
     }
 
-
     public Vector2[] cropLine(Vector2 p1, Vector2 p2) {
         Vector2[] result = new Vector2[2];
         return null;
@@ -108,7 +107,7 @@ public class Overlappable {
         Vector2 result = null;
         float intersectionDst = 0;
         for (LineSegment ls : lines) {
-            Vector2 intersection = ls.intersectionPoint(lineSegment);
+            Vector2 intersection = ls.intersectionPointInclusive(lineSegment);
             if (intersection == null) continue;
             if (!(result == null || intersection.dst(lineSegment.p1) < intersectionDst)) continue;
 

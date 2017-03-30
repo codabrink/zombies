@@ -2,6 +2,7 @@ package com.zombies.util;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
+import com.zombies.interfaces.Geom.Line;
 
 public class G {
     public static final double PIHALF = Math.PI / 2;
@@ -34,16 +35,15 @@ public class G {
         return value >= a && value <= b || value <= a && value >= b;
     }
 
-    public static Vector2 segmentIntersectionPoint(LineSegment ls1, LineSegment ls2) {
-        Vector2 point = lineIntersectionPoint(ls1.formula, ls2.formula);
-        if (point == null || !ls1.inRange(point) || !ls2.inRange(point))
+    public static Vector2 lineIntersectionPoint(Line a, Line b) {
+        Vector2 point = lineIntersectionPoint(a.getFormula(), b.getFormula());
+        if (point == null || !a.inRange(point) || !b.inRange(point))
             return null;
         return point;
     }
-
-    public static Vector2 segmentRayIntersectionPoint(LineSegment ls, Ray r) {
-        Vector2 point = lineIntersectionPoint(ls.formula, r.formula);
-        if (point == null || !ls.inRange(point) || !r.inRange(point))
+    public static Vector2 lineIntersectionPointInclusive(Line a, Line b) {
+        Vector2 point = lineIntersectionPoint(a.getFormula(), b.getFormula());
+        if (point == null || !a.inRangeInclusive(point) || !b.inRangeInclusive(point))
             return null;
         return point;
     }
