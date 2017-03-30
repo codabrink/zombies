@@ -278,12 +278,8 @@ public class Player extends Unit implements Collideable {
 
     @Override
     public void update() {
-        updateBox();
-        updateZone();
-        zone.update(1);
         DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 150, 40000);
-        zone.draw(C.DRAW_DISTANCE);
         this.handleHealth();
         for (Gun g: guns)
             g.update();

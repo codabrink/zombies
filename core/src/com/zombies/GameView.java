@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -45,6 +46,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
+    public static ModelCache modelCache = new ModelCache();
     private static List readyToModel    = Collections.synchronizedList(new ArrayList());
     private static List endableBuilders = Collections.synchronizedList(new ArrayList());
     private static List callbacks       = Collections.synchronizedList(new ArrayList());
@@ -192,6 +194,15 @@ public class GameView implements Screen {
         handleKeys();
 
         player.update();
+        D.currentZone.update(C.DRAW_DISTANCE);
+
+        modelCache.begin();
+        D.currentZone.draw(C.DRAW_DISTANCE);
+        modelCache.end();
+
+        modelBatch.begin(getCamera());
+        modelBatch.render(modelCache, outsideEnvironment);
+        modelBatch.end();
 
         for (DebugCircle dc: debugCircles)
             dc.draw(spriteBatch, shapeRenderer, modelBatch);

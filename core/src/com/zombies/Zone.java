@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Vector3;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.D;
@@ -46,18 +45,10 @@ public class Zone extends Overlappable {
         public void response(Model m) {
             if (model != null)
                 model.dispose();
-            if (modelCache != null)
-                modelCache.dispose();
+
             model = m;
             modelInstance = new ModelInstance(model);
             modelInstance.transform.setTranslation(center.x, center.y, 0);
-
-            modelCache = new ModelCache();
-            modelCache.begin();
-            modelCache.add(modelInstance);
-            for (ModelInstance instance : modelInstances)
-                modelCache.add(instance);
-            modelCache.end();
         }
     });
     private Thread modelingThread;
@@ -162,7 +153,7 @@ public class Zone extends Overlappable {
     }
 
     public void draw(int limit) {
-        HashSet<Zone> zones = getAdjZones(limit);
+        LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones)
             z.draw();
     }
@@ -171,19 +162,15 @@ public class Zone extends Overlappable {
         for (Drawable d : drawables)
             if (d.getZone() == this)
                 d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-        for (Drawable d : debugLines)
-            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
     private void drawThineself() {
         if (modelInstance == null)
             return;
-        GameView.gv.modelBatch.begin(GameView.gv.getCamera());
-        GameView.gv.modelBatch.render(modelCache, GameView.outsideEnvironment);
-        GameView.gv.modelBatch.end();
+        GameView.modelCache.add(modelInstance);
     }
 
     public void update(int limit) {
-        HashSet<Zone> zones = getAdjZones(limit);
+        LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones)
             z.update();
     }
@@ -212,12 +199,11 @@ public class Zone extends Overlappable {
         }
 
         for (Updateable u : updateables)
-            if (u.getZone() == this)
-                u.update();
+            u.update();
     }
 
     public void load(int limit) {
-        HashSet<Zone> zones = getAdjZones(limit);
+        LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z: zones)
             z.load();
     }
@@ -529,7 +515,7 @@ public class Zone extends Overlappable {
     private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
-        HashSet<Zone> zones = getAdjZones(limit);
+        LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             Set<Overlappable> overlappables = z.getOverlappables();
             synchronized (overlappables) {
@@ -552,7 +538,7 @@ public class Zone extends Overlappable {
         return null;
     }
 
-    public HashSet<Zone> getAdjZones(int limit) {
+    public LinkedHashSet<Zone> getAdjZones(int limit) {
         LinkedHashSet<Zone> zones = adjZones.get(limit);
         if (zones != null)
             return zones;

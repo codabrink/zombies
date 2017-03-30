@@ -50,7 +50,7 @@ public class StreetSegment extends Overlappable {
         width      = p1.dst(p2);
         height     = Street.RADIUS * 2;
 
-        zone = Zone.getZone(p1);
+        zone = Zone.getZone(center);
         zone.addPendingObject(this);
         compile();
 

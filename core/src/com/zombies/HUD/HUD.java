@@ -32,6 +32,7 @@ public class HUD implements InputProcessor{
     }
 
 	public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
+        if (true) return;
 		view.getPlayer().renderGunInfo(spriteBatch);
         if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
             view.getThumbpadLeft().render(spriteBatch);
