@@ -102,18 +102,21 @@ public class Overlappable {
     }
 
     public Vector2 lineIntersect(Vector2 p1, Vector2 p2) {
+        return lineIntersect(new LineSegment(p1, p2));
+    }
+    public Vector2 lineIntersect(LineSegment lineSegment) {
         Vector2 result = null;
         float intersectionDst = 0;
-        LineSegment lineSegment = new LineSegment(p1, p2);
         for (LineSegment ls : lines) {
             Vector2 intersection = ls.intersectionPoint(lineSegment);
             if (intersection == null) continue;
-            if (!(result == null || intersection.dst(p1) < intersectionDst)) continue;
+            if (!(result == null || intersection.dst(lineSegment.p1) < intersectionDst)) continue;
 
-            intersectionDst = intersection.dst(p1);
+            intersectionDst = intersection.dst(lineSegment.p1);
             result          = intersection;
         }
         return result;
+
     }
 
     public float getHeight() { return height;}

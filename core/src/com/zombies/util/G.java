@@ -35,8 +35,6 @@ public class G {
     }
 
     public static Vector2 segmentIntersectionPoint(LineSegment ls1, LineSegment ls2) {
-        if (Math.abs(ls1.formula[2]) == Math.abs(ls2.formula[2]))
-            return null;
         Vector2 point = lineIntersectionPoint(ls1.formula, ls2.formula);
         if (point == null || !ls1.inRange(point) || !ls2.inRange(point))
             return null;
@@ -44,8 +42,6 @@ public class G {
     }
 
     public static Vector2 segmentRayIntersectionPoint(LineSegment ls, Ray r) {
-        if (Math.abs(ls.formula[2]) == Math.abs(r.formula[2]))
-            return null;
         Vector2 point = lineIntersectionPoint(ls.formula, r.formula);
         if (point == null || !ls.inRange(point) || !r.inRange(point))
             return null;

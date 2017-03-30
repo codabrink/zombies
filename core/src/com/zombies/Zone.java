@@ -40,7 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class Zone {
+public class Zone extends Overlappable {
     private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
         @Override
         public void response(Model m) {
@@ -133,6 +133,13 @@ public class Zone {
         bounds = new Bounds2(x, y, C.ZONE_SIZE, C.ZONE_SIZE);
         numRooms = r.nextInt(numRooms);
         addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
+
+        setCorners(new Vector2[]{
+                position.cpy(),
+                position.cpy().add(C.ZONE_SIZE, 0),
+                position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE),
+                position.cpy().add(0, C.ZONE_SIZE)
+        });
 
         if (C.ENABLE_DEBUG_LINES) {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));

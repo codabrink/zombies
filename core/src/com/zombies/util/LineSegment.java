@@ -20,7 +20,8 @@ public class LineSegment implements Line {
     }
 
     public boolean inRange(Vector2 point) {
-        return G.inRangeInclusive(point.x, p1.x, p2.x) && G.inRangeInclusive(point.y, p1.y, p2.y);
+        return (point.x == p1.x && p1.x == p2.x || G.inRange(point.x, p1.x, p2.x)) &&
+                (point.y == p1.y && p1.y == p2.y || G.inRange(point.y, p1.y, p2.y));
     }
 
     @Override

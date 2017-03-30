@@ -21,6 +21,7 @@ public class StreetSegment extends Overlappable {
     private float width, height;
     private Vector2[] corners = new Vector2[4];
     private Zone zone;
+    private Street street;
     private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
         @Override
         public void response(Model model) {
@@ -32,10 +33,18 @@ public class StreetSegment extends Overlappable {
         }
     });
 
-    public StreetSegment(Vector2 p1, Vector2 p2, double angle) {
+    public static StreetSegment createStreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
+        if (p1.x == p2.x && p1.y == p2.y)
+            return null;
+
+        return new StreetSegment(street, p1, p2, angle);
+    }
+
+    private StreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
         this.p1    = p1;
         this.p2    = p2;
         this.angle = angle;
+        this.street = street;
 
         center = G.center(p1, p2);
         width      = p1.dst(p2);

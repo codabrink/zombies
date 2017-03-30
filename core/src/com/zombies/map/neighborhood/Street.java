@@ -8,10 +8,11 @@ import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.map.room.Building;
 import com.zombies.util.Bounds2;
 import com.zombies.util.G;
+import com.zombies.util.LineSegment;
 
 import java.util.LinkedHashSet;
 
-public class Street extends Overlappable implements StreetConnection {
+public class Street implements StreetConnection {
     public static final float RADIUS = 3f;
 
     private StreetSystem streetSystem;
@@ -58,16 +59,30 @@ public class Street extends Overlappable implements StreetConnection {
         streetSystem = ss;
         streetSystem.addConnection(this);
 
-        float dx = p2.x - p1.x;
-        float dy = p2.y - p1.y;
+        LineSegment lineSegment = new LineSegment(p1, p2);
+        LineSegment reverseLineSegment = new LineSegment(p2, p1);
 
         for (Zone z : Zone.zonesOnLine(p1, p2)) {
             z.addPendingObject(this);
-            Bounds2 bounds = Bounds2.crop(z.bounds, p1, dx, dy);
-            new StreetSegment(p1, p1.cpy().add(bounds.w, bounds.h), angle);
-        }
 
-        setCorners(corners);
+            Vector2 i1, i2;
+            i1 = z.lineIntersect(lineSegment);
+            i2 = z.lineIntersect(reverseLineSegment);
+
+            if (i1 == null)
+                i1 = p1;
+            if (i2 == null)
+                i2 = p2;
+
+            if (i1.equals(i2)) { // if this is true; ONE of the points is contained by the zone
+                if (z.contains(i1))
+                    i1 = p1;
+                else
+                    i2 = p2;
+            }
+
+            StreetSegment.createStreetSegment(this, i1, i2, angle);
+        }
     }
 
     public void compile() {
