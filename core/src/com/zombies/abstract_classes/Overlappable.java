@@ -89,7 +89,7 @@ public class Overlappable {
         Ray r = new Ray(p);
         int count = 0;
         for (LineSegment line : lines) {
-            if (line.intersectionPoint(r) != null)
+            if (line.intersectionPointInclusive(r) != null)
                 count++;
         }
         return !((count & 1) == 0);
