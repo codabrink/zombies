@@ -63,8 +63,6 @@ public class Room implements Loadable, HasZone, Updateable {
 
         id = roomCount;
         roomCount++;
-
-        D.update();
     }
 
     private void generate(int[] key, int maxBoxes) {
