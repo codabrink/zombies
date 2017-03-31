@@ -10,8 +10,8 @@ public class CameraHandle {
     private Player player;
     public PerspectiveCamera cam;
 
-    float lerp = 1f;
-    public float z = 100f;
+    float lerp = 5f;
+    public static float z = 50f;
 
     public CameraHandle(GameView view) {
         cam = new PerspectiveCamera(C.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -24,10 +24,8 @@ public class CameraHandle {
     }
 
     public void update(float dt) {
-        z = C.DRAW_DISTANCE * 100 + 150;
-
         Vector3 position = cam.position;
-        cam.far = z + 200;
+        cam.far = z + 50;
         cam.fieldOfView = C.FOV;
         position.x += (D.player().getPosition().x - position.x) * lerp * dt;
         position.y += (D.player().getPosition().y - position.y) * lerp * dt;

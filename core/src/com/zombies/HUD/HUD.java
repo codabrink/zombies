@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.CameraHandle;
 import com.zombies.Zombies;
 import com.zombies.map.room.Box;
 import com.zombies.GameView;
@@ -32,7 +33,6 @@ public class HUD implements InputProcessor{
     }
 
 	public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        if (true) return;
 		view.getPlayer().renderGunInfo(spriteBatch);
         if (Gdx.app.getType() != Application.ApplicationType.Desktop) {
             view.getThumbpadLeft().render(spriteBatch);
@@ -162,8 +162,7 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean scrolled(int amount) {
-        PerspectiveCamera c = view.getCamera();
-        c.position.set(c.position.x, c.position.y, c.position.z + amount * 2);
+        CameraHandle.z += amount * 20;
         return true;
     }
 }

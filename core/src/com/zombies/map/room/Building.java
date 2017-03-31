@@ -28,6 +28,8 @@ public class Building implements HasZone {
     public BuildingType buildingType;
     private static Random random = new Random();
 
+    public int outsideDoorCount = 0;
+
     public enum BuildingType {
         //VINYL_BEIGE (MATERIAL.SIDING_BEIGE_VINYL);
         BRICK (MATERIAL.SIDING_BRICK);

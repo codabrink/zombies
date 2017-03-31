@@ -164,15 +164,17 @@ public class Zone extends Overlappable {
             z.draw();
     }
     public void draw() {
-        drawThineself();
+        if (modelInstance == null)
+            return;
+        GameView.modelCache.add(modelInstance);
+        for (ModelInstance mi : modelInstances)
+            GameView.modelCache.add(mi);
         for (Drawable d : drawables)
             if (d.getZone() == this)
                 d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
     private void drawThineself() {
-        if (modelInstance == null)
-            return;
-        GameView.modelCache.add(modelInstance);
+
     }
 
     public void update(int limit) {

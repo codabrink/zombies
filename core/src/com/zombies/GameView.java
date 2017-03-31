@@ -196,13 +196,17 @@ public class GameView implements Screen {
         player.update();
         D.currentZone.update(C.DRAW_DISTANCE);
 
-        modelCache.begin();
-        D.currentZone.draw(C.DRAW_DISTANCE);
-        modelCache.end();
+        try {
+            modelCache.begin();
+            D.currentZone.draw(C.DRAW_DISTANCE);
+            modelCache.end();
 
-        modelBatch.begin(getCamera());
-        modelBatch.render(modelCache, outsideEnvironment);
-        modelBatch.end();
+            modelBatch.begin(getCamera());
+            modelBatch.render(modelCache, outsideEnvironment);
+            modelBatch.end();
+        } catch (Exception e) {
+            modelCache = new ModelCache();
+        }
 
         for (DebugCircle dc: debugCircles)
             dc.draw(spriteBatch, shapeRenderer, modelBatch);

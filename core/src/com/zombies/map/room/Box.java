@@ -37,6 +37,7 @@ public class Box extends Overlappable implements Gridable {
     };
 
     private Wall[] walls = new Wall[4];
+    private Vector2[] outerCorners = new Vector2[4];
     private Wall[] outerWalls = new Wall[4];
 
     private int id;
@@ -77,6 +78,18 @@ public class Box extends Overlappable implements Gridable {
         zone.addModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
     }
 
+    @Override
+    protected void setCorners(Vector2[] corners) {
+        super.setCorners(corners);
+        float thickness = 0.1f;
+        outerCorners = new Vector2[]{
+                position.cpy().add(width + thickness, height + thickness),
+                position.cpy().add(0, height + thickness),
+                position.cpy().add(0, -thickness),
+                position.cpy().add(width + thickness, 0)
+        };
+    }
+
     public void compile() {
         buildWalls();
         for (Wall wall : walls)
@@ -87,37 +100,51 @@ public class Box extends Overlappable implements Gridable {
                 wall.compile();
     }
 
-    public void buildWalls() {
+    private void buildWalls() {
         Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
         Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
         Gridable e = gridMap.get(key[0] + 1 + "," + key[1]);
         Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
-        if (!(e instanceof Box) || ((Box)e).getRoom() != room)
-            walls[0] = new WallWall(position.cpy().add(width, height), position.cpy().add(width, 0), room.roomType.wallMaterial);
-        if (!(n instanceof Box) || ((Box)n).getRoom() != room)
-            walls[1] = new WallWall(position.cpy().add(0, height), position.cpy().add(width, height), room.roomType.wallMaterial);
-        if (!(w instanceof Box) || ((Box)w).getRoom() != room)
-            walls[2] = new WallWall(position.cpy(), position.cpy().add(0, height), room.roomType.wallMaterial);
-        if (!(s instanceof Box) || ((Box)s).getRoom() != room)
-            walls[3] = new WallWall(position.cpy().add(width, 0), position.cpy(), room.roomType.wallMaterial);
-
-        final float thickness = 0.1f;
-        Vector2 c0 = position.cpy().add(width + thickness, height + thickness),
-                c1 = position.cpy().add(-thickness, height + thickness),
-                c2 = position.cpy().add(-thickness, -thickness),
-                c3 = position.cpy().add(width + thickness, -thickness);
-
-        if (e == null)
-            outerWalls[0] = new WallWall(c3, c0, building.buildingType.outerWallMaterial);
-        if (n == null)
-            outerWalls[1] = new WallWall(c0, c1, building.buildingType.outerWallMaterial);
-        if (w == null)
-            outerWalls[2] = new WallWall(c1, c2, building.buildingType.outerWallMaterial);
-        if (s == null)
-            outerWalls[3] = new WallWall(c2, c3, building.buildingType.outerWallMaterial);
-
+        processWall(e, 0, 0, 3);
+        processWall(n, 1, 0, 1);
+        processWall(w, 2, 2, 1);
+        processWall(s, 3, 3, 2);
     }
+
+    private void processWall(Gridable g, int i, int a, int b) {
+        if (g == null) {
+            if (building.outsideDoorCount == 0 || random.nextFloat() < 0.2f) {
+                walls[i] = new DoorWall(corners[a], corners[b], building, room.roomType.wallMaterial);
+                outerWalls[i] = new FramelessDoorWall(outerCorners[b], outerCorners[a], building, building.buildingType.outerWallMaterial);
+                return;
+            }
+            createOuterWall(i, a, b);
+            room.connected = true;
+            this.room.connected = true;
+            return;
+        }
+
+        if (g instanceof Box) {
+            Box box = (Box) g;
+            Room room = box.getRoom();
+            if (this.room != room && (!(this.room.connected && room.connected) || random.nextFloat() < 0.2f)) {
+                createDoor(i, a, b);
+            }
+        }
+    }
+    private void createDoor(int i, int a, int b) {
+        walls[i] = new DoorWall(corners[a], corners[b], building, room.roomType.wallMaterial);
+    }
+
+    private void createWall(int i, int a, int b) {
+        walls[i] = new WallWall(corners[a], corners[b], room.roomType.wallMaterial);
+    }
+    private void createOuterWall(int i, int a, int b) {
+        createWall(i, a, b);
+        outerWalls[i] = new WallWall(outerCorners[b], outerCorners[a], building.buildingType.outerWallMaterial);
+    }
+
 
     public float x() {return position.x;}
     public float y() {return position.y;}
