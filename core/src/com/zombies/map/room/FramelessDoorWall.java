@@ -8,8 +8,8 @@ public class FramelessDoorWall extends Wall {
     protected Vector2 doorStart, doorEnd;
     protected Building building;
 
-    public FramelessDoorWall(Vector2 p1, Vector2 p2, Building building, MATERIAL material) {
-        super(p1, p2, material);
+    public FramelessDoorWall(Vector2 p1, Vector2 p2, Building building, MATERIAL leftMaterial, MATERIAL rightMaterial) {
+        super(p1, p2, leftMaterial, rightMaterial);
 
         this.building = building;
 

@@ -38,7 +38,7 @@ public class Room implements Loadable, HasZone, Updateable {
     public static int roomCount = 0;
     private static Random random = new Random();
 
-    public RoomType roomType;
+    public RoomType type;
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
     public boolean connected = false;
@@ -55,7 +55,7 @@ public class Room implements Loadable, HasZone, Updateable {
     }
 
     protected Room(Building building, int[] key, int maxBoxes) {
-        roomType = RoomType.random();
+        type = RoomType.random();
 
         building.addRoom(this);
         this.building = building;

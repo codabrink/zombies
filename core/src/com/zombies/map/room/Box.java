@@ -16,6 +16,7 @@ import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.util.Assets.MATERIAL;
 
 public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
@@ -75,7 +76,7 @@ public class Box extends Overlappable implements Gridable {
         zone = Zone.getZone(getCenter());
         zone.addPendingObject(this);
         zone.addPendingObject(room);
-        zone.addModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
+        zone.addModelingCallback(room.type.floorMaterial, modelFloorCallback);
     }
 
     @Override
@@ -107,7 +108,7 @@ public class Box extends Overlappable implements Gridable {
         Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
         processWall(e, 0, 0, 3);
-        processWall(n, 1, 0, 1);
+        processWall(n, 1, 1, 0);
         processWall(w, 2, 2, 1);
         processWall(s, 3, 3, 2);
     }
@@ -115,34 +116,40 @@ public class Box extends Overlappable implements Gridable {
     private void processWall(Gridable g, int i, int a, int b) {
         if (g == null) {
             if (building.outsideDoorCount == 0 || random.nextFloat() < 0.2f) {
-                walls[i] = new DoorWall(corners[a], corners[b], building, room.roomType.wallMaterial);
-                outerWalls[i] = new FramelessDoorWall(outerCorners[b], outerCorners[a], building, building.buildingType.outerWallMaterial);
+                createDoor(i, a, b, room.type.wallMaterial, building.type.outerWallMaterial);
+                this.room.connected = true;
                 return;
             }
-            createOuterWall(i, a, b);
-            room.connected = true;
-            this.room.connected = true;
+            createWall(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
             return;
         }
 
-        if (g instanceof Box) {
+        if (g instanceof Box && ((Box) g).getRoom() != room) {
             Box box = (Box) g;
             Room room = box.getRoom();
             if (this.room != room && (!(this.room.connected && room.connected) || random.nextFloat() < 0.2f)) {
-                createDoor(i, a, b);
+                createWall(g, a, b, this.room.type.wallMaterial, room.type.wallMaterial);
+                this.room.connected = this.room.connected && room.connected;
+                room.connected      = this.room.connected;
+                return;
             }
+            createWall(g, a, b, room.type.wallMaterial, this.room.type.wallMaterial);
+            return;
         }
     }
-    private void createDoor(int i, int a, int b) {
-        walls[i] = new DoorWall(corners[a], corners[b], building, room.roomType.wallMaterial);
-    }
 
-    private void createWall(int i, int a, int b) {
-        walls[i] = new WallWall(corners[a], corners[b], room.roomType.wallMaterial);
+
+    private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, i, new DoorWall(corners[a], corners[b], building, lm, rm));
     }
-    private void createOuterWall(int i, int a, int b) {
-        createWall(i, a, b);
-        outerWalls[i] = new WallWall(outerCorners[b], outerCorners[a], building.buildingType.outerWallMaterial);
+    private void createDoor(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, g, new DoorWall(corners[a], corners[b], building, lm, rm));
+    }
+    private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));
+    }
+    private void createWall(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, g, new WallWall(corners[a], corners[b], lm, rm));
     }
 
 
@@ -233,7 +240,7 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public void dispose() {
-        zone.removeModelingCallback(room.roomType.floorMaterial, modelFloorCallback);
+        zone.removeModelingCallback(room.type.floorMaterial, modelFloorCallback);
         zone.removeObject(this);
     }
 

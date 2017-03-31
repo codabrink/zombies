@@ -151,9 +151,9 @@ public class ZoneAndNeighborhoodTest {
         // Test building features
         Gridable g1 = building.gridMap.get("0,0");
         Gridable g2 = building.gridMap.get("1,0");
-        assertTrue(Building.wallKeyBetweenGridables(g1, g2).equals("1,0,v"));
+        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("1,0,v"));
         g2     = building.gridMap.get("0,1");
-        assertTrue(Building.wallKeyBetweenGridables(g1, g2).equals("0,1,h"));
+        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("0,1,h"));
 
         // test vertical wall positions
         Vector2[] positions = building.wallPositionOf("1,0,v");

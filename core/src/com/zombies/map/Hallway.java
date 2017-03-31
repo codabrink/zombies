@@ -12,7 +12,6 @@ import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.DoorWall;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,7 +47,7 @@ public class Hallway implements Drawable, HasZone {
 
     public void compile() {
         // create a door
-        String wallKey = Building.wallKeyBetweenGridables(box.getKey(), firstKey);
+        String wallKey = Building.wallKeyBetweenKeys(box.getKey(), firstKey);
         Vector2[] wallPosition = box.getBuilding().wallPositionOf(wallKey);
 
         for (HallwaySegment hs : segments)

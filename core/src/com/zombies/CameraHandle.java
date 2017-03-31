@@ -25,7 +25,7 @@ public class CameraHandle {
 
     public void update(float dt) {
         Vector3 position = cam.position;
-        cam.far = z + 50;
+        cam.far = position.z + 100;
         cam.fieldOfView = C.FOV;
         position.x += (D.player().getPosition().x - position.x) * lerp * dt;
         position.y += (D.player().getPosition().y - position.y) * lerp * dt;

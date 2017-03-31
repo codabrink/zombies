@@ -17,16 +17,17 @@ import java.util.Random;
 
 public class Building implements HasZone {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
+    private static Random random = new Random();
 
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
-    public boolean threadLocked = false;
-    protected HashSet<Room> rooms = new HashSet<>();
-    public HashMap<String, Gridable> gridMap = new HashMap<>();
-    public HashSet<Hallway> hallways = new HashSet<>();
-    protected Vector2 center;
-    protected Zone zone;
-    public BuildingType buildingType;
-    private static Random random = new Random();
+
+    public    BuildingType type;
+    protected HashSet<Room>             rooms    = new HashSet<>();
+    public    HashMap<String, Gridable> gridMap  = new HashMap<>();
+    public    HashMap<String, Wall>     wallMap  = new HashMap<>();
+    public    HashSet<Hallway>          hallways = new HashSet<>();
+    protected Vector2                   center;
+    protected Zone                      zone;
 
     public int outsideDoorCount = 0;
 
@@ -56,13 +57,10 @@ public class Building implements HasZone {
     protected Building(Vector2 c, int maxRooms) {
         center = c;
 
-        this.buildingType = BuildingType.random();
+        this.type = BuildingType.random();
 
         generate(maxRooms);
         compile();
-
-        for (Room room : rooms)
-            RoomDoorWorker.processDoorsOnRoom(room);
 
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
@@ -94,6 +92,8 @@ public class Building implements HasZone {
             room.compile();
         for (Hallway hallway : hallways)
             hallway.compile();
+        for (Wall wall : wallMap.values())
+            wall.compile();
         calculateBorders();
     }
 
@@ -165,13 +165,30 @@ public class Building implements HasZone {
                 (orientation == 'v' ? p1.cpy().add(0, C.GRIDSIZE) : p1.cpy().add(C.GRIDSIZE, 0))};
     }
 
-    public static String wallKeyBetweenGridables(int[] k1, int[] k2) {
+
+    public void putWall(Gridable g, int direction, Wall wall) {
+        String key = wallKeyFromGridableAndDirection(g, direction);
+        putWall(key, wall);
+    }
+    public void putWall(Gridable a, Gridable b, Wall wall) {
+        String key = wallKeyBetweenGridables(a, b);
+        putWall(key, wall);
+    }
+    public void putWall(String key, Wall wall) {
+        Wall w = wallMap.get(key);
+        if (w != null)
+            return;
+        wallMap.put(key, wall);
+    }
+
+
+    public static String wallKeyBetweenKeys(int[] k1, int[] k2) {
         return Math.max(k1[0], k2[0]) + "," +
-                Math.max(k1[1], k2[1]) + "," +
-                (k1[0] != k2[0] ? "v" : "h");
+                Math.max(k1[1], k2[1]) + ',' +
+                (k1[0] == k2[0] ? 'h' : 'v');
     }
     public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
-        return wallKeyBetweenGridables(g1.getKey(), g2.getKey());
+        return wallKeyBetweenKeys(g1.getKey(), g2.getKey());
     }
     public String wallKeyFromGridableAndDirection(Gridable g, int direction) {
         return wallKeyFromGridableAndDirection(g.getKey(), direction);

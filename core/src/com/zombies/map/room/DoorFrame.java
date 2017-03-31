@@ -13,7 +13,7 @@ import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.G;
 
 public class DoorFrame {
-    private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
+    private BoxShapeBuilder boxShapeBuilder;
     private Vector2 p1, p2;
     private Building building;
     private double angle;
@@ -33,9 +33,8 @@ public class DoorFrame {
         Zone.getZone(p1).addModelingCallback(MATERIAL.FLOOR_WOOD, modelFrameCallback);
     }
 
-    public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
-        if (true)
-            return;
+    public void buildMesh(MeshPartBuilder builder, Vector2 center) {
+        boxShapeBuilder = new BoxShapeBuilder();
         BoundingBox bounds;
         Vector3 min, max;
 
@@ -46,7 +45,7 @@ public class DoorFrame {
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
-        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, frameTop);
+        mtrans.translate(p1.x - center.x, p1.y - center.y, frameTop);
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
 
@@ -57,7 +56,7 @@ public class DoorFrame {
         bounds = new BoundingBox(min, max);
 
         mtrans = new Matrix4();
-        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
+        mtrans.translate(p1.x - center.x, p1.y - center.y, 0);
         bounds.mul(mtrans);
 
         boxShapeBuilder.build(builder, bounds);

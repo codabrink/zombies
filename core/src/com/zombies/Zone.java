@@ -188,7 +188,7 @@ public class Zone extends Overlappable {
             while (i.hasNext()) {
                 Object o = i.next();
                 if (o instanceof ModelInstance) {
-                    if (modelingThread.isAlive()) continue;
+                    if (modelingThread != null && modelingThread.isAlive()) continue;
 
                     modelInstances.add((ModelInstance) o);
                     i.remove();
@@ -376,8 +376,8 @@ public class Zone extends Overlappable {
                 // if both intersections are beyond one of the wall's endpoints, they both be set to the
                 // same endpoint by the code above. the segment is not actually being intersected. only
                 // create the hole if that is not the case.
-                if (!i1.equals(i2))
-                    w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
+                //if (!i1.equals(i2))
+                    //w.createHole(i1.cpy().add(i2).scl(0.5f), i1.cpy().dst(i2));
             }
         }
     }
@@ -591,7 +591,7 @@ public class Zone extends Overlappable {
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w : walls)
-            w.buildWallMesh(builder, center);
+            w.buildRightMesh(builder, center);
         synchronized (modelables) {
             for (MATERIAL m : modelables.keySet()) {
                 builder = modelBuilder.part(m.partName,
