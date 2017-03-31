@@ -180,10 +180,11 @@ public class Zone extends Overlappable {
             while (i.hasNext()) {
                 Object o = i.next();
                 if (o instanceof ModelInstance) {
+                    if (modelingThread.isAlive()) continue;
+
                     modelInstances.add((ModelInstance) o);
                     i.remove();
-                    if (modelInstance != null)
-                        rebuildModel();
+                    if (modelInstance != null) rebuildModel();
                     continue;
                 }
 
