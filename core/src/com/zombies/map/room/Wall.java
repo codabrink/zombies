@@ -86,7 +86,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         if (body != null)
             D.world.destroyBody(body);
 
-        flushPoints();
+        //flushPoints();
 
         rightSegments = new LinkedList<>();
         leftSegments  = new LinkedList<>();

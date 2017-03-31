@@ -13,7 +13,7 @@ import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.G;
 
 public class DoorFrame {
-    private BoxShapeBuilder boxShapeBuilder;
+    private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
     private Vector2 p1, p2;
     private Building building;
     private double angle;
@@ -34,7 +34,6 @@ public class DoorFrame {
     }
 
     public void buildMesh(MeshPartBuilder builder, Vector2 center) {
-        boxShapeBuilder = new BoxShapeBuilder();
         BoundingBox bounds;
         Vector3 min, max;
 
