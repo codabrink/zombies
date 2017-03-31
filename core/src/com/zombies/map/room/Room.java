@@ -41,6 +41,7 @@ public class Room implements Loadable, HasZone, Updateable {
     public RoomType type;
     private int id;
     public  HashSet<Box> boxes = new HashSet<>();
+    public  HashSet<Room> connections = new HashSet<>();
     public boolean connected = false;
     private boolean alarmed = false;
     private Zone zone;

@@ -127,10 +127,14 @@ public class Box extends Overlappable implements Gridable {
         if (g instanceof Box && ((Box) g).getRoom() != room) {
             Box box = (Box) g;
             Room room = box.getRoom();
-            if (this.room != room && (!(this.room.connected && room.connected) || random.nextFloat() < 0.05f)) {
+            if (this.room != room && (!(this.room.connections.contains(room)) || random.nextFloat() < 0.05f)) {
                 createDoor(g, a, b, this.room.type.wallMaterial, room.type.wallMaterial);
+                room.connections.add(this.room);
+                this.room.connections.add(room);
+
                 this.room.connected = this.room.connected && room.connected;
                 room.connected      = this.room.connected;
+                
                 return;
             }
             createWall(g, a, b, room.type.wallMaterial, this.room.type.wallMaterial);
