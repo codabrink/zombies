@@ -12,14 +12,12 @@ public class WallSegment {
 	private Vector2 p1, p2;
     private double angle;
     private float height;
-    private MATERIAL material;
 
 	public WallSegment(Vector2 p1, Vector2 p2, float height, MATERIAL material) {
         this.p1 = p1;
         this.p2 = p2;
         this.height = height;
-        this.material = material;
-        angle = G.getAngle(p1, p2);
+        angle       = G.getAngle(p1, p2);
     }
 
 	public void genShapes(Body body) {

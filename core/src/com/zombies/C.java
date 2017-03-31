@@ -46,7 +46,7 @@ public class C {
 
     public static final float ZONE_SIZE = 500 * SCALE;
     public static final float ZONE_HALF_SIZE = ZONE_SIZE / 2;
-    public static int DRAW_DISTANCE = 2;
+    public static int DRAW_DISTANCE = 1;
     public static final float FOV = 90;
     public static final int ERROR_TOLERANCE = 4;
 

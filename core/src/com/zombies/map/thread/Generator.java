@@ -37,7 +37,7 @@ public class Generator {
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            StreetSystem.populateBox(zone.randomPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, GameView.r.nextInt((int) C.GRIDSIZE * 3));
+            //StreetSystem.populateBox(zone.randomPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, GameView.r.nextInt((int) C.GRIDSIZE * 3));
             Building.createBuilding(zone.getCenter(), 3);
             zone.rebuildModel();
             D.removeRunningThread(Thread.currentThread());

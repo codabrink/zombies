@@ -19,7 +19,7 @@ public class FramelessDoorWall extends Wall {
         doorStart = new Vector2(p1.x + dx * widthFactor, p1.y + dy * widthFactor);
         doorEnd   = new Vector2(p1.x + dx * (1 - widthFactor), p1.y + dy * (1 - widthFactor));
 
-        points.add(new WallPoint(new Vector2(p1), 1));
+        points.add(new WallPoint(p1.cpy(), 1));
         points.add(new WallPoint(doorStart, -0.2f));
         points.add(new WallPoint(doorEnd, 1));
         points.add(new WallPoint(p2, 0));
