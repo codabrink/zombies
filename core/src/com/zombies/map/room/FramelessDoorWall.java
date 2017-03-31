@@ -13,11 +13,10 @@ public class FramelessDoorWall extends Wall {
 
         this.building = building;
 
-        float dx = Math.abs(p2.x - p1.x);
-        float dy = Math.abs(p2.y - p1.y);
+        float dst = p1.dst(p2);
 
-        doorStart = new Vector2(p1.x + dx * widthFactor, p1.y + dy * widthFactor);
-        doorEnd   = new Vector2(p1.x + dx * (1 - widthFactor), p1.y + dy * (1 - widthFactor));
+        doorStart = p2.cpy().sub(p1).setAngleRad((float) angle).setLength(dst * 0.3f).add(p1);
+        doorEnd   = p2.cpy().sub(p1).setAngleRad((float) angle).setLength(dst * 0.7f).add(p1);
 
         points.add(new WallPoint(p1.cpy(), 1));
         points.add(new WallPoint(doorStart, -0.2f));

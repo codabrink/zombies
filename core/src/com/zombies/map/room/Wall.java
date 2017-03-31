@@ -26,7 +26,7 @@ import com.zombies.util.G;
 
 public class Wall implements Collideable, Loadable, HasZone {
     private Vector2 p1, p2, center;
-    private double angle;
+    protected double angle;
     private Body body;
     private MATERIAL leftMaterial, rightMaterial;
     private Zone zone;
