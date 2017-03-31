@@ -116,11 +116,11 @@ public class Box extends Overlappable implements Gridable {
     private void processWall(Gridable g, int i, int a, int b) {
         if (g == null) {
             if (building.outsideDoorCount == 0 || random.nextFloat() < 0.1f) {
-                createDoor(i, a, b, room.type.wallMaterial, building.type.outerWallMaterial);
+                createDoor(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
                 building.outsideDoorCount++;
                 return;
             }
-            createWall(i, a, b, room.type.wallMaterial, building.type.outerWallMaterial);
+            createWall(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
             return;
         }
 
@@ -128,15 +128,17 @@ public class Box extends Overlappable implements Gridable {
             Box box = (Box) g;
             Room room = box.getRoom();
             if (this.room != room && (!(this.room.connections.contains(room)) || random.nextFloat() < 0.05f)) {
-                createDoor(g, a, b, this.room.type.wallMaterial, room.type.wallMaterial);
+                createDoor(g, a, b, room.type.wallMaterial, this.room.type.wallMaterial);
+
                 room.connections.add(this.room);
                 this.room.connections.add(room);
 
                 this.room.connected = this.room.connected && room.connected;
                 room.connected      = this.room.connected;
-                
+
                 return;
             }
+
             createWall(g, a, b, room.type.wallMaterial, this.room.type.wallMaterial);
             return;
         }

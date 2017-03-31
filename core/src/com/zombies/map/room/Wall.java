@@ -95,12 +95,12 @@ public class Wall implements Collideable, Loadable, HasZone {
 
         while (itr.hasNext()) {
             currPoint = itr.next();
-            rightSegments.add(new WallSegment(
+            leftSegments.add(new WallSegment(
                     prevPoint.point,
                     currPoint.point,
                     prevPoint.height,
                     rightMaterial));
-            leftSegments.add(new WallSegment(
+            rightSegments.add(new WallSegment(
                     currPoint.point,
                     prevPoint.point,
                     prevPoint.height,

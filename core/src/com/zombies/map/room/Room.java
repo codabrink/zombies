@@ -20,7 +20,7 @@ import com.zombies.util.U;
 public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
         LIVING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_CARPET),
-        DINING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_WOOD),
+        DINING_ROOM (MATERIAL.WALL_PAINTED_RED, MATERIAL.FLOOR_WOOD),
         KITCHEN (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.GREEN_TILE);
 
         public MATERIAL floorMaterial;

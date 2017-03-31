@@ -13,6 +13,10 @@ public class ZTexture {
     public TextureAttribute textureAttribute;
 
     public ZTexture(String path) {
+        this(path, 1);
+    }
+
+    public ZTexture(String path, int UVScale) {
         this.path = path;
         Assets.a.load(path, Texture.class);
         Assets.a.finishLoading();
@@ -21,6 +25,6 @@ public class ZTexture {
         textureRegion = new TextureRegion(texture);
         textureAttribute = new TextureAttribute(Attribute.getAttributeType("diffuseTexture"),
                 new TextureDescriptor<>(texture),
-                0, 0, 1, 1);
+                0, 0, UVScale, UVScale);
     }
 }
