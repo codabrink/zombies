@@ -7,11 +7,13 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
+import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.U;
 import com.zombies.workers.RoomDoorWorker;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 public class Building implements HasZone {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
@@ -23,6 +25,20 @@ public class Building implements HasZone {
     public HashSet<Hallway> hallways = new HashSet<>();
     protected Vector2 center;
     protected Zone zone;
+    public BuildingType buildingType;
+    private static Random random = new Random();
+
+    public enum BuildingType {
+        //VINYL_BEIGE (MATERIAL.SIDING_BEIGE_VINYL);
+        BRICK (MATERIAL.SIDING_BRICK);
+
+        public MATERIAL outerWallMaterial;
+        BuildingType(MATERIAL outerWallMaterial) {
+            this.outerWallMaterial = outerWallMaterial;
+        }
+
+        public static BuildingType random() { return values()[random.nextInt(values().length)]; }
+    }
 
     public static Building createBuilding(Vector2 c, int maxRooms) {
         Zone z = Zone.getZone(c);
@@ -37,6 +53,8 @@ public class Building implements HasZone {
     protected Building() {}
     protected Building(Vector2 c, int maxRooms) {
         center = c;
+
+        this.buildingType = BuildingType.random();
 
         generate(maxRooms);
         compile();

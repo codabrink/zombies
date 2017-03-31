@@ -1,11 +1,7 @@
 package com.zombies.map.room;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.zombies.C;
@@ -35,11 +31,11 @@ public class WallSegment {
         }
     }
 
-    public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+    public void buildMesh(MeshPartBuilder builder, Vector2 center) {
         if (height == 0)
             return;
 
-        Vector2 a = new Vector2(p1.x - modelCenter.x, p1.y - modelCenter.y);
+        Vector2 a = new Vector2(p1.x - center.x, p1.y - center.y);
         Vector2 b = p2.cpy().sub(p1).setAngleRad((float) angle).add(a);
 
         float lowZ = (height < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(height) : 0);

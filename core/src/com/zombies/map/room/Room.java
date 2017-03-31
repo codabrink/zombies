@@ -11,7 +11,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.zombies.C;
 import com.zombies.Unit;
 import com.zombies.Zone;
-import com.zombies.data.D;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;

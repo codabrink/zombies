@@ -16,7 +16,6 @@ import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.ModelMeCallback;
-import com.zombies.util.U;
 
 public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
@@ -38,6 +37,7 @@ public class Box extends Overlappable implements Gridable {
     };
 
     private Wall[] walls = new Wall[4];
+    private Wall[] outerWalls = new Wall[4];
 
     private int id;
     private int[] key;
@@ -82,6 +82,9 @@ public class Box extends Overlappable implements Gridable {
         for (Wall wall : walls)
             if (wall != null)
                 wall.compile();
+        for (Wall wall : outerWalls)
+            if (wall != null)
+                wall.compile();
     }
 
     public void buildWalls() {
@@ -98,6 +101,22 @@ public class Box extends Overlappable implements Gridable {
             walls[2] = new WallWall(position.cpy(), position.cpy().add(0, height), room.roomType.wallMaterial);
         if (!(s instanceof Box) || ((Box)s).getRoom() != room)
             walls[3] = new WallWall(position.cpy().add(width, 0), position.cpy(), room.roomType.wallMaterial);
+
+        final float thickness = 0.1f;
+        Vector2 c0 = position.cpy().add(width + thickness, height + thickness),
+                c1 = position.cpy().add(-thickness, height + thickness),
+                c2 = position.cpy().add(-thickness, -thickness),
+                c3 = position.cpy().add(width + thickness, -thickness);
+
+        if (e == null)
+            outerWalls[0] = new WallWall(c3, c0, building.buildingType.outerWallMaterial);
+        if (n == null)
+            outerWalls[1] = new WallWall(c0, c1, building.buildingType.outerWallMaterial);
+        if (w == null)
+            outerWalls[2] = new WallWall(c1, c2, building.buildingType.outerWallMaterial);
+        if (s == null)
+            outerWalls[3] = new WallWall(c2, c3, building.buildingType.outerWallMaterial);
+
     }
 
     public float x() {return position.x;}
@@ -153,10 +172,6 @@ public class Box extends Overlappable implements Gridable {
         return position.cpy().add(random.nextFloat() * C.GRIDSIZE, random.nextFloat() * C.GRIDSIZE);
     }
 
-    public Unit randomZombie() {
-        return (Unit)U.random(zombies);
-    }
-
     public int getId() { return id; }
     public Building getBuilding() { return building; }
     public Room getRoom() { return room; }
@@ -183,10 +198,10 @@ public class Box extends Overlappable implements Gridable {
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
-        builder.rect(relp.x, relp.y, 0,
-                relp.x + width, relp.y, 0,
-                relp.x + width, relp.y + height, 0,
-                relp.x, relp.y + height, 0,
+        builder.rect(relp.x, relp.y, 1,
+                relp.x + width, relp.y, 1,
+                relp.x + width, relp.y + height, 1,
+                relp.x, relp.y + height, 1,
                 1, 1, 1);
     }
 

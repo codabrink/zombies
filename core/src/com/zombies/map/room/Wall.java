@@ -26,6 +26,7 @@ public class Wall implements Collideable, Loadable, HasZone {
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
     private MATERIAL material;
+    private Zone zone;
 
     protected ArrayList<WallPoint>   points   = new ArrayList<>();
     protected ArrayList<WallSegment> segments = new ArrayList<>();
@@ -37,8 +38,6 @@ public class Wall implements Collideable, Loadable, HasZone {
         }
     };
 
-    private Zone zone;
-
     public Wall(Vector2 p1, Vector2 p2, MATERIAL material) {
         this.material = material;
 
@@ -47,10 +46,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
 
-        zone = Zone.getZone(p1);
-
-        for (Zone z : Zone.zonesOnLine(p1, p2))
-            z.addPendingObject(this);
+        zone = Zone.getZone(center);
     }
 
     public void compile() {
