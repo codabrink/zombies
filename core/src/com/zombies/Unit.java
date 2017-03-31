@@ -43,8 +43,6 @@ public class Unit implements Collideable, Loadable, HasZone {
         DORMANT, LOADED, ACTIVE, DEAD, FOUND
     }
 
-    protected int frame = 0;
-
     protected BodData storedBodData;
 
     private RayCastCallback vision = new RayCastCallback() {
@@ -197,12 +195,7 @@ public class Unit implements Collideable, Loadable, HasZone {
         body.setActive(false);
     }
 
-    public void update(int frame) {
-        if (this.frame == frame) {
-            if (C.DEBUG) System.out.println("ERROR: something is checking this unit twice. " + this.getClass().getName());
-            return;
-        }
-        this.frame = frame;
+    public void update() {
     }
 
     public void victory() {}

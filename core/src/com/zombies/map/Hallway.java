@@ -8,12 +8,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Modelable;
 import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.DoorWall;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,9 +47,8 @@ public class Hallway implements Drawable, HasZone {
 
     public void compile() {
         // create a door
-        String wallKey = Building.wallKeyBetweenGridables(box.getKey(), firstKey);
+        String wallKey = Building.wallKeyBetweenKeys(box.getKey(), firstKey);
         Vector2[] wallPosition = box.getBuilding().wallPositionOf(wallKey);
-        box.getBuilding().putWallMap(wallKey, new DoorWall(wallPosition[0], wallPosition[1], building));
 
         for (HallwaySegment hs : segments)
             hs.compile();
@@ -65,10 +62,6 @@ public class Hallway implements Drawable, HasZone {
                 outerSegments.add(segment);
         }
         return outerSegments;
-    }
-
-    public Modelable getModelable() {
-        return box.getBuilding();
     }
 
     public Box getBox() { return box; }

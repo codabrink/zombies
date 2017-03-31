@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.zombies.interfaces.Collideable;
-import com.zombies.map.thread.MapAdmin;
 
 public class Player extends Unit implements Collideable {
     private long beginAttacks = System.currentTimeMillis();
@@ -178,10 +177,6 @@ public class Player extends Unit implements Collideable {
         lastAttack = System.currentTimeMillis();
     }
 
-    public boolean isBody(Body b) {
-        return b == body;
-    }
-
     @Override
     public void die(Unit u) {
         view.end();
@@ -282,18 +277,14 @@ public class Player extends Unit implements Collideable {
     }
 
     @Override
-    public void update(int frame) {
-        updateBox();
-        updateZone();
-        zone.update(1);
+    public void update() {
         DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
         pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 150, 40000);
-        zone.draw(C.DRAW_DISTANCE);
         this.handleHealth();
         for (Gun g: guns)
             g.update();
         for (Survivor s: survivors) {
-            s.update(frame);
+            s.update();
 
             if (s.getState() == State.DEAD)
                 survivors.remove(s);
@@ -305,7 +296,7 @@ public class Player extends Unit implements Collideable {
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
 
-        if (frame % 10 == 0)
+        if (D.tick % 10 == 0)
             updateInfo();
     }
 

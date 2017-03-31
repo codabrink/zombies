@@ -118,8 +118,8 @@ public class Zombie extends Unit implements Drawable {
     }
 
     @Override
-    public void update(int frame) {
-        super.update(frame);
+    public void update() {
+        super.update();
         if (state == State.DORMANT) {
             if (body.getPosition().dst(GameView.gv.getPlayer().getBody().getPosition()) < 50)
                 state = State.ACTIVE;

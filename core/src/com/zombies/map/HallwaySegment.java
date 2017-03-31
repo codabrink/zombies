@@ -4,20 +4,19 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
+import com.zombies.interfaces.Loadable;
 import com.zombies.map.room.Building;
-import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
-import com.zombies.util.Geometry;
+import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.G;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
 import com.zombies.Zone;
-import com.zombies.util.U;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable implements Gridable {
+public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
     private boolean[] connections = new boolean[4];
@@ -34,7 +33,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
         hallway  = h;
         building = h.getBuilding();
         position = building.positionOf(key);
-        corners  = building.cornersOf(position);
+        setCorners(building.cornersOf(position));
 
         diameter   = C.HALLWAY_WIDTH;
         radius     = diameter / 2;
@@ -50,8 +49,8 @@ public class HallwaySegment extends Overlappable implements Gridable {
         setInfo(h, key);
     }
     public HallwaySegment(Hallway h, int[] key) {
-        width      = C.GRID_SIZE;
-        height     = C.GRID_SIZE;
+        width      = C.GRIDSIZE;
+        height     = C.GRIDSIZE;
         setInfo(h, key);
     }
 
@@ -62,15 +61,7 @@ public class HallwaySegment extends Overlappable implements Gridable {
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
-        Zone.getZone(getCenter()).addObject(this);
-    }
-
-    public void connect(Gridable g, int direction) {
-        connectionOverride[direction] = true;
-        Building otherBuilding = g.getBuilding();
-        String wallKey = otherBuilding.wallKeyFromGridableAndDirection(g.getKey(), U.oppositeDirection(direction));
-        Vector2[] wallPositions = otherBuilding.wallPositionOf(wallKey);
-        otherBuilding.putWallMap(wallKey, new DoorWall(wallPositions[0], wallPositions[1], otherBuilding));
+        Zone.getZone(getCenter()).addPendingObject(this);
     }
 
     public ArrayList<int[]> getOpenAdjKeys() {
@@ -83,103 +74,73 @@ public class HallwaySegment extends Overlappable implements Gridable {
     }
 
     // TODO: build rotation into this to reduce redundant code
-    @Override
     public void buildWallMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 center = getCenter(), c;
         // right
         if (connections[0]) {
             // right hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
             // right hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off right side
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // top
         if (connections[1]) {
             // top hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
             // top hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off top side
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // left
         if (connections[2]) {
             // left hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
             // left hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off left
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // bottom
         if (connections[3]) {
             // bottom hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
             // bottom hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // capp off bottom
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), building));
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         for (Wall wall : walls) {
-            wall.genSegmentsFromPoints();
-            wall.buildWallMesh(builder, modelCenter);
+            wall.buildRightMesh(builder, modelCenter);
         }
     }
 
-    @Override
-    public String className() { return "HallwaySegment"; }
     @Override
     public Vector2[] getCorners() { return corners; }
     @Override
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(x, y, w, h, position.x, position.y, width, height);
-    }
-    @Override
-    public boolean contains(float x, float y) { return Geometry.rectContains(x, y, position, width, height); }
-    @Override
-    public float edge(int direction) {
-        switch(direction) {
-            case 0:
-                return position.x + width;
-            case 90:
-                return position.y + height;
-            case 180:
-                return position.x;
-            case 270:
-                return position.y;
-        }
-        throw new  IllegalArgumentException();
-    }
-
-    @Override
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
-    }
-
-    @Override
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
+    public boolean contains(float x, float y) { return G.rectContains(x, y, position, width, height); }
 
     @Override
     public float getWidth() {
@@ -201,20 +162,11 @@ public class HallwaySegment extends Overlappable implements Gridable {
         for (Wall w: walls)
             w.unload();
     }
-    @Override
-    public Zone getZone() {
-        return zone;
-    }
-    @Override
-    public void setZone(Zone z) {
-        zone = z;
-    }
 
-    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
-        builder.setUVRange(0, 0, width / C.GRID_SIZE, height / C.GRID_SIZE);
+        builder.setUVRange(0, 0, width / C.GRIDSIZE, height / C.GRIDSIZE);
         builder.rect(relp.x, relp.y, -0.1f,
                 relp.x + width, relp.y, -0.1f,
                 relp.x + width, relp.y + height, -0.1f,

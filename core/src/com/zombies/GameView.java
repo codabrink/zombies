@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -25,7 +26,6 @@ import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
 import com.zombies.map.thread.Generator;
-import com.zombies.map.thread.MapAdmin;
 import com.zombies.util.Assets;
 import com.zombies.interfaces.Collideable;
 import com.zombies.util.ThreadedModelBuilder;
@@ -38,7 +38,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 public class GameView implements Screen {
     // STATIC VARIABLES
@@ -47,6 +46,7 @@ public class GameView implements Screen {
     public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
+    public static ModelCache modelCache = new ModelCache();
     private static List readyToModel    = Collections.synchronizedList(new ArrayList());
     private static List endableBuilders = Collections.synchronizedList(new ArrayList());
     private static List callbacks       = Collections.synchronizedList(new ArrayList());
@@ -69,7 +69,6 @@ public class GameView implements Screen {
     private com.zombies.HUD.HUD hud;
     private LinkedList<DebugDots> debugDots = new LinkedList<DebugDots>();
     private ArrayList<DebugCircle> debugCircles = new ArrayList<DebugCircle>();
-    public int frame = 0;
 
     private Box2DDebugRenderer debugRenderer;
     private Matrix4 debugMatrix;
@@ -93,52 +92,45 @@ public class GameView implements Screen {
         D.workers = new HashMap<>();
         D.workers.put(D.Worker.ROOM_DOOR, new Thread(new RoomDoorWorker()));
         D.workers.get(D.Worker.ROOM_DOOR).start();
-
-        D.workers.put(D.Worker.MAP_ADMIN, new Thread(new MapAdmin()));
-        D.workers.get(D.Worker.MAP_ADMIN).start();
     }
 
     public void reset() {
         gv = this;
 
-        Zone.zones = new HashMap<>();
-        Zone.loadedZones = new ArrayList<>();
         stats = new Stats();
 
         hud = new com.zombies.HUD.HUD();
         D.reset();
 
-        player = new Player(new Vector2(0, 0));
+        player = new Player(new Vector2(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE));
 
-        camHandle = new CameraHandle(this);
-        thumbpadLeft = new ThumbpadLeft(this);
+        camHandle     = new CameraHandle(this);
+        thumbpadLeft  = new ThumbpadLeft(this);
         thumbpadRight = new ThumbpadRight(this);
-        mh = new MessageHandler(this);
+        mh            = new MessageHandler(this);
         //meshes.main.play();
 
         Gdx.input.setInputProcessor(hud);
 
-        modelBatch = new ModelBatch();
+        modelBatch  = new ModelBatch();
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(player.pointLight);
 
         outsideEnvironment = new Environment();
-        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
+        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
-        readyToModel    = Collections.synchronizedList(new ArrayList());
-        endableBuilders = Collections.synchronizedList(new ArrayList());
-        callbacks       = Collections.synchronizedList(new ArrayList());
-
-        MapAdmin.reset = true;
+        readyToModel            = Collections.synchronizedList(new ArrayList());
+        endableBuilders         = Collections.synchronizedList(new ArrayList());
+        callbacks               = Collections.synchronizedList(new ArrayList());
 
         System.gc();
     }
 
     public void initialRoom() {
-        Generator.genFullBuilding(new Vector2(0, 0));
+        //TODO: initial room
     }
 
     public HUD getHUD() {
@@ -184,6 +176,8 @@ public class GameView implements Screen {
 
     @Override
     public void render(float dt) {
+        D.tick++;
+
         updateLoop();
 
         handleContacts();
@@ -194,12 +188,25 @@ public class GameView implements Screen {
 
         //lists
         D.world.step(Gdx.graphics.getDeltaTime(), 3, 4);
-        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
         // renderer.draw(D.world);
         Gdx.gl.glFlush();
         handleKeys();
 
-        player.update(frame);
+        player.update();
+        D.currentZone.update(C.DRAW_DISTANCE);
+
+        try {
+            modelCache.begin();
+            D.currentZone.draw(C.DRAW_DISTANCE);
+            modelCache.end();
+
+            modelBatch.begin(getCamera());
+            modelBatch.render(modelCache, outsideEnvironment);
+            modelBatch.end();
+        } catch (Exception e) {
+            modelCache = new ModelCache();
+        }
 
         for (DebugCircle dc: debugCircles)
             dc.draw(spriteBatch, shapeRenderer, modelBatch);
@@ -219,6 +226,8 @@ public class GameView implements Screen {
     protected void updateLoop() {
         mh.update();
         hud.update();
+
+        Generator.update();
 
         synchronized (readyToModel) {
             Iterator i = readyToModel.iterator();
@@ -243,10 +252,6 @@ public class GameView implements Screen {
                 i.remove();
             }
         }
-
-        frame++;
-        if (frame > 2000)
-            frame = 0;
     }
 
     protected void handleKeys() {
@@ -301,16 +306,16 @@ public class GameView implements Screen {
         float strength = 50 * C.SCALE;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, C.GRID_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, C.GRIDSIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(C.GRID_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(C.GRIDSIZE, 0), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.GRID_SIZE), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(0, -C.GRIDSIZE), player.getBody().getAngle());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            player.getBody().setTransform(player.getBody().getPosition().add(-C.GRID_SIZE, 0), player.getBody().getAngle());
+            player.getBody().setTransform(player.getBody().getPosition().add(-C.GRIDSIZE, 0), player.getBody().getAngle());
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {

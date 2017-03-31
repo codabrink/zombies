@@ -7,30 +7,33 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zombies.C;
+import com.zombies.Zone;
 import com.zombies.interfaces.ModelMeCallback;
-import com.zombies.util.Geometry;
+import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.G;
 
 public class DoorFrame {
     private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
     private Vector2 p1, p2;
     private Building building;
     private double angle;
+    private ModelMeCallback modelFrameCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildMesh(builder, center);
+        }
+    };
 
     public DoorFrame(Vector2 p1, Vector2 p2, Building b) {
         this.p1 = p1;
         this.p2 = p2;
         building = b;
-        angle = Geometry.getAngle(p1, p2);
+        angle = G.getAngle(p1, p2);
 
-        building.modelables.get(Building.MATERIAL.FLOOR_WOOD).add(new ModelMeCallback() {
-            @Override
-            public void buildModel(MeshPartBuilder builder, Vector2 center) {
-                buildMesh(builder, center);
-            }
-        });
+        Zone.getZone(p1).addModelingCallback(MATERIAL.FLOOR_WOOD, modelFrameCallback);
     }
 
-    public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
+    public void buildMesh(MeshPartBuilder builder, Vector2 center) {
         BoundingBox bounds;
         Vector3 min, max;
 
@@ -41,7 +44,7 @@ public class DoorFrame {
         bounds = new BoundingBox(min, max);
 
         Matrix4 mtrans = new Matrix4();
-        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, frameTop);
+        mtrans.translate(p1.x - center.x, p1.y - center.y, frameTop);
         mtrans.rotate(Vector3.Z, (float)Math.toDegrees(angle));
         bounds.mul(mtrans);
 
@@ -52,7 +55,7 @@ public class DoorFrame {
         bounds = new BoundingBox(min, max);
 
         mtrans = new Matrix4();
-        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
+        mtrans.translate(p1.x - center.x, p1.y - center.y, 0);
         bounds.mul(mtrans);
 
         boxShapeBuilder.build(builder, bounds);

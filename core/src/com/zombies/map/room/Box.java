@@ -8,7 +8,6 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.Crate;
 import com.zombies.GameView;
 import com.zombies.Survivor;
 import com.zombies.Unit;
@@ -16,27 +15,44 @@ import com.zombies.Zombie;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
-import com.zombies.interfaces.Modelable;
-import com.zombies.powerups.Powerup;
+import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.util.Assets.MATERIAL;
 
 public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;
 
-    private ArrayList<Unit> zombies = new ArrayList<>();
-    private ArrayList<Unit> survivors = new ArrayList<Unit>();
-    private ArrayList<Crate> crates = new ArrayList<Crate>();
-    private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
+    private HashSet<Unit> zombies = new HashSet<>();
+    private HashSet<Unit> survivors = new HashSet<Unit>();
+    public HashSet<DoorContainer> doors = new HashSet<>();
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
+    private Zone zone;
 
     private Building building;
     private Room room;
+    private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildFloorMesh(builder, center);
+        }
+    };
+
+    private Wall[] walls = new Wall[4];
+    private Vector2[] outerCorners = new Vector2[4];
+    private Wall[] outerWalls = new Wall[4];
 
     private int id;
     private int[] key;
     private String sKey;
 
-    public Box(Room room, int[] key) {
+    public static Box createBox(Room room, int[] key) {
+        Overlappable o = room.getBuilding().checkOverlap(key);
+        if (room.getBuilding().checkOverlap(key) != null)
+            return null;
+        return new Box(room, key);
+    }
+
+    protected Box(Room room, int[] key) {
         id = numBoxes;
         numBoxes++;
 
@@ -52,78 +68,97 @@ public class Box extends Overlappable implements Gridable {
         room.boxes.add(this);
 
         position = building.positionOf(key);
-        height   = C.GRID_SIZE;
-        width    = C.GRID_SIZE;
+        height   = C.GRIDSIZE;
+        width    = C.GRIDSIZE;
 
-        corners = building.cornersOf(position);
-        setZones();
-    }
+        setCorners(building.cornersOf(position));
 
-    private void setZones() {
         zone = Zone.getZone(getCenter());
-        Zone z;
-        for (Vector2 v : corners) {
-            z = Zone.getZone(v);
-            synchronized (z.pendingObjects) {
-                z.addObject(this);
-                z.addObject(room);
-            }
-        }
+        zone.addPendingObject(this);
+        zone.addPendingObject(room);
+        zone.addModelingCallback(room.type.floorMaterial, modelFloorCallback);
     }
 
-    public void setAdjWallMap() {
+    @Override
+    protected void setCorners(Vector2[] corners) {
+        super.setCorners(corners);
+        float thickness = 0.1f;
+        outerCorners = new Vector2[]{
+                position.cpy().add(width + thickness, height + thickness),
+                position.cpy().add(0, height + thickness),
+                position.cpy().add(0, -thickness),
+                position.cpy().add(width + thickness, 0)
+        };
+    }
+
+    public void compile() {
+        buildWalls();
+        for (Wall wall : walls)
+            if (wall != null)
+                wall.compile();
+        for (Wall wall : outerWalls)
+            if (wall != null)
+                wall.compile();
+    }
+
+    private void buildWalls() {
         Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
         Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
         Gridable e = gridMap.get(key[0] + 1 + "," + key[1]);
         Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
-        String key = this.key[0]+","+(this.key[1]+1)+",h";
-        if (!(n instanceof Box) || ((Box)n).getRoom() != room) {
-            putWall(key,
-                    position.cpy().add(0, height),
-                    position.cpy().add(width, height),
-                    building);
-        } else { clearWall(key); }
-
-        key = (this.key[0]+1)+","+ this.key[1]+",v";
-        if (!(e instanceof Box) || ((Box)e).getRoom() != room) {
-            putWall(key,
-                    position.cpy().add(width, 0),
-                    position.cpy().add(width, height),
-                    building);
-        } else { clearWall(key); }
-
-        key = sKey+",h";
-        if (!(s instanceof Box) || ((Box)s).getRoom() != room) {
-            putWall(key,
-                    position.cpy(),
-                    position.cpy().add(width, 0),
-                    building);
-        } else { clearWall(key); }
-
-        key = sKey+",v";
-        if (!(w instanceof Box) || ((Box)w).getRoom() != room) {
-            putWall(key,
-                    position.cpy(),
-                    position.cpy().add(0, height),
-                    building);
-        } else { clearWall(key); }
+        processWall(e, 0, 0, 3);
+        processWall(n, 1, 1, 0);
+        processWall(w, 2, 2, 1);
+        processWall(s, 3, 3, 2);
     }
 
-    private void putWall(String key, Vector2 p1, Vector2 p2, Building b) {
-        building.putWallMap(key, new WallWall(p1, p2, b));
+    private void processWall(Gridable g, int i, int a, int b) {
+        if (g == null) {
+            if (building.outsideDoorCount == 0 || random.nextFloat() < 0.1f) {
+                createDoor(i, a, b, room.type.wallMaterial, building.type.outerWallMaterial);
+                building.outsideDoorCount++;
+                return;
+            }
+            createWall(i, a, b, room.type.wallMaterial, building.type.outerWallMaterial);
+            return;
+        }
+
+        if (g instanceof Box && ((Box) g).getRoom() != room) {
+            Box box = (Box) g;
+            Room room = box.getRoom();
+            if (this.room != room && (!(this.room.connections.contains(room)) || random.nextFloat() < 0.05f)) {
+                createDoor(g, a, b, this.room.type.wallMaterial, room.type.wallMaterial);
+                room.connections.add(this.room);
+                this.room.connections.add(room);
+
+                this.room.connected = this.room.connected && room.connected;
+                room.connected      = this.room.connected;
+                
+                return;
+            }
+            createWall(g, a, b, room.type.wallMaterial, this.room.type.wallMaterial);
+            return;
+        }
     }
-    private void clearWall(String key) {
-        if (building.wallMap.get(key) != null)
-            building.wallMap.get(key).destroy();
+
+
+    private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, i, new DoorWall(corners[a], corners[b], building, lm, rm));
     }
+    private void createDoor(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, g, new DoorWall(corners[a], corners[b], building, lm, rm));
+    }
+    private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));
+    }
+    private void createWall(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, g, new WallWall(corners[a], corners[b], lm, rm));
+    }
+
 
     public float x() {return position.x;}
     public float y() {return position.y;}
-
-    public ArrayList<Powerup> getPowerups() {
-        return powerups;
-    }
 
     public Survivor addSurvivor() {
         Survivor s = new Survivor(this.randomPoint());
@@ -158,33 +193,21 @@ public class Box extends Overlappable implements Gridable {
         case 1:
             return position;
         case 2:
-            return position.cpy().add(C.GRID_SIZE, 0);
+            return position.cpy().add(C.GRIDSIZE, 0);
         case 3:
-            return position.cpy().add(0, C.GRID_SIZE);
+            return position.cpy().add(0, C.GRIDSIZE);
         case 4:
-            return position.cpy().add(C.GRID_SIZE, C.GRID_SIZE);
+            return position.cpy().add(C.GRIDSIZE, C.GRIDSIZE);
         }
         return new Vector2();
     }
 
-    public ArrayList<Unit> getSurvivorList() {
-        return survivors;
-    }
-
-    public ArrayList<Unit> getUnits() {
+    public HashSet<Unit> getUnits() {
         return zombies;
     }
 
     public Vector2 randomPoint() {
-        return position.cpy().add(random.nextFloat() * C.GRID_SIZE, random.nextFloat() * C.GRID_SIZE);
-    }
-
-    public Unit randomZombie() {
-        if (zombies.isEmpty() || zombies.size() == 1) {
-            return null;
-        }
-        Unit u = zombies.get(random.nextInt(zombies.size()));
-        return u;
+        return position.cpy().add(random.nextFloat() * C.GRIDSIZE, random.nextFloat() * C.GRIDSIZE);
     }
 
     public int getId() { return id; }
@@ -211,36 +234,18 @@ public class Box extends Overlappable implements Gridable {
         return adjKeys;
     }
 
-    @Override
-    public void buildWallMesh(MeshPartBuilder builder, Vector2 center) {}
-
-    @Override
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
-        builder.rect(relp.x, relp.y, 0,
-                relp.x + width, relp.y, 0,
-                relp.x + width, relp.y + height, 0,
-                relp.x, relp.y + height, 0,
+        builder.rect(relp.x, relp.y, 1,
+                relp.x + width, relp.y, 1,
+                relp.x + width, relp.y + height, 1,
+                relp.x, relp.y + height, 1,
                 1, 1, 1);
     }
 
-    @Override
-    public void setZone(Zone z) {
-    }
-
-    @Override
-    public String className() {
-        return "Box";
-    }
-
-
-    @Override
-    public void load() {
-
-    }
-    @Override
-    public void unload() {
-
+    public void dispose() {
+        zone.removeModelingCallback(room.type.floorMaterial, modelFloorCallback);
+        zone.removeObject(this);
     }
 
     public String giveKey(Box b) {

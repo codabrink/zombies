@@ -1,103 +1,108 @@
 package com.zombies.map.room;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.Modelable;
-import com.zombies.interfaces.ModelMeCallback;
-import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.map.Hallway;
-import com.zombies.util.Assets;
-import com.zombies.util.ThreadedModelBuilder;
-import com.zombies.util.ZTexture;
+import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.U;
+import com.zombies.workers.RoomDoorWorker;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
-public class Building implements HasZone, Modelable {
+public class Building implements HasZone {
     public static final int[] MODIFIERS = {1, 0, 0, 1, -1, 0, 0, -1};
+    private static Random random = new Random();
 
-    private Model model;
-    private ModelInstance modelInstance;
-
-    private int drawFrame = 0;
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
-    public boolean threadLocked = false;
-    private HashSet<Room> rooms = new HashSet<>();
-    public HashMap<String, Gridable> gridMap = new HashMap<>();
-    public HashMap<String, Wall> wallMap = new HashMap<>();
-    public HashSet<Hallway> hallways = new HashSet<>();
-    private Vector2 center;
-    private Zone zone;
 
-    private ThreadedModelBuilder modelBuilder;
+    public    BuildingType type;
+    protected HashSet<Room>             rooms    = new HashSet<>();
+    public    HashMap<String, Gridable> gridMap  = new HashMap<>();
+    public    HashMap<String, Wall>     wallMap  = new HashMap<>();
+    public    HashSet<Hallway>          hallways = new HashSet<>();
+    protected Vector2                   center;
+    protected Zone                      zone;
 
-    public enum MATERIAL {
-        GREEN_TILE ("greentile", "data/room/floor/kitchen.jpg"),
-        FLOOR_CARPET ("floorcarpet", "data/room/floor/living_room.jpg"),
-        FLOOR_WOOD ("floorwood", "data/room/floor/dining_room.jpg");
+    public int outsideDoorCount = 0;
 
-        public ZTexture texture;
-        public String partName;
-        MATERIAL(String partName, String path) {
-            this.partName = partName;
-            texture = new ZTexture(path);
+    public enum BuildingType {
+        //VINYL_BEIGE (MATERIAL.SIDING_BEIGE_VINYL);
+        BRICK (MATERIAL.SIDING_BRICK);
+
+        public MATERIAL outerWallMaterial;
+        BuildingType(MATERIAL outerWallMaterial) {
+            this.outerWallMaterial = outerWallMaterial;
         }
+
+        public static BuildingType random() { return values()[random.nextInt(values().length)]; }
     }
-    public HashMap<MATERIAL, HashSet<ModelMeCallback>> modelables = new HashMap<>();
 
-    private boolean compiled = false; // debug var
+    public static Building createBuilding(Vector2 c, int maxRooms) {
+        Zone z = Zone.getZone(c);
+        float bufferRadius = C.GRIDSIZE * 2;
+        float bufferDiameter = bufferRadius * 2;
+        if (z.checkOverlap(new Overlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
+            return null;
 
-    public Building(Vector2 c) {
+        return new Building(c, maxRooms);
+    }
+
+    protected Building() {}
+    protected Building(Vector2 c, int maxRooms) {
         center = c;
 
-        for (MATERIAL m : MATERIAL.values())
-            modelables.put(m, new HashSet<ModelMeCallback>());
+        this.type = BuildingType.random();
 
-        modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
-            @Override
-            public void response(Model m) {
-                model = m;
-                modelInstance = new ModelInstance(model);
-                modelInstance.transform.setTranslation(center.x, center.y, 0);
-            }
-        });
+        generate(maxRooms);
+        compile();
 
-        Zone z = Zone.getZone(center);
-        synchronized (z.pendingObjects) {
-            z.pendingObjects.add(this);
+        zone = Zone.getZone(center);
+        zone.addPendingObject(this);
+    }
+
+    private void generate(int maxRooms) {
+        if (maxRooms == 0)
+            return;
+
+        final int preferredRoomSize = 8;
+
+        int[] key = new int[]{0, 0};
+        Room.createRoom(this, key, preferredRoomSize);
+
+        int loops = 0;
+
+        while(rooms.size() < maxRooms && loops < maxRooms * C.ERROR_TOLERANCE) {
+            loops++;
+            Box b = (Box) U.random(getOuterBoxes());
+            if (b == null)
+                continue;
+            key   = (int[]) U.random(b.getOpenAdjKeys());
+            Room.createRoom(this, key, preferredRoomSize);
         }
     }
+
     public void compile() {
         for (Room room : rooms)
             room.compile();
         for (Hallway hallway : hallways)
             hallway.compile();
+        for (Wall wall : wallMap.values())
+            wall.compile();
         calculateBorders();
-        if (C.DEBUG) compiled = true;
     }
 
     public Vector2 positionOf(int[] key) {
         return positionOf(key[0], key[1]);
     }
     public Vector2 positionOf(int x, int y) {
-        float vx = center.x - C.GRID_HALF_SIZE + (C.GRID_SIZE * x);
-        float vy = center.y - C.GRID_HALF_SIZE + (C.GRID_SIZE * y);
+        float vx = center.x - C.GRID_HALF_SIZE + (C.GRIDSIZE * x);
+        float vy = center.y - C.GRID_HALF_SIZE + (C.GRIDSIZE * y);
         return new Vector2(vx, vy);
     }
 
@@ -105,10 +110,10 @@ public class Building implements HasZone, Modelable {
     public Vector2[] cornersOf(int x, int y) { return cornersOf(positionOf(x, y)); }
     public Vector2[] cornersOf(Vector2 position) {
         return new Vector2[] {
-                new Vector2(position.x + C.GRID_SIZE, position.y + C.GRID_SIZE),
-                new Vector2(position.x, position.y + C.GRID_SIZE),
+                new Vector2(position.x + C.GRIDSIZE, position.y + C.GRIDSIZE),
+                new Vector2(position.x, position.y + C.GRIDSIZE),
                 new Vector2(position.x, position.y),
-                new Vector2(position.x + C.GRID_SIZE, position.y)
+                new Vector2(position.x + C.GRIDSIZE, position.y)
         };
     }
 
@@ -135,12 +140,18 @@ public class Building implements HasZone, Modelable {
     }
 
     public Overlappable checkOverlap(int[] key) {
-        return checkOverlap(key, C.GRID_SIZE, C.GRID_SIZE);
+        return checkOverlap(key, 0);
     }
-    public Overlappable checkOverlap(int[] key, float width, float height) {
+    public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
+        Gridable g = gridMapGet(key);
+        if (g != null)
+            return (Overlappable) g;
+        return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
+    }
+    public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
         Zone    zone     = Zone.getZone(position);
-        return zone.checkOverlap(position, width, height, 1);
+        return zone.checkOverlap(new Overlappable(position, width, height), 1, gridMap.values());
     }
 
     public Vector2[] wallPositionOf(String key) {
@@ -151,19 +162,33 @@ public class Building implements HasZone, Modelable {
         Vector2 p1 = positionOf(new int[]{x, y});
         return new Vector2[]{
                 p1,
-                (orientation == 'v' ? p1.cpy().add(0, C.GRID_SIZE) : p1.cpy().add(C.GRID_SIZE, 0))};
+                (orientation == 'v' ? p1.cpy().add(0, C.GRIDSIZE) : p1.cpy().add(C.GRIDSIZE, 0))};
     }
 
-    public static String wallKeyBetweenGridables(int[] k1, int[] k2) {
+
+    public void putWall(Gridable g, int direction, Wall wall) {
+        String key = wallKeyFromGridableAndDirection(g, direction);
+        putWall(key, wall);
+    }
+    public void putWall(Gridable a, Gridable b, Wall wall) {
+        String key = wallKeyBetweenGridables(a, b);
+        putWall(key, wall);
+    }
+    public void putWall(String key, Wall wall) {
+        Wall w = wallMap.get(key);
+        if (w != null)
+            return;
+        wallMap.put(key, wall);
+    }
+
+
+    public static String wallKeyBetweenKeys(int[] k1, int[] k2) {
         return Math.max(k1[0], k2[0]) + "," +
-                Math.max(k1[1], k2[1]) + "," +
-                (k1[0] != k2[0] ? "v" : "h");
+                Math.max(k1[1], k2[1]) + ',' +
+                (k1[0] == k2[0] ? 'h' : 'v');
     }
     public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
-        return wallKeyBetweenGridables(g1.getKey(), g2.getKey());
-    }
-    public Wall wallBetweenBoxes(Box b1, Box b2) {
-        return wallMap.get(wallKeyBetweenGridables(b1, b2));
+        return wallKeyBetweenKeys(g1.getKey(), g2.getKey());
     }
     public String wallKeyFromGridableAndDirection(Gridable g, int direction) {
         return wallKeyFromGridableAndDirection(g.getKey(), direction);
@@ -181,12 +206,6 @@ public class Building implements HasZone, Modelable {
             default:
                 throw new IllegalArgumentException("Direction should be between 0 and 3.");
         }
-    }
-    public Wall wallFromGridableAndDirection(Gridable g, int direction) {
-        return wallFromGridableAndDirection(g.getKey(), direction);
-    }
-    public Wall wallFromGridableAndDirection(int[] key, int direction) {
-        return wallMap.get(wallKeyFromGridableAndDirection(key, direction));
     }
 
     public HashSet<Box> getOuterBoxes() {
@@ -208,11 +227,6 @@ public class Building implements HasZone, Modelable {
     public void putBoxMap(int[] key, Box b) {
         gridMap.put(key[0] + "," + key[1], b);
     }
-    public void putWallMap(String key, Wall w) {
-        if (wallMap.get(key) != null)
-            wallMap.get(key).destroy();
-        wallMap.put(key, w);
-    }
 
     public void calculateBorders() {
         int[] key;
@@ -230,51 +244,10 @@ public class Building implements HasZone, Modelable {
         return center;
     }
     public void addRoom(Room room) {
-        if (C.DEBUG) { compiled = false; }
         rooms.add(room);
     }
     public HashSet<Room> getRooms() { return rooms; }
     public HashSet<Hallway> getHallways() { return hallways; }
-
-    @Override
-    public void rebuildModel() {
-        if (C.DEBUG && !compiled)
-            System.out.println("Building: ERROR! Building is not compiled.");
-
-        for (Wall w : wallMap.values())
-            w.genSegmentsFromPoints();
-
-        modelBuilder.begin();
-        // build walls
-        MeshPartBuilder builder = modelBuilder.part("Walls",
-                GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w : wallMap.values())
-            w.buildWallMesh(builder, center);
-        for (Gridable g : gridMap.values())
-            g.buildWallMesh(builder, center);
-        // done with walls
-        // modeling callbacks
-        for (MATERIAL m : modelables.keySet()) {
-            builder = modelBuilder.part(m.partName,
-                    GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                    new Material(m.texture.textureAttribute));
-            for (ModelMeCallback mc : modelables.get(m))
-                mc.buildModel(builder, center);
-        }
-        modelBuilder.finish();
-    }
-
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        if (drawFrame == GameView.gv.frame)
-            return;
-        drawFrame = GameView.gv.frame;
-
-        modelBatch.begin(GameView.gv.getCamera());
-        if (modelInstance != null)
-            modelBatch.render(modelInstance, GameView.environment);
-        modelBatch.end();
-    }
 
     @Override
     public Zone getZone() {
@@ -282,9 +255,7 @@ public class Building implements HasZone, Modelable {
     }
 
     @Override
-    public void setZone(Zone z) {
-        zone = z;
-    }
+    public void setZone(Zone z) {}
 
     public static int bmKeyToDirection(int[] bmKey1, int[] bmKey2) {
         if (bmKey2[0] == bmKey1[0] + 1 && bmKey2[1] == bmKey1[1])

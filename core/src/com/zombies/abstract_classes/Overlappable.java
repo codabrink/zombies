@@ -1,79 +1,123 @@
 package com.zombies.abstract_classes;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
-import com.zombies.interfaces.IOverlappable;
-import com.zombies.interfaces.Loadable;
-import com.zombies.map.data.join.JoinOverlappableOverlappable;
-import com.zombies.util.Geometry;
+import com.zombies.util.G;
+import com.zombies.util.LineSegment;
+import com.zombies.util.Ray;
+import com.zombies.util.U;
 
-import java.util.HashSet;
-
-public abstract class Overlappable implements IOverlappable, Loadable, HasZone {
+public class Overlappable {
     public float width, height;
-    protected Vector2 position;
-    protected Vector2[] corners = new Vector2[4];
-    protected HashSet<JoinOverlappableOverlappable> joinOverlappableOverlappables = new HashSet<>();
+    protected Vector2    position, center;
+    protected Vector2[]  corners;
+    public LineSegment[] lines;
 
-    private Vector2 zonedPosition = null;
-    private long zonedTimestamp = 0l;
+    public Overlappable() {}
+    public Overlappable(Vector2[] corners) {
+        setCorners(corners);
+    }
+    public Overlappable(Vector2 position, float width, float height) {
+        setCorners(new Vector2[]{
+                position,
+                position.cpy().add(width, 0),
+                position.cpy().add(width, height),
+                position.cpy().add(0, height)
+        });
+    }
 
-    protected Zone zone;
-
+    // corners need to be oriented in counter-clockwise fashion
+    protected void setCorners(Vector2[] corners) {
+        this.corners = corners;
+        lines = new LineSegment[corners.length]; // line forumlas are cached for performance
+        for (int i = 0; i < corners.length; i++)
+            lines[i] = new LineSegment(corners[i], corners[(i + 1) % corners.length]);
+    }
     public Vector2[] getCorners() { return corners; }
+
+
     public Vector2 getCenter() {
-        return position.cpy().add(width / 2, height / 2);
-    }
-    public boolean overlaps(float x, float y, float w, float h) {
-        return Geometry.rectOverlap(position.x, position.y, width, height, x, y, w, h);
-    }
-    public boolean contains(float x, float y) {
-        return Geometry.rectContains(x, y, position, width, height);
-    }
-    public float edge(int direction) {
-        switch(direction) {
-            case 90:
-                return position.y + height;
-            case 0:
-                return position.x + width;
-            case 270:
-                return position.y;
-            case 180:
-                return position.x;
+        if (center != null)
+            return center;
+        float x = 0, y = 0;
+        for (Vector2 corner : corners) {
+            x += corner.x;
+            y += corner.y;
         }
-        return 0;
+        center = new Vector2(x / corners.length, y / corners.length);
+        return center;
     }
-    public float oppositeEdge(int direction) {
-        return edge((direction + 180) % 360);
+    // TODO: currently only returns true if lines intersect
+    public boolean overlaps(Overlappable o) {
+        int closest      = closestCornerTo(o);
+        int oClosest     = o.closestCornerTo(this);
+        for (int i = -1; i <= 0; i++)
+            for (int ii = -1; ii <= 0; ii++)
+                if (lines[U.mod(closest + i, lines.length)].intersectionPoint(o.lines[U.mod(oClosest + ii, o.lines.length)]) != null)
+                    return true;
+        return false;
     }
-    public Vector2 intersectPointOfLine(Vector2 p1, Vector2 p2) { return Geometry.edgeIntersection(p1, p2, this); }
 
+    private void checkForOversizing() {
+        float max = 0;
+        for (int i = 1; i < corners.length; i++)
+            max = Math.max(max, corners[i - 1].dst(corners[i]));
+        if (max > C.ZONE_SIZE * (C.DRAW_DISTANCE + 1))
+            System.out.println("Overlappable: ERROR! Object is too large to render properly.");
+    }
+
+    public int closestCornerTo(Overlappable o) {
+        int closestIndex = 0;
+        float closestDistance = corners[0].dst(o.getCenter());
+        for (int i = 1; i < corners.length; i++) {
+            float distance = corners[i].dst(o.getCenter());
+            if (distance > closestDistance)
+                continue;
+
+            closestDistance = distance;
+            closestIndex    = i;
+        }
+        return closestIndex;
+    }
+
+    public boolean contains(float x, float y) {
+        return contains(new Vector2(x, y));
+    }
+    public boolean contains(Vector2 p) {
+        Ray r = new Ray(p);
+        int count = 0;
+        for (LineSegment line : lines) {
+            if (line.intersectionPointInclusive(r) != null)
+                count++;
+        }
+        return !((count & 1) == 0);
+    }
+
+    public Vector2[] cropLine(Vector2 p1, Vector2 p2) {
+        Vector2[] result = new Vector2[2];
+        return null;
+    }
+
+    public Vector2 lineIntersect(Vector2 p1, Vector2 p2) {
+        return lineIntersect(new LineSegment(p1, p2));
+    }
+    public Vector2 lineIntersect(LineSegment lineSegment) {
+        Vector2 result = null;
+        float intersectionDst = 0;
+        for (LineSegment ls : lines) {
+            Vector2 intersection = ls.intersectionPointInclusive(lineSegment);
+            if (intersection == null) continue;
+            if (!(result == null || intersection.dst(lineSegment.p1) < intersectionDst)) continue;
+
+            intersectionDst = intersection.dst(lineSegment.p1);
+            result          = intersection;
+        }
+        return result;
+
+    }
+
+    public float getHeight() { return height;}
     public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    public void addJoinOverlappableOverlappable(JoinOverlappableOverlappable joo) {
-        for (JoinOverlappableOverlappable j : joinOverlappableOverlappables)
-            if (j.o1 == this || j.o2 == this)
-                return;
-        joinOverlappableOverlappables.add(joo);
-    }
-
-    @Override
-    public void setZone(Zone z) {
-        this.zone = Zone.getZone(getCenter());
-
-        if (zonedPosition == position || System.currentTimeMillis() < zonedTimestamp + 1000l)
-            return;
-
-        zonedPosition = position;
-        zonedTimestamp = System.currentTimeMillis();
-
-        for (Vector2 corner : corners)
-            Zone.getZone(corner).addObject(this);
-    }
-
-    @Override
-    public Zone getZone() {
-        return zone;
-    }
 }

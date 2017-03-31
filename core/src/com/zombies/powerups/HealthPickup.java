@@ -96,7 +96,6 @@ public class HealthPickup extends Powerup implements com.zombies.interfaces.Coll
 	private void destroy() {
 		shape.dispose();
 		body.getWorld().destroyBody(body);
-		box.getPowerups().remove(this);
 	}
 	
 	@Override
