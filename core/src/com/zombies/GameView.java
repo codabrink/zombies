@@ -102,7 +102,7 @@ public class GameView implements Screen {
         hud = new com.zombies.HUD.HUD();
         D.reset();
 
-        player = new Player(new Vector2(0, 0));
+        player = new Player(new Vector2(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE));
 
         camHandle     = new CameraHandle(this);
         thumbpadLeft  = new ThumbpadLeft(this);
@@ -188,7 +188,7 @@ public class GameView implements Screen {
 
         //lists
         D.world.step(Gdx.graphics.getDeltaTime(), 3, 4);
-        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
         // renderer.draw(D.world);
         Gdx.gl.glFlush();
         handleKeys();
@@ -196,13 +196,17 @@ public class GameView implements Screen {
         player.update();
         D.currentZone.update(C.DRAW_DISTANCE);
 
-        modelCache.begin();
-        D.currentZone.draw(C.DRAW_DISTANCE);
-        modelCache.end();
+        try {
+            modelCache.begin();
+            D.currentZone.draw(C.DRAW_DISTANCE);
+            modelCache.end();
 
-        modelBatch.begin(getCamera());
-        modelBatch.render(modelCache, outsideEnvironment);
-        modelBatch.end();
+            modelBatch.begin(getCamera());
+            modelBatch.render(modelCache, outsideEnvironment);
+            modelBatch.end();
+        } catch (Exception e) {
+            modelCache = new ModelCache();
+        }
 
         for (DebugCircle dc: debugCircles)
             dc.draw(spriteBatch, shapeRenderer, modelBatch);

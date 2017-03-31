@@ -44,7 +44,7 @@ public class C {
     public static final float ZOMBIE_SPEED = 15f;
     public static final float ZOMBIE_STRENGTH = 7f;
 
-    public static final float ZONE_SIZE = 100 * SCALE;
+    public static final float ZONE_SIZE = 500 * SCALE;
     public static final float ZONE_HALF_SIZE = ZONE_SIZE / 2;
     public static int DRAW_DISTANCE = 2;
     public static final float FOV = 90;

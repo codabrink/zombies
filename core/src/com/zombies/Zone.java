@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -94,7 +95,7 @@ public class Zone extends Overlappable {
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
-    private LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = new LinkedHashMap<>();
+
     public boolean needsRemodel = false; // flag true, and the model will rebuild at next possible moment
 
     // Collections
@@ -108,6 +109,7 @@ public class Zone extends Overlappable {
 
     private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
     private Set<Overlappable> overlappables                      = Collections.synchronizedSet(new LinkedHashSet<Overlappable>());
+    private Map<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = Collections.synchronizedMap(new LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>>());
     private LinkedHashSet<Updateable> updateables                = new LinkedHashSet<>();
     private LinkedHashSet<Wall> walls                            = new LinkedHashSet<>();
     private LinkedHashSet<Loadable> loadables                    = new LinkedHashSet<>();
@@ -139,17 +141,21 @@ public class Zone extends Overlappable {
     }
 
     public void addModelingCallback(MATERIAL m, ModelMeCallback mmc) {
-        LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
-        if (modelableSet == null) {
-            modelableSet = new LinkedHashSet<>();
-            modelables.put(m, modelableSet);
+        synchronized (modelables) {
+            LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
+            if (modelableSet == null) {
+                modelableSet = new LinkedHashSet<>();
+                modelables.put(m, modelableSet);
+            }
+            modelableSet.add(mmc);
         }
-        modelableSet.add(mmc);
     }
     public void removeModelingCallback(MATERIAL m, ModelMeCallback mmc) {
-        LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
-        if (modelableSet != null)
-            modelableSet.remove(mmc);
+        synchronized (modelables) {
+            LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
+            if (modelableSet != null)
+                modelableSet.remove(mmc);
+        }
     }
 
     public void draw(int limit) {
@@ -158,15 +164,17 @@ public class Zone extends Overlappable {
             z.draw();
     }
     public void draw() {
-        drawThineself();
+        if (modelInstance == null)
+            return;
+        GameView.modelCache.add(modelInstance);
+        for (ModelInstance mi : modelInstances)
+            GameView.modelCache.add(mi);
         for (Drawable d : drawables)
             if (d.getZone() == this)
                 d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
     private void drawThineself() {
-        if (modelInstance == null)
-            return;
-        GameView.modelCache.add(modelInstance);
+
     }
 
     public void update(int limit) {
@@ -584,12 +592,14 @@ public class Zone extends Overlappable {
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
         for (Wall w : walls)
             w.buildWallMesh(builder, center);
-        for (MATERIAL m : modelables.keySet()) {
-            builder = modelBuilder.part(m.partName,
-                    GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                    new Material(m.texture.textureAttribute));
-            for (ModelMeCallback mc : modelables.get(m))
-                mc.buildModel(builder, center);
+        synchronized (modelables) {
+            for (MATERIAL m : modelables.keySet()) {
+                builder = modelBuilder.part(m.partName,
+                        GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
+                        new Material(m.texture.textureAttribute));
+                for (ModelMeCallback mc : modelables.get(m))
+                    mc.buildModel(builder, center);
+            }
         }
         modelBuilder.finish();
     }

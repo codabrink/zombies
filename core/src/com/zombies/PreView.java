@@ -22,11 +22,7 @@ public class PreView implements Screen {
     public PreView() {
         spriteBatch = new SpriteBatch();
 
-        intro.add("Kill as many zombies as you can before dying.");
-        intro.add("There are health packs and guns scattered throughout the maze.");
-        intro.add("This is a pre-alpha build and is in heavy development.");
-        intro.add("Please be patient, updates and features are coming!");
-        intro.add("Touch the screen to continue.");
+        intro.add("Blah blah blah.. Nothing to see here.");
 
         textStartHeight = Gdx.graphics.getHeight() / 2 + (intro.size() * fontSize * Gdx.graphics.getDensity());
     }

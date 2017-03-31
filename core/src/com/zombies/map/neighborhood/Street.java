@@ -13,7 +13,7 @@ import com.zombies.util.LineSegment;
 import java.util.LinkedHashSet;
 
 public class Street implements StreetConnection {
-    public static final float RADIUS = 3f;
+    public static final float RADIUS = 10f;
 
     private StreetSystem streetSystem;
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
