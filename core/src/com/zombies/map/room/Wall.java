@@ -3,19 +3,7 @@ package com.zombies.map.room;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
-
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -28,41 +16,46 @@ import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
-import com.zombies.interfaces.Modelable;
+import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.ZCallback;
-import com.zombies.util.Assets;
+import com.zombies.util.Assets.MATERIAL;
 
 public class Wall implements Collideable, Loadable, HasZone {
     private Vector2 p1, p2, center;
     private double angle;
     private Body body;
     private HashMap<Float, Float> holes = new HashMap<Float, Float>();
+    private MATERIAL material;
 
     protected ArrayList<WallPoint>   points   = new ArrayList<>();
     protected ArrayList<WallSegment> segments = new ArrayList<>();
 
-    private GameView view;
+    private ModelMeCallback modelMeCallback = new ModelMeCallback() {
+        @Override
+        public void buildModel(MeshPartBuilder builder, Vector2 center) {
+            buildWallMesh(builder, center);
+        }
+    };
 
-    public Building building;
-    private int[] key;
-    private String sKey;
     private Zone zone;
 
-    public Wall(Vector2 p1, Vector2 p2, Building b) {
-        view = GameView.gv;
+    public Wall(Vector2 p1, Vector2 p2, MATERIAL material) {
+        this.material = material;
 
         this.p1 = p1;
         this.p2 = p2;
         angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         center = new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-        building = b;
 
         zone = Zone.getZone(p1);
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
             z.addPendingObject(this);
+    }
 
+    public void compile() {
         genSegmentsFromPoints();
+        zone.addModelingCallback(material, modelMeCallback);
     }
 
     public void genSegmentsFromPoints() {
@@ -77,7 +70,7 @@ public class Wall implements Collideable, Loadable, HasZone {
             segments.add(new WallSegment(
                     points.get(i).getPoint(),
                     points.get(i + 1).getPoint(),
-                    points.get(i).getHeight()));
+                    points.get(i).getHeight(), material));
         }
 
         final Wall wall = this;
@@ -177,7 +170,7 @@ public class Wall implements Collideable, Loadable, HasZone {
             // the wall unit vector (second requirement is false if the last/first hole extends past
             // the wall, in which case this seg is not needed).
             if (v2.cpy().sub(v1).len() > 0 && v2.cpy().sub(v1).dot(vo) > 0.0) {
-                WallSegment s = new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2), 1);
+                WallSegment s = new WallSegment(p1.cpy().add(v1), p1.cpy().add(v2), 1, material);
                 segments.add(s);
                 s.genShapes(body);
             }

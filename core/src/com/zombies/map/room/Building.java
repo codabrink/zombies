@@ -20,7 +20,6 @@ public class Building implements HasZone {
     public boolean threadLocked = false;
     protected HashSet<Room> rooms = new HashSet<>();
     public HashMap<String, Gridable> gridMap = new HashMap<>();
-    public HashMap<String, Wall> wallMap = new HashMap<>();
     public HashSet<Hallway> hallways = new HashSet<>();
     protected Vector2 center;
     protected Zone zone;
@@ -154,9 +153,6 @@ public class Building implements HasZone {
     public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
         return wallKeyBetweenGridables(g1.getKey(), g2.getKey());
     }
-    public Wall wallBetweenBoxes(Box b1, Box b2) {
-        return wallMap.get(wallKeyBetweenGridables(b1, b2));
-    }
     public String wallKeyFromGridableAndDirection(Gridable g, int direction) {
         return wallKeyFromGridableAndDirection(g.getKey(), direction);
     }
@@ -173,12 +169,6 @@ public class Building implements HasZone {
             default:
                 throw new IllegalArgumentException("Direction should be between 0 and 3.");
         }
-    }
-    public Wall wallFromGridableAndDirection(Gridable g, int direction) {
-        return wallFromGridableAndDirection(g.getKey(), direction);
-    }
-    public Wall wallFromGridableAndDirection(int[] key, int direction) {
-        return wallMap.get(wallKeyFromGridableAndDirection(key, direction));
     }
 
     public HashSet<Box> getOuterBoxes() {
@@ -199,11 +189,6 @@ public class Building implements HasZone {
 
     public void putBoxMap(int[] key, Box b) {
         gridMap.put(key[0] + "," + key[1], b);
-    }
-    public void putWallMap(String key, Wall w) {
-        if (wallMap.get(key) != null)
-            wallMap.get(key).destroy();
-        wallMap.put(key, w);
     }
 
     public void calculateBorders() {

@@ -2,13 +2,14 @@ package com.zombies.map.room;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.util.Assets.MATERIAL;
 
 public class DoorWall extends Wall {
     private static final float widthFactor = 0.3f;
     private DoorContainer doorContainer;
 
-    public DoorWall(Vector2 p1, Vector2 p2, Building b) {
-        super(p1, p2, b);
+    public DoorWall(Vector2 p1, Vector2 p2, Building building, MATERIAL material) {
+        super(p1, p2, material);
 
         float dx = Math.abs(p2.x - p1.x);
         float dy = Math.abs(p2.y - p1.y);

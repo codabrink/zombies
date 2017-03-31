@@ -37,6 +37,8 @@ public class Box extends Overlappable implements Gridable {
         }
     };
 
+    private Wall[] walls = new Wall[4];
+
     private int id;
     private int[] key;
     private String sKey;
@@ -76,54 +78,26 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public void compile() {
-
+        buildWalls();
+        for (Wall wall : walls)
+            if (wall != null)
+                wall.compile();
     }
 
-    public void setAdjWallMap() {
+    public void buildWalls() {
         Gridable n = gridMap.get(key[0] + "," + (key[1] + 1));
         Gridable s = gridMap.get(key[0] + "," + (key[1] - 1));
         Gridable e = gridMap.get(key[0] + 1 + "," + key[1]);
         Gridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
-        String key = this.key[0]+","+(this.key[1]+1)+",h";
-        if (!(n instanceof Box) || ((Box)n).getRoom() != room) {
-            putWall(key,
-                    position.cpy().add(0, height),
-                    position.cpy().add(width, height),
-                    building);
-        } else { clearWall(key); }
-
-        key = (this.key[0]+1)+","+ this.key[1]+",v";
-        if (!(e instanceof Box) || ((Box)e).getRoom() != room) {
-            putWall(key,
-                    position.cpy().add(width, 0),
-                    position.cpy().add(width, height),
-                    building);
-        } else { clearWall(key); }
-
-        key = sKey+",h";
-        if (!(s instanceof Box) || ((Box)s).getRoom() != room) {
-            putWall(key,
-                    position.cpy(),
-                    position.cpy().add(width, 0),
-                    building);
-        } else { clearWall(key); }
-
-        key = sKey+",v";
-        if (!(w instanceof Box) || ((Box)w).getRoom() != room) {
-            putWall(key,
-                    position.cpy(),
-                    position.cpy().add(0, height),
-                    building);
-        } else { clearWall(key); }
-    }
-
-    private void putWall(String key, Vector2 p1, Vector2 p2, Building b) {
-        building.putWallMap(key, new WallWall(p1, p2, b));
-    }
-    private void clearWall(String key) {
-        if (building.wallMap.get(key) != null)
-            building.wallMap.get(key).destroy();
+        if (!(e instanceof Box) || ((Box)e).getRoom() != room)
+            walls[0] = new WallWall(position.cpy().add(width, height), position.cpy().add(width, 0), room.roomType.wallMaterial);
+        if (!(n instanceof Box) || ((Box)n).getRoom() != room)
+            walls[1] = new WallWall(position.cpy().add(0, height), position.cpy().add(width, height), room.roomType.wallMaterial);
+        if (!(w instanceof Box) || ((Box)w).getRoom() != room)
+            walls[2] = new WallWall(position.cpy(), position.cpy().add(0, height), room.roomType.wallMaterial);
+        if (!(s instanceof Box) || ((Box)s).getRoom() != room)
+            walls[3] = new WallWall(position.cpy().add(width, 0), position.cpy(), room.roomType.wallMaterial);
     }
 
     public float x() {return position.x;}

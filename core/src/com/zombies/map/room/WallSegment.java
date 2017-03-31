@@ -9,19 +9,22 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.zombies.C;
+import com.zombies.util.Assets.MATERIAL;
+import com.zombies.util.G;
 
 public class WallSegment {
-    private static BoxShapeBuilder boxShapeBuilder = new BoxShapeBuilder();
 	private Vector2 p1, p2;
     private double angle;
     private float height;
+    private MATERIAL material;
 
-	public WallSegment(Vector2 p1, Vector2 p2, float height) {
+	public WallSegment(Vector2 p1, Vector2 p2, float height, MATERIAL material) {
         this.p1 = p1;
         this.p2 = p2;
         this.height = height;
-        angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-	}
+        this.material = material;
+        angle = G.getAngle(p1, p2);
+    }
 
 	public void genShapes(Body body) {
         if (height > 0) {
@@ -32,25 +35,21 @@ public class WallSegment {
         }
     }
 
-    public void buildMesh(MeshPartBuilder wallBuilder, Vector2 modelCenter) {
+    public void buildMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         if (height == 0)
             return;
 
-        BoundingBox bounds;
-        Vector3 min, max;
+        Vector2 a = new Vector2(p1.x - modelCenter.x, p1.y - modelCenter.y);
+        Vector2 b = p2.cpy().sub(p1).setAngleRad((float) angle).add(a);
 
-        float dx = p2.x - p1.x;
-        float dy = p2.y - p1.y;
+        float lowZ = (height < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(height) : 0);
+        float highZ = (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH);
 
-        min = new Vector3(0, 0, (height < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(height) : 0));
-        max = new Vector3(Math.max(dx, 0.2f), Math.max(dy, 0.2f), (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH));
-        bounds = new BoundingBox(min, max);
-
-        Matrix4 mtrans = new Matrix4();
-        mtrans.translate(p1.x - modelCenter.x, p1.y - modelCenter.y, 0);
-        //mtrans.rotate(Vector3.Z, (float)Math.toDegrees(getAngle));
-        bounds.mul(mtrans);
-
-        boxShapeBuilder.build(wallBuilder, bounds);
+        builder.rect(
+                a.x, a.y, lowZ,
+                b.x, b.y, lowZ,
+                b.x, b.y, highZ,
+                a.x, a.y, highZ,
+                1, 1, 1);
     }
 }

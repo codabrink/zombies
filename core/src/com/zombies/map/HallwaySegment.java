@@ -8,6 +8,7 @@ import com.zombies.interfaces.Loadable;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.DoorWall;
 import com.zombies.map.room.WallWall;
+import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.G;
 import com.zombies.C;
 import com.zombies.map.room.Wall;
@@ -65,14 +66,6 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         Zone.getZone(getCenter()).addPendingObject(this);
     }
 
-    public void connect(Gridable g, int direction) {
-        connectionOverride[direction] = true;
-        Building otherBuilding = g.getBuilding();
-        String wallKey = otherBuilding.wallKeyFromGridableAndDirection(g.getKey(), U.oppositeDirection(direction));
-        Vector2[] wallPositions = otherBuilding.wallPositionOf(wallKey);
-        otherBuilding.putWallMap(wallKey, new DoorWall(wallPositions[0], wallPositions[1], otherBuilding));
-    }
-
     public ArrayList<int[]> getOpenAdjKeys() {
         ArrayList<int[]> adjKeys = new ArrayList<>();
         for (int[] k : Building.getAdjBMKeys(key)) {
@@ -89,56 +82,56 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         if (connections[0]) {
             // right hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER));
             // right hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, -radius), c.cpy().add(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off right side
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().sub(0, diameter), MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // top
         if (connections[1]) {
             // top hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER));
             // top hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(radius, radius), c.cpy().add(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off top side
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().add(diameter, 0), MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // left
         if (connections[2]) {
             // left hallway, top
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER));
             // left hallway, bottom
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), building));
+            walls.add(new WallWall(c.sub(radius,radius), c.cpy().sub(halfWidth - radius, 0), MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // cap off left
             c = center.cpy();
-            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), building));
+            walls.add(new WallWall(c.add(-radius, radius), c.cpy().sub(0, diameter), MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         // bottom
         if (connections[3]) {
             // bottom hallway, left
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().sub(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER));
             // bottom hallway, right
             c = center.cpy();
-            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), building));
+            walls.add(new WallWall(c.add(radius, -radius), c.cpy().sub(0, halfHeight - radius), MATERIAL.WALL_WHITE_WALLPAPER));
         } else {
             // capp off bottom
             c = center.cpy();
-            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), building));
+            walls.add(new WallWall(c.sub(radius, radius), c.cpy().add(diameter, 0), MATERIAL.WALL_WHITE_WALLPAPER));
         }
 
         for (Wall wall : walls) {

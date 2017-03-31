@@ -50,7 +50,6 @@ public class Hallway implements Drawable, HasZone {
         // create a door
         String wallKey = Building.wallKeyBetweenGridables(box.getKey(), firstKey);
         Vector2[] wallPosition = box.getBuilding().wallPositionOf(wallKey);
-        box.getBuilding().putWallMap(wallKey, new DoorWall(wallPosition[0], wallPosition[1], building));
 
         for (HallwaySegment hs : segments)
             hs.compile();

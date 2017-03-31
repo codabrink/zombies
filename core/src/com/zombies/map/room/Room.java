@@ -20,12 +20,14 @@ import com.zombies.util.U;
 
 public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
-        LIVING_ROOM (MATERIAL.FLOOR_CARPET),
-        DINING_ROOM (MATERIAL.FLOOR_WOOD),
-        KITCHEN (MATERIAL.GREEN_TILE);
+        LIVING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_CARPET),
+        DINING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_WOOD),
+        KITCHEN (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.GREEN_TILE);
 
         public MATERIAL floorMaterial;
-        RoomType(MATERIAL floorMaterial) {
+        public MATERIAL wallMaterial;
+        RoomType(MATERIAL wallMaterial, MATERIAL floorMaterial) {
+            this.wallMaterial = wallMaterial;
             this.floorMaterial = floorMaterial;
         }
 
@@ -97,7 +99,7 @@ public class Room implements Loadable, HasZone, Updateable {
 
     public void compile() {
         for (Box b: boxes)
-            b.setAdjWallMap();
+            b.compile();
 
         if (center != null)
             return;

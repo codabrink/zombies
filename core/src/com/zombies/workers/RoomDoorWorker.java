@@ -6,6 +6,7 @@ import com.zombies.map.room.Box;
 import com.zombies.map.room.Building;
 import com.zombies.map.room.Room;
 import com.zombies.map.room.DoorWall;
+import com.zombies.util.Assets;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,7 +88,7 @@ public class RoomDoorWorker implements Runnable {
         if (checkDoorExistence(b1, roomKey, wallMapKey))
             return;
 
-        building.putWallMap(wallMapKey, new DoorWall(positions[0], positions[1], building));
+        new DoorWall(positions[0], positions[1], building, Assets.MATERIAL.WALL_WHITE_WALLPAPER);
 
         if (b1.getRoom().connected == true)
             b2.getRoom().connected = true;
@@ -97,8 +98,6 @@ public class RoomDoorWorker implements Runnable {
 
     // true - exists, false - doesn't exist
     private static boolean checkDoorExistence(Box b, String roomKey, String wallKey) {
-        if (b.getBuilding().wallMap.get(wallKey) instanceof DoorWall)
-            return true;
         return false;
     }
 }
