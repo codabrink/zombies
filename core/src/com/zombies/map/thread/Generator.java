@@ -1,10 +1,8 @@
 package com.zombies.map.thread;
 
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
-import com.zombies.map.neighborhood.StreetSystem;
 import com.zombies.map.room.Building;
 
 public class Generator {

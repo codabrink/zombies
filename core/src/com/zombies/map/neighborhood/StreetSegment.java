@@ -71,7 +71,7 @@ public class StreetSegment extends Overlappable {
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("street",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                new Material(Assets.MATERIAL.STREET.texture.textureAttribute));
+                new Material(Assets.MATERIAL.STREET.texture.attributes));
         builder.rect(
                 -width / 2, -height / 2, 0,
                 width / 2,  -height / 2, 0,

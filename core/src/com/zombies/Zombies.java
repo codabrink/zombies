@@ -18,7 +18,7 @@ public class Zombies extends Game {
     public void create() {
         instance = this;
         generateFonts();
-        setScreen(new PreView());
+        setScreen(new GameView());
     }
 
     public static BitmapFont getFont(String fontKey) {

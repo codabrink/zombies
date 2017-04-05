@@ -29,7 +29,7 @@ public class Assets {
         WALL_WHITE_WALLPAPER ("whitewallpaper", "data/room/wall/wall.jpg"),
         WALL_PAINTED_RED ("wallpaintedred", "data/room/wall/painted_red.jpg"),
         SIDING_BEIGE_VINYL("beigevinyl", "data/room/building/vinyl-beige.jpg"),
-        SIDING_BRICK("sidingbrick", "data/room/building/brick.jpg");
+        SIDING_BRICK("sidingbrick", "data/room/wall/brick.jpg");
 
         public ZTexture texture;
         public String partName;

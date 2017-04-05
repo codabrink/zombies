@@ -14,32 +14,20 @@ public class Intersection implements StreetNode {
     private StreetSystem streetSystem;
     private Vector2      position;
     private float        dstFromCenter;
-    private int[] key;
     private Zone zone;
     public LinkedHashMap<Double, StreetConnection> connections = new LinkedHashMap<>();
 
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
-        StreetNode node = ss.getNode(p);
-        if (node != null)
-            return node;
-
-        return new Intersection(ss, p);
+        return null;
     }
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
-        StreetNode node = ss.getNode(p);
-        if (node != null)
-            return node;
-
-        Intersection intersection = new Intersection(ss, p);
-        Street.createStreet(ss, sn, intersection);
-        return intersection;
+        return null;
     }
 
 
     protected Intersection(StreetSystem ss, Vector2 p) {
         position      = p;
         dstFromCenter = p.dst(ss.getCenter());
-        key           = ss.keyOf(position);
         streetSystem  = ss;
         zone          = Zone.getZone(p);
         streetSystem.addNode(this);
@@ -55,11 +43,6 @@ public class Intersection implements StreetNode {
     @Override
     public Zone getZone() {
         return zone;
-    }
-
-    @Override
-    public int[] getKey() {
-        return key;
     }
 
     @Override

@@ -8,6 +8,5 @@ public interface StreetNode {
     public boolean checkAvailability(StreetConnection sc);
     public Vector2 getPosition();
     public Zone getZone();
-    public int[] getKey();
     public float dstFromCenter();
 }

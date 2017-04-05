@@ -238,10 +238,10 @@ public class Box extends Overlappable implements Gridable {
 
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
-        builder.rect(relp.x, relp.y, 1,
-                relp.x + width, relp.y, 1,
-                relp.x + width, relp.y + height, 1,
-                relp.x, relp.y + height, 1,
+        builder.rect(relp.x, relp.y, 0,
+                relp.x + width, relp.y, 0,
+                relp.x + width, relp.y + height, 0,
+                relp.x, relp.y + height, 0,
                 1, 1, 1);
     }
 

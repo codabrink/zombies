@@ -596,7 +596,7 @@ public class Zone extends Overlappable {
             for (MATERIAL m : modelables.keySet()) {
                 builder = modelBuilder.part(m.partName,
                         GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                        new Material(m.texture.textureAttribute));
+                        new Material(m.texture.attributes));
                 for (ModelMeCallback mc : modelables.get(m))
                     mc.buildModel(builder, center);
             }
