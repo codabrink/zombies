@@ -2,6 +2,7 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
+import com.zombies.data.D;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.util.G;
@@ -13,22 +14,24 @@ public class Intersection implements StreetNode {
 
     private StreetSystem streetSystem;
     private Vector2      position;
-    private float        dstFromCenter;
+    private float        dstFromCenter, orientation;
+
     private Zone zone;
-    public LinkedHashMap<Double, StreetConnection> connections = new LinkedHashMap<>();
+    public LinkedHashMap<Float, StreetConnection> connections = new LinkedHashMap<>();
 
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
-        return null;
+        return new Intersection(ss, p, (float) G.getAngle(ss.getCenter(), D.player().getPosition()));
     }
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
         return null;
     }
 
-
-    protected Intersection(StreetSystem ss, Vector2 p) {
+    private Intersection(StreetSystem ss, Vector2 p, float o) {
         position      = p;
-        dstFromCenter = p.dst(ss.getCenter());
         streetSystem  = ss;
+        orientation   = o;
+
+        dstFromCenter = p.dst(ss.getCenter());
         zone          = Zone.getZone(p);
         streetSystem.addNode(this);
     }
@@ -39,6 +42,11 @@ public class Intersection implements StreetNode {
 
     @Override
     public Vector2 getPosition() { return position; }
+
+    @Override
+    public float getOrientation() {
+        return orientation;
+    }
 
     @Override
     public Zone getZone() {
@@ -52,7 +60,7 @@ public class Intersection implements StreetNode {
 
     @Override
     public void addConnection(StreetConnection connection) {
-        connections.put(connection.getAngle(this), connection);
+        connections.put((float) connection.getAngle(this), connection);
     }
 
     @Override

@@ -30,9 +30,12 @@ public class Overlappable {
 
     // corners need to be oriented in counter-clockwise fashion
     protected void setCorners(Vector2[] corners) {
+        setCorners(corners, true);
+    }
+    protected void setCorners(Vector2[] corners, boolean close) {
         this.corners = corners;
-        lines = new LineSegment[corners.length]; // line forumlas are cached for performance
-        for (int i = 0; i < corners.length; i++)
+        lines = new LineSegment[(close ? corners.length : corners.length - 1)];
+        for (int i = 0; i < lines.length; i++)
             lines[i] = new LineSegment(corners[i], corners[(i + 1) % corners.length]);
     }
     public Vector2[] getCorners() { return corners; }

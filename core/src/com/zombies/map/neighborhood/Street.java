@@ -20,13 +20,13 @@ public class Street implements StreetConnection {
     private LinkedHashSet<Building> buildings           = new LinkedHashSet<>();
     private StreetNode n1, n2;
     private Vector2 p1, p2;
-    private double angle;
+    private float angle, length;
     private boolean compiled = false;
 
     public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
         Vector2 p1 = n1.getPosition();
         Vector2 p2 = n2.getPosition();
-        double angle = G.getAngle(p1, p2);
+        float angle = (float) G.getAngle(p1, p2);
         Overlappable overlappable = new Overlappable(getCorners(p1, p2, angle, RADIUS));
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
@@ -45,13 +45,14 @@ public class Street implements StreetConnection {
         };
     }
 
-    private Street(StreetSystem ss, StreetNode n1, StreetNode n2, double angle, Vector2[] corners) {
+    private Street(StreetSystem ss, StreetNode n1, StreetNode n2, float angle, Vector2[] corners) {
         p1 = n1.getPosition();
         p2 = n2.getPosition();
 
         this.angle = angle;
-        this.n1 = n1;
-        this.n2 = n2;
+        angle      = p1.dst(p2);
+        this.n1    = n1;
+        this.n2    = n2;
 
         n1.addConnection(this);
         n2.addConnection(this);
@@ -103,5 +104,10 @@ public class Street implements StreetConnection {
         if (sn == n2)
             return (angle + G.PIHALF) % G.TWOPI;
         return  angle;
+    }
+
+    @Override
+    public float getLength() {
+        return length;
     }
 }

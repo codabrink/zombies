@@ -13,9 +13,11 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.util.Assets;
 import com.zombies.util.G;
+import com.zombies.util.LineSegment;
 import com.zombies.util.ThreadedModelBuilder;
 
 public class StreetSegment extends Overlappable {
+    public LineSegment line;
     public Vector2 p1, p2, center;
     public double angle;
     private float width, height;
@@ -41,12 +43,13 @@ public class StreetSegment extends Overlappable {
     }
 
     private StreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
-        this.p1    = p1;
-        this.p2    = p2;
-        this.angle = angle;
+        this.p1     = p1;
+        this.p2     = p2;
+        this.angle  = angle;
         this.street = street;
 
-        center = G.center(p1, p2);
+        line       = new LineSegment(p1, p2);
+        center     = G.center(p1, p2);
         width      = p1.dst(p2);
         height     = Street.RADIUS * 2;
 
