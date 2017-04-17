@@ -1,5 +1,6 @@
 package com.zombies.map.room;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,20 +15,23 @@ import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
+import com.zombies.map.room.roomType.Kitchen;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.U;
 
 public class Room implements Loadable, HasZone, Updateable {
     public enum RoomType {
-        LIVING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_CARPET),
-        DINING_ROOM (MATERIAL.WALL_PAINTED_RED, MATERIAL.FLOOR_WOOD),
-        KITCHEN (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.GREEN_TILE);
+        LIVING_ROOM (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.FLOOR_CARPET, Room.class),
+        DINING_ROOM (MATERIAL.WALL_PAINTED_RED, MATERIAL.FLOOR_WOOD, Room.class),
+        KITCHEN (MATERIAL.WALL_WHITE_WALLPAPER, MATERIAL.GREEN_TILE, Kitchen.class);
 
         public MATERIAL floorMaterial;
         public MATERIAL wallMaterial;
-        RoomType(MATERIAL wallMaterial, MATERIAL floorMaterial) {
-            this.wallMaterial = wallMaterial;
+        public Class    klass;
+        RoomType(MATERIAL wallMaterial, MATERIAL floorMaterial, Class klass) {
+            this.wallMaterial  = wallMaterial;
             this.floorMaterial = floorMaterial;
+            this.klass         = klass;
         }
 
         public static RoomType random() {
@@ -52,11 +56,19 @@ public class Room implements Loadable, HasZone, Updateable {
     public static Room createRoom(Building building, int[] key, int maxBoxes) {
         if (building.checkOverlap(key) != null)
             return null;
-        return new Room(building, key, maxBoxes);
+
+        RoomType type = RoomType.random();
+        try {
+            Constructor constructor = type.klass.getDeclaredConstructor(new Class[] {Building.class, int[].class, int.class, RoomType.class});
+            return (Room) constructor.newInstance(new Object[] {building, key, maxBoxes, type});
+        } catch (Exception e) {
+            System.out.println("Darn. I so failed.");
+        }
+        return null;
     }
 
-    protected Room(Building building, int[] key, int maxBoxes) {
-        type = RoomType.random();
+    protected Room(Building building, int[] key, int maxBoxes, RoomType roomType) {
+        type = roomType;
 
         building.addRoom(this);
         this.building = building;

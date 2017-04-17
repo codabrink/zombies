@@ -1,9 +1,11 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 
 public class Assets {
     public static AssetManager a;
+    public static ModelLoader loader = new ObjLoader();
+
     public static ModelBuilder modelBuilder;
     public static MeshBuilder meshBuilder;
     public static Texture floor1Texture;
