@@ -50,6 +50,8 @@ public class Zone extends Overlappable {
             model = m;
             modelInstance = new ModelInstance(model);
             modelInstance.transform.setTranslation(center.x, center.y, 0);
+
+            D.modelCacheValid = false;
         }
     });
     private Thread modelingThread;
@@ -164,18 +166,25 @@ public class Zone extends Overlappable {
             z.draw();
     }
     public void draw() {
+        for (Drawable d : drawables)
+            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
+    }
+
+    public void rebuildModelCache(int limit) {
+        LinkedHashSet<Zone> zones = getAdjZones(limit);
+        GameView.modelCache.begin();
+        for (Zone z : zones)
+            z.rebuildModelCache();
+        GameView.modelCache.end();
+    }
+    public void rebuildModelCache() {
         if (modelInstance == null)
             return;
         GameView.modelCache.add(modelInstance);
         for (ModelInstance mi : modelInstances)
             GameView.modelCache.add(mi);
-        for (Drawable d : drawables)
-            if (d.getZone() == this)
-                d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
-    private void drawThineself() {
 
-    }
 
     public void update(int limit) {
         LinkedHashSet<Zone> zones = getAdjZones(limit);

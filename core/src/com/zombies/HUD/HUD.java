@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.CameraHandle;
 import com.zombies.Zombies;
+import com.zombies.data.D;
 import com.zombies.map.room.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
@@ -78,10 +79,14 @@ public class HUD implements InputProcessor{
             view.getPlayer().getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
             C.DRAW_DISTANCE++;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
+            D.modelCacheValid = false;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
             C.DRAW_DISTANCE--;
+            D.modelCacheValid = false;
+        }
     }
 
     @Override

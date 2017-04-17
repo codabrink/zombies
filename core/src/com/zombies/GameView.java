@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.graphics.GL20;
+import com.zombies.HUD.DebugText;
 import com.zombies.HUD.HUD;
 import com.zombies.data.D;
 import com.zombies.data.Stats;
@@ -178,6 +179,8 @@ public class GameView implements Screen {
     public void render(float dt) {
         D.tick++;
 
+        DebugText.addMessage("fps", "FPS: " + Gdx.graphics.getFramesPerSecond());
+
         updateLoop();
 
         handleContacts();
@@ -197,10 +200,6 @@ public class GameView implements Screen {
         D.currentZone.update(C.DRAW_DISTANCE);
 
         try {
-            modelCache.begin();
-            D.currentZone.draw(C.DRAW_DISTANCE);
-            modelCache.end();
-
             modelBatch.begin(getCamera());
             modelBatch.render(modelCache, outsideEnvironment);
             modelBatch.end();

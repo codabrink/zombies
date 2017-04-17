@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.zombies.C;
 import com.zombies.Player;
 import com.zombies.Zone;
 import com.zombies.map.neighborhood.StreetSystem;
@@ -36,6 +37,8 @@ public class D {
     public static Body groundBody;
     public static long mainThreadId;
     private static Set runningThreads = Collections.synchronizedSet(new HashSet<>());
+
+    public static boolean modelCacheValid;
 
     public static HashMap<Worker, Thread> workers;
 
@@ -74,7 +77,12 @@ public class D {
     }
 
     public static void update() {
-        currentZone = Zone.getZone(player().getPosition());
+        Zone newZone = Zone.getZone(player().getPosition());
+        if (newZone != currentZone || !modelCacheValid)
+            newZone.rebuildModelCache(C.DRAW_DISTANCE);
+
+        modelCacheValid = true;
+        currentZone = newZone;
         currentBox  = currentZone.getBox(player().getPosition());
      }
 }
