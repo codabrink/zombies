@@ -1,15 +1,15 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.util.Assets.MATERIAL;
 
 public class DoorWall extends FramelessDoorWall {
-    private DoorContainer doorContainer;
+    private com.zombies.map.building.DoorContainer doorContainer;
 
-    public DoorWall(Vector2 p1, Vector2 p2, Building building, MATERIAL leftMaterial, MATERIAL rightMaterial) {
+    public DoorWall(Vector2 p1, Vector2 p2, com.zombies.map.building.Building building, MATERIAL leftMaterial, MATERIAL rightMaterial) {
         super(p1, p2, building, leftMaterial, rightMaterial);
-        doorContainer = new DoorContainer(doorStart, doorEnd, building);
+        doorContainer = new com.zombies.map.building.DoorContainer(doorStart, doorEnd, building);
     }
 
     @Override

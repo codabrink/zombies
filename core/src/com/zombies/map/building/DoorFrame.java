@@ -1,4 +1,4 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;

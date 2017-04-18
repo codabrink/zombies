@@ -4,22 +4,20 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Attribute;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
-import com.zombies.map.room.Room;
+import com.zombies.map.building.room.Room;
 
 import java.util.HashMap;
 
 public class Assets {
-    public static AssetManager a;
+    public static AssetManager a = new AssetManager();
     public static ModelLoader loader = new ObjLoader();
 
-    public static ModelBuilder modelBuilder;
-    public static MeshBuilder meshBuilder;
-    public static Texture floor1Texture;
     public static TextureAttribute wildGrassTextureDiffuse, floor1Diffuse;
 
     public static HashMap<Room.RoomType, ZTexture> roomFloorTextures = new HashMap<>();
@@ -47,12 +45,10 @@ public class Assets {
     }
 
     public Assets() {
-        a = new AssetManager();
-        modelBuilder = new ModelBuilder();
-        meshBuilder = new MeshBuilder();
-
         a.load("data/texture/wildgrass.jpg", Texture.class);
         a.load("data/room/wall/wall.jpg", Texture.class);
+        a.load("data/models/wood-table.g3dj", Model.class);
+        a.load("data/models/fridge.g3dj", Model.class);
         a.finishLoading();
 
         Texture rawWildGrass = a.get("data/texture/wildgrass.jpg", Texture.class);

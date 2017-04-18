@@ -3,7 +3,7 @@ package com.zombies.map.thread;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.data.D;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Building;
 
 public class Generator {
     private static Thread thread;

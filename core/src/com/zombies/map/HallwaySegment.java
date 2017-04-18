@@ -5,12 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Loadable;
-import com.zombies.map.room.Building;
-import com.zombies.map.room.WallWall;
+import com.zombies.map.building.Building;
+import com.zombies.map.building.WallWall;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.G;
 import com.zombies.C;
-import com.zombies.map.room.Wall;
+import com.zombies.map.building.Wall;
 import com.zombies.Zone;
 
 import java.util.ArrayList;

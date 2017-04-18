@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -13,7 +12,7 @@ import com.zombies.C;
 import com.zombies.CameraHandle;
 import com.zombies.Zombies;
 import com.zombies.data.D;
-import com.zombies.map.room.Box;
+import com.zombies.map.building.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
 

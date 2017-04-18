@@ -1,7 +1,9 @@
-package com.zombies.map.room;
+package com.zombies.map.building.room;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -15,7 +17,8 @@ import com.zombies.Zone;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.Updateable;
-import com.zombies.map.room.roomType.Kitchen;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.U;
 
@@ -51,20 +54,21 @@ public class Room implements Loadable, HasZone, Updateable {
     private Zone zone;
     private Vector2 center;
 
+    protected HashMap<Class, HashSet<Object>> objectMap = new HashMap<>();
+
     private Building building;
 
     public static Room createRoom(Building building, int[] key, int maxBoxes) {
         if (building.checkOverlap(key) != null)
             return null;
 
-        RoomType type = RoomType.random();
-        try {
-            Constructor constructor = type.klass.getDeclaredConstructor(new Class[] {Building.class, int[].class, int.class, RoomType.class});
-            return (Room) constructor.newInstance(new Object[] {building, key, maxBoxes, type});
-        } catch (Exception e) {
-            System.out.println("Darn. I so failed.");
+        RoomType type = RoomType.KITCHEN;
+        switch (type) {
+            case KITCHEN:
+                return new Kitchen(building, key, maxBoxes, type);
+            default:
+                return new Room(building, key, maxBoxes, type);
         }
-        return null;
     }
 
     protected Room(Building building, int[] key, int maxBoxes, RoomType roomType) {
@@ -79,11 +83,11 @@ public class Room implements Loadable, HasZone, Updateable {
         roomCount++;
     }
 
-    private void generate(int[] key, int maxBoxes) {
+    protected void generate(int[] key, int maxBoxes) {
         if (maxBoxes == 0)
             return;
 
-        new Box(this, key);
+        Box.createBox(this, key);
 
         int loops = 0; Box b;
         float cx = 0, cy = 0;

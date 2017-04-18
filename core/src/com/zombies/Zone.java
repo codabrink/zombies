@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -20,10 +21,10 @@ import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
+import com.zombies.map.building.room.Room;
 import com.zombies.map.neighborhood.Street;
 import com.zombies.map.neighborhood.StreetSegment;
-import com.zombies.map.room.*;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Building;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.Bounds2;
 import com.zombies.util.ThreadedModelBuilder;
@@ -85,7 +86,6 @@ public class Zone extends Overlappable {
 
     private Model model;
     private ModelInstance modelInstance;
-    private ModelCache modelCache;
     private LinkedHashSet<ModelInstance> modelInstances = new LinkedHashSet<>();
 
     public enum GENERATOR_STATE { UNINITIATED, GENERATING, GENERATED }
@@ -102,7 +102,7 @@ public class Zone extends Overlappable {
 
     // Collections
 
-    private LinkedHashSet<Box>           boxes          = new LinkedHashSet<>();
+    private LinkedHashSet<com.zombies.map.building.Box>           boxes          = new LinkedHashSet<>();
     private LinkedHashSet<Room>          rooms          = new LinkedHashSet<>();
     private LinkedHashSet<Building>      buildings      = new LinkedHashSet<>();
     private LinkedHashSet<Street>        streets        = new LinkedHashSet<>();
@@ -113,7 +113,7 @@ public class Zone extends Overlappable {
     private Set<Overlappable> overlappables                      = Collections.synchronizedSet(new LinkedHashSet<Overlappable>());
     private Map<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = Collections.synchronizedMap(new LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>>());
     private LinkedHashSet<Updateable> updateables                = new LinkedHashSet<>();
-    private LinkedHashSet<Wall> walls                            = new LinkedHashSet<>();
+    private LinkedHashSet<com.zombies.map.building.Wall> walls                            = new LinkedHashSet<>();
     private LinkedHashSet<Loadable> loadables                    = new LinkedHashSet<>();
     private LinkedHashSet<Drawable> drawables                    = new LinkedHashSet<>();
     private LinkedHashSet<Drawable> debugLines                   = new LinkedHashSet<>();
@@ -302,11 +302,11 @@ public class Zone extends Overlappable {
         return zones;
     }
 
-    public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
+    public static HashSet<com.zombies.map.building.Wall> getWallsOverlappingCircle(Vector2 c, float r) {
         Vector2 p1, p2;
-        HashSet<Wall> walls = new HashSet<>();
+        HashSet<com.zombies.map.building.Wall> walls = new HashSet<>();
         for (Zone z : Zone.getZone(c).getAdjZones(C.DRAW_DISTANCE)) {
-            for (Wall w : z.getWalls()) {
+            for (com.zombies.map.building.Wall w : z.getWalls()) {
                 p1 = w.getStart();
                 p2 = w.getEnd();
                 // http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
@@ -323,7 +323,7 @@ public class Zone extends Overlappable {
     public static void createHole(Vector2 center, Float radius) {
         HashSet<Zone> zones = Zone.getZone(center).getAdjZones(C.DRAW_DISTANCE);
         for (Zone z : zones) {
-            for (Wall w : z.getWalls()) {
+            for (com.zombies.map.building.Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
                 Float d, a, b, c, square, xi1, yi1, xi2, yi2;
 
@@ -391,14 +391,14 @@ public class Zone extends Overlappable {
         }
     }
 
-    public Box getBox(float x, float y) {
+    public com.zombies.map.building.Box getBox(float x, float y) {
         for (Zone z : getAdjZones(C.DRAW_DISTANCE))
-            for (Box b : z.getBoxes())
+            for (com.zombies.map.building.Box b : z.getBoxes())
                 if (b.contains(x, y))
                     return b;
         return null;
     }
-    public Box getBox(Vector2 v) {
+    public com.zombies.map.building.Box getBox(Vector2 v) {
         return getBox(v.x, v.y);
     }
 
@@ -412,14 +412,14 @@ public class Zone extends Overlappable {
         if (o instanceof HasZone)
             ((HasZone) o).setZone(this);
 
-        if (o instanceof Wall)
-            addWall((Wall) o);
+        if (o instanceof com.zombies.map.building.Wall)
+            addWall((com.zombies.map.building.Wall) o);
         if (o instanceof Building)
             addBuilding((Building) o);
         if (o instanceof Room)
             addRoom((Room) o);
-        if (o instanceof Box)
-            addBox((Box) o);
+        if (o instanceof com.zombies.map.building.Box)
+            addBox((com.zombies.map.building.Box) o);
 
         if (o instanceof Street)
             streets.add((Street) o);
@@ -443,14 +443,14 @@ public class Zone extends Overlappable {
         if (o instanceof HasZone)
             ((HasZone) o).setZone(null);
 
-        if (o instanceof Wall)
-            removeWall((Wall) o);
+        if (o instanceof com.zombies.map.building.Wall)
+            removeWall((com.zombies.map.building.Wall) o);
         if (o instanceof Building)
             removeBuilding((Building) o);
         if (o instanceof Room)
             removeRoom((Room) o);
-        if (o instanceof Box)
-            removeBox((Box) o);
+        if (o instanceof com.zombies.map.building.Box)
+            removeBox((com.zombies.map.building.Box) o);
         if (o instanceof StreetNode)
             streetNodes.remove((StreetNode) o);
 
@@ -471,7 +471,7 @@ public class Zone extends Overlappable {
     public Vector2 getCenter() { return center; }
     private Set<Overlappable> getOverlappables() { return overlappables; }
     public Set getPendingObjects() { return pendingObjects; }
-    public LinkedHashSet<Box> getBoxes() { return boxes; }
+    public LinkedHashSet<com.zombies.map.building.Box> getBoxes() { return boxes; }
     public LinkedHashSet<Room> getRooms() { return rooms; }
     public LinkedHashSet<Building> getBuildings() { return buildings; }
     public LinkedHashSet<Street> getStreets() { return streets; }
@@ -482,11 +482,11 @@ public class Zone extends Overlappable {
     private void addRoom(Room r) {
         rooms.add(r);
     }
-    private void addBox(Box b) {
+    private void addBox(com.zombies.map.building.Box b) {
         boxes.add(b);
     }
 
-    private void removeWall(Wall w) {
+    private void removeWall(com.zombies.map.building.Wall w) {
         walls.remove(w);
     }
     private void removeBuilding(Building b) {
@@ -496,10 +496,10 @@ public class Zone extends Overlappable {
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
-        for (Box b : r.getBoxes())
+        for (com.zombies.map.building.Box b : r.getBoxes())
             removeObject(b);
     }
-    private void removeBox(Box b) {
+    private void removeBox(com.zombies.map.building.Box b) {
         boxes.remove(b);
     }
 
@@ -529,8 +529,8 @@ public class Zone extends Overlappable {
         return new Vector2(position.x + r.nextFloat() * C.ZONE_SIZE, position.y + r.nextFloat() + C.ZONE_SIZE);
     }
 
-    public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
-    private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
+    public HashSet<com.zombies.map.building.Wall> getWalls() { return walls; }
+    private void addWall(com.zombies.map.building.Wall w) { walls.add(w); }
 
     public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
         LinkedHashSet<Zone> zones = getAdjZones(limit);
@@ -599,7 +599,7 @@ public class Zone extends Overlappable {
         MeshPartBuilder builder = modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w : walls)
+        for (com.zombies.map.building.Wall w : walls)
             w.buildRightMesh(builder, center);
         synchronized (modelables) {
             for (MATERIAL m : modelables.keySet()) {

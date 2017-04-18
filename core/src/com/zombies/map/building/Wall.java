@@ -1,4 +1,4 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import java.util.Iterator;
 import java.util.LinkedList;

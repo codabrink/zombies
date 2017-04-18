@@ -1,12 +1,9 @@
 package com.zombies.workers;
 
-import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Building;
-import com.zombies.map.room.Room;
-import com.zombies.map.room.DoorWall;
-import com.zombies.util.Assets;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
+import com.zombies.map.building.room.Room;
 
 import java.util.HashMap;
 import java.util.HashSet;

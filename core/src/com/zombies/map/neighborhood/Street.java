@@ -5,8 +5,7 @@ import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.map.room.Building;
-import com.zombies.util.Bounds2;
+import com.zombies.map.building.Building;
 import com.zombies.util.G;
 import com.zombies.util.LineSegment;
 

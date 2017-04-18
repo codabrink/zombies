@@ -1,15 +1,17 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
+import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
+import com.zombies.map.building.room.Room;
 import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.U;
-import com.zombies.workers.RoomDoorWorker;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +30,7 @@ public class Building implements HasZone {
     public    HashSet<Hallway>          hallways = new HashSet<>();
     protected Vector2                   center;
     protected Zone                      zone;
+    public    Environment               environment = GameView.outsideEnvironment;
 
     public int outsideDoorCount = 0;
 

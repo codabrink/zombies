@@ -8,8 +8,8 @@ import com.zombies.C;
 import com.zombies.Player;
 import com.zombies.Zone;
 import com.zombies.map.neighborhood.StreetSystem;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Room;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.room.Room;
 
 import java.util.ArrayList;
 import java.util.Collections;

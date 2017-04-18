@@ -1,4 +1,4 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.map.building.room.Room;
 import com.zombies.util.Assets.MATERIAL;
 
 public class Box extends Overlappable implements Gridable {
@@ -28,7 +29,7 @@ public class Box extends Overlappable implements Gridable {
     private Random random = new Random();
     private Zone zone;
 
-    private Building building;
+    private com.zombies.map.building.Building building;
     private Room room;
     private ModelMeCallback modelFloorCallback = new ModelMeCallback() {
         @Override
@@ -37,9 +38,9 @@ public class Box extends Overlappable implements Gridable {
         }
     };
 
-    private Wall[] walls = new Wall[4];
+    private com.zombies.map.building.Wall[] walls = new com.zombies.map.building.Wall[4];
     private Vector2[] outerCorners = new Vector2[4];
-    private Wall[] outerWalls = new Wall[4];
+    private com.zombies.map.building.Wall[] outerWalls = new com.zombies.map.building.Wall[4];
 
     private int id;
     private int[] key;
@@ -93,10 +94,10 @@ public class Box extends Overlappable implements Gridable {
 
     public void compile() {
         buildWalls();
-        for (Wall wall : walls)
+        for (com.zombies.map.building.Wall wall : walls)
             if (wall != null)
                 wall.compile();
-        for (Wall wall : outerWalls)
+        for (com.zombies.map.building.Wall wall : outerWalls)
             if (wall != null)
                 wall.compile();
     }
@@ -146,10 +147,10 @@ public class Box extends Overlappable implements Gridable {
 
 
     private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, i, new DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, i, new com.zombies.map.building.DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createDoor(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, g, new DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, g, new com.zombies.map.building.DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));
@@ -213,14 +214,14 @@ public class Box extends Overlappable implements Gridable {
     }
 
     public int getId() { return id; }
-    public Building getBuilding() { return building; }
+    public com.zombies.map.building.Building getBuilding() { return building; }
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
     public String getSKey() { return sKey; }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
         Gridable g;
-        for (int[] k : Building.getAdjBMKeys(key)) {
+        for (int[] k : com.zombies.map.building.Building.getAdjBMKeys(key)) {
             g = building.gridMapGet(k);
             if (g instanceof Box)
                 adjBoxes.add((Box)g);
@@ -229,7 +230,7 @@ public class Box extends Overlappable implements Gridable {
     }
     public ArrayList<int[]> getOpenAdjKeys() {
         ArrayList<int[]> adjKeys = new ArrayList<>();
-        for (int[] k : Building.getAdjBMKeys(key)) {
+        for (int[] k : com.zombies.map.building.Building.getAdjBMKeys(key)) {
             if (gridMap.get(k[0] + "," + k[1]) == null)
                 adjKeys.add(k);
         }

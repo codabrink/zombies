@@ -1,4 +1,4 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;

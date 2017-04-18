@@ -1,4 +1,4 @@
-package com.zombies.map.room;
+package com.zombies.map.building;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.util.Assets.MATERIAL;

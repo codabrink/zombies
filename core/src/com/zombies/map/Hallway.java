@@ -10,8 +10,8 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.GameView;
 import com.zombies.Zone;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
 
 import java.util.ArrayList;
 import java.util.HashSet;
