@@ -10,14 +10,10 @@ import com.badlogic.gdx.utils.Array;
 
 public class ZTexture {
     public String path;
-    public Texture texture;
+    private Texture texture;
     public TextureRegion textureRegion;
 
     public Array<Attribute> attributes = new Array<>();
-
-    public ZTexture(String path) {
-        this(path, 1);
-    }
 
     public ZTexture(String path, int UVScale) {
         this.path = path;
@@ -55,6 +51,5 @@ public class ZTexture {
                     new TextureDescriptor<>(Assets.a.get(bumpPath, Texture.class)),
                     0, 0, UVScale, UVScale));
         }
-
     }
 }

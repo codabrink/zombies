@@ -39,6 +39,8 @@ public class WallSegment {
         float lowZ = (height < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(height) : 0);
         float highZ = (height > 0 ? C.BOX_DEPTH * height : C.BOX_DEPTH);
 
+        builder.setUVRange(0, 0, 1, Math.abs(height));
+
         builder.rect(
                 a.x, a.y, lowZ,
                 b.x, b.y, lowZ,

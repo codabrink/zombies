@@ -2,9 +2,11 @@ package com.zombies.util;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
@@ -41,6 +43,9 @@ public class Assets {
         MATERIAL(String partName, String path, int UVScale) {
             this.partName = partName;
             texture = new ZTexture(path, UVScale);
+        }
+        MATERIAL(String partName, MATERIAL m) {
+            this.partName = partName;
         }
     }
 
