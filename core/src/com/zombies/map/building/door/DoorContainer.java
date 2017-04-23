@@ -1,16 +1,16 @@
-package com.zombies.map.building;
+package com.zombies.map.building.door;
 
 import com.badlogic.gdx.math.Vector2;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
 
 public class DoorContainer {
     private DoorFrame doorFrame;
     private Door door;
 
     public DoorContainer(Box b1, Box b2) {
-        b1.doors.add(this);
-        b2.doors.add(this);
-
-        // TODO: improve box to door references
+        b1.doors[b1.directionOf(b2)] = this;
+        b2.doors[b2.directionOf(b1)] = this;
     }
 
     public DoorContainer(Vector2 p1, Vector2 p2, Building b) {

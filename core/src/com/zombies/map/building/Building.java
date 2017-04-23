@@ -261,14 +261,9 @@ public class Building implements HasZone {
     public void setZone(Zone z) {}
 
     public static int bmKeyToDirection(int[] bmKey1, int[] bmKey2) {
-        if (bmKey2[0] == bmKey1[0] + 1 && bmKey2[1] == bmKey1[1])
-            return 0;
-        if (bmKey2[0] == bmKey1[0] && bmKey2[1] == bmKey1[1] + 1)
-            return 1;
-        if (bmKey2[0] == bmKey1[0] - 1 && bmKey2[1] == bmKey1[1])
-            return 2;
-        if (bmKey2[0] == bmKey1[0] && bmKey2[1] == bmKey1[1] - 1)
-            return 3;
+        for (int i = 0; i <= MODIFIERS.length; i += 2)
+            if (bmKey2[0] == MODIFIERS[i] + bmKey1[0] && bmKey2[1] == MODIFIERS[i + 1] + bmKey1[1])
+                return i / 2;
         throw new IllegalArgumentException("Keys are not adjacent");
     }
     public static int[] directionToBMKey(int[] bmKey, int direction) {

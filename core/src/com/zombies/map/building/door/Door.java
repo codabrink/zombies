@@ -1,4 +1,4 @@
-package com.zombies.map.building;
+package com.zombies.map.building.door;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -33,6 +33,7 @@ import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Modelable;
+import com.zombies.map.building.Building;
 import com.zombies.util.Assets;
 import com.zombies.util.G;
 

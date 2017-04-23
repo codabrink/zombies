@@ -16,6 +16,7 @@ import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.ModelMeCallback;
+import com.zombies.map.building.door.DoorContainer;
 import com.zombies.map.building.room.Room;
 import com.zombies.util.Assets.MATERIAL;
 
@@ -24,7 +25,9 @@ public class Box extends Overlappable implements Gridable {
 
     private HashSet<Unit> zombies = new HashSet<>();
     private HashSet<Unit> survivors = new HashSet<Unit>();
-    public HashSet<DoorContainer> doors = new HashSet<>();
+
+    public com.zombies.map.building.door.DoorContainer[] doors = new DoorContainer[4];
+
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
     private Zone zone;
@@ -38,9 +41,9 @@ public class Box extends Overlappable implements Gridable {
         }
     };
 
-    private com.zombies.map.building.Wall[] walls = new com.zombies.map.building.Wall[4];
+    private Wall[]    walls        = new Wall[4];
     private Vector2[] outerCorners = new Vector2[4];
-    private com.zombies.map.building.Wall[] outerWalls = new com.zombies.map.building.Wall[4];
+    private Wall[]    outerWalls   = new Wall[4];
 
     private int id;
     private int[] key;
@@ -147,10 +150,10 @@ public class Box extends Overlappable implements Gridable {
 
 
     private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, i, new com.zombies.map.building.DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, i, new com.zombies.map.building.door.DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createDoor(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, g, new com.zombies.map.building.DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, g, new com.zombies.map.building.door.DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));
@@ -218,6 +221,9 @@ public class Box extends Overlappable implements Gridable {
     public Room getRoom() { return room; }
     public int[] getKey() { return key; }
     public String getSKey() { return sKey; }
+    public int directionOf(Box b) {
+        return Building.bmKeyToDirection(key, b.key);
+    }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
         Gridable g;
