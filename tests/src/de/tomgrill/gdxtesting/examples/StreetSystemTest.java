@@ -31,7 +31,7 @@ public class StreetSystemTest {
         StreetSystem ss = new StreetSystem(new Vector2(0, 0));
         StreetSystem.populateBox(new Vector2(0, 0), C.ZONE_SIZE * 10, C.ZONE_SIZE * 10, 1);
 
-        zone.update();
+        zone.update(0);
 
         System.out.println("Street System node count: " + ss.getNodes().size());
         System.out.println("Zone node count: " + zone.getStreetNodes().size());
@@ -54,22 +54,22 @@ public class StreetSystemTest {
         assertTrue(ss.getConnections().size() == 1);
 
         Zone z0 = Zone.getZone(0, 0);
-        z0.update();
+        z0.update(0);
         assertTrue(z0.getStreetSegments().size() == 1);
         assertTrue(z0.getStreets().size() == 1);
 
         Zone z1 = Zone.getZone(C.ZONE_SIZE, 0);
-        z1.update();
+        z1.update(0);
         assertTrue(z1.getStreetSegments().size() == 1);
         assertTrue(z1.getStreets().size() == 1);
 
         Zone z2 = Zone.getZone(C.ZONE_SIZE * 2, 0);
-        z2.update();
+        z2.update(0);
         assertTrue(z2.getStreetSegments().size() == 1);
         assertTrue(z2.getStreets().size() == 1);
 
         Zone z3 = Zone.getZone(C.ZONE_SIZE * 3, 0);
-        z3.update();
+        z3.update(0);
         assertTrue(z3.getStreetSegments().size() == 0);
         assertTrue(z3.getStreets().size() == 0);
     }

@@ -12,9 +12,6 @@ public class Generator {
         if (thread != null && thread.isAlive())
             return;
 
-        if (D.currentZone == null)
-            D.update();
-
         for (Zone z: D.currentZone.getAdjZones(C.DRAW_DISTANCE)) {
             if (z.genState != Zone.GENERATOR_STATE.UNINITIATED)
                 continue;

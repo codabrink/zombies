@@ -31,8 +31,8 @@ public class D {
             return currentBox.getRoom();
         return null;
     }
-    public static ArrayList<Player> players = new ArrayList<>();
-    public static Player player() { return players.get(0); }
+    public static Player[] players = new Player[4];
+    public static Player player() { return players[0]; }
     public static World world;
     public static Body groundBody;
     public static long mainThreadId;
@@ -76,13 +76,19 @@ public class D {
         }
     }
 
-    public static void update() {
-        Zone newZone = Zone.getZone(player().getPosition());
-        if (newZone != currentZone || !modelCacheValid)
-            newZone.rebuildModelCache(C.DRAW_DISTANCE);
+    public static void update(float dt) {
+        if (tick % 10 == 0)
+            updateInfo();
+        tick++;
+     }
 
-        modelCacheValid = true;
-        currentZone = newZone;
-        currentBox  = currentZone.getBox(player().getPosition());
+     private static void updateInfo() {
+         Zone newZone = Zone.getZone(player().getPosition());
+         if (newZone != currentZone || !modelCacheValid)
+             newZone.rebuildModelCache(C.DRAW_DISTANCE);
+
+         modelCacheValid = true;
+         currentZone = newZone;
+         currentBox  = currentZone.getBox(player().getPosition());
      }
 }

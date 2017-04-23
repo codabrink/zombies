@@ -177,11 +177,9 @@ public class GameView implements Screen {
 
     @Override
     public void render(float dt) {
-        D.tick++;
-
         DebugText.addMessage("fps", "FPS: " + Gdx.graphics.getFramesPerSecond());
 
-        updateLoop();
+        update(dt);
 
         handleContacts();
         camHandle.update(dt);
@@ -222,9 +220,11 @@ public class GameView implements Screen {
         //debugRenderer.render(world, cam.combined);
     }
 
-    protected void updateLoop() {
+    protected void update(float dt) {
         mh.update();
         hud.update();
+
+        D.update(dt);
 
         Generator.update();
 

@@ -1,5 +1,6 @@
 package com.zombies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.zombies.HUD.DebugText;
 import com.zombies.abstract_classes.Overlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.D;
@@ -21,6 +23,7 @@ import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
 import com.zombies.map.Grass;
+import com.zombies.map.building.Box;
 import com.zombies.map.building.room.Room;
 import com.zombies.map.neighborhood.Street;
 import com.zombies.map.neighborhood.StreetSegment;
@@ -187,11 +190,12 @@ public class Zone extends Overlappable {
 
 
     public void update(int limit) {
+        DebugText.addMessage("boxes", "Zone box count: " + boxes.size());
         LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones)
             z.update();
     }
-    public void update() {
+    private void update() {
         synchronized (pendingObjects) {
             Iterator i = pendingObjects.iterator();
             while (i.hasNext()) {
@@ -393,7 +397,7 @@ public class Zone extends Overlappable {
 
     public com.zombies.map.building.Box getBox(float x, float y) {
         for (Zone z : getAdjZones(C.DRAW_DISTANCE))
-            for (com.zombies.map.building.Box b : z.getBoxes())
+            for (Box b : z.getBoxes())
                 if (b.contains(x, y))
                     return b;
         return null;

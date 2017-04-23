@@ -36,7 +36,7 @@ public class ZoneAndNeighborhoodTest {
         building.compile();
 
         // process pending objects
-        zone.update();
+        zone.update(0);
 
         // assert a room is generating
 		assertTrue(zone.getRooms().size() > 0);
@@ -90,10 +90,10 @@ public class ZoneAndNeighborhoodTest {
         building.compile();
 
         // process pendingObjects lists
-        z1.update();
-        z2.update();
-        z3.update();
-        z4.update();
+        z1.update(0);
+        z2.update(0);
+        z3.update(0);
+        z4.update(0);
 
         // assert corners
         assertTrue(b00.getCorners()[0].x == C.GRID_HALF_SIZE);
@@ -151,9 +151,9 @@ public class ZoneAndNeighborhoodTest {
         // Test building features
         Gridable g1 = building.gridMap.get("0,0");
         Gridable g2 = building.gridMap.get("1,0");
-        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("1,0,v"));
+        assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("1,0,v"));
         g2     = building.gridMap.get("0,1");
-        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("0,1,h"));
+        assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("0,1,h"));
 
         // test vertical wall positions
         Vector2[] positions = building.wallPositionOf("1,0,v");

@@ -72,7 +72,7 @@ public class Player extends Unit implements Collideable {
         updateZone();
         updateBox();
 
-        D.players.add(this);
+        D.players[0] = this;
     }
 
     public float getHealth() {
@@ -295,13 +295,6 @@ public class Player extends Unit implements Collideable {
         capSpeed();
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
-
-        if (D.tick % 10 == 0)
-            updateInfo();
-    }
-
-    private void updateInfo() {
-        D.update();
     }
 
     @Override

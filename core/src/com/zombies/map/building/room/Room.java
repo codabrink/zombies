@@ -62,7 +62,7 @@ public class Room implements Loadable, HasZone, Updateable {
         if (building.checkOverlap(key) != null)
             return null;
 
-        RoomType type = RoomType.KITCHEN;
+        RoomType type = RoomType.random();
         switch (type) {
             case KITCHEN:
                 return new Kitchen(building, key, maxBoxes, type);
