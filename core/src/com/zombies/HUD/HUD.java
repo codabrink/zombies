@@ -166,7 +166,7 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean scrolled(int amount) {
-        CameraHandle.z += amount * 20;
+        CameraHandle.z = Math.max(CameraHandle.z + amount * 20, 20);
         return true;
     }
 }

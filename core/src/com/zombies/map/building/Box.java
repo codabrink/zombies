@@ -17,7 +17,10 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.map.building.door.DoorContainer;
+import com.zombies.map.building.door.DoorWall;
 import com.zombies.map.building.room.Room;
+import com.zombies.map.building.window.WindowContainer;
+import com.zombies.map.building.window.WindowWall;
 import com.zombies.util.Assets.MATERIAL;
 
 public class Box extends Overlappable implements Gridable {
@@ -25,8 +28,6 @@ public class Box extends Overlappable implements Gridable {
 
     private HashSet<Unit> zombies = new HashSet<>();
     private HashSet<Unit> survivors = new HashSet<Unit>();
-
-    public com.zombies.map.building.door.DoorContainer[] doors = new DoorContainer[4];
 
     private HashMap<String, Gridable> gridMap;
     private Random random = new Random();
@@ -41,9 +42,11 @@ public class Box extends Overlappable implements Gridable {
         }
     };
 
-    private Wall[]    walls        = new Wall[4];
-    private Vector2[] outerCorners = new Vector2[4];
-    private Wall[]    outerWalls   = new Wall[4];
+    private Wall[]           walls        = new Wall[4];
+    public DoorContainer[]   doors        = new DoorContainer[4];
+    public WindowContainer[] windows      = new WindowContainer[4];
+    private Vector2[]        outerCorners = new Vector2[4];
+    private Wall[]           outerWalls   = new Wall[4];
 
     private int id;
     private int[] key;
@@ -123,6 +126,9 @@ public class Box extends Overlappable implements Gridable {
                 createDoor(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
                 building.outsideDoorCount++;
                 return;
+            } else if (random.nextFloat() < 0.2f) {
+                createWindow(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
+                return;
             }
             createWall(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
             return;
@@ -150,10 +156,16 @@ public class Box extends Overlappable implements Gridable {
 
 
     private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, i, new com.zombies.map.building.door.DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, i, new DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createDoor(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
-        building.putWall(this, g, new com.zombies.map.building.door.DoorWall(corners[a], corners[b], building, lm, rm));
+        building.putWall(this, g, new DoorWall(corners[a], corners[b], building, lm, rm));
+    }
+    private void createWindow(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, i, new WindowWall(corners[a], corners[b], building, lm, rm));
+    }
+    private void createWindow(Gridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+        building.putWall(this, g, new WindowWall(corners[a], corners[b], building, lm, rm));
     }
     private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));

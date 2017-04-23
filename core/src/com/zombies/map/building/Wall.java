@@ -72,7 +72,7 @@ public class Wall implements Collideable, Loadable, HasZone {
 
         while (itr.hasNext()) {
             currPoint = itr.next();
-            if (currPoint.point.dst(p1) < prevPoint.point.dst(p1))
+            if (currPoint.p1.dst(p1) < prevPoint.p1.dst(p1))
                 itr.remove();
             else
                 prevPoint = currPoint;
@@ -88,21 +88,19 @@ public class Wall implements Collideable, Loadable, HasZone {
         rightSegments = new LinkedList<>();
         leftSegments  = new LinkedList<>();
         Iterator<WallPoint> itr = points.iterator();
-        WallPoint prevPoint = itr.next(), currPoint;
 
-        while (itr.hasNext()) {
-            currPoint = itr.next();
+        for (WallPoint wp : points) {
+            Vector2 p2 = G.projectVector(wp.p1.cpy(), angle, wp.length);
             leftSegments.add(new WallSegment(
-                    prevPoint.point,
-                    currPoint.point,
-                    prevPoint.height,
+                    wp.p1,
+                    p2,
+                    wp.height,
                     rightMaterial));
             rightSegments.add(new WallSegment(
-                    currPoint.point,
-                    prevPoint.point,
-                    prevPoint.height,
+                    p2,
+                    wp.p1,
+                    wp.height,
                     leftMaterial));
-            prevPoint = currPoint;
         }
 
         final Wall wall = this;
