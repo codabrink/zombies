@@ -22,10 +22,13 @@ import com.zombies.util.Assets.MATERIAL;
 import com.zombies.util.G;
 
 public class Wall implements Collideable, Loadable, HasZone {
+    final float DIAMETER = 1f;
+    final float RADIUS = DIAMETER / 2;
+
     private Vector2 p1, p2, center;
-    protected double angle;
+    protected float angle;
     private Body body;
-    private MATERIAL leftMaterial, rightMaterial;
+    private MATERIAL rightMaterial, leftMaterial;
     private Zone zone;
 
     protected LinkedList<WallPoint>   points   = new LinkedList<>();
@@ -44,14 +47,14 @@ public class Wall implements Collideable, Loadable, HasZone {
         }
     };
 
-    public Wall(Vector2 p1, Vector2 p2, MATERIAL leftMaterial, MATERIAL rightMaterial) {
+    public Wall(Vector2 p1, Vector2 p2, MATERIAL rightMaterial, MATERIAL leftMaterial) {
         this.p1 = p1;
         this.p2 = p2;
 
-        this.leftMaterial = leftMaterial;
         this.rightMaterial = rightMaterial;
+        this.leftMaterial = leftMaterial;
 
-        angle = G.getAngle(p1, p2);
+        angle = (float) G.getAngle(p1, p2);
         center = G.center(p1, p2);
 
         zone = Zone.getZone(center);
@@ -59,8 +62,8 @@ public class Wall implements Collideable, Loadable, HasZone {
 
     public void compile() {
         genSegmentsFromPoints();
-        zone.addModelingCallback(leftMaterial, modelLeft);
-        zone.addModelingCallback(rightMaterial, modelRight);
+        zone.addModelingCallback(rightMaterial, modelLeft);
+        zone.addModelingCallback(leftMaterial, modelRight);
     }
 
     private void flushPoints() {
@@ -90,17 +93,24 @@ public class Wall implements Collideable, Loadable, HasZone {
         Iterator<WallPoint> itr = points.iterator();
 
         for (WallPoint wp : points) {
-            Vector2 p2 = G.projectVector(wp.p1.cpy(), angle, wp.length);
+            Vector2 p2 = G.projectVector(wp.p1, angle, wp.length);
+
+            final Vector2 c1 = G.projectVector(wp.p1, angle - G.PI34, RADIUS),
+                    c2 = G.projectVector(p2, angle - G.PI14, RADIUS),
+                    c3 = G.projectVector(p2, angle + G.PI14, RADIUS),
+                    c4 = G.projectVector(wp.p1, angle + G.PI34, RADIUS);
+
             leftSegments.add(new WallSegment(
-                    wp.p1,
-                    p2,
+                    c1,
+                    c2,
+                    wp.height,
+                    leftMaterial)
+                    .addTop(c1, c2, c3, c4));
+            rightSegments.add(new WallSegment(
+                    c3,
+                    c4,
                     wp.height,
                     rightMaterial));
-            rightSegments.add(new WallSegment(
-                    p2,
-                    wp.p1,
-                    wp.height,
-                    leftMaterial));
         }
 
         final Wall wall = this;
@@ -127,7 +137,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         return false;
     }
 
-    public Double getAngle() { return angle; }
+    public float getAngle() { return angle; }
     public Vector2 getStart() { return p1; }
     public Vector2 getEnd() { return p2; }
 
@@ -145,6 +155,13 @@ public class Wall implements Collideable, Loadable, HasZone {
 
     public void dispose() {
 
+    }
+
+    public static float getBottom(float i) {
+        return i < 0 ? C.BOX_DEPTH - C.BOX_DEPTH * Math.abs(i) : 0;
+    }
+    public static float getTop(float i) {
+        return i > 0 ? C.BOX_DEPTH * i : C.BOX_DEPTH;
     }
 
     @Override

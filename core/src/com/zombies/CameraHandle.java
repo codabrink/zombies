@@ -29,9 +29,9 @@ public class CameraHandle {
         Vector3 position = cam.position;
 
         if (D.currentBox != null) {
-            z = 20;
+            //z = 20;
         } else if (D.currentBox == null) {
-            z = 60;
+            //z = 60;
         }
 
         cam.far = position.z + 100;

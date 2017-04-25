@@ -6,11 +6,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.zombies.map.building.room.Room;
 
@@ -33,7 +30,9 @@ public class Assets {
         WALL_WHITE_WALLPAPER ("whitewallpaper", "data/room/wall/wall.jpg"),
         WALL_PAINTED_RED ("wallpaintedred", "data/room/wall/painted_red.jpg"),
         SIDING_BEIGE_VINYL("beigevinyl", "data/room/building/vinyl-beige.jpg"),
-        SIDING_BRICK("sidingbrick", "data/room/wall/brick.jpg");
+        SIDING_BRICK("sidingbrick", "data/room/wall/brick.jpg"),
+        BLACK("black", Color.BLACK),
+        GRAY("gray", Color.GRAY);
 
         public ZTexture texture;
         public String partName;
@@ -44,8 +43,9 @@ public class Assets {
             this.partName = partName;
             texture = new ZTexture(path, UVScale);
         }
-        MATERIAL(String partName, MATERIAL m) {
+        MATERIAL(String partName, Color color) {
             this.partName = partName;
+            texture = new ZTexture(color);
         }
     }
 

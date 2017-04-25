@@ -5,9 +5,11 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Geom.Line;
 
 public class G {
-    public static final double PIHALF = Math.PI / 2;
-    public static final double THRPIHALF = (3 * Math.PI) / 2;
-    public static final double TWOPI = 2 * Math.PI;
+    public static final float PIHALF    = (float) (Math.PI / 2f);
+    public static final float THRPIHALF = (float) (3f * Math.PI) / 2f;
+    public static final float TWOPI     = (float) (2f * Math.PI);
+    public static final float PI34      = (float) (Math.PI * (3f / 4f));
+    public static final float PI14      = (float) (Math.PI * (1f / 4f));
 
     public static boolean rectContains(float x, float y, Vector2 p, float w, float h) {
         return inRange(x, p.x, p.x + w) &&

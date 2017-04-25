@@ -1,12 +1,15 @@
 package com.zombies.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Attribute;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.utils.Array;
+
 
 public class ZTexture {
     public String path;
@@ -14,6 +17,10 @@ public class ZTexture {
     public TextureRegion textureRegion;
 
     public Array<Attribute> attributes = new Array<>();
+
+    public ZTexture(Color color) {
+        attributes.add(ColorAttribute.createDiffuse(color));
+    }
 
     public ZTexture(String path, int UVScale) {
         this.path = path;
