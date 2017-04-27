@@ -21,7 +21,7 @@ import com.zombies.map.building.door.DoorWall;
 import com.zombies.map.building.room.Room;
 import com.zombies.map.building.window.WindowContainer;
 import com.zombies.map.building.window.WindowWall;
-import com.zombies.util.Assets.MATERIAL;
+import com.zombies.lib.Assets.MATERIAL;
 
 public class Box extends Overlappable implements Gridable {
     public static int numBoxes = 0;

@@ -1,4 +1,4 @@
-package com.zombies.util;
+package com.zombies.lib;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;

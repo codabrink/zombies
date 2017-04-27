@@ -3,7 +3,7 @@ package com.zombies.map.building.door;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.map.building.Building;
-import com.zombies.util.Assets.MATERIAL;
+import com.zombies.lib.Assets.MATERIAL;
 
 public class DoorWall extends FramelessDoorWall {
     private DoorContainer doorContainer;

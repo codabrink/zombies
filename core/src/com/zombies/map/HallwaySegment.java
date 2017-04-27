@@ -7,8 +7,8 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.WallWall;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.G;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.math.M;
 import com.zombies.C;
 import com.zombies.map.building.Wall;
 import com.zombies.Zone;
@@ -140,7 +140,7 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     @Override
     public Vector2[] getCorners() { return corners; }
     @Override
-    public boolean contains(float x, float y) { return G.rectContains(x, y, position, width, height); }
+    public boolean contains(float x, float y) { return M.rectContains(x, y, position, width, height); }
 
     @Override
     public float getWidth() {

@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
 import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.map.building.Building;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.G;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.math.M;
 
 public class WindowFrame {
     private Vector2 p1, p2;
@@ -23,7 +23,7 @@ public class WindowFrame {
         this.p1  = p1;
         this.p2  = p2;
         building = b;
-        angle = (float) G.getAngle(p1, p2);
+        angle = (float) M.getAngle(p1, p2);
 
         Zone.getZone(p1).addModelingCallback(MATERIAL.FLOOR_WOOD, modelFrameCallback);
     }

@@ -1,4 +1,4 @@
-package com.zombies.util;
+package com.zombies.lib;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

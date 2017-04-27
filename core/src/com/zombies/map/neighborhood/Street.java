@@ -6,8 +6,8 @@ import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.map.building.Building;
-import com.zombies.util.G;
-import com.zombies.util.LineSegment;
+import com.zombies.lib.math.M;
+import com.zombies.lib.math.LineSegment;
 
 import java.util.LinkedHashSet;
 
@@ -25,7 +25,7 @@ public class Street implements StreetConnection {
     public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
         Vector2 p1 = n1.getPosition();
         Vector2 p2 = n2.getPosition();
-        float angle = (float) G.getAngle(p1, p2);
+        float angle = (float) M.getAngle(p1, p2);
         Overlappable overlappable = new Overlappable(getCorners(p1, p2, angle, RADIUS));
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
@@ -37,10 +37,10 @@ public class Street implements StreetConnection {
 
     public static Vector2[] getCorners(Vector2 p1, Vector2 p2, double angle, float radius) {
         return new Vector2[]{
-                G.projectVector(p1, angle - G.PIHALF, radius),
-                G.projectVector(p2, angle - G.PIHALF, radius),
-                G.projectVector(p2, angle + G.PIHALF, radius),
-                G.projectVector(p1, angle + G.PIHALF, radius)
+                M.projectVector(p1, angle - M.PIHALF, radius),
+                M.projectVector(p2, angle - M.PIHALF, radius),
+                M.projectVector(p2, angle + M.PIHALF, radius),
+                M.projectVector(p1, angle + M.PIHALF, radius)
         };
     }
 
@@ -94,14 +94,14 @@ public class Street implements StreetConnection {
 
     @Override
     public float distance(Vector2 p) {
-        return G.distanceOfPointFromLine(p1, p2, p);
+        return M.distanceOfPointFromLine(p1, p2, p);
     }
     @Override
     public double getAngle() { return angle; }
     @Override
     public double getAngle(StreetNode sn) {
         if (sn == n2)
-            return (angle + G.PIHALF) % G.TWOPI;
+            return (angle + M.PIHALF) % M.TWOPI;
         return  angle;
     }
 

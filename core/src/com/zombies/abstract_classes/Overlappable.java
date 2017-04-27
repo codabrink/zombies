@@ -2,12 +2,9 @@ package com.zombies.abstract_classes;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.Zone;
-import com.zombies.interfaces.HasZone;
-import com.zombies.util.G;
-import com.zombies.util.LineSegment;
-import com.zombies.util.Ray;
-import com.zombies.util.U;
+import com.zombies.lib.math.LineSegment;
+import com.zombies.lib.math.Ray;
+import com.zombies.lib.U;
 
 public class Overlappable {
     public float width, height;

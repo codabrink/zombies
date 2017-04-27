@@ -5,7 +5,7 @@ import com.zombies.Zone;
 import com.zombies.data.D;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.util.G;
+import com.zombies.lib.math.M;
 
 import java.util.LinkedHashMap;
 
@@ -20,7 +20,7 @@ public class Intersection implements StreetNode {
     public LinkedHashMap<Float, StreetConnection> connections = new LinkedHashMap<>();
 
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
-        return new Intersection(ss, p, (float) G.getAngle(ss.getCenter(), D.player().getPosition()));
+        return new Intersection(ss, p, (float) M.getAngle(ss.getCenter(), D.player().getPosition()));
     }
     public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
         return null;
@@ -66,7 +66,7 @@ public class Intersection implements StreetNode {
     @Override
     public boolean checkAvailability(StreetConnection connection) {
         for (StreetConnection sc : connections.values())
-            if (G.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
+            if (M.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
                 return false;
         return true;
     }

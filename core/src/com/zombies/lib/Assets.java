@@ -1,4 +1,4 @@
-package com.zombies.util;
+package com.zombies.lib;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ModelLoader;

@@ -1,13 +1,10 @@
 package com.zombies;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -28,10 +25,10 @@ import com.zombies.map.building.room.Room;
 import com.zombies.map.neighborhood.Street;
 import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.building.Building;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.Bounds2;
-import com.zombies.util.ThreadedModelBuilder;
-import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.Bounds2;
+import com.zombies.lib.ThreadedModelBuilder;
+import com.zombies.lib.ThreadedModelBuilder.MODELING_STATE;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -1,10 +1,10 @@
-package com.zombies.util;
+package com.zombies.lib.math;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.Geom.Line;
 
-public class G {
+public class M {
     public static final float PIHALF    = (float) (Math.PI / 2f);
     public static final float THRPIHALF = (float) (3f * Math.PI) / 2f;
     public static final float TWOPI     = (float) (2f * Math.PI);

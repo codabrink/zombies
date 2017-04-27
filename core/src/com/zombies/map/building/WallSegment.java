@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.zombies.C;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.G;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.math.M;
 
 public class WallSegment {
 	private Vector2 p1, p2;
@@ -21,7 +21,7 @@ public class WallSegment {
         this.p2 = p2;
         this.height = height;
         this.dst    = p1.dst(p2);
-        angle       = G.getAngle(p1, p2);
+        angle       = M.getAngle(p1, p2);
 
         top = Wall.getTop(height);
         bottom = Wall.getBottom(height);

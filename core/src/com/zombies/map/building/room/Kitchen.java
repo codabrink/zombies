@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.zombies.map.building.Box;
 import com.zombies.map.building.objects.Fridge;
 import com.zombies.map.building.objects.Table;
-import com.zombies.util.U;
+import com.zombies.lib.U;
 
 import java.util.HashSet;
 

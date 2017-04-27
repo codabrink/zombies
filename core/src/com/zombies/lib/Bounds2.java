@@ -1,4 +1,4 @@
-package com.zombies.util;
+package com.zombies.lib;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;

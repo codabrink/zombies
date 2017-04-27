@@ -4,12 +4,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.util.G;
+import com.zombies.lib.math.M;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 public class StreetSystem {
@@ -23,7 +22,7 @@ public class StreetSystem {
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
     private float rigidity;
-    private float rsm = (float) G.PIHALF; // Rotational Segmentation Factor
+    private float rsm = (float) M.PIHALF; // Rotational Segmentation Factor
 
     public static void populateBox(Vector2 point, float w, float h, int resolution) {
 

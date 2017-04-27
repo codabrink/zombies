@@ -10,8 +10,8 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
 import com.zombies.map.building.room.Room;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.U;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.U;
 
 import java.util.HashMap;
 import java.util.HashSet;

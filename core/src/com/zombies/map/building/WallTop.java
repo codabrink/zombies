@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
 import com.zombies.interfaces.ModelMeCallback;
-import com.zombies.util.Assets;
+import com.zombies.lib.Assets;
 
 public class WallTop {
     private Vector2 c1, c2, c3, c4;

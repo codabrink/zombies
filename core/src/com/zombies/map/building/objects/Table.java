@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
-import com.zombies.util.Assets;
-import com.zombies.util.G;
+import com.zombies.lib.Assets;
+import com.zombies.lib.math.M;
 
 public class Table {
     public static Model model;
@@ -19,7 +19,7 @@ public class Table {
 
     public Table(Vector2 p, float angle) {
         modelInstance = new ModelInstance(model);
-        modelInstance.transform.setToRotationRad(Vector3.X, (float) G.PIHALF);
+        modelInstance.transform.setToRotationRad(Vector3.X, (float) M.PIHALF);
         modelInstance.transform.rotateRad(Vector3.Y, angle);
         modelInstance.transform.setTranslation(p.x, p.y, 0);
 

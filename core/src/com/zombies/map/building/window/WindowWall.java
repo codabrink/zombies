@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.Wall;
 import com.zombies.map.building.WallPoint;
-import com.zombies.util.Assets.MATERIAL;
+import com.zombies.lib.Assets.MATERIAL;
 
 public class WindowWall extends Wall {
     protected Vector2 windowStart, windowEnd;

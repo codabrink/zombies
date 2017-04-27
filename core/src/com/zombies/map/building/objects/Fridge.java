@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
 import com.zombies.map.building.Box;
-import com.zombies.util.Assets;
-import com.zombies.util.G;
+import com.zombies.lib.Assets;
+import com.zombies.lib.math.M;
 
 public class Fridge {
     public static Model model;
@@ -22,8 +22,8 @@ public class Fridge {
         Vector2 p = b.getCenter();
 
         modelInstance = new ModelInstance(model);
-        modelInstance.transform.setToRotationRad(Vector3.X, (float) G.PIHALF);
-        modelInstance.transform.rotateRad(Vector3.Y, (float) -G.PIHALF);
+        modelInstance.transform.setToRotationRad(Vector3.X, (float) M.PIHALF);
+        modelInstance.transform.rotateRad(Vector3.Y, (float) -M.PIHALF);
 
         modelInstance.transform.setTranslation(p.x, p.y, 0);
 

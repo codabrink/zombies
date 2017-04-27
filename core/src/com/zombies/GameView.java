@@ -27,9 +27,9 @@ import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
 import com.zombies.map.thread.Generator;
-import com.zombies.util.Assets;
+import com.zombies.lib.Assets;
 import com.zombies.interfaces.Collideable;
-import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.lib.ThreadedModelBuilder;
 import com.zombies.workers.RoomDoorWorker;
 
 import java.util.ArrayList;
@@ -44,7 +44,6 @@ public class GameView implements Screen {
     // STATIC VARIABLES
     public static com.zombies.HUD.FontGen fontGen;
     public static GameView gv;
-    public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
     public static ModelCache modelCache = new ModelCache();

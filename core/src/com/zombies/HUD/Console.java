@@ -11,7 +11,7 @@ import com.zombies.Player;
 import com.zombies.Zombies;
 import com.zombies.Zone;
 import com.zombies.map.Hallway;
-import com.zombies.util.U;
+import com.zombies.lib.U;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

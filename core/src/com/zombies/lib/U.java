@@ -1,4 +1,4 @@
-package com.zombies.util;
+package com.zombies.lib;
 
 import com.zombies.C;
 
@@ -35,10 +35,6 @@ public class U {
         if (size == 0) return null;
         if (size == 1) return list.get(0);
         return list.get(random.nextInt(list.size() - 1));
-    }
-
-    public static int oppositeDirection(int direction) {
-        return (direction + 2) % 4;
     }
 
     private static String getCallerClassName() {

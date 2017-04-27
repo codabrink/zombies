@@ -11,10 +11,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
-import com.zombies.util.Assets;
-import com.zombies.util.G;
-import com.zombies.util.LineSegment;
-import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.lib.Assets;
+import com.zombies.lib.math.M;
+import com.zombies.lib.math.LineSegment;
+import com.zombies.lib.ThreadedModelBuilder;
 
 public class StreetSegment extends Overlappable {
     public LineSegment line;
@@ -49,7 +49,7 @@ public class StreetSegment extends Overlappable {
         this.street = street;
 
         line       = new LineSegment(p1, p2);
-        center     = G.center(p1, p2);
+        center     = M.center(p1, p2);
         width      = p1.dst(p2);
         height     = Street.RADIUS * 2;
 
@@ -62,10 +62,10 @@ public class StreetSegment extends Overlappable {
 
     private void compile() {
         // corners are counter clockwise from p1
-        corners[0] = new Vector2(G.projectVector(p1, angle + G.THRPIHALF, Street.RADIUS));
-        corners[1] = new Vector2(G.projectVector(p2, angle + G.THRPIHALF, Street.RADIUS));
-        corners[2] = new Vector2(G.projectVector(p2, angle + G.PIHALF, Street.RADIUS));
-        corners[3] = new Vector2(G.projectVector(p1, angle + G.PIHALF, Street.RADIUS));
+        corners[0] = new Vector2(M.projectVector(p1, angle + M.THRPIHALF, Street.RADIUS));
+        corners[1] = new Vector2(M.projectVector(p2, angle + M.THRPIHALF, Street.RADIUS));
+        corners[2] = new Vector2(M.projectVector(p2, angle + M.PIHALF, Street.RADIUS));
+        corners[3] = new Vector2(M.projectVector(p1, angle + M.PIHALF, Street.RADIUS));
 
         setCorners(corners);
     }

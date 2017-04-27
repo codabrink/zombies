@@ -18,8 +18,8 @@ import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.ZCallback;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.G;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.math.M;
 
 public class Wall implements Collideable, Loadable, HasZone {
     final float DIAMETER = 1f;
@@ -54,8 +54,8 @@ public class Wall implements Collideable, Loadable, HasZone {
         this.rightMaterial = rightMaterial;
         this.leftMaterial = leftMaterial;
 
-        angle = (float) G.getAngle(p1, p2);
-        center = G.center(p1, p2);
+        angle = (float) M.getAngle(p1, p2);
+        center = M.center(p1, p2);
 
         zone = Zone.getZone(center);
     }
@@ -93,12 +93,12 @@ public class Wall implements Collideable, Loadable, HasZone {
         Iterator<WallPoint> itr = points.iterator();
 
         for (WallPoint wp : points) {
-            Vector2 p2 = G.projectVector(wp.p1, angle, wp.length);
+            Vector2 p2 = M.projectVector(wp.p1, angle, wp.length);
 
-            final Vector2 c1 = G.projectVector(wp.p1, angle - G.PI34, RADIUS),
-                    c2 = G.projectVector(p2, angle - G.PI14, RADIUS),
-                    c3 = G.projectVector(p2, angle + G.PI14, RADIUS),
-                    c4 = G.projectVector(wp.p1, angle + G.PI34, RADIUS);
+            final Vector2 c1 = M.projectVector(wp.p1, angle - M.PI34, RADIUS),
+                    c2 = M.projectVector(p2, angle - M.PI14, RADIUS),
+                    c3 = M.projectVector(p2, angle + M.PI14, RADIUS),
+                    c4 = M.projectVector(wp.p1, angle + M.PI34, RADIUS);
 
             leftSegments.add(new WallSegment(
                     c1,

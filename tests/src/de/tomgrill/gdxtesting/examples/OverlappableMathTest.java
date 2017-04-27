@@ -2,8 +2,8 @@ package de.tomgrill.gdxtesting.examples;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.util.G;
-import com.zombies.util.LineSegment;
+import com.zombies.lib.math.M;
+import com.zombies.lib.math.LineSegment;
 
 import static org.junit.Assert.assertTrue;
 
@@ -33,8 +33,8 @@ public class OverlappableMathTest {
         end = System.currentTimeMillis();
         System.out.println("A million square overlap tests took " + (end - start) + " milliseconds.");
 
-        float[] line = G.line(new Vector2(2, 3), new Vector2(3, 3));
-        float[] line2 = G.line(new Vector2(0, 3), new Vector2(2, 3));
+        float[] line = M.line(new Vector2(2, 3), new Vector2(3, 3));
+        float[] line2 = M.line(new Vector2(0, 3), new Vector2(2, 3));
     }
 
     @Test

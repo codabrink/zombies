@@ -14,7 +14,7 @@ import com.zombies.interfaces.Gridable;
 import com.zombies.map.building.Box;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.room.Room;
-import com.zombies.util.U;
+import com.zombies.lib.U;
 
 import java.util.HashMap;
 import java.util.HashSet;
