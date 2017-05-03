@@ -2,7 +2,6 @@ package com.zombies.lib;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.zombies.GameView;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 
 public class ThreadedModelBuilder extends ModelBuilder {
@@ -11,17 +10,21 @@ public class ThreadedModelBuilder extends ModelBuilder {
     // 2. calls .end() in main thread and receives model
     // 3. sends model back as parameter to callback given to constructor
 
-    public enum MODELING_STATE { DORMANT, MODELING, FINISHED }
+    public enum MODELING_STATE { READY, MODELING, FINISHED, DORMANT}
     private ThreadedModelBuilderCallback callback;
     public MODELING_STATE modelingState = MODELING_STATE.DORMANT;
 
-    public ThreadedModelBuilder(ThreadedModelBuilderCallback callback) {
+    public boolean setCallback(ThreadedModelBuilderCallback callback) {
+        if (modelingState != MODELING_STATE.DORMANT)
+            return false;
         this.callback = callback;
+        modelingState = MODELING_STATE.READY;
+        return true;
     }
 
     @Override
     public void begin() {
-        if (modelingState != MODELING_STATE.DORMANT)
+        if (modelingState != MODELING_STATE.READY)
             return;
         modelingState = MODELING_STATE.MODELING;
         super.begin();
@@ -29,7 +32,6 @@ public class ThreadedModelBuilder extends ModelBuilder {
 
     public void finish() {
         modelingState = MODELING_STATE.FINISHED;
-        GameView.addEndableBuilder(this);
     }
 
     // only call in main thread

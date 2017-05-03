@@ -19,6 +19,7 @@ import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
+import com.zombies.lib.Models;
 import com.zombies.map.Grass;
 import com.zombies.map.building.Box;
 import com.zombies.map.building.room.Room;
@@ -41,43 +42,42 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class Zone extends Overlappable {
-    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
-        @Override
-        public void response(Model m) {
-            if (model != null)
-                model.dispose();
+public class Zone extends Overlappable implements Loadable {
+    public static ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder();
+    public static Thread modelingThread;
 
-            model = m;
-            modelInstance = new ModelInstance(model);
-            modelInstance.transform.setTranslation(center.x, center.y, 0);
-
-            D.modelCacheValid = false;
-        }
-    });
-    private Thread modelingThread;
     private static class ZoneModelingRunnable implements Runnable {
-        private ThreadedModelBuilder modelBuilder;
         private Zone zone;
-        public ZoneModelingRunnable(Zone zone, ThreadedModelBuilder modelBuilder) {
-            this.modelBuilder = modelBuilder;
+        public ZoneModelingRunnable(Zone zone) {
             this.zone = zone;
         }
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
+            final Zone z = zone;
+            ThreadedModelBuilderCallback callback = new ThreadedModelBuilderCallback() {
+                @Override
+                public void response(Model m) {
+                    if (z.model != null)
+                        z.model.dispose();
+
+                    z.model = m;
+                    ModelInstance oldModelInstance = z.modelInstance;
+                    z.modelInstance = new ModelInstance(z.model);
+                    z.modelInstance.transform.setTranslation(z.center.x, z.center.y, 0);
+                    Models.addInactiveModel(z.modelInstance, oldModelInstance);
+
+                    D.modelCacheValid = false;
+                }
+            };
+
+            while (!modelBuilder.setCallback(callback))
                 try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+
             zone.rebuildModel();
-            if (zone.needsRemodel) { // reuse the thread
-                run();
-                return;
-            }
             D.removeRunningThread(Thread.currentThread());
         }
     };
-
-
 
     private Vector2 position, center;
     public Bounds2 bounds;
@@ -93,12 +93,12 @@ public class Zone extends Overlappable {
 
     // Static Variables
     public static HashMap<String, Zone> zones;
-    public static HashSet<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
 
-    public boolean needsRemodel = false; // flag true, and the model will rebuild at next possible moment
+    private boolean compiled = false;
+    private boolean loaded   = false;
 
     // Collections
 
@@ -142,6 +142,10 @@ public class Zone extends Overlappable {
         }
     }
 
+    public void compile() {
+        compiled = true;
+    }
+
     public void addModelingCallback(MATERIAL m, ModelMeCallback mmc) {
         synchronized (modelables) {
             LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
@@ -170,29 +174,19 @@ public class Zone extends Overlappable {
             d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
 
-    public void rebuildModelCache(int limit) {
-        LinkedHashSet<Zone> zones = getAdjZones(limit);
-        GameView.modelCache.begin();
-        for (Zone z : zones)
-            z.rebuildModelCache();
-        GameView.modelCache.end();
-    }
-    public void rebuildModelCache() {
-        if (modelInstance == null)
-            return;
-        GameView.modelCache.add(modelInstance);
-        for (ModelInstance mi : modelInstances)
-            GameView.modelCache.add(mi);
-    }
-
-
     public void update(int limit) {
         DebugText.addMessage("boxes", "Zone box count: " + boxes.size());
+
+        if (modelBuilder.modelingState == MODELING_STATE.FINISHED)
+            modelBuilder.end();
+
         LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones)
             z.update();
     }
     private void update() {
+        if (!compiled) return;
+
         synchronized (pendingObjects) {
             Iterator i = pendingObjects.iterator();
             while (i.hasNext()) {
@@ -211,9 +205,8 @@ public class Zone extends Overlappable {
             }
         }
 
-        if (needsRemodel && (modelingThread == null || !modelingThread.isAlive())) {
-            needsRemodel = false;
-            modelingThread = new Thread(new ZoneModelingRunnable(this, modelBuilder));
+        if (model == null && (modelingThread == null || !modelingThread.isAlive())) {
+            modelingThread = new Thread(new ZoneModelingRunnable(this));
             modelingThread.start();
         }
 
@@ -221,22 +214,44 @@ public class Zone extends Overlappable {
             u.update();
     }
 
-    public void load(int limit) {
-        LinkedHashSet<Zone> zones = getAdjZones(limit);
-        for (Zone z: zones)
-            z.load();
+
+    public static void updateCurrentZone() {
+        Zone currentZone = Zone.getZone(D.player().getPosition());
+        if (currentZone != D.currentZone) {
+            LinkedHashSet<Zone> adjZones = currentZone.getAdjZones(C.DRAW_DISTANCE);
+            Iterator<Zone> itr = D.loadedZones.iterator();
+            while (itr.hasNext()) {
+                Zone z = itr.next();
+                if (adjZones.contains(z))
+                    continue;
+                z.unload();
+                itr.remove();
+            }
+            for (Zone z : adjZones) {
+                z.load();
+                D.loadedZones.add(z);
+            }
+            D.currentZone = currentZone;
+        }
     }
     public void load() {
-        if (loadIndex == Zone.globalLoadIndex)
-            return; // already loaded
-        loadIndex = Zone.globalLoadIndex;
-        Zone.loadedZones.add(this);
+        if (loaded)
+            return;
+        loaded = true;
+
+        if (modelInstance != null)
+            Models.addInactiveModel(modelInstance);
 
         for (Loadable l: loadables)
             l.load();
     }
-
     public void unload() {
+        if (!loaded)
+            return;
+        loaded = false;
+
+        Models.removeInactiveModel(modelInstance);
+
         for (Loadable l: loadables)
             l.unload();
     }
@@ -254,24 +269,6 @@ public class Zone extends Overlappable {
     }
     public static Zone getZone(Vector2 v) {
         return getZone(v.x, v.y);
-    }
-    public static boolean setCurrentZone(Zone z) {
-        if (Zone.currentZone == z)
-            return false;
-
-        Zone.globalLoadIndex++;
-        Zone.currentZone = z;
-        z.load(C.DRAW_DISTANCE);
-
-        // unload dormant zones
-        for (Iterator<Zone> it = loadedZones.iterator(); it.hasNext();) {
-            Zone zz = it.next();
-            if (zz.loadIndex != Zone.globalLoadIndex) {
-                zz.unload();
-                it.remove();
-            }
-        }
-        return true;
     }
 
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
@@ -592,7 +589,6 @@ public class Zone extends Overlappable {
     public void rebuildModel() {
         // only run in modeling thread
         if (modelingThread == null || Thread.currentThread().getId() != modelingThread.getId()) {
-            needsRemodel = true;
             return;
         }
 

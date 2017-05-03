@@ -26,6 +26,7 @@ import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
+import com.zombies.lib.Models;
 import com.zombies.map.thread.Generator;
 import com.zombies.lib.Assets;
 import com.zombies.interfaces.Collideable;
@@ -46,7 +47,6 @@ public class GameView implements Screen {
     public static GameView gv;
     public static Player player;
     public static Random r = new Random();
-    public static ModelCache modelCache = new ModelCache();
     private static List readyToModel    = Collections.synchronizedList(new ArrayList());
     private static List endableBuilders = Collections.synchronizedList(new ArrayList());
     private static List callbacks       = Collections.synchronizedList(new ArrayList());
@@ -99,8 +99,9 @@ public class GameView implements Screen {
 
         stats = new Stats();
 
-        hud = new com.zombies.HUD.HUD();
-        D.reset();
+        hud = new HUD();
+        new D();
+        new Models();
 
         player = new Player(new Vector2(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE));
 
@@ -113,12 +114,7 @@ public class GameView implements Screen {
         Gdx.input.setInputProcessor(hud);
 
         modelBatch  = new ModelBatch();
-        environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(player.pointLight);
 
-        outsideEnvironment = new Environment();
-        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
@@ -187,21 +183,20 @@ public class GameView implements Screen {
         spriteBatch.setProjectionMatrix(camHandle.cam.combined);
 
         //lists
-        D.world.step(Gdx.graphics.getDeltaTime(), 3, 4);
+        D.world.step(dt, 3, 4);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
         // renderer.draw(D.world);
         Gdx.gl.glFlush();
         handleKeys();
 
-        player.update();
         D.currentZone.update(C.DRAW_DISTANCE);
+        player.update();
 
         try {
             modelBatch.begin(getCamera());
-            modelBatch.render(modelCache, outsideEnvironment);
+            Models.render(modelBatch);
             modelBatch.end();
         } catch (Exception e) {
-            modelCache = new ModelCache();
         }
 
         for (DebugCircle dc: debugCircles)

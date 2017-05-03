@@ -30,7 +30,6 @@ public class Building implements HasZone {
     public    HashSet<Hallway>          hallways = new HashSet<>();
     protected Vector2                   center;
     protected Zone                      zone;
-    public    Environment               environment = GameView.outsideEnvironment;
 
     public int outsideDoorCount = 0;
 

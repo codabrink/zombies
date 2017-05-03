@@ -24,16 +24,8 @@ public class StreetSegment extends Overlappable {
     private Vector2[] corners = new Vector2[4];
     private Zone zone;
     private Street street;
-    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
-        @Override
-        public void response(Model model) {
-            ModelInstance modelInstance = new ModelInstance(model);
-            modelInstance.transform.rotateRad(Vector3.Z, (float) angle);
-            modelInstance.transform.setTranslation(center.x, center.y, 0);
+    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder();
 
-            zone.addPendingObject(modelInstance);
-        }
-    });
 
     public static StreetSegment createStreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
         if (p1.x == p2.x && p1.y == p2.y)
@@ -56,6 +48,18 @@ public class StreetSegment extends Overlappable {
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
         compile();
+
+        final float fangle = (float) angle;
+        modelBuilder.setCallback(new ThreadedModelBuilderCallback() {
+            @Override
+            public void response(Model model) {
+                ModelInstance modelInstance = new ModelInstance(model);
+                modelInstance.transform.rotateRad(Vector3.Z, fangle);
+                modelInstance.transform.setTranslation(center.x, center.y, 0);
+
+                zone.addPendingObject(modelInstance);
+            }
+        });
 
         buildMesh();
     }

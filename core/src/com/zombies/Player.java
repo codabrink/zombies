@@ -299,8 +299,7 @@ public class Player extends Unit implements Collideable {
 
     @Override
     protected void updateZone() {
-        zone = Zone.getZone(body.getPosition());
-        Zone.setCurrentZone(zone);
+        zone = D.currentZone;
     }
     public void removeSurvivor(Survivor s) {survivors.remove(s);}
     public void addSurvivor(Survivor s) {

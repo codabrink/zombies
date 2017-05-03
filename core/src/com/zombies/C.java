@@ -14,7 +14,7 @@ public class C {
     public static final boolean ENABLE_ACCEL = false;
     public static final boolean ENABLE_WALL_DESTRUCTION = true;
     public static final boolean ENABLE_DEBUG_LINES = true;
-    public static final float BOX_DEPTH = 7 * SCALE;
+    public static final float BOX_DEPTH = 5 * SCALE;
     public static final float GRIDSIZE = 15 * SCALE;
     public static final float GRID_HALF_SIZE = GRIDSIZE / 2;
     public static final int BULLET_DAMAGE_FACTOR = 2;

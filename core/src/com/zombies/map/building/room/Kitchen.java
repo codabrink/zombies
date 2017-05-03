@@ -31,7 +31,6 @@ public class Kitchen extends Room {
         b = ((Box) U.random(boxes));
         if (b == null)
             return;
-        getBuilding().environment.add(new PointLight().set(Color.WHITE, b.getCenter().x, b.getCenter().y, 20, 0.04f));
     }
 
     private void addObject(Object o) {

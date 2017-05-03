@@ -24,7 +24,10 @@ public class D {
     public static D d;
 
     public static long tick;
+
     public static Zone currentZone;
+    public static LinkedHashSet<Zone> loadedZones = new LinkedHashSet<>();
+
     public static Box currentBox;
     public static Room currentRoom() {
         if (currentBox != null)
@@ -42,7 +45,7 @@ public class D {
 
     public static HashMap<Worker, Thread> workers;
 
-    public static void reset() {
+    public D() {
         tick = 0l;
 
         synchronized (runningThreads) {
@@ -54,7 +57,7 @@ public class D {
         mainThreadId         = Thread.currentThread().getId();
 
         Zone.zones           = new HashMap<>();
-        Zone.loadedZones     = new HashSet<>();
+        loadedZones          = new LinkedHashSet<>();
         StreetSystem.systems = new LinkedHashSet<>();
 
         world                = new World(new Vector2(), true);
@@ -83,12 +86,9 @@ public class D {
      }
 
      private static void updateInfo() {
-         Zone newZone = Zone.getZone(player().getPosition());
-         if (newZone != currentZone || !modelCacheValid)
-             newZone.rebuildModelCache(C.DRAW_DISTANCE);
+         Zone.updateCurrentZone();
 
          modelCacheValid = true;
-         currentZone = newZone;
          currentBox  = currentZone.getBox(player().getPosition());
      }
 }
