@@ -7,7 +7,6 @@ import com.zombies.lib.math.Ray;
 import com.zombies.lib.U;
 
 public class Overlappable {
-    public float width, height;
     protected Vector2    position, center;
     protected Vector2[]  corners;
     public LineSegment[] lines;
@@ -117,7 +116,4 @@ public class Overlappable {
         return result;
 
     }
-
-    public float getHeight() { return height;}
-    public float getWidth() { return width; }
 }

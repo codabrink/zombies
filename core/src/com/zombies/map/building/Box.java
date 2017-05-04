@@ -1,6 +1,5 @@
 package com.zombies.map.building;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -47,7 +46,6 @@ public class Box extends BuildingGridable {
     private Wall[]           outerWalls   = new Wall[4];
 
     private int id;
-    private String sKey;
 
     public static Box createBox(Room room, int[] key) {
         Overlappable o = room.getBuilding().checkOverlap(key);
@@ -63,15 +61,9 @@ public class Box extends BuildingGridable {
 
         this.room     = room;
 
-        this.sKey     = key[0]+","+key[1];
-
         gridMap = building.gridMap;
 
-        building.putBoxMap(this.key, this);
         room.boxes.add(this);
-
-        height   = C.GRIDSIZE;
-        width    = C.GRIDSIZE;
 
         setCorners(building.cornersOf(position));
 
@@ -233,9 +225,9 @@ public class Box extends BuildingGridable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 modelCenter) {
         Vector2 relp = new Vector2(position.x - modelCenter.x, position.y - modelCenter.y);
         builder.rect(relp.x, relp.y, 0,
-                relp.x + width, relp.y, 0,
-                relp.x + width, relp.y + height, 0,
-                relp.x, relp.y + height, 0,
+                relp.x + C.GRIDSIZE, relp.y, 0,
+                relp.x + C.GRIDSIZE, relp.y + C.GRIDSIZE, 0,
+                relp.x, relp.y + C.GRIDSIZE, 0,
                 1, 1, 1);
     }
 

@@ -24,12 +24,12 @@ public class Building implements HasZone {
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
 
     public    BuildingType type;
-    protected HashSet<Room>             rooms    = new HashSet<>();
+    protected HashSet<Room>              rooms    = new HashSet<>();
     public    HashMap<String, IGridable> gridMap  = new HashMap<>();
-    public    HashMap<String, Wall>     wallMap  = new HashMap<>();
-    public    HashSet<Hallway>          hallways = new HashSet<>();
-    protected Vector2                   center;
-    protected Zone                      zone;
+    public    HashMap<String, Wall>      wallMap  = new HashMap<>();
+    public    HashSet<Hallway>           hallways = new HashSet<>();
+    protected Vector2                    center;
+    protected Zone                       zone;
 
     public int outsideDoorCount = 0;
 
@@ -226,8 +226,8 @@ public class Building implements HasZone {
         return oldIGridable;
     }
 
-    public void putBoxMap(int[] key, Box b) {
-        gridMap.put(key[0] + "," + key[1], b);
+    public void putGridMap(int[] key, IGridable g) {
+        gridMap.put(key[0] + "," + key[1], g);
     }
 
     public void calculateBorders() {
@@ -297,5 +297,34 @@ public class Building implements HasZone {
             if (gridMap.get(k[0] + "," + k[1]) == null)
                 adjKeys.add(k);
         return adjKeys;
+    }
+
+    public LinkedList<int[]> keysOnLine(Vector2 start, Vector2 end) {
+        start.sub(center); end.sub(center);
+
+        // slope intercept form (y = mx + b)
+        float m = (end.y - start.y) / (end.x - start.x);
+        float b = start.y - (m * start.x);
+
+        LinkedList<int[]> keys = new LinkedList<>();
+        float xStart = (float)(C.GRIDSIZE * Math.floor(Math.min(start.x, end.x) / C.GRIDSIZE));
+        float xEnd   = (float)(C.GRIDSIZE * Math.ceil(Math.max(start.x, end.x) / C.GRIDSIZE));
+        float yStart = (float)(C.GRIDSIZE * Math.floor(Math.min(start.y, end.y) / C.GRIDSIZE));
+        float yEnd   = (float)(C.GRIDSIZE * Math.ceil(Math.max(start.y, end.y) / C.GRIDSIZE));
+
+        // find all vertical intercepts of line on zone grid
+        for (float x = xStart; x < xEnd; x = x + C.ZONE_SIZE) {
+            // add zones from both sides of line
+            keys.add(new int[]{(int) (x - C.ZONE_HALF_SIZE), (int) (m * x + b)});
+            keys.add(new int[]{(int) (x + C.ZONE_HALF_SIZE), (int) (m * x + b)});
+        }
+        if (m != 0) {
+            // find all horizontal intercepts of line on zone grid
+            for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
+                keys.add(new int[]{(int) ((y - b) / m), (int) (y - C.ZONE_HALF_SIZE)});
+                keys.add(new int[]{(int) ((y - b) / m), (int) (y + C.ZONE_HALF_SIZE)});
+            }
+        }
+        return keys;
     }
 }

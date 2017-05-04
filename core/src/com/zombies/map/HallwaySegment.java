@@ -40,14 +40,9 @@ public class HallwaySegment extends BuildingGridable implements Loadable {
         radius     = diameter / 2;
         this.key   = key;
         sKey       = key[0] + "," + key[1];
-
-        halfWidth  = width / 2;
-        halfHeight = height / 2;
     }
     public HallwaySegment(Hallway h, int[] key) {
         super(h.getBuilding(), key);
-        width      = C.GRIDSIZE;
-        height     = C.GRIDSIZE;
         setInfo(h, key);
     }
 
@@ -128,17 +123,7 @@ public class HallwaySegment extends BuildingGridable implements Loadable {
     @Override
     public Vector2[] getCorners() { return corners; }
     @Override
-    public boolean contains(float x, float y) { return M.rectContains(x, y, position, width, height); }
-
-    @Override
-    public float getWidth() {
-        return width;
-    }
-
-    @Override
-    public float getHeight() {
-        return height;
-    }
+    public boolean contains(float x, float y) { return M.rectContains(x, y, position, C.GRIDSIZE, C.GRIDSIZE); }
 
     @Override
     public void load() {
@@ -154,11 +139,11 @@ public class HallwaySegment extends BuildingGridable implements Loadable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
-        builder.setUVRange(0, 0, width / C.GRIDSIZE, height / C.GRIDSIZE);
+        builder.setUVRange(0, 0, C.GRIDSIZE / C.GRIDSIZE, C.GRIDSIZE / C.GRIDSIZE);
         builder.rect(relp.x, relp.y, -0.1f,
-                relp.x + width, relp.y, -0.1f,
-                relp.x + width, relp.y + height, -0.1f,
-                relp.x, relp.y + height, -0.1f,
+                relp.x + C.GRIDSIZE, relp.y, -0.1f,
+                relp.x + C.GRIDSIZE, relp.y + C.GRIDSIZE, -0.1f,
+                relp.x, relp.y + C.GRIDSIZE, -0.1f,
                 1, 1, 1);
     }
 

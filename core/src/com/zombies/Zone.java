@@ -281,19 +281,17 @@ public class Zone extends Overlappable implements Loadable {
         float yStart = (float)(C.ZONE_SIZE * Math.floor(Math.min(start.y, end.y) / C.ZONE_SIZE));
         float yEnd   = (float)(C.ZONE_SIZE * Math.ceil(Math.max(start.y, end.y) / C.ZONE_SIZE));
 
-        float halfZoneSize = C.ZONE_SIZE / 2;
-
         // find all vertical intercepts of line on zone grid
         for (float x = xStart; x < xEnd; x = x + C.ZONE_SIZE) {
             // add zones from both sides of line
-            zones.add(getZone(x - halfZoneSize, m * x + b));
-            zones.add(getZone(x + halfZoneSize, m * x + b));
+            zones.add(getZone(x - C.ZONE_HALF_SIZE, m * x + b));
+            zones.add(getZone(x + C.ZONE_HALF_SIZE, m * x + b));
         }
         if (m != 0) {
             // find all horizontal intercepts of line on zone grid
             for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
-                zones.add(getZone((y - b) / m, y - halfZoneSize));
-                zones.add(getZone((y - b) / m, y + halfZoneSize));
+                zones.add(getZone((y - b) / m, y - C.ZONE_HALF_SIZE));
+                zones.add(getZone((y - b) / m, y + C.ZONE_HALF_SIZE));
             }
         }
         return zones;

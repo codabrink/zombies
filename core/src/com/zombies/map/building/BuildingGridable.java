@@ -10,15 +10,21 @@ import java.util.LinkedList;
 
 public class BuildingGridable extends Overlappable implements IGridable {
     protected Building building;
-    protected int[] key;
+
+    protected String sKey;
+    protected int[]  key;
+
     protected Vector2 position;
 
     public BuildingGridable(Building building, int[] key) {
         super(building.cornersOf(key));
         this.building = building;
         this.key      = key;
+        this.sKey     = key[0]+","+key[1];
 
         position = building.positionOf(key);
+
+        building.putGridMap(key, this);
     }
 
     @Override
