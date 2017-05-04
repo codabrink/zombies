@@ -2,8 +2,6 @@ package com.zombies.map;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IGridable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.BuildingGridable;
@@ -14,7 +12,6 @@ import com.zombies.C;
 import com.zombies.map.building.Wall;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class HallwaySegment extends BuildingGridable implements Loadable {
@@ -47,8 +44,8 @@ public class HallwaySegment extends BuildingGridable implements Loadable {
     }
 
     public void compile() {
-        HashSet<IGridable> adj = new HashSet<>();
-        IGridable g;
+        HashSet<BuildingGridable> adj = new HashSet<>();
+        BuildingGridable g;
         int[][] adjGridKeys = Building.getAdjBMKeys(key);
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);

@@ -84,10 +84,10 @@ public class Box extends BuildingGridable {
     }
 
     private void buildWalls() {
-        IGridable n = gridMap.get(key[0] + "," + (key[1] + 1));
-        IGridable s = gridMap.get(key[0] + "," + (key[1] - 1));
-        IGridable e = gridMap.get(key[0] + 1 + "," + key[1]);
-        IGridable w = gridMap.get(key[0] - 1 + "," + key[1]);
+        BuildingGridable n = gridMap.get(key[0] + "," + (key[1] + 1));
+        BuildingGridable s = gridMap.get(key[0] + "," + (key[1] - 1));
+        BuildingGridable e = gridMap.get(key[0] + 1 + "," + key[1]);
+        BuildingGridable w = gridMap.get(key[0] - 1 + "," + key[1]);
 
         processWall(e, 0, 0, 3);
         processWall(n, 1, 1, 0);
@@ -95,7 +95,7 @@ public class Box extends BuildingGridable {
         processWall(s, 3, 3, 2);
     }
 
-    private void processWall(IGridable g, int i, int a, int b) {
+    private void processWall(BuildingGridable g, int i, int a, int b) {
         if (g == null) {
             if (building.outsideDoorCount == 0 || random.nextFloat() < 0.1f) {
                 createDoor(i, a, b, building.type.outerWallMaterial, room.type.wallMaterial);
@@ -133,19 +133,19 @@ public class Box extends BuildingGridable {
     private void createDoor(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new DoorWall(corners[a], corners[b], building, lm, rm));
     }
-    private void createDoor(IGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+    private void createDoor(BuildingGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, g, new DoorWall(corners[a], corners[b], building, lm, rm));
     }
     private void createWindow(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new WindowWall(corners[a], corners[b], building, lm, rm));
     }
-    private void createWindow(IGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+    private void createWindow(BuildingGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, g, new WindowWall(corners[a], corners[b], building, lm, rm));
     }
     private void createWall(int i, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, i, new WallWall(corners[a], corners[b], lm, rm));
     }
-    private void createWall(IGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
+    private void createWall(BuildingGridable g, int a, int b, MATERIAL lm, MATERIAL rm) {
         building.putWall(this, g, new WallWall(corners[a], corners[b], lm, rm));
     }
 
@@ -213,7 +213,7 @@ public class Box extends BuildingGridable {
     }
     public HashSet<Box> getAdjBoxes() {
         HashSet<Box> adjBoxes = new HashSet<>();
-        IGridable g;
+        BuildingGridable g;
         for (int[] k : Building.getAdjBMKeys(key)) {
             g = building.gridMapGet(k);
             if (g instanceof Box)

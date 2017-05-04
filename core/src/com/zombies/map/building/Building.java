@@ -4,14 +4,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IGridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
 import com.zombies.map.building.room.Room;
 import com.zombies.lib.Assets.MATERIAL;
 import com.zombies.lib.U;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -121,7 +119,7 @@ public class Building implements HasZone {
 
     public HashSet<Box> boxesOnCol(int col) {
         HashSet<Box> boxes = new HashSet<>();
-        IGridable g;
+        BuildingGridable g;
         for (int y = yLow; y <= yHigh; y++) {
             g = gridMap.get(col + "," + y);
             if (g instanceof Box)
@@ -132,7 +130,7 @@ public class Building implements HasZone {
 
     public HashSet<Box> boxesOnRow(int row) {
         HashSet<Box> boxes = new HashSet<>();
-        IGridable g;
+        BuildingGridable g;
         for (int x = xLow; x <= xHigh; x++) {
             g = gridMap.get(x + "," + row);
             if (g instanceof Box)
@@ -145,7 +143,7 @@ public class Building implements HasZone {
         return checkOverlap(key, 0);
     }
     public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
-        IGridable g = gridMapGet(key);
+        BuildingGridable g = gridMapGet(key);
         if (g != null)
             return (Overlappable) g;
         return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
@@ -168,11 +166,11 @@ public class Building implements HasZone {
     }
 
 
-    public void putWall(IGridable g, int direction, Wall wall) {
+    public void putWall(BuildingGridable g, int direction, Wall wall) {
         String key = wallKeyFromGridableAndDirection(g, direction);
         putWall(key, wall);
     }
-    public void putWall(IGridable a, IGridable b, Wall wall) {
+    public void putWall(BuildingGridable a, BuildingGridable b, Wall wall) {
         String key = wallKeyBetweenGridables(a, b);
         putWall(key, wall);
     }
@@ -189,10 +187,10 @@ public class Building implements HasZone {
                 Math.max(k1[1], k2[1]) + ',' +
                 (k1[0] == k2[0] ? 'h' : 'v');
     }
-    public static String wallKeyBetweenGridables(IGridable g1, IGridable g2) {
+    public static String wallKeyBetweenGridables(BuildingGridable g1, BuildingGridable g2) {
         return wallKeyBetweenKeys(g1.getKey(), g2.getKey());
     }
-    public String wallKeyFromGridableAndDirection(IGridable g, int direction) {
+    public String wallKeyFromGridableAndDirection(BuildingGridable g, int direction) {
         return wallKeyFromGridableAndDirection(g.getKey(), direction);
     }
     public static String wallKeyFromGridableAndDirection(int[] key, int direction) {
@@ -212,7 +210,7 @@ public class Building implements HasZone {
 
     public HashSet<Box> getOuterBoxes() {
         HashSet<Box> boxes = new HashSet<>();
-        for (IGridable g : gridMap.values())
+        for (BuildingGridable g : gridMap.values())
             if (g instanceof Box && ((Box)g).getOpenAdjKeys().size() > 0)
                 boxes.add((Box)g);
         return boxes;
@@ -233,7 +231,7 @@ public class Building implements HasZone {
 
     public void calculateBorders() {
         int[] key;
-        for (IGridable g : gridMap.values()) {
+        for (BuildingGridable g : gridMap.values()) {
             if (!(g instanceof Box)) continue;
 
             key = ((Box)g).getKey();

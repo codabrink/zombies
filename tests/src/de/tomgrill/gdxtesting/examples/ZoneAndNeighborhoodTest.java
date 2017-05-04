@@ -10,7 +10,6 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
-import com.zombies.interfaces.IGridable;
 import com.zombies.map.building.Box;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.room.Room;

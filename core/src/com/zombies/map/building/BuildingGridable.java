@@ -3,12 +3,11 @@ package com.zombies.map.building;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.IGridable;
 import com.zombies.lib.math.M;
 
 import java.util.LinkedList;
 
-public class BuildingGridable extends Overlappable implements IGridable {
+public class BuildingGridable extends Overlappable {
     protected Building building;
 
     protected String sKey;
@@ -33,17 +32,12 @@ public class BuildingGridable extends Overlappable implements IGridable {
                 M.inRangeInclusive(p.y, position.y, position.y + C.GRIDSIZE);
     }
 
-    @Override
     public Building getBuilding() {
         return building;
     }
-
-    @Override
     public LinkedList<int[]> getOpenAdjKeys() {
         return building.getOpenAdjKeys(key);
     }
-
-    @Override
     public int[] getKey() {
         return key;
     }
