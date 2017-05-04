@@ -10,7 +10,7 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
-import com.zombies.interfaces.Gridable;
+import com.zombies.interfaces.IGridable;
 import com.zombies.map.building.Box;
 import com.zombies.map.building.Building;
 import com.zombies.map.building.room.Room;
@@ -149,8 +149,8 @@ public class ZoneAndNeighborhoodTest {
         assertTrue(building.wallMap.get("1,1,h") != null);
 
         // Test building features
-        Gridable g1 = building.gridMap.get("0,0");
-        Gridable g2 = building.gridMap.get("1,0");
+        IGridable g1 = building.gridMap.get("0,0");
+        IGridable g2 = building.gridMap.get("1,0");
         assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("1,0,v"));
         g2     = building.gridMap.get("0,1");
         assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("0,1,h"));

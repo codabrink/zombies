@@ -1,10 +1,10 @@
 package com.zombies.interfaces;
 
 import com.zombies.map.building.Building;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public interface Gridable {
+public interface IGridable {
     Building getBuilding();
-    ArrayList<int[]> getOpenAdjKeys();
+    LinkedList<int[]> getOpenAdjKeys();
     int[] getKey();
 }

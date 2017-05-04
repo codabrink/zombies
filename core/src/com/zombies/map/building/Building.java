@@ -1,20 +1,20 @@
 package com.zombies.map.building;
 
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.Gridable;
+import com.zombies.interfaces.IGridable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
 import com.zombies.map.building.room.Room;
 import com.zombies.lib.Assets.MATERIAL;
 import com.zombies.lib.U;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class Building implements HasZone {
@@ -25,7 +25,7 @@ public class Building implements HasZone {
 
     public    BuildingType type;
     protected HashSet<Room>             rooms    = new HashSet<>();
-    public    HashMap<String, Gridable> gridMap  = new HashMap<>();
+    public    HashMap<String, IGridable> gridMap  = new HashMap<>();
     public    HashMap<String, Wall>     wallMap  = new HashMap<>();
     public    HashSet<Hallway>          hallways = new HashSet<>();
     protected Vector2                   center;
@@ -121,7 +121,7 @@ public class Building implements HasZone {
 
     public HashSet<Box> boxesOnCol(int col) {
         HashSet<Box> boxes = new HashSet<>();
-        Gridable g;
+        IGridable g;
         for (int y = yLow; y <= yHigh; y++) {
             g = gridMap.get(col + "," + y);
             if (g instanceof Box)
@@ -132,7 +132,7 @@ public class Building implements HasZone {
 
     public HashSet<Box> boxesOnRow(int row) {
         HashSet<Box> boxes = new HashSet<>();
-        Gridable g;
+        IGridable g;
         for (int x = xLow; x <= xHigh; x++) {
             g = gridMap.get(x + "," + row);
             if (g instanceof Box)
@@ -145,7 +145,7 @@ public class Building implements HasZone {
         return checkOverlap(key, 0);
     }
     public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
-        Gridable g = gridMapGet(key);
+        IGridable g = gridMapGet(key);
         if (g != null)
             return (Overlappable) g;
         return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
@@ -168,11 +168,11 @@ public class Building implements HasZone {
     }
 
 
-    public void putWall(Gridable g, int direction, Wall wall) {
+    public void putWall(IGridable g, int direction, Wall wall) {
         String key = wallKeyFromGridableAndDirection(g, direction);
         putWall(key, wall);
     }
-    public void putWall(Gridable a, Gridable b, Wall wall) {
+    public void putWall(IGridable a, IGridable b, Wall wall) {
         String key = wallKeyBetweenGridables(a, b);
         putWall(key, wall);
     }
@@ -189,10 +189,10 @@ public class Building implements HasZone {
                 Math.max(k1[1], k2[1]) + ',' +
                 (k1[0] == k2[0] ? 'h' : 'v');
     }
-    public static String wallKeyBetweenGridables(Gridable g1, Gridable g2) {
+    public static String wallKeyBetweenGridables(IGridable g1, IGridable g2) {
         return wallKeyBetweenKeys(g1.getKey(), g2.getKey());
     }
-    public String wallKeyFromGridableAndDirection(Gridable g, int direction) {
+    public String wallKeyFromGridableAndDirection(IGridable g, int direction) {
         return wallKeyFromGridableAndDirection(g.getKey(), direction);
     }
     public static String wallKeyFromGridableAndDirection(int[] key, int direction) {
@@ -212,18 +212,18 @@ public class Building implements HasZone {
 
     public HashSet<Box> getOuterBoxes() {
         HashSet<Box> boxes = new HashSet<>();
-        for (Gridable g : gridMap.values())
+        for (IGridable g : gridMap.values())
             if (g instanceof Box && ((Box)g).getOpenAdjKeys().size() > 0)
                 boxes.add((Box)g);
         return boxes;
     }
-    public Gridable gridMapGet(int[] key) {
+    public IGridable gridMapGet(int[] key) {
         return gridMap.get(key[0] + "," + key[1]);
     }
-    public Gridable gridMapPut(int[] key, Gridable g) {
-        Gridable oldGridable = gridMapGet(key);
+    public IGridable gridMapPut(int[] key, IGridable g) {
+        IGridable oldIGridable = gridMapGet(key);
         gridMap.put(key[0] + "," + key[1], g);
-        return oldGridable;
+        return oldIGridable;
     }
 
     public void putBoxMap(int[] key, Box b) {
@@ -232,7 +232,7 @@ public class Building implements HasZone {
 
     public void calculateBorders() {
         int[] key;
-        for (Gridable g : gridMap.values()) {
+        for (IGridable g : gridMap.values()) {
             if (!(g instanceof Box)) continue;
 
             key = ((Box)g).getKey();
@@ -288,6 +288,14 @@ public class Building implements HasZone {
         for (int i = 0; i < MODIFIERS.length; i += 2) {
             adjKeys[i / 2] = new int[] { key[0] + MODIFIERS[i], key[1] + MODIFIERS[i + 1] };
         }
+        return adjKeys;
+    }
+
+    public LinkedList<int[]> getOpenAdjKeys(int[] key) {
+        LinkedList<int[]> adjKeys = new LinkedList<>();
+        for (int[] k : Building.getAdjBMKeys(key))
+            if (gridMap.get(k[0] + "," + k[1]) == null)
+                adjKeys.add(k);
         return adjKeys;
     }
 }

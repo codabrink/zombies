@@ -27,7 +27,6 @@ import com.zombies.map.neighborhood.Street;
 import com.zombies.map.neighborhood.StreetSegment;
 import com.zombies.map.building.Building;
 import com.zombies.lib.Assets.MATERIAL;
-import com.zombies.lib.Bounds2;
 import com.zombies.lib.ThreadedModelBuilder;
 import com.zombies.lib.ThreadedModelBuilder.MODELING_STATE;
 
@@ -80,7 +79,6 @@ public class Zone extends Overlappable implements Loadable {
     };
 
     private Vector2 position, center;
-    public Bounds2 bounds;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r = new Random();
 
@@ -123,9 +121,10 @@ public class Zone extends Overlappable implements Loadable {
     public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
+        super(new Vector2(x, y), C.ZONE_SIZE, C.ZONE_SIZE);
+
         position = new Vector2(x, y);
         center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
-        bounds = new Bounds2(x, y, C.ZONE_SIZE, C.ZONE_SIZE);
         numRooms = r.nextInt(numRooms);
         addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
 
@@ -513,6 +512,8 @@ public class Zone extends Overlappable implements Loadable {
     }
     private void addLoadable(Loadable l) {
         loadables.add(l);
+        if (loaded)
+            l.load();
     }
     private void removeLoadable(Loadable l) {
         loadables.remove(l);

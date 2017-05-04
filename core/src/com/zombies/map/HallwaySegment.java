@@ -3,9 +3,10 @@ package com.zombies.map;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.Gridable;
+import com.zombies.interfaces.IGridable;
 import com.zombies.interfaces.Loadable;
 import com.zombies.map.building.Building;
+import com.zombies.map.building.BuildingGridable;
 import com.zombies.map.building.WallWall;
 import com.zombies.lib.Assets.MATERIAL;
 import com.zombies.lib.math.M;
@@ -16,7 +17,7 @@ import com.zombies.Zone;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable implements Gridable, Loadable {
+public class HallwaySegment extends BuildingGridable implements Loadable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
     private boolean[] connections = new boolean[4];
@@ -43,34 +44,21 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         halfWidth  = width / 2;
         halfHeight = height / 2;
     }
-    public HallwaySegment(Hallway h, int[] key, float width, float height) {
-        this.width      = width;
-        this.height     = height;
-        setInfo(h, key);
-    }
     public HallwaySegment(Hallway h, int[] key) {
+        super(h.getBuilding(), key);
         width      = C.GRIDSIZE;
         height     = C.GRIDSIZE;
         setInfo(h, key);
     }
 
     public void compile() {
-        HashSet<Gridable> adj = new HashSet<>();
-        Gridable g;
+        HashSet<IGridable> adj = new HashSet<>();
+        IGridable g;
         int[][] adjGridKeys = Building.getAdjBMKeys(key);
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
         Zone.getZone(getCenter()).addPendingObject(this);
-    }
-
-    public ArrayList<int[]> getOpenAdjKeys() {
-        ArrayList<int[]> adjKeys = new ArrayList<>();
-        for (int[] k : Building.getAdjBMKeys(key)) {
-            if (building.gridMap.get(k[0] + "," + k[1]) == null)
-                adjKeys.add(k);
-        }
-        return adjKeys;
     }
 
     // TODO: build rotation into this to reduce redundant code

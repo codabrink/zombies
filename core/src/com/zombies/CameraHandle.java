@@ -11,7 +11,7 @@ public class CameraHandle {
     public PerspectiveCamera cam;
 
     float lerp = 5f;
-    public static float z = 50f;
+    public static float z = 15f;
 
     private boolean inBuilding = false;
 

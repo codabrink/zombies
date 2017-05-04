@@ -16,6 +16,8 @@ public class Models implements Disposable {
     ModelCache inactiveCache = new ModelCache();
     ModelCache activeCache   = new ModelCache();
 
+    private final boolean cacheActive = false;
+
     public Models() {
         m = this;
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -25,12 +27,39 @@ public class Models implements Disposable {
     private LinkedHashSet<ModelInstance> activeModels   = new LinkedHashSet<>();
 
     public static void render(ModelBatch modelBatch) {
+        if (m.cacheActive) {
+            m.rebuildActiveModelCache();
+            modelBatch.render(m.activeCache, m.environment);
+        } else {
+            for (ModelInstance mi : m.activeModels)
+                modelBatch.render(mi, m.environment);
+        }
         modelBatch.render(m.inactiveCache, m.environment);
-        modelBatch.render(m.activeCache, m.environment);
     }
 
+    // ACTIVE
+    public static void addActiveModel(ModelInstance modelInstance, ModelInstance replacing) {
+        m.activeModels.remove(replacing);
+        m.addActiveModel(modelInstance);
+    }
+    public static void addActiveModel(ModelInstance modelInstance) {
+        m.activeModels.add(modelInstance);
+        m.rebuildActiveModelCache();
+    }
+    public static void removeActiveModel(ModelInstance modelInstance) {
+        m.activeModels.remove(modelInstance);
+        m.rebuildActiveModelCache();
+    }
+    private void rebuildActiveModelCache() {
+        activeCache.begin();
+        for (ModelInstance mi : activeModels)
+            activeCache.add(mi);
+        activeCache.end();
+    }
+
+    // INACTIVE
     public static void addInactiveModel(ModelInstance modelInstance, ModelInstance replacing) {
-        m.inactiveModels.remove(modelInstance);
+        m.inactiveModels.remove(replacing);
         m.addInactiveModel(modelInstance);
     }
     public static void addInactiveModel(ModelInstance modelInstance) {
