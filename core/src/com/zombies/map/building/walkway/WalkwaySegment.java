@@ -14,8 +14,16 @@ public class WalkwaySegment extends BuildingGridable {
         }
     };
 
-    public WalkwaySegment(Building building, int[] key) {
-        super(building, key);
+    public static WalkwaySegment createWalkwaySegment(Walkway walkway, int[] key) {
+        Building building = walkway.getBuilding();
+        if (building.gridMap.get(Building.stringify(key)) != null)
+            return null;
+
+        return new WalkwaySegment(walkway, key);
+    }
+
+    private WalkwaySegment(Walkway walkway, int[] key) {
+        super(walkway.getBuilding(), key);
     }
 
     private void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {

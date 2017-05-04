@@ -27,7 +27,7 @@ public class Box extends BuildingGridable {
     private HashSet<Unit> zombies = new HashSet<>();
     private HashSet<Unit> survivors = new HashSet<Unit>();
 
-    private HashMap<String, IGridable> gridMap;
+    private HashMap<String, BuildingGridable> gridMap;
     private Random random = new Random();
     private Zone zone;
 

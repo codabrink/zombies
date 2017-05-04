@@ -23,13 +23,13 @@ public class Building implements HasZone {
 
     public int xLow = 0, xHigh = 0, yLow = 0, yHigh = 0;
 
-    public    BuildingType type;
-    protected HashSet<Room>              rooms    = new HashSet<>();
-    public    HashMap<String, IGridable> gridMap  = new HashMap<>();
-    public    HashMap<String, Wall>      wallMap  = new HashMap<>();
-    public    HashSet<Hallway>           hallways = new HashSet<>();
-    protected Vector2                    center;
-    protected Zone                       zone;
+    public    BuildingType                      type;
+    protected HashSet<Room>                     rooms    = new HashSet<>();
+    public    HashMap<String, BuildingGridable> gridMap  = new HashMap<>();
+    public    HashMap<String, Wall>             wallMap  = new HashMap<>();
+    public    HashSet<Hallway>                  hallways = new HashSet<>();
+    protected Vector2                           center;
+    protected Zone                              zone;
 
     public int outsideDoorCount = 0;
 
@@ -217,18 +217,19 @@ public class Building implements HasZone {
                 boxes.add((Box)g);
         return boxes;
     }
-    public IGridable gridMapGet(int[] key) {
-        return gridMap.get(key[0] + "," + key[1]);
+    public BuildingGridable gridMapGet(int[] key) {
+        return gridMap.get(stringify(key));
     }
-    public IGridable gridMapPut(int[] key, IGridable g) {
-        IGridable oldIGridable = gridMapGet(key);
+    public BuildingGridable gridMapPut(int[] key, BuildingGridable g) {
+        BuildingGridable oldGridable = gridMapGet(key);
         gridMap.put(key[0] + "," + key[1], g);
-        return oldIGridable;
+        return oldGridable;
     }
 
-    public void putGridMap(int[] key, IGridable g) {
-        gridMap.put(key[0] + "," + key[1], g);
+    public void putGridMap(int[] key, BuildingGridable g) {
+        gridMap.put(stringify(key), g);
     }
+    public BuildingGridable getGridMap(int[] key) { return gridMap.get(stringify(key)); }
 
     public void calculateBorders() {
         int[] key;
@@ -289,6 +290,9 @@ public class Building implements HasZone {
             adjKeys[i / 2] = new int[] { key[0] + MODIFIERS[i], key[1] + MODIFIERS[i + 1] };
         }
         return adjKeys;
+    }
+    public static String stringify(int[] key) {
+        return key[0] + "," + key[1];
     }
 
     public LinkedList<int[]> getOpenAdjKeys(int[] key) {
