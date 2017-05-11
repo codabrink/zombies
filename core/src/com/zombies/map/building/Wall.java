@@ -10,14 +10,12 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.zombies.BodData;
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
 import com.zombies.interfaces.Collideable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.Loadable;
 import com.zombies.interfaces.ModelMeCallback;
-import com.zombies.interfaces.ZCallback;
 import com.zombies.lib.Assets.MATERIAL;
 import com.zombies.lib.math.M;
 
@@ -30,6 +28,7 @@ public class Wall implements Collideable, Loadable, HasZone {
     private Body body;
     private MATERIAL rightMaterial, leftMaterial;
     private Zone zone;
+    private boolean compiled = false;
 
     protected LinkedList<WallPoint>   points   = new LinkedList<>();
     protected LinkedList<WallSegment> rightSegments, leftSegments;
@@ -64,6 +63,7 @@ public class Wall implements Collideable, Loadable, HasZone {
         genSegmentsFromPoints();
         zone.addModelingCallback(rightMaterial, modelLeft);
         zone.addModelingCallback(leftMaterial, modelRight);
+        zone.addPendingObject(this);
     }
 
     private void flushPoints() {
@@ -112,21 +112,6 @@ public class Wall implements Collideable, Loadable, HasZone {
                     wp.height,
                     rightMaterial));
         }
-
-        final Wall wall = this;
-        GameView.gv.addCallback(new ZCallback() {
-            @Override
-            public void call() {
-                BodyDef bodyDef = new BodyDef();
-                bodyDef.type = BodyDef.BodyType.StaticBody;
-                body = D.world.createBody(bodyDef);
-                body.setTransform(p1, (float)angle);
-                body.setUserData(new BodData("wall", wall));
-
-                for (WallSegment ws : rightSegments)
-                    ws.genShapes(body);
-            }
-        });
     }
 
     // Check if two lines are very close
@@ -173,12 +158,20 @@ public class Wall implements Collideable, Loadable, HasZone {
 
     @Override
     public void load() {
-        body.setActive(true);
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        body = D.world.createBody(bodyDef);
+        body.setTransform(p1, angle);
+        body.setUserData(new BodData("wall", this));
+
+        for (WallSegment ws : rightSegments)
+            ws.genShapes(body);
     }
 
     @Override
     public void unload() {
-        body.setActive(false);
+        D.world.destroyBody(body);
+        body = null;
     }
 
     @Override

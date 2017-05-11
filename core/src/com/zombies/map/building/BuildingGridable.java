@@ -2,12 +2,12 @@ package com.zombies.map.building;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.lib.math.M;
 
 import java.util.LinkedList;
 
-public class BuildingGridable extends Overlappable {
+public class BuildingGridable extends PolygonOverlappable {
     protected Building building;
 
     protected String sKey;

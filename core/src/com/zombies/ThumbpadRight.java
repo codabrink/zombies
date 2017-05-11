@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
  * Created by Coda on 1/29/15.
  */
 public class ThumbpadRight extends Thumbpad {
-    private Texture thumbPoint = new Texture(Gdx.files.internal("data/joy-p.png"));
+    private Texture thumbPoint = new Texture(Gdx.files.internal("data/joy-position.png"));
     private Texture thumbArea = new Texture(Gdx.files.internal("data/joy-a.png"));
     private Vector2 center;
     private GameView view;

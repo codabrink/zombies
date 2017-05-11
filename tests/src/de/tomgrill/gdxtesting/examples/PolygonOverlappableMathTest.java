@@ -1,7 +1,7 @@
 package de.tomgrill.gdxtesting.examples;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.lib.math.M;
 import com.zombies.lib.math.LineSegment;
 
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class OverlappableMathTest {
+public class PolygonOverlappableMathTest {
 
     @Test
     public void OverlappableTest() {
@@ -18,9 +18,9 @@ public class OverlappableMathTest {
         Vector2 ip = ls.intersectionPoint(ls2);
         assertTrue(ip == null);
 
-        Overlappable o1 = new Overlappable(new Vector2(0, 0), 100, 100);
-        Overlappable o2 = new Overlappable(new Vector2(50, 50), 100, 100);
-        Overlappable o3 = new Overlappable(new Vector2(100, 0), 100, 100);
+        PolygonOverlappable o1 = new PolygonOverlappable(new Vector2(0, 0), 100, 100);
+        PolygonOverlappable o2 = new PolygonOverlappable(new Vector2(50, 50), 100, 100);
+        PolygonOverlappable o3 = new PolygonOverlappable(new Vector2(100, 0), 100, 100);
 
         assertTrue(o1.overlaps(o2));
         assertTrue(!o1.overlaps(o3));
@@ -39,7 +39,7 @@ public class OverlappableMathTest {
 
     @Test
     public void LineIntersectionTest() {
-        Overlappable o = new Overlappable(new Vector2(0, 0), 100, 100);
+        PolygonOverlappable o = new PolygonOverlappable(new Vector2(0, 0), 100, 100);
         Vector2 p1 = new Vector2(-50, 50);
         Vector2 p2 = new Vector2(150, 50);
         LineSegment lineSegment = new LineSegment(p1, p2);

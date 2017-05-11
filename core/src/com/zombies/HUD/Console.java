@@ -86,8 +86,8 @@ public class Console {
                 b = D.currentBox;
                 int[] key = (int[])U.random(b.getOpenAdjKeys());
                 new Hallway(b, key);
-                //p = view.getPlayer();
-                //b = Zone.getZone(p.getPosition()).getBox(p.getPosition());
+                //position = view.getPlayer();
+                //b = Zone.getZone(position.getPosition()).getBox(position.getPosition());
                 //new Hallway(b, Integer.parseInt(m.group(2)), 2 * C.SCALE);
                 break;
             case "debug":

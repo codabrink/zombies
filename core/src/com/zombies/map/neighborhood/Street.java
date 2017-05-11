@@ -2,7 +2,7 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.map.building.Building;
@@ -10,6 +10,7 @@ import com.zombies.lib.math.M;
 import com.zombies.lib.math.LineSegment;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 public class Street implements StreetConnection {
     public static final float RADIUS = 10f;
@@ -17,22 +18,26 @@ public class Street implements StreetConnection {
     private StreetSystem streetSystem;
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
     private LinkedHashSet<Building> buildings           = new LinkedHashSet<>();
-    private StreetNode n1, n2;
-    private Vector2 p1, p2;
-    private float angle, length;
-    private boolean compiled = false;
 
-    public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
+    private float perseverance;
+    private LinkedList<StreetNode> streetNodes = new LinkedList<>();
+
+    private float angle, length;
+
+    public static Street createStreet(StreetSystem ss, Vector2 p, float angle, float length) {
+
+
+
         Vector2 p1 = n1.getPosition();
         Vector2 p2 = n2.getPosition();
         float angle = (float) M.getAngle(p1, p2);
-        Overlappable overlappable = new Overlappable(getCorners(p1, p2, angle, RADIUS));
+        PolygonOverlappable polygonOverlappable = new PolygonOverlappable(getCorners(p1, p2, angle, RADIUS));
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
-            if (z.checkOverlap(overlappable, 0, null) != null)
+            if (z.checkOverlap(polygonOverlappable, 0, null) != null)
                 return null;
 
-        return new Street(ss, n1, n2, angle, overlappable.getCorners());
+        return new Street(ss, n1, n2, angle, polygonOverlappable.getCorners());
     }
 
     public static Vector2[] getCorners(Vector2 p1, Vector2 p2, double angle, float radius) {

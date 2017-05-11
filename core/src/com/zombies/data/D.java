@@ -39,6 +39,9 @@ public class D {
     public static World world;
     public static Body groundBody;
     public static long mainThreadId;
+    public static boolean isMainThread() {
+        return Thread.currentThread().getId() == mainThreadId;
+    }
     private static Set runningThreads = Collections.synchronizedSet(new HashSet<>());
 
     public static boolean modelCacheValid;

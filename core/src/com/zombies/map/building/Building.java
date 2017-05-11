@@ -3,7 +3,7 @@ package com.zombies.map.building;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
 import com.zombies.map.building.room.Room;
@@ -47,7 +47,7 @@ public class Building implements HasZone {
         Zone z = Zone.getZone(c);
         float bufferRadius = C.GRIDSIZE * 2;
         float bufferDiameter = bufferRadius * 2;
-        if (z.checkOverlap(new Overlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
+        if (z.checkOverlap(new PolygonOverlappable(c, bufferDiameter, bufferDiameter), 1, null) != null)
             return null;
 
         return new Building(c, maxRooms);
@@ -139,19 +139,19 @@ public class Building implements HasZone {
         return boxes;
     }
 
-    public Overlappable checkOverlap(int[] key) {
+    public PolygonOverlappable checkOverlap(int[] key) {
         return checkOverlap(key, 0);
     }
-    public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
+    public PolygonOverlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
         BuildingGridable g = gridMapGet(key);
         if (g != null)
-            return (Overlappable) g;
+            return g;
         return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
     }
-    public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
+    public PolygonOverlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
         Zone    zone     = Zone.getZone(position);
-        return zone.checkOverlap(new Overlappable(position, width, height), 1, gridMap.values());
+        return zone.checkOverlap(new PolygonOverlappable(position, width, height), 1, gridMap.values());
     }
 
     public Vector2[] wallPositionOf(String key) {

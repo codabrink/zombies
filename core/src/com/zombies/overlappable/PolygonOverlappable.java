@@ -1,21 +1,24 @@
-package com.zombies.abstract_classes;
+package com.zombies.overlappable;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.lib.math.LineSegment;
+import com.zombies.lib.math.M;
 import com.zombies.lib.math.Ray;
 import com.zombies.lib.U;
 
-public class Overlappable {
-    protected Vector2    position, center;
-    protected Vector2[]  corners;
+import java.util.HashSet;
+
+public class PolygonOverlappable implements Overlappable {
+    public Vector2    position, center;
+    public Vector2[]  corners;
     public LineSegment[] lines;
 
-    public Overlappable() {}
-    public Overlappable(Vector2[] corners) {
+    public PolygonOverlappable() {}
+    public PolygonOverlappable(Vector2[] corners) {
         setCorners(corners);
     }
-    public Overlappable(Vector2 position, float width, float height) {
+    public PolygonOverlappable(Vector2 position, float width, float height) {
         setCorners(new Vector2[]{
                 position,
                 position.cpy().add(width, 0),
@@ -48,8 +51,19 @@ public class Overlappable {
         center = new Vector2(x / corners.length, y / corners.length);
         return center;
     }
+
+    @Override
+    public boolean overlaps(CircleOverlappable co) {
+        for (int i = 0; i <= corners.length; i++) {
+            if (M.distanceOfPointFromLine(corners[i], corners[i+1 % corners.length], co.position) < co.radius)
+                return true;
+        }
+        return false;
+    }
+
     // TODO: currently only returns true if lines intersect
-    public boolean overlaps(Overlappable o) {
+    @Override
+    public boolean overlaps(PolygonOverlappable o) {
         int closest      = closestCornerTo(o);
         int oClosest     = o.closestCornerTo(this);
         for (int i = -1; i <= 0; i++)
@@ -59,15 +73,16 @@ public class Overlappable {
         return false;
     }
 
-    private void checkForOversizing() {
-        float max = 0;
-        for (int i = 1; i < corners.length; i++)
-            max = Math.max(max, corners[i - 1].dst(corners[i]));
-        if (max > C.ZONE_SIZE * (C.DRAW_DISTANCE + 1))
-            System.out.println("Overlappable: ERROR! Object is too large to render properly.");
+    @Override
+    public boolean overlaps(Overlappable o) {
+        if (o instanceof PolygonOverlappable)
+            return overlaps((PolygonOverlappable) o);
+        if (o instanceof CircleOverlappable)
+            return overlaps((CircleOverlappable) o);
+        throw new IllegalArgumentException("Overlappable checking not covered. Implement it.");
     }
 
-    public int closestCornerTo(Overlappable o) {
+    public int closestCornerTo(PolygonOverlappable o) {
         int closestIndex = 0;
         float closestDistance = corners[0].dst(o.getCenter());
         for (int i = 1; i < corners.length; i++) {
@@ -116,4 +131,5 @@ public class Overlappable {
         return result;
 
     }
+
 }

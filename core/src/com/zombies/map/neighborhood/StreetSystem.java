@@ -21,6 +21,7 @@ public class StreetSystem {
     private LinkedHashSet<StreetNode>         nodes       = new LinkedHashSet<>();
     private LinkedHashSet<StreetConnection>   connections = new LinkedHashSet<>();
 
+    private float initialRigidity;
     private float rigidity;
     private float rsm = (float) M.PIHALF; // Rotational Segmentation Factor
 
@@ -28,11 +29,12 @@ public class StreetSystem {
 
     }
 
-    public StreetSystem(Vector2 center) {
-        this.center = center;
-        rigidity    = 0.9f;
-        systems.add(this);
+    public StreetSystem(Vector2 center, float rigidity) {
+        this.center     = center;
+        initialRigidity = this.rigidity = rigidity;
+
         StreetNode node = Intersection.createIntersection(this, center);
+        systems.add(this);
     }
 
     public static StreetSystem closestStreetSystem(Vector2 p) {
@@ -45,6 +47,10 @@ public class StreetSystem {
             }
         }
         return streetSystem;
+    }
+
+    public void generate(Vector2 p) {
+
     }
 
     public StreetConnection closestConnection(Vector2 p) {

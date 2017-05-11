@@ -9,14 +9,14 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.zombies.Zone;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.lib.Assets;
 import com.zombies.lib.math.M;
 import com.zombies.lib.math.LineSegment;
 import com.zombies.lib.ThreadedModelBuilder;
 
-public class StreetSegment extends Overlappable {
+public class StreetSegment extends PolygonOverlappable {
     public LineSegment line;
     public Vector2 p1, p2, center;
     public double angle;
