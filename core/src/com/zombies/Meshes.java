@@ -30,11 +30,7 @@ public class Meshes {
     //public Music main = Gdx.audio.newMusic(Gdx.files.internal("data/sound/music/main.mp3"));
 
     public Meshes() {
-        FileHandle imageFileHandle = Gdx.files.internal("data/wall1.png");
-        wall1Texture = new Texture(imageFileHandle);
-        imageFileHandle = Gdx.files.internal("data/wall2.png");
-        wall2Texture = new Texture(imageFileHandle);
-        imageFileHandle = Gdx.files.internal("data/crate.png");
+        FileHandle imageFileHandle = Gdx.files.internal("data/crate.png");
         crateTexture = new Texture(imageFileHandle);
         imageFileHandle = Gdx.files.internal("data/shotgun.png");
 		shotgunTexture = new Texture(imageFileHandle);
@@ -42,8 +38,6 @@ public class Meshes {
 		pistolTexture = new Texture(imageFileHandle);
 		imageFileHandle = Gdx.files.internal("data/health.png");
 		healthTexture = new Texture(imageFileHandle);
-		imageFileHandle = Gdx.files.internal("data/floor2.png");
-		floor2Texture = new Texture(imageFileHandle);
 
 		gunMesh = new Mesh(true, 4, 4,
 				new VertexAttribute(Usage.Position, 3, "a_position"),

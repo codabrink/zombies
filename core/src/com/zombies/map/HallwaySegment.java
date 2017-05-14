@@ -2,21 +2,19 @@ package com.zombies.map;
 
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.abstract_classes.Overlappable;
-import com.zombies.interfaces.Gridable;
 import com.zombies.interfaces.Loadable;
-import com.zombies.map.room.Building;
-import com.zombies.map.room.WallWall;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.G;
+import com.zombies.map.building.Building;
+import com.zombies.map.building.BuildingGridable;
+import com.zombies.map.building.WallWall;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.math.M;
 import com.zombies.C;
-import com.zombies.map.room.Wall;
+import com.zombies.map.building.Wall;
 import com.zombies.Zone;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
-public class HallwaySegment extends Overlappable implements Gridable, Loadable {
+public class HallwaySegment extends BuildingGridable implements Loadable {
     public float diameter, radius;
     private HashSet<Wall> walls = new HashSet<>();
     private boolean[] connections = new boolean[4];
@@ -39,38 +37,20 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
         radius     = diameter / 2;
         this.key   = key;
         sKey       = key[0] + "," + key[1];
-
-        halfWidth  = width / 2;
-        halfHeight = height / 2;
-    }
-    public HallwaySegment(Hallway h, int[] key, float width, float height) {
-        this.width      = width;
-        this.height     = height;
-        setInfo(h, key);
     }
     public HallwaySegment(Hallway h, int[] key) {
-        width      = C.GRIDSIZE;
-        height     = C.GRIDSIZE;
+        super(h.getBuilding(), key);
         setInfo(h, key);
     }
 
     public void compile() {
-        HashSet<Gridable> adj = new HashSet<>();
-        Gridable g;
+        HashSet<BuildingGridable> adj = new HashSet<>();
+        BuildingGridable g;
         int[][] adjGridKeys = Building.getAdjBMKeys(key);
         for (int i = 0; i < adjGridKeys.length; i++)
             connections[i] = (building.gridMapGet(adjGridKeys[i]) instanceof HallwaySegment);
 
         Zone.getZone(getCenter()).addPendingObject(this);
-    }
-
-    public ArrayList<int[]> getOpenAdjKeys() {
-        ArrayList<int[]> adjKeys = new ArrayList<>();
-        for (int[] k : Building.getAdjBMKeys(key)) {
-            if (building.gridMap.get(k[0] + "," + k[1]) == null)
-                adjKeys.add(k);
-        }
-        return adjKeys;
     }
 
     // TODO: build rotation into this to reduce redundant code
@@ -140,17 +120,7 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     @Override
     public Vector2[] getCorners() { return corners; }
     @Override
-    public boolean contains(float x, float y) { return G.rectContains(x, y, position, width, height); }
-
-    @Override
-    public float getWidth() {
-        return width;
-    }
-
-    @Override
-    public float getHeight() {
-        return height;
-    }
+    public boolean contains(float x, float y) { return M.rectContains(x, y, position, C.GRIDSIZE, C.GRIDSIZE); }
 
     @Override
     public void load() {
@@ -166,11 +136,11 @@ public class HallwaySegment extends Overlappable implements Gridable, Loadable {
     public void buildFloorMesh(MeshPartBuilder builder, Vector2 center) {
         Vector2 relp = new Vector2(position.x - center.x, position.y - center.y);
 
-        builder.setUVRange(0, 0, width / C.GRIDSIZE, height / C.GRIDSIZE);
+        builder.setUVRange(0, 0, C.GRIDSIZE / C.GRIDSIZE, C.GRIDSIZE / C.GRIDSIZE);
         builder.rect(relp.x, relp.y, -0.1f,
-                relp.x + width, relp.y, -0.1f,
-                relp.x + width, relp.y + height, -0.1f,
-                relp.x, relp.y + height, -0.1f,
+                relp.x + C.GRIDSIZE, relp.y, -0.1f,
+                relp.x + C.GRIDSIZE, relp.y + C.GRIDSIZE, -0.1f,
+                relp.x, relp.y + C.GRIDSIZE, -0.1f,
                 1, 1, 1);
     }
 

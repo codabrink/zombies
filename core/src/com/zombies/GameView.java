@@ -20,15 +20,17 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.graphics.GL20;
+import com.zombies.HUD.DebugText;
 import com.zombies.HUD.HUD;
 import com.zombies.data.D;
 import com.zombies.data.Stats;
 import com.zombies.interfaces.Modelable;
 import com.zombies.interfaces.ZCallback;
+import com.zombies.lib.Models;
 import com.zombies.map.thread.Generator;
-import com.zombies.util.Assets;
+import com.zombies.lib.Assets;
 import com.zombies.interfaces.Collideable;
-import com.zombies.util.ThreadedModelBuilder;
+import com.zombies.lib.ThreadedModelBuilder;
 import com.zombies.workers.RoomDoorWorker;
 
 import java.util.ArrayList;
@@ -43,10 +45,8 @@ public class GameView implements Screen {
     // STATIC VARIABLES
     public static com.zombies.HUD.FontGen fontGen;
     public static GameView gv;
-    public static Environment environment, outsideEnvironment;
     public static Player player;
     public static Random r = new Random();
-    public static ModelCache modelCache = new ModelCache();
     private static List readyToModel    = Collections.synchronizedList(new ArrayList());
     private static List endableBuilders = Collections.synchronizedList(new ArrayList());
     private static List callbacks       = Collections.synchronizedList(new ArrayList());
@@ -99,8 +99,9 @@ public class GameView implements Screen {
 
         stats = new Stats();
 
-        hud = new com.zombies.HUD.HUD();
-        D.reset();
+        hud = new HUD();
+        new D();
+        new Models();
 
         player = new Player(new Vector2(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE));
 
@@ -113,12 +114,7 @@ public class GameView implements Screen {
         Gdx.input.setInputProcessor(hud);
 
         modelBatch  = new ModelBatch();
-        environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(player.pointLight);
 
-        outsideEnvironment = new Environment();
-        outsideEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
 
         // worker resetting
         RoomDoorWorker.roomList = new LinkedList<>();
@@ -176,9 +172,9 @@ public class GameView implements Screen {
 
     @Override
     public void render(float dt) {
-        D.tick++;
+        DebugText.addMessage("fps", "FPS: " + Gdx.graphics.getFramesPerSecond());
 
-        updateLoop();
+        update(dt);
 
         handleContacts();
         camHandle.update(dt);
@@ -187,25 +183,20 @@ public class GameView implements Screen {
         spriteBatch.setProjectionMatrix(camHandle.cam.combined);
 
         //lists
-        D.world.step(Gdx.graphics.getDeltaTime(), 3, 4);
+        D.world.step(dt, 3, 4);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
         // renderer.draw(D.world);
         Gdx.gl.glFlush();
         handleKeys();
 
-        player.update();
         D.currentZone.update(C.DRAW_DISTANCE);
+        player.update();
 
         try {
-            modelCache.begin();
-            D.currentZone.draw(C.DRAW_DISTANCE);
-            modelCache.end();
-
             modelBatch.begin(getCamera());
-            modelBatch.render(modelCache, outsideEnvironment);
+            Models.render(modelBatch);
             modelBatch.end();
         } catch (Exception e) {
-            modelCache = new ModelCache();
         }
 
         for (DebugCircle dc: debugCircles)
@@ -223,9 +214,11 @@ public class GameView implements Screen {
         //debugRenderer.render(world, cam.combined);
     }
 
-    protected void updateLoop() {
+    protected void update(float dt) {
         mh.update();
         hud.update();
+
+        D.update(dt);
 
         Generator.update();
 

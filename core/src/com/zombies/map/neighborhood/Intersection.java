@@ -2,64 +2,54 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
+import com.zombies.data.D;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.util.G;
+import com.zombies.lib.math.M;
 
 import java.util.LinkedHashMap;
 
 public class Intersection implements StreetNode {
-    public final static double minAngleDelta = Math.PI / 8;
+    public final static float MIN_DELTA_ANGLE = (float) (Math.PI / 8);
+    public static final float MIN_INTERSECTION_DISTANCE = 1f;
 
     private StreetSystem streetSystem;
     private Vector2      position;
-    private float        dstFromCenter;
-    private int[] key;
+    private float        dstFromCenter, angle;
+
     private Zone zone;
-    public LinkedHashMap<Double, StreetConnection> connections = new LinkedHashMap<>();
+    public LinkedHashMap<Float, StreetConnection> connections = new LinkedHashMap<>();
 
-    public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
-        StreetNode node = ss.getNode(p);
-        if (node != null)
-            return node;
-
-        return new Intersection(ss, p);
-    }
-    public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
-        StreetNode node = ss.getNode(p);
-        if (node != null)
-            return node;
-
-        Intersection intersection = new Intersection(ss, p);
-        Street.createStreet(ss, sn, intersection);
-        return intersection;
+    public static Intersection createIntersection(StreetSystem ss, Vector2 p) {
+        for (StreetNode sn : ss.getNodes())
+            if (sn.getPosition().dst(p) < MIN_INTERSECTION_DISTANCE)
+                return null;
+        return new Intersection(ss, p, (float) M.getAngle(ss.getCenter(), D.player().getPosition()));
     }
 
-
-    protected Intersection(StreetSystem ss, Vector2 p) {
+    private Intersection(StreetSystem ss, Vector2 p, float angle) {
         position      = p;
-        dstFromCenter = p.dst(ss.getCenter());
-        key           = ss.keyOf(position);
         streetSystem  = ss;
+        this.angle = angle;
+
+        dstFromCenter = p.dst(ss.getCenter());
         zone          = Zone.getZone(p);
-        streetSystem.addNode(this);
     }
 
     public void compile() {
-
+        streetSystem.addNode(this);
     }
 
     @Override
     public Vector2 getPosition() { return position; }
 
-    @Override
-    public Zone getZone() {
-        return zone;
+    public float getAngle() {
+        return angle;
     }
 
     @Override
-    public int[] getKey() {
-        return key;
+    public Zone getZone() {
+        return zone;
     }
 
     @Override
@@ -69,13 +59,13 @@ public class Intersection implements StreetNode {
 
     @Override
     public void addConnection(StreetConnection connection) {
-        connections.put(connection.getAngle(this), connection);
+        connections.put((float) connection.getAngle(this), connection);
     }
 
     @Override
     public boolean checkAvailability(StreetConnection connection) {
         for (StreetConnection sc : connections.values())
-            if (G.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
+            if (M.angleDelta(sc.getAngle(this), connection.getAngle(this)) < MIN_DELTA_ANGLE)
                 return false;
         return true;
     }

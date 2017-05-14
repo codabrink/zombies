@@ -1,11 +1,9 @@
 package com.zombies.map.thread;
 
 import com.zombies.C;
-import com.zombies.GameView;
 import com.zombies.Zone;
 import com.zombies.data.D;
-import com.zombies.map.neighborhood.StreetSystem;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Building;
 
 public class Generator {
     private static Thread thread;
@@ -13,9 +11,6 @@ public class Generator {
     public static void update() {
         if (thread != null && thread.isAlive())
             return;
-
-        if (D.currentZone == null)
-            D.update();
 
         for (Zone z: D.currentZone.getAdjZones(C.DRAW_DISTANCE)) {
             if (z.genState != Zone.GENERATOR_STATE.UNINITIATED)
@@ -37,9 +32,9 @@ public class Generator {
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            //StreetSystem.populateBox(zone.randomPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, GameView.r.nextInt((int) C.GRIDSIZE * 3));
+            //StreetSystem.populateBox(zone.randomPosition(), C.ZONE_SIZE * 3, C.ZONE_SIZE * 3, GameView.radius.nextInt((int) C.GRIDSIZE * 3));
             Building.createBuilding(zone.getCenter(), 3);
-            zone.rebuildModel();
+            zone.compile();
             D.removeRunningThread(Thread.currentThread());
         }
     }

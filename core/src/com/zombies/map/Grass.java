@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.HasZone;
 import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.Zone;
-import com.zombies.util.Assets.MATERIAL;
+import com.zombies.lib.Assets.MATERIAL;
 
 public class Grass implements HasZone {
     private float width, height;

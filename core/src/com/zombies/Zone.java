@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelCache;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.HUD.DebugText;
+import com.zombies.interfaces.ZCallback;
+import com.zombies.map.building.Wall;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.D;
 import com.zombies.interfaces.Drawable;
@@ -19,15 +20,18 @@ import com.zombies.interfaces.ModelMeCallback;
 import com.zombies.interfaces.Streets.StreetNode;
 import com.zombies.interfaces.ThreadedModelBuilderCallback;
 import com.zombies.interfaces.Updateable;
+import com.zombies.lib.Models;
 import com.zombies.map.Grass;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.room.Room;
 import com.zombies.map.neighborhood.Street;
 import com.zombies.map.neighborhood.StreetSegment;
-import com.zombies.map.room.*;
-import com.zombies.map.room.Building;
-import com.zombies.util.Assets.MATERIAL;
-import com.zombies.util.Bounds2;
-import com.zombies.util.ThreadedModelBuilder;
-import com.zombies.util.ThreadedModelBuilder.MODELING_STATE;
+import com.zombies.map.building.Building;
+import com.zombies.lib.Assets.MATERIAL;
+import com.zombies.lib.ThreadedModelBuilder;
+import com.zombies.lib.ThreadedModelBuilder.MODELING_STATE;
+import com.zombies.overlappable.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,54 +40,52 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class Zone extends Overlappable {
-    private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder(new ThreadedModelBuilderCallback() {
-        @Override
-        public void response(Model m) {
-            if (model != null)
-                model.dispose();
+public class Zone implements Loadable {
+    public static ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder();
+    public static Thread modelingThread;
 
-            model = m;
-            modelInstance = new ModelInstance(model);
-            modelInstance.transform.setTranslation(center.x, center.y, 0);
-        }
-    });
-    private Thread modelingThread;
     private static class ZoneModelingRunnable implements Runnable {
-        private ThreadedModelBuilder modelBuilder;
         private Zone zone;
-        public ZoneModelingRunnable(Zone zone, ThreadedModelBuilder modelBuilder) {
-            this.modelBuilder = modelBuilder;
+        public ZoneModelingRunnable(Zone zone) {
             this.zone = zone;
         }
         @Override
         public void run() {
             D.addRunningThread(Thread.currentThread());
-            while (modelBuilder.modelingState != MODELING_STATE.DORMANT)
+            final Zone z = zone;
+            ThreadedModelBuilderCallback callback = new ThreadedModelBuilderCallback() {
+                @Override
+                public void response(Model m) {
+                    if (z.model != null)
+                        z.model.dispose();
+
+                    z.model = m;
+                    ModelInstance oldModelInstance = z.modelInstance;
+                    z.modelInstance = new ModelInstance(z.model);
+                    z.modelInstance.transform.setTranslation(z.center.x, z.center.y, 0);
+                    Models.addInactiveModel(z.modelInstance, oldModelInstance);
+
+                    D.modelCacheValid = false;
+                }
+            };
+
+            while (!modelBuilder.setCallback(callback))
                 try { Thread.sleep(500l); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+
             zone.rebuildModel();
-            if (zone.needsRemodel) { // reuse the thread
-                run();
-                return;
-            }
             D.removeRunningThread(Thread.currentThread());
         }
     };
 
-
-
     private Vector2 position, center;
-    public Bounds2 bounds;
     public int loadIndex; // Tracks on what frame the zone was loaded (garbage collection)
     private static Random r = new Random();
 
     private Model model;
     private ModelInstance modelInstance;
-    private ModelCache modelCache;
     private LinkedHashSet<ModelInstance> modelInstances = new LinkedHashSet<>();
 
     public enum GENERATOR_STATE { UNINITIATED, GENERATING, GENERATED }
@@ -91,48 +93,37 @@ public class Zone extends Overlappable {
 
     // Static Variables
     public static HashMap<String, Zone> zones;
-    public static HashSet<Zone> loadedZones;
     public static Zone currentZone;
     public static int globalLoadIndex = 0;
 
 
-    public boolean needsRemodel = false; // flag true, and the model will rebuild at next possible moment
+    private boolean compiled = false;
+    private boolean loaded   = false;
 
     // Collections
 
-    private LinkedHashSet<Box>           boxes          = new LinkedHashSet<>();
-    private LinkedHashSet<Room>          rooms          = new LinkedHashSet<>();
-    private LinkedHashSet<Building>      buildings      = new LinkedHashSet<>();
-    private LinkedHashSet<Street>        streets        = new LinkedHashSet<>();
-    private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
-    private LinkedHashSet<StreetNode>    streetNodes    = new LinkedHashSet<>();
+    private LinkedHashSet<Box>                                      boxes          = new LinkedHashSet<>();
+    private LinkedHashSet<Room>                                     rooms          = new LinkedHashSet<>();
+    private LinkedHashSet<Building>                                 buildings      = new LinkedHashSet<>();
+    private LinkedHashSet<Street>                                   streets        = new LinkedHashSet<>();
+    private LinkedHashSet<StreetSegment>                            streetSegments = new LinkedHashSet<>();
+    private LinkedHashSet<StreetNode>                               streetNodes    = new LinkedHashSet<>();
 
-    private LinkedHashMap<Integer, LinkedHashSet<Zone>> adjZones = new LinkedHashMap<>();
-    private Set<Overlappable> overlappables                      = Collections.synchronizedSet(new LinkedHashSet<Overlappable>());
-    private Map<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables = Collections.synchronizedMap(new LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>>());
-    private LinkedHashSet<Updateable> updateables                = new LinkedHashSet<>();
-    private LinkedHashSet<Wall> walls                            = new LinkedHashSet<>();
-    private LinkedHashSet<Loadable> loadables                    = new LinkedHashSet<>();
-    private LinkedHashSet<Drawable> drawables                    = new LinkedHashSet<>();
-    private LinkedHashSet<Drawable> debugLines                   = new LinkedHashSet<>();
+    private LinkedHashMap<Integer, LinkedHashSet<Zone>>             adjZones       = new LinkedHashMap<>();
+    private LinkedHashSet<Overlappable>                             overlappables  = new LinkedHashSet<>();
+    private LinkedHashMap<MATERIAL, LinkedHashSet<ModelMeCallback>> modelables     = new LinkedHashMap<>();
+    private LinkedHashSet<Updateable>                               updateables    = new LinkedHashSet<>();
+    private LinkedHashSet<Wall>                                     walls          = new LinkedHashSet<>();
+    private LinkedHashSet<Loadable>                                 loadables      = new LinkedHashSet<>();
+    private LinkedHashSet<Drawable>                                 drawables      = new LinkedHashSet<>();
+    private LinkedHashSet<Drawable>                                 debugLines     = new LinkedHashSet<>();
 
     private Set pendingObjects = Collections.synchronizedSet(new LinkedHashSet());
-
-    public int numRooms = 6; // number of rooms that are supposed to exist in the zone
 
     public Zone(float x, float y) {
         position = new Vector2(x, y);
         center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
-        bounds = new Bounds2(x, y, C.ZONE_SIZE, C.ZONE_SIZE);
-        numRooms = r.nextInt(numRooms);
         addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
-
-        setCorners(new Vector2[]{
-                position.cpy(),
-                position.cpy().add(C.ZONE_SIZE, 0),
-                position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE),
-                position.cpy().add(0, C.ZONE_SIZE)
-        });
 
         if (C.ENABLE_DEBUG_LINES) {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
@@ -140,14 +131,28 @@ public class Zone extends Overlappable {
         }
     }
 
+    public void compile() {
+        compiled = true;
+    }
+
     public void addModelingCallback(MATERIAL m, ModelMeCallback mmc) {
-        synchronized (modelables) {
+        if (D.isMainThread() || !compiled) {
             LinkedHashSet<ModelMeCallback> modelableSet = modelables.get(m);
             if (modelableSet == null) {
                 modelableSet = new LinkedHashSet<>();
                 modelables.put(m, modelableSet);
             }
             modelableSet.add(mmc);
+        } else {
+            final Zone            zone            = this;
+            final MATERIAL        material        = m;
+            final ModelMeCallback modelMeCallback = mmc;
+            GameView.addCallback(new ZCallback() {
+                @Override
+                public void call() {
+                    zone.addModelingCallback(material, modelMeCallback);
+                }
+            });
         }
     }
     public void removeModelingCallback(MATERIAL m, ModelMeCallback mmc) {
@@ -164,25 +169,23 @@ public class Zone extends Overlappable {
             z.draw();
     }
     public void draw() {
-        if (modelInstance == null)
-            return;
-        GameView.modelCache.add(modelInstance);
-        for (ModelInstance mi : modelInstances)
-            GameView.modelCache.add(mi);
         for (Drawable d : drawables)
-            if (d.getZone() == this)
-                d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
-    }
-    private void drawThineself() {
-
+            d.draw(GameView.gv.spriteBatch, GameView.gv.shapeRenderer, GameView.gv.modelBatch);
     }
 
     public void update(int limit) {
+        DebugText.addMessage("boxes", "Zone box count: " + boxes.size());
+
+        if (modelBuilder.modelingState == MODELING_STATE.FINISHED)
+            modelBuilder.end();
+
         LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones)
             z.update();
     }
-    public void update() {
+    private void update() {
+        if (!compiled) return;
+
         synchronized (pendingObjects) {
             Iterator i = pendingObjects.iterator();
             while (i.hasNext()) {
@@ -201,9 +204,8 @@ public class Zone extends Overlappable {
             }
         }
 
-        if (needsRemodel && (modelingThread == null || !modelingThread.isAlive())) {
-            needsRemodel = false;
-            modelingThread = new Thread(new ZoneModelingRunnable(this, modelBuilder));
+        if (model == null && (modelingThread == null || !modelingThread.isAlive())) {
+            modelingThread = new Thread(new ZoneModelingRunnable(this));
             modelingThread.start();
         }
 
@@ -211,22 +213,44 @@ public class Zone extends Overlappable {
             u.update();
     }
 
-    public void load(int limit) {
-        LinkedHashSet<Zone> zones = getAdjZones(limit);
-        for (Zone z: zones)
-            z.load();
+
+    public static void updateCurrentZone() {
+        Zone currentZone = Zone.getZone(D.player().getPosition());
+        if (currentZone != D.currentZone) {
+            LinkedHashSet<Zone> adjZones = currentZone.getAdjZones(C.DRAW_DISTANCE);
+            Iterator<Zone> itr = D.loadedZones.iterator();
+            while (itr.hasNext()) {
+                Zone z = itr.next();
+                if (adjZones.contains(z))
+                    continue;
+                z.unload();
+                itr.remove();
+            }
+            for (Zone z : adjZones) {
+                z.load();
+                D.loadedZones.add(z);
+            }
+            D.currentZone = currentZone;
+        }
     }
     public void load() {
-        if (loadIndex == Zone.globalLoadIndex)
-            return; // already loaded
-        loadIndex = Zone.globalLoadIndex;
-        Zone.loadedZones.add(this);
+        if (loaded)
+            return;
+        loaded = true;
+
+        if (modelInstance != null)
+            Models.addInactiveModel(modelInstance);
 
         for (Loadable l: loadables)
             l.load();
     }
-
     public void unload() {
+        if (!loaded)
+            return;
+        loaded = false;
+
+        Models.removeInactiveModel(modelInstance);
+
         for (Loadable l: loadables)
             l.unload();
     }
@@ -245,24 +269,6 @@ public class Zone extends Overlappable {
     public static Zone getZone(Vector2 v) {
         return getZone(v.x, v.y);
     }
-    public static boolean setCurrentZone(Zone z) {
-        if (Zone.currentZone == z)
-            return false;
-
-        Zone.globalLoadIndex++;
-        Zone.currentZone = z;
-        z.load(C.DRAW_DISTANCE);
-
-        // unload dormant zones
-        for (Iterator<Zone> it = loadedZones.iterator(); it.hasNext();) {
-            Zone zz = it.next();
-            if (zz.loadIndex != Zone.globalLoadIndex) {
-                zz.unload();
-                it.remove();
-            }
-        }
-        return true;
-    }
 
     public static HashSet<Zone> zonesOnLine(Vector2 start, Vector2 end) {
         // slope intercept form (y = mx + b)
@@ -275,29 +281,27 @@ public class Zone extends Overlappable {
         float yStart = (float)(C.ZONE_SIZE * Math.floor(Math.min(start.y, end.y) / C.ZONE_SIZE));
         float yEnd   = (float)(C.ZONE_SIZE * Math.ceil(Math.max(start.y, end.y) / C.ZONE_SIZE));
 
-        float halfZoneSize = C.ZONE_SIZE / 2;
-
         // find all vertical intercepts of line on zone grid
         for (float x = xStart; x < xEnd; x = x + C.ZONE_SIZE) {
             // add zones from both sides of line
-            zones.add(getZone(x - halfZoneSize, m * x + b));
-            zones.add(getZone(x + halfZoneSize, m * x + b));
+            zones.add(getZone(x - C.ZONE_HALF_SIZE, m * x + b));
+            zones.add(getZone(x + C.ZONE_HALF_SIZE, m * x + b));
         }
         if (m != 0) {
             // find all horizontal intercepts of line on zone grid
             for (float y = yStart; y < yEnd; y = y + C.ZONE_SIZE) {
-                zones.add(getZone((y - b) / m, y - halfZoneSize));
-                zones.add(getZone((y - b) / m, y + halfZoneSize));
+                zones.add(getZone((y - b) / m, y - C.ZONE_HALF_SIZE));
+                zones.add(getZone((y - b) / m, y + C.ZONE_HALF_SIZE));
             }
         }
         return zones;
     }
 
-    public static HashSet<Wall> getWallsOverlappingCircle(Vector2 c, float r) {
+    public static HashSet<com.zombies.map.building.Wall> getWallsOverlappingCircle(Vector2 c, float r) {
         Vector2 p1, p2;
-        HashSet<Wall> walls = new HashSet<>();
+        HashSet<com.zombies.map.building.Wall> walls = new HashSet<>();
         for (Zone z : Zone.getZone(c).getAdjZones(C.DRAW_DISTANCE)) {
-            for (Wall w : z.getWalls()) {
+            for (com.zombies.map.building.Wall w : z.getWalls()) {
                 p1 = w.getStart();
                 p2 = w.getEnd();
                 // http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
@@ -314,7 +318,7 @@ public class Zone extends Overlappable {
     public static void createHole(Vector2 center, Float radius) {
         HashSet<Zone> zones = Zone.getZone(center).getAdjZones(C.DRAW_DISTANCE);
         for (Zone z : zones) {
-            for (Wall w : z.getWalls()) {
+            for (com.zombies.map.building.Wall w : z.getWalls()) {
                 Float m = w.getEnd().cpy().sub(w.getStart()).y / w.getEnd().cpy().sub(w.getStart()).x;
                 Float d, a, b, c, square, xi1, yi1, xi2, yi2;
 
@@ -382,24 +386,23 @@ public class Zone extends Overlappable {
         }
     }
 
-    public Box getBox(float x, float y) {
+    public com.zombies.map.building.Box getBox(float x, float y) {
         for (Zone z : getAdjZones(C.DRAW_DISTANCE))
             for (Box b : z.getBoxes())
                 if (b.contains(x, y))
                     return b;
         return null;
     }
-    public Box getBox(Vector2 v) {
+    public com.zombies.map.building.Box getBox(Vector2 v) {
         return getBox(v.x, v.y);
     }
 
-    public Zone addPendingObject(Object o) {
-        synchronized (pendingObjects) {
-            pendingObjects.add(o);
+    public Zone addObject(Object o) {
+        if (compiled && !D.isMainThread()) {
+            synchronized (pendingObjects) { pendingObjects.add(o); }
+            return this;
         }
-        return this;
-    }
-    private Zone addObject(Object o) {
+
         if (o instanceof HasZone)
             ((HasZone) o).setZone(this);
 
@@ -434,19 +437,19 @@ public class Zone extends Overlappable {
         if (o instanceof HasZone)
             ((HasZone) o).setZone(null);
 
-        if (o instanceof Wall)
-            removeWall((Wall) o);
+        if (o instanceof com.zombies.map.building.Wall)
+            removeWall((com.zombies.map.building.Wall) o);
         if (o instanceof Building)
             removeBuilding((Building) o);
         if (o instanceof Room)
             removeRoom((Room) o);
-        if (o instanceof Box)
-            removeBox((Box) o);
+        if (o instanceof com.zombies.map.building.Box)
+            removeBox((com.zombies.map.building.Box) o);
         if (o instanceof StreetNode)
             streetNodes.remove((StreetNode) o);
 
-        if (o instanceof Overlappable)
-            removeOverlappable((Overlappable) o);
+        if (o instanceof PolygonOverlappable)
+            removeOverlappable((PolygonOverlappable) o);
         if (o instanceof Loadable)
             removeLoadable((Loadable) o);
         if (o instanceof Updateable)
@@ -462,7 +465,7 @@ public class Zone extends Overlappable {
     public Vector2 getCenter() { return center; }
     private Set<Overlappable> getOverlappables() { return overlappables; }
     public Set getPendingObjects() { return pendingObjects; }
-    public LinkedHashSet<Box> getBoxes() { return boxes; }
+    public LinkedHashSet<com.zombies.map.building.Box> getBoxes() { return boxes; }
     public LinkedHashSet<Room> getRooms() { return rooms; }
     public LinkedHashSet<Building> getBuildings() { return buildings; }
     public LinkedHashSet<Street> getStreets() { return streets; }
@@ -473,11 +476,11 @@ public class Zone extends Overlappable {
     private void addRoom(Room r) {
         rooms.add(r);
     }
-    private void addBox(Box b) {
+    private void addBox(com.zombies.map.building.Box b) {
         boxes.add(b);
     }
 
-    private void removeWall(Wall w) {
+    private void removeWall(com.zombies.map.building.Wall w) {
         walls.remove(w);
     }
     private void removeBuilding(Building b) {
@@ -487,10 +490,10 @@ public class Zone extends Overlappable {
     }
     private void removeRoom(Room r) {
         rooms.remove(r);
-        for (Box b : r.getBoxes())
+        for (com.zombies.map.building.Box b : r.getBoxes())
             removeObject(b);
     }
-    private void removeBox(Box b) {
+    private void removeBox(com.zombies.map.building.Box b) {
         boxes.remove(b);
     }
 
@@ -506,6 +509,8 @@ public class Zone extends Overlappable {
     }
     private void addLoadable(Loadable l) {
         loadables.add(l);
+        if (loaded)
+            l.load();
     }
     private void removeLoadable(Loadable l) {
         loadables.remove(l);
@@ -520,31 +525,37 @@ public class Zone extends Overlappable {
         return new Vector2(position.x + r.nextFloat() * C.ZONE_SIZE, position.y + r.nextFloat() + C.ZONE_SIZE);
     }
 
-    public HashSet<com.zombies.map.room.Wall> getWalls() { return walls; }
-    private void addWall(com.zombies.map.room.Wall w) { walls.add(w); }
+    public HashSet<com.zombies.map.building.Wall> getWalls() { return walls; }
+    private void addWall(com.zombies.map.building.Wall w) { walls.add(w); }
 
-    public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
+    public HashSet<Overlappable> checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
+        HashSet<Overlappable> overlapped = new HashSet<>();
+
         LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             Set<Overlappable> overlappables = z.getOverlappables();
-            synchronized (overlappables) {
-                for (Overlappable o : overlappables) {
-                    if (ignore != null && ignore.contains(o))
-                        continue;
-                    if (overlappable.overlaps(o))
-                        return o;
-                }
+            for (Overlappable o : overlappables) {
+                if (ignore != null && ignore.contains(o))
+                    continue;
+                if (overlappable.overlaps(o))
+                    overlapped.add(o);
             }
+
+            if (!compiled) continue;
             synchronized (z.getPendingObjects()) {
                 for (Object o : z.getPendingObjects()) {
                     if (ignore != null && ignore.contains(o))
                         continue;
                     if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o))
-                        return (Overlappable) o;
+                        overlapped.add((Overlappable) o);
                 }
             }
         }
-        return null;
+        return overlapped;
+    }
+
+    public float getRoadDensity() {
+        return 0.5f;
     }
 
     public LinkedHashSet<Zone> getAdjZones(int limit) {
@@ -563,26 +574,9 @@ public class Zone extends Overlappable {
         return zones;
     }
 
-    public HashSet<Overlappable> checkOverlap(float x, float y, int limit) {
-        HashSet<Overlappable> overlapped = new HashSet<>();
-        HashSet<Zone> zones = getAdjZones(limit);
-        Iterator<Zone> iterator = zones.iterator();
-        while (iterator.hasNext())
-            iterator.next().checkOverlap(x, y, overlapped);
-        return overlapped;
-    }
-    public HashSet<Overlappable> checkOverlap(Vector2 point, int limit) { return checkOverlap(point.x, point.y, limit);}
-    private HashSet<Overlappable> checkOverlap(float x, float y, HashSet<Overlappable> overlapped) {
-        for (Overlappable o : overlappables)
-            if (o.contains(x, y))
-                overlapped.add(o);
-        return overlapped;
-    }
-
     public void rebuildModel() {
         // only run in modeling thread
         if (modelingThread == null || Thread.currentThread().getId() != modelingThread.getId()) {
-            needsRemodel = true;
             return;
         }
 
@@ -590,13 +584,13 @@ public class Zone extends Overlappable {
         MeshPartBuilder builder = modelBuilder.part("Walls",
                 GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)));
-        for (Wall w : walls)
+        for (com.zombies.map.building.Wall w : walls)
             w.buildRightMesh(builder, center);
         synchronized (modelables) {
             for (MATERIAL m : modelables.keySet()) {
                 builder = modelBuilder.part(m.partName,
                         GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-                        new Material(m.texture.textureAttribute));
+                        new Material(m.texture.attributes));
                 for (ModelMeCallback mc : modelables.get(m))
                     mc.buildModel(builder, center);
             }

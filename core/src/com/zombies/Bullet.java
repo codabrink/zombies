@@ -43,7 +43,7 @@ public class Bullet {
                 // If the fixture is in the stoppingObjects list
                 BodData bodData = ((BodData) fixture.getBody().getUserData());
                 if (bodData.getType().equals("wall")) {
-                    //((com.zombies.map.room.Wall)bodData.getObject()).createHole(point, 2 * C.SCALE);
+                    //((Wall)bodData.getObject()).createHole(a, 2 * C.SCALE);
                 }
 
                 if (bodData != null && Arrays.asList(stoppingObjects).contains(bodData.getType())) {

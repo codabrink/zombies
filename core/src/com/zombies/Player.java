@@ -72,7 +72,7 @@ public class Player extends Unit implements Collideable {
         updateZone();
         updateBox();
 
-        D.players.add(this);
+        D.players[0] = this;
     }
 
     public float getHealth() {
@@ -279,7 +279,7 @@ public class Player extends Unit implements Collideable {
     @Override
     public void update() {
         DebugText.addMessage("position", "Player Position: " + Math.round(body.getPosition().x * 10.0) / 10.0 + " " + Math.round(body.getPosition().y * 10.0) / 10.0);
-        pointLight.set(0.8f, 0.8f, 0.8f, body.getPosition().x, body.getPosition().y, 150, 40000);
+        pointLight.set(5f, 5f, 5f, body.getPosition().x, body.getPosition().y, 150, 40);
         this.handleHealth();
         for (Gun g: guns)
             g.update();
@@ -295,19 +295,11 @@ public class Player extends Unit implements Collideable {
         capSpeed();
         if (Gdx.app.getType() != Application.ApplicationType.Desktop)
             this.applyMove();
-
-        if (D.tick % 10 == 0)
-            updateInfo();
-    }
-
-    private void updateInfo() {
-        D.update();
     }
 
     @Override
     protected void updateZone() {
-        zone = Zone.getZone(body.getPosition());
-        Zone.setCurrentZone(zone);
+        zone = D.currentZone;
     }
     public void removeSurvivor(Survivor s) {survivors.remove(s);}
     public void addSurvivor(Survivor s) {

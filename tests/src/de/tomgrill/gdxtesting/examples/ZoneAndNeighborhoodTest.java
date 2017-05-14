@@ -10,11 +10,10 @@ import com.zombies.C;
 import com.zombies.GameView;
 import com.zombies.Zombies;
 import com.zombies.Zone;
-import com.zombies.interfaces.Gridable;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Building;
-import com.zombies.map.room.Room;
-import com.zombies.util.U;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
+import com.zombies.map.building.room.Room;
+import com.zombies.lib.U;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,7 @@ public class ZoneAndNeighborhoodTest {
         building.compile();
 
         // process pending objects
-        zone.update();
+        zone.update(0);
 
         // assert a room is generating
 		assertTrue(zone.getRooms().size() > 0);
@@ -90,10 +89,10 @@ public class ZoneAndNeighborhoodTest {
         building.compile();
 
         // process pendingObjects lists
-        z1.update();
-        z2.update();
-        z3.update();
-        z4.update();
+        z1.update(0);
+        z2.update(0);
+        z3.update(0);
+        z4.update(0);
 
         // assert corners
         assertTrue(b00.getCorners()[0].x == C.GRID_HALF_SIZE);
@@ -149,11 +148,11 @@ public class ZoneAndNeighborhoodTest {
         assertTrue(building.wallMap.get("1,1,h") != null);
 
         // Test building features
-        Gridable g1 = building.gridMap.get("0,0");
-        Gridable g2 = building.gridMap.get("1,0");
-        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("1,0,v"));
+        IGridable g1 = building.gridMap.get("0,0");
+        IGridable g2 = building.gridMap.get("1,0");
+        assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("1,0,v"));
         g2     = building.gridMap.get("0,1");
-        assertTrue(Building.wallKeyBetweenKeys(g1, g2).equals("0,1,h"));
+        assertTrue(Building.wallKeyBetweenKeys(g1.getKey(), g2.getKey()).equals("0,1,h"));
 
         // test vertical wall positions
         Vector2[] positions = building.wallPositionOf("1,0,v");

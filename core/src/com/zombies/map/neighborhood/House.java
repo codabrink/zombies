@@ -1,7 +1,7 @@
 package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Building;
 
 public class House extends Building {
     private int roomCount;

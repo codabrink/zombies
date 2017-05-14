@@ -2,56 +2,56 @@ package com.zombies.map.neighborhood;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.Zone;
-import com.zombies.abstract_classes.Overlappable;
+import com.zombies.overlappable.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.Streets.StreetConnection;
 import com.zombies.interfaces.Streets.StreetNode;
-import com.zombies.map.room.Building;
-import com.zombies.util.Bounds2;
-import com.zombies.util.G;
-import com.zombies.util.LineSegment;
+import com.zombies.map.building.Building;
+import com.zombies.lib.math.M;
+import com.zombies.lib.math.LineSegment;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 public class Street implements StreetConnection {
-    public static final float RADIUS = 10f;
+    private static final float DEFAULT_RADIUS = 10f;
 
     private StreetSystem streetSystem;
     private LinkedHashSet<StreetSegment> streetSegments = new LinkedHashSet<>();
     private LinkedHashSet<Building> buildings           = new LinkedHashSet<>();
-    private StreetNode n1, n2;
-    private Vector2 p1, p2;
-    private double angle;
-    private boolean compiled = false;
 
-    public static Street createStreet(StreetSystem ss, StreetNode n1, StreetNode n2) {
-        Vector2 p1 = n1.getPosition();
-        Vector2 p2 = n2.getPosition();
-        double angle = G.getAngle(p1, p2);
-        Overlappable overlappable = new Overlappable(getCorners(p1, p2, angle, RADIUS));
+    private float perseverance;
+    private LinkedList<StreetNode> intersections = new LinkedList<>();
+
+    public float angle, radius;
+
+    public static Street createStreet(StreetSystem ss, Vector2 p1, float angle, float length, float radius, float perseverance) {
+        Vector2 p2 = M.projectVector(p1, angle, length);
+        return createStreet(ss, p1, p2, radius, perseverance);
+    }
+    public static Street createStreet(StreetSystem ss, Vector2 p1, Vector2 p2, float radius, float perseverance) {
+        if (radius == 0) radius = DEFAULT_RADIUS;
+        if (perseverance == 0) perseverance = 0.5f;
+
+        Intersection i1 = Intersection.createIntersection(ss, p1);
+        Intersection i2 = Intersection.createIntersection(ss, p2);
+        if (i1 == null || i2 == null) return null;
+
+        PolygonOverlappable polygonOverlappable = new PolygonOverlappable(M.lineToCorners(p1, p2, radius));
 
         for (Zone z : Zone.zonesOnLine(p1, p2))
-            if (z.checkOverlap(overlappable, 0, null) != null)
+            for (Overlappable o : z.checkOverlap(polygonOverlappable, 0, null))
                 return null;
 
-        return new Street(ss, n1, n2, angle, overlappable.getCorners());
+        return new Street(ss, i1, i2, polygonOverlappable.getCorners());
     }
 
-    public static Vector2[] getCorners(Vector2 p1, Vector2 p2, double angle, float radius) {
-        return new Vector2[]{
-                G.projectVector(p1, angle - G.PIHALF, radius),
-                G.projectVector(p2, angle - G.PIHALF, radius),
-                G.projectVector(p2, angle + G.PIHALF, radius),
-                G.projectVector(p1, angle + G.PIHALF, radius)
-        };
-    }
 
-    private Street(StreetSystem ss, StreetNode n1, StreetNode n2, double angle, Vector2[] corners) {
-        p1 = n1.getPosition();
-        p2 = n2.getPosition();
+    private Street(StreetSystem ss, StreetNode n1, StreetNode n2, Vector2[] corners, ) {
+        intersections.push(n1);
+        intersections.push(n2);
 
-        this.angle = angle;
-        this.n1 = n1;
-        this.n2 = n2;
+        angle = (float) M.getAngle(n1.getPosition(), n2.getPosition());
 
         n1.addConnection(this);
         n2.addConnection(this);
@@ -63,7 +63,7 @@ public class Street implements StreetConnection {
         LineSegment reverseLineSegment = new LineSegment(p2, p1);
 
         for (Zone z : Zone.zonesOnLine(p1, p2)) {
-            z.addPendingObject(this);
+            z.addObject(this);
 
             Vector2 i1, i2;
             i1 = z.lineIntersect(lineSegment);
@@ -85,6 +85,10 @@ public class Street implements StreetConnection {
         }
     }
 
+    private generateStreetSegments() {
+        
+    }
+
     public void compile() {
         compiled = true;
     }
@@ -94,14 +98,19 @@ public class Street implements StreetConnection {
 
     @Override
     public float distance(Vector2 p) {
-        return G.distanceOfPointFromLine(p1, p2, p);
+        return M.distanceOfPointFromLine(p1, p2, p);
     }
     @Override
     public double getAngle() { return angle; }
     @Override
     public double getAngle(StreetNode sn) {
         if (sn == n2)
-            return (angle + G.PIHALF) % G.TWOPI;
+            return (angle + M.PIHALF) % M.TWOPI;
         return  angle;
+    }
+
+    @Override
+    public float getLength() {
+        return length;
     }
 }

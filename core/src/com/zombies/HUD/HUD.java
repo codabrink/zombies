@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,7 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.CameraHandle;
 import com.zombies.Zombies;
-import com.zombies.map.room.Box;
+import com.zombies.data.D;
+import com.zombies.map.building.Box;
 import com.zombies.GameView;
 import com.zombies.Zone;
 
@@ -78,10 +78,14 @@ public class HUD implements InputProcessor{
             view.getPlayer().getBody().applyForce(new Vector2(strength, 0), new Vector2(), true);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
             C.DRAW_DISTANCE++;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
+            D.modelCacheValid = false;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
             C.DRAW_DISTANCE--;
+            D.modelCacheValid = false;
+        }
     }
 
     @Override
@@ -162,7 +166,7 @@ public class HUD implements InputProcessor{
 
     @Override
     public boolean scrolled(int amount) {
-        CameraHandle.z += amount * 20;
+        CameraHandle.z = Math.max(CameraHandle.z + amount * 20, 15);
         return true;
     }
 }

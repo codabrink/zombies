@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zombies.data.D;
 import com.zombies.interfaces.Drawable;
-import com.zombies.map.room.Box;
+import com.zombies.map.building.Box;
 
 public class Zombie extends Unit implements Drawable {
     private long lastAttack = System.currentTimeMillis();

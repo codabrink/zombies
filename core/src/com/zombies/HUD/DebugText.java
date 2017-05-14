@@ -10,7 +10,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class DebugText {
-    public static Hashtable<String,String> m = new Hashtable<String, String>();
+    private static Hashtable<String,String> m = new Hashtable<String, String>();
     private static SpriteBatch spriteBatch = new SpriteBatch();
 
     public static void render() {

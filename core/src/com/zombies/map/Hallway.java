@@ -10,13 +10,13 @@ import com.zombies.interfaces.Drawable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.GameView;
 import com.zombies.Zone;
-import com.zombies.map.room.Box;
-import com.zombies.map.room.Building;
+import com.zombies.map.building.Box;
+import com.zombies.map.building.Building;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class Hallway implements Drawable, HasZone {
+public class Hallway implements HasZone {
     public ArrayList<HallwaySegment> segments = new ArrayList<>();
     private Box box;
 
@@ -66,13 +66,6 @@ public class Hallway implements Drawable, HasZone {
 
     public Box getBox() { return box; }
     public Building getBuilding() { return building; }
-
-    @Override
-    public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, ModelBatch modelBatch) {
-        modelBatch.begin(GameView.gv.getCamera());
-        modelBatch.render(modelInstance, GameView.environment);
-        modelBatch.end();
-    }
 
     @Override
     public Zone getZone() {

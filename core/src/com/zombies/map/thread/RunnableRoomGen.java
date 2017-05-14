@@ -1,7 +1,7 @@
 package com.zombies.map.thread;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.map.room.Room;
+import com.zombies.map.building.room.Room;
 
 public class RunnableRoomGen implements Runnable {
     private Vector2 startPosition;
