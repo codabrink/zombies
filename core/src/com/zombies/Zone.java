@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.zombies.HUD.DebugText;
 import com.zombies.interfaces.ZCallback;
 import com.zombies.map.building.Wall;
-import com.zombies.overlappable.Overlappable;
-import com.zombies.overlappable.PolygonOverlappable;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.data.D;
 import com.zombies.interfaces.Drawable;
@@ -32,6 +30,8 @@ import com.zombies.map.building.Building;
 import com.zombies.lib.Assets.MATERIAL;
 import com.zombies.lib.ThreadedModelBuilder;
 import com.zombies.lib.ThreadedModelBuilder.MODELING_STATE;
+import com.zombies.overlappable.Overlappable;
+import com.zombies.overlappable.PolygonOverlappable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class Zone extends PolygonOverlappable implements Loadable {
+public class Zone implements Loadable {
     public static ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder();
     public static Thread modelingThread;
 
@@ -121,18 +121,9 @@ public class Zone extends PolygonOverlappable implements Loadable {
     private Set pendingObjects = Collections.synchronizedSet(new LinkedHashSet());
 
     public Zone(float x, float y) {
-        super(new Vector2(x, y), C.ZONE_SIZE, C.ZONE_SIZE);
-
         position = new Vector2(x, y);
         center = position.cpy().add(C.ZONE_HALF_SIZE, C.ZONE_HALF_SIZE);
         addObject(new Grass(this, C.ZONE_SIZE, C.ZONE_SIZE));
-
-        setCorners(new Vector2[]{
-                position.cpy(),
-                position.cpy().add(C.ZONE_SIZE, 0),
-                position.cpy().add(C.ZONE_SIZE, C.ZONE_SIZE),
-                position.cpy().add(0, C.ZONE_SIZE)
-        });
 
         if (C.ENABLE_DEBUG_LINES) {
             debugLines.add(new DebugLine(new Vector2(position.x, position.y), new Vector2(position.x, position.y + C.ZONE_SIZE)));
@@ -406,29 +397,23 @@ public class Zone extends PolygonOverlappable implements Loadable {
         return getBox(v.x, v.y);
     }
 
-    public Zone addPendingObject(Object o) {
-        if (compiled) {
-            synchronized (pendingObjects) {
-                pendingObjects.add(o);
-            }
-        } else {
-            addObject(o);
+    public Zone addObject(Object o) {
+        if (compiled && !D.isMainThread()) {
+            synchronized (pendingObjects) { pendingObjects.add(o); }
+            return this;
         }
 
-        return this;
-    }
-    private Zone addObject(Object o) {
         if (o instanceof HasZone)
             ((HasZone) o).setZone(this);
 
-        if (o instanceof com.zombies.map.building.Wall)
-            addWall((com.zombies.map.building.Wall) o);
+        if (o instanceof Wall)
+            addWall((Wall) o);
         if (o instanceof Building)
             addBuilding((Building) o);
         if (o instanceof Room)
             addRoom((Room) o);
-        if (o instanceof com.zombies.map.building.Box)
-            addBox((com.zombies.map.building.Box) o);
+        if (o instanceof Box)
+            addBox((Box) o);
 
         if (o instanceof Street)
             streets.add((Street) o);
@@ -543,7 +528,9 @@ public class Zone extends PolygonOverlappable implements Loadable {
     public HashSet<com.zombies.map.building.Wall> getWalls() { return walls; }
     private void addWall(com.zombies.map.building.Wall w) { walls.add(w); }
 
-    public Overlappable checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
+    public HashSet<Overlappable> checkOverlap(Overlappable overlappable, int limit, Collection ignore) {
+        HashSet<Overlappable> overlapped = new HashSet<>();
+
         LinkedHashSet<Zone> zones = getAdjZones(limit);
         for (Zone z : zones) {
             Set<Overlappable> overlappables = z.getOverlappables();
@@ -551,7 +538,7 @@ public class Zone extends PolygonOverlappable implements Loadable {
                 if (ignore != null && ignore.contains(o))
                     continue;
                 if (overlappable.overlaps(o))
-                    return o;
+                    overlapped.add(o);
             }
 
             if (!compiled) continue;
@@ -560,11 +547,15 @@ public class Zone extends PolygonOverlappable implements Loadable {
                     if (ignore != null && ignore.contains(o))
                         continue;
                     if (o instanceof Overlappable && overlappable.overlaps((Overlappable) o))
-                        return (Overlappable) o;
+                        overlapped.add((Overlappable) o);
                 }
             }
         }
-        return null;
+        return overlapped;
+    }
+
+    public float getRoadDensity() {
+        return 0.5f;
     }
 
     public LinkedHashSet<Zone> getAdjZones(int limit) {

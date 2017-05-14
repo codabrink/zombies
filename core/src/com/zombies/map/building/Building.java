@@ -3,6 +3,8 @@ package com.zombies.map.building;
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.C;
 import com.zombies.Zone;
+import com.zombies.overlappable.CircleOverlappable;
+import com.zombies.overlappable.Overlappable;
 import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.HasZone;
 import com.zombies.map.Hallway;
@@ -139,16 +141,16 @@ public class Building implements HasZone {
         return boxes;
     }
 
-    public PolygonOverlappable checkOverlap(int[] key) {
+    public Overlappable checkOverlap(int[] key) {
         return checkOverlap(key, 0);
     }
-    public PolygonOverlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
+    public Overlappable checkOverlap(int[] key, float margin) { // margin; lke CSS margin. The area around an area.
         BuildingGridable g = gridMapGet(key);
         if (g != null)
             return g;
         return checkOverlap(key, C.GRIDSIZE, C.GRIDSIZE, margin);
     }
-    public PolygonOverlappable checkOverlap(int[] key, float width, float height, float margin) {
+    public Overlappable checkOverlap(int[] key, float width, float height, float margin) {
         Vector2 position = positionOf(key);
         Zone    zone     = Zone.getZone(position);
         return zone.checkOverlap(new PolygonOverlappable(position, width, height), 1, gridMap.values());

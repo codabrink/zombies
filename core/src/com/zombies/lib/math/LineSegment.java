@@ -2,26 +2,25 @@ package com.zombies.lib.math;
 
 import com.badlogic.gdx.math.Vector2;
 import com.zombies.interfaces.Geom.Line;
-import com.zombies.lib.math.M;
 
 public class LineSegment implements Line {
-    public Vector2 p1, p2;
+    public Vector2 a, b;
     public float[] formula;
-    public LineSegment(Vector2 p1, Vector2 p2) {
-        this.p1 = p1;
-        this.p2 = p2;
-        formula = M.line(p1, p2);
+    public LineSegment(Vector2 a, Vector2 b) {
+        this.a = a;
+        this.b = b;
+        formula = M.line(a, b);
     }
 
     public boolean inRange(Vector2 point) {
-        return (point.x == p1.x && p1.x == p2.x || M.inRange(point.x, p1.x, p2.x)) &&
-                (point.y == p1.y && p1.y == p2.y || M.inRange(point.y, p1.y, p2.y));
+        return (point.x == a.x && a.x == b.x || M.inRange(point.x, a.x, b.x)) &&
+                (point.y == a.y && a.y == b.y || M.inRange(point.y, a.y, b.y));
     }
 
     @Override
     public boolean inRangeInclusive(Vector2 point) {
-        return (point.x == p1.x && p1.x == p2.x || M.inRangeInclusive(point.x, p1.x, p2.x)) &&
-                (point.y == p1.y && p1.y == p2.y || M.inRangeInclusive(point.y, p1.y, p2.y));
+        return (point.x == a.x && a.x == b.x || M.inRangeInclusive(point.x, a.x, b.x)) &&
+                (point.y == a.y && a.y == b.y || M.inRangeInclusive(point.y, a.y, b.y));
     }
 
     @Override

@@ -1,13 +1,10 @@
 package com.zombies.overlappable;
 
 import com.badlogic.gdx.math.Vector2;
-import com.zombies.C;
 import com.zombies.lib.math.LineSegment;
 import com.zombies.lib.math.M;
 import com.zombies.lib.math.Ray;
 import com.zombies.lib.U;
-
-import java.util.HashSet;
 
 public class PolygonOverlappable implements Overlappable {
     public Vector2    position, center;
@@ -123,9 +120,9 @@ public class PolygonOverlappable implements Overlappable {
         for (LineSegment ls : lines) {
             Vector2 intersection = ls.intersectionPointInclusive(lineSegment);
             if (intersection == null) continue;
-            if (!(result == null || intersection.dst(lineSegment.p1) < intersectionDst)) continue;
+            if (!(result == null || intersection.dst(lineSegment.a) < intersectionDst)) continue;
 
-            intersectionDst = intersection.dst(lineSegment.p1);
+            intersectionDst = intersection.dst(lineSegment.a);
             result          = intersection;
         }
         return result;

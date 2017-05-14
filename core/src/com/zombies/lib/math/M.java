@@ -49,6 +49,19 @@ public class M {
         return point;
     }
 
+    public static Vector2[] lineToCorners(LineSegment l, float r) {
+        return lineToCorners(l.a, l.b, r);
+    }
+    public static Vector2[] lineToCorners(Vector2 a, Vector2 b, float r) {
+        double angle = getAngle(a, b);
+        return new Vector2[]{
+                M.projectVector(a, angle - M.PIHALF, r),
+                M.projectVector(b, angle - M.PIHALF, r),
+                M.projectVector(b, angle + M.PIHALF, r),
+                M.projectVector(a, angle + M.PIHALF, r)
+        };
+    }
+
     public static float[] line(Vector2 p1, Vector2 p2) {
         float A = p1.y - p2.y;
         float B = p2.x - p1.x;

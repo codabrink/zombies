@@ -8,6 +8,11 @@ public class CircleOverlappable implements Overlappable {
     public Vector2 position;
     public float radius;
 
+    public CircleOverlappable(Vector2 p, float r) {
+        position = p;
+        radius   = r;
+    }
+
     @Override
     public boolean overlaps(CircleOverlappable co) {
         return position.dst(co.position) < radius + co.radius;

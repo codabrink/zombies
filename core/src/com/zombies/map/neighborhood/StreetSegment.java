@@ -18,14 +18,13 @@ import com.zombies.lib.ThreadedModelBuilder;
 
 public class StreetSegment extends PolygonOverlappable {
     public LineSegment line;
-    public Vector2 p1, p2, center;
+    public Vector2 a, b, center;
     public double angle;
     private float width, height;
-    private Vector2[] corners = new Vector2[4];
+    public float length, surfaceArea;
     private Zone zone;
     private Street street;
     private ThreadedModelBuilder modelBuilder = new ThreadedModelBuilder();
-
 
     public static StreetSegment createStreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
         if (p1.x == p2.x && p1.y == p2.y)
@@ -34,20 +33,19 @@ public class StreetSegment extends PolygonOverlappable {
         return new StreetSegment(street, p1, p2, angle);
     }
 
-    private StreetSegment(Street street, Vector2 p1, Vector2 p2, double angle) {
-        this.p1     = p1;
-        this.p2     = p2;
+    private StreetSegment(Street street, Vector2 a, Vector2 b, double angle) {
+        this.a      = a;
+        this.b      = b;
         this.angle  = angle;
         this.street = street;
-
-        line       = new LineSegment(p1, p2);
-        center     = M.center(p1, p2);
-        width      = p1.dst(p2);
-        height     = Street.RADIUS * 2;
-
+        line        = new LineSegment(a, b);
+        center      = M.center(a, b);
+        length      = a.dst(b);
+        surfaceArea = length * street.radius;
         zone = Zone.getZone(center);
         zone.addPendingObject(this);
-        compile();
+
+        setCorners(M.lineToCorners(line, width / 2));
 
         final float fangle = (float) angle;
         modelBuilder.setCallback(new ThreadedModelBuilderCallback() {
@@ -64,14 +62,13 @@ public class StreetSegment extends PolygonOverlappable {
         buildMesh();
     }
 
-    private void compile() {
-        // corners are counter clockwise from p1
-        corners[0] = new Vector2(M.projectVector(p1, angle + M.THRPIHALF, Street.RADIUS));
-        corners[1] = new Vector2(M.projectVector(p2, angle + M.THRPIHALF, Street.RADIUS));
-        corners[2] = new Vector2(M.projectVector(p2, angle + M.PIHALF, Street.RADIUS));
-        corners[3] = new Vector2(M.projectVector(p1, angle + M.PIHALF, Street.RADIUS));
+    @Override
+    public boolean overlaps(PolygonOverlappable po) {
+        if (!(po instanceof StreetSegment)) return super.overlaps(po);
 
-        setCorners(corners);
+        StreetSegment otherSegment = (StreetSegment) po;
+        Vector2 p = otherSegment.line.intersectionPoint(line);
+        return Math.min(p.dst(a), p.dst(b)) < Intersection.MIN_INTERSECTION_DISTANCE;
     }
 
     private void buildMesh() {

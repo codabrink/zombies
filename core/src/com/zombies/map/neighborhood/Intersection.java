@@ -10,42 +10,41 @@ import com.zombies.lib.math.M;
 import java.util.LinkedHashMap;
 
 public class Intersection implements StreetNode {
-    public final static double minAngleDelta = Math.PI / 8;
+    public final static float MIN_DELTA_ANGLE = (float) (Math.PI / 8);
+    public static final float MIN_INTERSECTION_DISTANCE = 1f;
 
     private StreetSystem streetSystem;
     private Vector2      position;
-    private float        dstFromCenter, orientation;
+    private float        dstFromCenter, angle;
 
     private Zone zone;
     public LinkedHashMap<Float, StreetConnection> connections = new LinkedHashMap<>();
 
-    public static StreetNode createIntersection(StreetSystem ss, Vector2 p) {
+    public static Intersection createIntersection(StreetSystem ss, Vector2 p) {
+        for (StreetNode sn : ss.getNodes())
+            if (sn.getPosition().dst(p) < MIN_INTERSECTION_DISTANCE)
+                return null;
         return new Intersection(ss, p, (float) M.getAngle(ss.getCenter(), D.player().getPosition()));
     }
-    public static StreetNode createIntersection(StreetSystem ss, Vector2 p, StreetNode sn) {
-        return null;
-    }
 
-    private Intersection(StreetSystem ss, Vector2 p, float o) {
+    private Intersection(StreetSystem ss, Vector2 p, float angle) {
         position      = p;
         streetSystem  = ss;
-        orientation   = o;
+        this.angle = angle;
 
         dstFromCenter = p.dst(ss.getCenter());
         zone          = Zone.getZone(p);
-        streetSystem.addNode(this);
     }
 
     public void compile() {
-
+        streetSystem.addNode(this);
     }
 
     @Override
     public Vector2 getPosition() { return position; }
 
-    @Override
-    public float getOrientation() {
-        return orientation;
+    public float getAngle() {
+        return angle;
     }
 
     @Override
@@ -66,7 +65,7 @@ public class Intersection implements StreetNode {
     @Override
     public boolean checkAvailability(StreetConnection connection) {
         for (StreetConnection sc : connections.values())
-            if (M.angleDelta(sc.getAngle(this), connection.getAngle(this)) < minAngleDelta)
+            if (M.angleDelta(sc.getAngle(this), connection.getAngle(this)) < MIN_DELTA_ANGLE)
                 return false;
         return true;
     }

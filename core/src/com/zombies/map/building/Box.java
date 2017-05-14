@@ -12,6 +12,7 @@ import com.zombies.Survivor;
 import com.zombies.Unit;
 import com.zombies.Zombie;
 import com.zombies.Zone;
+import com.zombies.overlappable.Overlappable;
 import com.zombies.overlappable.PolygonOverlappable;
 import com.zombies.interfaces.*;
 import com.zombies.map.building.door.DoorContainer;
@@ -48,7 +49,6 @@ public class Box extends BuildingGridable {
     private int id;
 
     public static Box createBox(Room room, int[] key) {
-        PolygonOverlappable o = room.getBuilding().checkOverlap(key);
         if (room.getBuilding().checkOverlap(key) != null)
             return null;
         return new Box(room, key);

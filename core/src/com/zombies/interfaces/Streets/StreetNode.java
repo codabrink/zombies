@@ -7,7 +7,7 @@ public interface StreetNode {
     void addConnection(StreetConnection sc);
     boolean checkAvailability(StreetConnection sc);
     Vector2 getPosition();
-    float getOrientation();
+    float getAngle();
     Zone getZone();
     float dstFromCenter();
 }
